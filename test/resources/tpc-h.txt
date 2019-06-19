@@ -1,0 +1,13 @@
+% Consulta per retornar les línies de comanda que s'han processat abans que es confirmés la comanda
+@1 :- LINEITEM_COMMITDATE(LI, O, LD), ORDER_ORDERDATE(O, OD), LD < OD
+
+% Consuta per retornar les comandes que no tenen cap línia			  
+@2 :- ORDERS(O), not(Aux(O))
+Aux(O) :- LINEITEM(LI, O)
+
+% Consulta per retornar les línies de comanda tals que el seu proveïdor té el mateix nom que el client de la comanda
+@3 :- LINEITEM_SUPPKEY(LI, O, S), ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N)
+
+% Consulta per retorna les línides de comanda la PART de les quals no té cap proveïdor d'un país diferent al proveïdor actual
+@4 :- LINEITEM_PARTKEY(LI, O, P), LINEITEM_SUPPKEY(LI, O, S), SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N))
+Aux2(P, N) :- PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), N<>N2

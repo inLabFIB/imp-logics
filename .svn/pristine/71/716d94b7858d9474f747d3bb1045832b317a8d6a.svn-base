@@ -1,0 +1,243 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.upc.mpi.tpch;
+
+import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
+import edu.upc.mpi.logicschema.LogicSchema;
+import edu.upc.mpi.parser.LogicSchemaParser;
+import java.io.File;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+/**
+ *
+ * @author Xavier
+ */
+public class TpcHTest {
+   
+    private void assertEqualsNoSpaces(String expected, String result) {
+        expected = expected.replaceAll(" ","");
+        result = result.replaceAll(" ", "");
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void test(){
+        File tpcFile = new File("test\\resources\\tpc-h.txt");
+        assert tpcFile.exists():"File "+tpcFile.getAbsolutePath()+" does not exists";
+        
+        System.out.println("Parsing file");
+        LogicSchemaParser parser = new LogicSchemaParser(tpcFile);
+        parser.parse();
+        LogicSchema schema = parser.getLogicSchema();
+        checkParsedSchema(schema);
+        System.out.println("Everything is ok");
+        
+        System.out.println("Augmenting schema");
+        LogicSchemaAugmenter augmenter = new LogicSchemaAugmenter(schema);
+        augmenter.augment();
+        checkAugmentedConstraints(augmenter.getAugmentedLogicSchema());
+        checkDerivationRules(augmenter.getAugmentedLogicSchema());
+        
+    }
+    
+    private void checkParsedSchema(LogicSchema schema){
+        String expected1 = "@1 :- LINEITEM_ORDERKEY(LI, O), LINEITEM_COMMITDATE(LI, LD), ORDER_ORDERDATE(O, OD), LD < OD";
+        assertEqualsNoSpaces(expected1, schema.getConstraintByNumber(1).toString());
+        
+        String expected2 = "@2 :- ORDERS(O), not(Aux(O))";
+        assertEqualsNoSpaces(expected2, schema.getConstraintByNumber(2).toString());
+        
+        String expected3 = "@3 :- LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected3, schema.getConstraintByNumber(3).toString());
+        
+        String expected4 = "@4 :- LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N))";
+        assertEqualsNoSpaces(expected4, schema.getConstraintByNumber(4).toString());
+        
+        String expected5 = "Aux(o) :- LINEITEM_ORDERKEY(LI, O)";
+        assertEqualsNoSpaces(expected5, schema.getDerivationRulesByHead("Aux").get(0).toString());
+        
+        String expected6 = "Aux2(P, N) :- PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), N<>N2";
+        assertEqualsNoSpaces(expected6, schema.getDerivationRulesByHead("Aux2").get(0).toString());
+        
+        int numberOfRules = schema.getAllConstraints().size();
+        assertEquals(4, numberOfRules);
+        
+        numberOfRules = schema.getAllDerivationRules().size();
+        assertEquals(2, numberOfRules);
+    }
+
+    private void checkAugmentedConstraints(LogicSchema augmentedLogicSchema) {
+        String expected;
+        expected = "@1000 :- ins_LINEITEM_ORDERKEY(LI, O), ins_LINEITEM_COMMITDATE(LI, LD), ins_ORDER_ORDERDATE(O, OD), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1000).toString());
+        expected = "@1001 :- ins_LINEITEM_ORDERKEY(LI, O), ins_LINEITEM_COMMITDATE(LI, LD), ORDER_ORDERDATE(O, OD), not(del_ORDER_ORDERDATE(O, OD)), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1001).toString());
+        expected = "@1002 :- ins_LINEITEM_ORDERKEY(LI, O), LINEITEM_COMMITDATE(LI, LD), not(del_LINEITEM_COMMITDATE(LI, LD)), ins_ORDER_ORDERDATE(O, OD), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1002).toString());
+        expected = "@1003 :- ins_LINEITEM_ORDERKEY(LI, O), LINEITEM_COMMITDATE(LI, LD), not(del_LINEITEM_COMMITDATE(LI, LD)), ORDER_ORDERDATE(O, OD), not(del_ORDER_ORDERDATE(O, OD)), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1003).toString());
+        expected = "@1004 :- LINEITEM_ORDERKEY(LI, O),  not(del_LINEITEM_ORDERKEY(LI, O)), ins_LINEITEM_COMMITDATE(LI, LD), ins_ORDER_ORDERDATE(O, OD), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1004).toString());
+        expected = "@1005 :- LINEITEM_ORDERKEY(LI, O),  not(del_LINEITEM_ORDERKEY(LI, O)), ins_LINEITEM_COMMITDATE(LI, LD), ORDER_ORDERDATE(O, OD), not(del_ORDER_ORDERDATE(O, OD)), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1005).toString());
+        expected = "@1006 :- LINEITEM_ORDERKEY(LI, O),  not(del_LINEITEM_ORDERKEY(LI, O)), LINEITEM_COMMITDATE(LI, LD), not(del_LINEITEM_COMMITDATE(LI, LD)), ins_ORDER_ORDERDATE(O, OD), LD < OD";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(1006).toString());
+        
+        expected = "@2000 :- ins_ORDERS(O), del_Aux(O)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(2000).toString());
+        expected = "@2001 :- ins_ORDERS(O), not(Aux(O)), not(ins_Aux(O))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(2001).toString());
+        expected = "@2002 :- ORDERS(O), not(del_ORDERS(O)), del_Aux(O)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(2002).toString());
+        
+        expected = "@3000 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3000).toString());
+        expected = "@3001 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3001).toString());
+        expected = "@3002 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3002).toString());
+        expected = "@3003 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3003).toString());
+        expected = "@3004 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3004).toString());
+        expected = "@3005 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3005).toString());
+        expected = "@3006 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3006).toString());
+        expected = "@3007 :- ins_LINEITEM_SUPPKEY(LI, S), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3007).toString());
+        expected = "@3008 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3008).toString());
+        expected = "@3009 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3009).toString());
+        expected = "@3010 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3010).toString());
+        expected = "@3011 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3011).toString());
+        expected = "@3012 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3012).toString());
+        expected = "@3013 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3013).toString());
+        expected = "@3014 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3014).toString());
+        expected = "@3015 :- ins_LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3015).toString());
+        expected = "@3016 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3016).toString());
+        expected = "@3017 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3017).toString());
+        expected = "@3018 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3018).toString());
+        expected = "@3019 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3019).toString());
+        expected = "@3020 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3020).toString());
+        expected = "@3021 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3021).toString());
+        expected = "@3022 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3022).toString());
+        expected = "@3023 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3023).toString());
+        expected = "@3024 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3024).toString());
+        expected = "@3025 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3025).toString());
+        expected = "@3026 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3026).toString());
+        expected = "@3027 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ins_ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3027).toString());
+        expected = "@3028 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3028).toString());
+        expected = "@3029 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), ins_SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N), not(del_CUSTOMER_NAME(C, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3029).toString());
+        expected = "@3030 :- LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O)), ORDER_CUSTOMER(O, C), not(del_ORDER_CUSTOMER(O, C)), SUPPLIER_NAME(S, N), not(del_SUPPLIER_NAME(S, N)), ins_CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(3030).toString());     
+        
+        expected = "@4000 :- ins_LINEITEM_PARTKEY(L, P), ins_LINEITEM_SUPPKEY(LI, S), ins_SUPPLIER_NATIONKEY(S, N), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4000).toString());
+        expected = "@4001 :- ins_LINEITEM_PARTKEY(L, P), ins_LINEITEM_SUPPKEY(LI, S), ins_SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4001).toString());
+        expected = "@4002 :- ins_LINEITEM_PARTKEY(L, P), ins_LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4002).toString());
+        expected = "@4003 :- ins_LINEITEM_PARTKEY(L, P), ins_LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4003).toString());
+        expected = "@4004 :- ins_LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_SUPPLIER_NATIONKEY(S, N), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4004).toString());
+        expected = "@4005 :- ins_LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4005).toString());
+        expected = "@4006 :- ins_LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4006).toString());
+        expected = "@4007 :- ins_LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4007).toString());
+        expected = "@4008 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), ins_LINEITEM_SUPPKEY(LI, S), ins_SUPPLIER_NATIONKEY(S, N), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4008).toString());
+        expected = "@4009 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), ins_LINEITEM_SUPPKEY(LI, S), ins_SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4009).toString());
+        expected = "@4010 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), ins_LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4010).toString());
+        expected = "@4011 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), ins_LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4011).toString());
+        expected = "@4012 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_SUPPLIER_NATIONKEY(S, N), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4012).toString());
+        expected = "@4013 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), ins_SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N)), not(ins_Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4013).toString());
+        expected = "@4014 :- LINEITEM_PARTKEY(L, P), not(del_LINEITEM_PARTKEY(L, P)), LINEITEM_SUPPKEY(LI, S), not(del_LINEITEM_SUPPKEY(LI, S)), SUPPLIER_NATIONKEY(S, N), not(del_SUPPLIER_NATIONKEY(S, N)), del_Aux2(P, N)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4014).toString());
+    
+        int numberOfRules = augmentedLogicSchema.getAllConstraints().size();
+        assertEquals(56, numberOfRules);
+    }
+
+    private void checkDerivationRules(LogicSchema augmentedLogicSchema) {
+        String expected;
+        
+        expected = "Aux(o) :- LINEITEM_ORDERKEY(LI, O)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux").get(0).toString());
+        
+        expected = "Aux'(o) :- ins_LINEITEM_ORDERKEY(LI, O)";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux'").get(0).toString());
+        expected = "Aux'(o) :- LINEITEM_ORDERKEY(LI, O), not(del_LINEITEM_ORDERKEY(LI, O))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux'").get(1).toString());
+        
+        expected = "ins_Aux(o) :- ins_LINEITEM_ORDERKEY(LI, O), not(Aux(o))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("ins_Aux").get(0).toString());
+        
+        expected = "del_Aux(o) :- del_LINEITEM_ORDERKEY(LI, O), not(Aux'(o))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("del_Aux").get(0).toString());
+        
+        
+        expected = "Aux2(P, N) :- PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), N<>N2";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux2").get(0).toString());
+        
+        expected = "Aux2'(P, N) :- ins_PARTSUPP(P, S2), ins_SUPPLIER_NATIONKEY(S2, N2), N<>N2";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux2'").get(0).toString());
+        expected = "Aux2'(P, N) :- ins_PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), not(del_SUPPLIER_NATIONKEY(S2, N2)), N<>N2";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux2'").get(1).toString());
+        expected = "Aux2'(P, N) :- PARTSUPP(P, S2), not(del_PARTSUPP(P, S2)), ins_SUPPLIER_NATIONKEY(S2, N2), N<>N2";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux2'").get(2).toString());
+        expected = "Aux2'(P, N) :- PARTSUPP(P, S2), not(del_PARTSUPP(P, S2)), SUPPLIER_NATIONKEY(S2, N2), not(del_SUPPLIER_NATIONKEY(S2, N2)), N<>N2";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("Aux2'").get(3).toString());
+        
+        expected = "ins_Aux2(P, N) :- ins_PARTSUPP(P, S2), ins_SUPPLIER_NATIONKEY(S2, N2), N<>N2, not(Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("ins_Aux2").get(0).toString());
+        expected = "ins_Aux2(P, N) :- ins_PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), not(del_SUPPLIER_NATIONKEY(S2, N2)), N<>N2, not(Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("ins_Aux2").get(1).toString());
+        expected = "ins_Aux2(P, N) :- PARTSUPP(P, S2), not(del_PARTSUPP(P, S2)), ins_SUPPLIER_NATIONKEY(S2, N2), N<>N2, not(Aux2(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("ins_Aux2").get(2).toString());
+ 
+        expected = "del_Aux2(P, N) :- del_PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), N<>N2, not(Aux2'(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("del_Aux2").get(0).toString());
+        expected = "del_Aux2(P, N) :- PARTSUPP(P, S2), del_SUPPLIER_NATIONKEY(S2, N2), N<>N2, not(Aux2'(P, N))";
+        assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("del_Aux2").get(1).toString());
+        
+        int numberOfRules = augmentedLogicSchema.getAllDerivationRules().size();
+        assertEquals(15, numberOfRules);
+    }
+   
+
+
+}

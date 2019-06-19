@@ -1,0 +1,63 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.upc.mpi.tpch;
+
+import edu.upc.mpi.logicschema.LogicSchema;
+import edu.upc.mpi.parser.LogicSchemaParser;
+import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
+import org.junit.Test;
+
+/**
+ *
+ * @author Xavier
+ */
+public class TpcHTest {
+   
+    private void assertEqualsNoSpaces(String expected, String result) {
+        expected = expected.replaceAll(" ","");
+        result = result.replaceAll(" ", "");
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void test(){
+        System.out.println("Test parsing");
+        File tpcFile = new File("test\\resources\\tpc-h.txt");
+        assert tpcFile.exists():"File "+tpcFile.getAbsolutePath()+" does not exists";
+        
+        LogicSchemaParser parser = new LogicSchemaParser(tpcFile);
+        parser.parse();
+        LogicSchema schema = parser.getLogicSchema();
+        
+        checkParsedSchema(schema);
+    }
+    
+    private void checkParsedSchema(LogicSchema schema){
+        String expected1 = "@1 :- LINEITEM_ORDERKEY(LI, O), LINEITEM_COMMITDATE(LI, LD), ORDER_ORDERDATE(O, OD), LD < LO";
+        assertEqualsNoSpaces(expected1, schema.getConstraintByNumber(1).toString());
+        
+        String expected2 = "@2 :- ORDERS(O), not(Aux(O))";
+        assertEqualsNoSpaces(expected2, schema.getConstraintByNumber(2).toString());
+        
+        String expected3 = "@3 :- LINEITEM_SUPPKEY(LI, S), LINEITEM_ORDERKEY(LI, O), ORDER_CUSTOMER(O, C), SUPPLIER_NAME(S, N), CUSTOMER_NAME(C, N)";
+        assertEqualsNoSpaces(expected3, schema.getConstraintByNumber(3).toString());
+        
+        String expected4 = "@4 :- LINEITEM_PARTKEY(L, P), LINEITEM_SUPPKEY(LI, S), SUPPLIER_NATIONKEY(S, N), not(Aux2(P, N))";
+        assertEqualsNoSpaces(expected4, schema.getConstraintByNumber(4).toString());
+        
+        String expected5 = "Aux(o) :- LINEITEM_ORDERKEY(LI, O)";
+        assertEqualsNoSpaces(expected5, schema.getDerivationRulesByHead("Aux").get(0).toString());
+        
+        String expected6 = "Aux2(P, N) :- PARTSUPP(P, S2), SUPPLIER_NATIONKEY(S2, N2), N<>N2";
+        assertEqualsNoSpaces(expected6, schema.getDerivationRulesByHead("Aux2").get(0).toString());
+    }
+   
+
+
+}
