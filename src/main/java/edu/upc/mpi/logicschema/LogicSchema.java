@@ -18,8 +18,8 @@ import java.util.Map;
 public class LogicSchema {
 	private LinkedList<LogicConstraint> constraints;    //All the constraints
 	private Map<String, Predicate> predicates;           //All the predicates
-        private DerivationRule goal;
-        private Map<String, List<Predicate>> derivedPredicateToSplittedDerivedPredicate; //Map from one derived predicate P to different predicates Pi
+    private DerivationRule goal;
+    private Map<String, List<Predicate>> derivedPredicateToSplittedDerivedPredicate; //Map from one derived predicate P to different predicates Pi
                                                                                             //where each predicate Pi is defined by means of one derivation
                                                                                             //rule of P.
                                                                                             //E.g:   P(x) <- Q(x, y)
@@ -31,9 +31,9 @@ public class LogicSchema {
 	
 	public LogicSchema()
 	{
-            constraints = new LinkedList();
-            predicates = new HashMap();
-            derivedPredicateToSplittedDerivedPredicate = new HashMap();
+            constraints = new LinkedList<>();
+            predicates = new HashMap<>();
+            derivedPredicateToSplittedDerivedPredicate = new HashMap<>();
 	}
 
 
@@ -74,9 +74,9 @@ public class LogicSchema {
          */
 	public void addPredicate(Predicate p)
 	{
-            if(!predicates.containsKey(p.getName())){
-		predicates.put(p.getName(),p);
-            }
+	    if(!predicates.containsKey(p.getName())){
+		    predicates.put(p.getName(),p);
+        }
 	}
       
         /**
@@ -86,7 +86,7 @@ public class LogicSchema {
          */
 	public void addConstraint(LogicConstraint rule)
 	{
-            List<NormalClause> safeRules = new LinkedList();
+            List<NormalClause> safeRules = new LinkedList<>();
             safeRules.add(rule);
             for(NormalClause safeRule: safeRules){
                 for(Predicate p: safeRule.getAllPredicatesClosure()){
@@ -105,7 +105,7 @@ public class LogicSchema {
          */
 	public void addConstraintWithoutCheckingExistance(LogicConstraint rule)
 	{
-            List<NormalClause> safeRules = new LinkedList();
+            List<NormalClause> safeRules = new LinkedList<>();
             safeRules.add(rule);
             for(NormalClause safeRule: safeRules){
 //                for(Predicate p: safeRule.getAllPredicatesClosure()){
@@ -215,7 +215,7 @@ public class LogicSchema {
          * @return a LinkedList containing all the derivation rules of the schema
          */
     public List<DerivationRule> getAllDerivationRules() {
-        LinkedList<DerivationRule> result = new LinkedList();
+        LinkedList<DerivationRule> result = new LinkedList<>();
         for(Predicate p: this.getAllPredicates()){
             result.addAll(p.getDefinitionRules());
         }
@@ -237,7 +237,7 @@ public class LogicSchema {
      * @return a list containing all the constraints and derivation rules of the schema
      */
     public List<NormalClause> getAllNormalClauses() {
-        List<NormalClause> result = new LinkedList();
+        List<NormalClause> result = new LinkedList<>();
         result.addAll(this.getAllConstraints());
         result.addAll(this.getAllDerivationRules());
         return result;
@@ -248,7 +248,7 @@ public class LogicSchema {
      * @return a list containing all the base predicates
      */
     public List<Predicate> getAllBasePredicates() {
-        LinkedList<Predicate> result = new LinkedList();
+        LinkedList<Predicate> result = new LinkedList<>();
         for(Predicate pred: this.getAllPredicates()){
             if(pred.isBase()){
                 result.add(pred);
