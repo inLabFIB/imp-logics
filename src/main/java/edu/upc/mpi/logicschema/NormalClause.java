@@ -238,7 +238,7 @@ public abstract class NormalClause {
      * @return a substitution S from variables to variables such that, the literals following the iterator, after applying the substitution S,
      * are included in the body of nc. S contains all the substitutions of the given substitution Map.
      */
-    private Map<String, String> getVariableToVariableSubstitutionRecursive(Map<String, String> substitution, ListIterator<Literal> iterator, NormalClause nc) {
+    protected Map<String, String> getVariableToVariableSubstitutionRecursive(Map<String, String> substitution, ListIterator<Literal> iterator, NormalClause nc) {
         if(!iterator.hasNext()) return substitution;
         else {
             Literal thisLiteral = iterator.next();
