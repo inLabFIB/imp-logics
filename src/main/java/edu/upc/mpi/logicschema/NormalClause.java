@@ -207,8 +207,7 @@ public abstract class NormalClause {
     public Map<String, String> getVariableToVariableSubstitution(NormalClause nc){
         Map<String, String> headSubstitution = this.getVariableToVariableSubstitutionForHead(nc);
         if(headSubstitution != null){
-            List<Literal> sortedLitersls = getLiteralsAdvancingBuiltInLiterals(this.literals);
-            Map<String, String> substitution = getVariableToVariableSubstitutionRecursive(headSubstitution, sortedLitersls.listIterator(), nc);
+            Map<String, String> substitution = getVariableToVariableSubstitutionForLiterals(headSubstitution, this.literals, nc.getLiterals());
 
             //Checking that unsafe variables are still unsafe
             if(substitution != null){
@@ -232,39 +231,55 @@ public abstract class NormalClause {
 
     /**
      *
-     * @param substitution
-     * @param iterator
-     * @param nc
-     * @return a substitution S from variables to variables such that, the literals following the iterator, after applying the substitution S,
-     * are included in the body of nc. S contains all the substitutions of the given substitution Map.
+     * @param substitution initial substitution to start with. You might invoke it with an empty substitution
+     * @param source
+     * @param target
+     *
+     * @return a new substitution that, when applied to makes source literals, makes source literals be contained in target literals
      */
-    protected Map<String, String> getVariableToVariableSubstitutionRecursive(Map<String, String> substitution, ListIterator<Literal> iterator, NormalClause nc) {
-        if(!iterator.hasNext()) return substitution;
+    public static Map<String, String> getVariableToVariableSubstitutionForLiterals(Map<String, String> substitution, List<Literal> source, List<Literal> target){
+        List<Literal> sortedLitersls = getLiteralsAdvancingBuiltInLiterals(source);
+        return getVariableToVariableSubstitutionForLiteralsRecursive(substitution, sortedLitersls.listIterator(), target);
+    }
+
+    private static Map<String, String> getVariableToVariableSubstitutionForLiteralsRecursive(Map<String, String> substitution, ListIterator<Literal> sourceIterator, List<Literal> target){
+        if(!sourceIterator.hasNext()) return substitution;
         else {
-            Literal thisLiteral = iterator.next();
-            for(Literal ncLiteral: nc.getVariableUnifiableLiterals(thisLiteral, substitution)){
+            Literal thisLiteral = sourceIterator.next();
+            for(Literal ncLiteral: getVariableUnifiableLiterals(substitution, thisLiteral, target)){
                 Map<String, String> newSubstitution = thisLiteral.getVariableToVariableSubstitution(substitution, ncLiteral);
-                Map<String, String> result = getVariableToVariableSubstitutionRecursive(newSubstitution, iterator, nc);
+                Map<String, String> result = getVariableToVariableSubstitutionForLiteralsRecursive(newSubstitution, sourceIterator, target);
                 if(result != null){
-                    iterator.previous();
+                    sourceIterator.previous();
                     return result;
                 }
             }
-            iterator.previous();
+            sourceIterator.previous();
             return null;
         }
     }
 
     /**
-     * @param thisLiteral
+     * @param thatLiteral
      * @param substitution
      * @return a list of the literals of this that can be unified with thatLiteral after applying the substitution S,
      * but without substituting any variable for a term.
      */
     private List<Literal> getVariableUnifiableLiterals(Literal thatLiteral, Map<String, String> substitution) {
+        return getVariableUnifiableLiterals(substitution, thatLiteral, this.literals);
+    }
+
+    /**
+     * @param sourceLiteral
+     * @param target
+     * @param substitution
+     * @return a list of the literals of target that can be unified with sourceLiteral after applying the substitution,
+     * but without substituting any variable for a term.
+     */
+    public static List<Literal> getVariableUnifiableLiterals(Map<String, String> substitution, Literal sourceLiteral, List<Literal> target) {
         List<Literal> result = new LinkedList<Literal>();
-        for(Literal thisLiteral: this.literals){
-            if(thatLiteral.isVariableUnifiable(thisLiteral, substitution)) result.add(thisLiteral);
+        for(Literal thisLiteral: target){
+            if(sourceLiteral.isVariableUnifiable(thisLiteral, substitution)) result.add(thisLiteral);
         }
         return result;
     }
@@ -320,7 +335,6 @@ public abstract class NormalClause {
     }
 
     /**
-     * @param predicateName
      * @return a list containing all the positive OrdinaryLiterals directly
      * from the body or in the body of a positive derivation rule
      */
@@ -367,7 +381,7 @@ public abstract class NormalClause {
 
     /**
      *
-     * @param uniqueTerm
+     * @param term
      * @return a list containing all the positive ordinary literals that uses the term given by parameter.
      * This method does not unfold derived literals.
      * 
@@ -427,7 +441,7 @@ public abstract class NormalClause {
      * Returns:
      * P(x, y), x > y, Q(y, z)
      */
-    private List<Literal> getLiteralsAdvancingBuiltInLiterals(List<Literal> literals) {
+    private static List<Literal> getLiteralsAdvancingBuiltInLiterals(List<Literal> literals) {
         List<OrdinaryLiteral> ordinaryLiterals = new LinkedList();
         List<BuiltInLiteral> builtInLiterals = new LinkedList();
 
