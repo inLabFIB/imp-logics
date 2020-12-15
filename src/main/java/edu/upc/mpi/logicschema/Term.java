@@ -89,12 +89,11 @@ public class Term {
      * is a variable before calling this method.
      * 
      * @param name != null && name != ""
-     * @throws MPILogicSchema.Exceptions.ConstantsCannotBeRenamedException 
      */
     public void setName(String name) {
         assert name != null:"The name of a term cannot be null";
         assert !name.equals(""):"The name of a term cannot be empty";
-        assert this.isVariable():"This term is not a variable";
+        assert this.nameIsModifiable():"This term cannot change its name";
         assert this.isValidName(name):"Given term name is not valid: "+name;
         this.name = name;
     }
@@ -112,6 +111,10 @@ public class Term {
                 return false;
             }
         }
+    }
+
+    public boolean nameIsModifiable(){
+        return !this.isConstant();
     }
 
     public boolean isVariable() {
