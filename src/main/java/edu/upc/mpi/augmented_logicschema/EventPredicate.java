@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.augmented_logicschema;
 
 import edu.upc.mpi.logicschema.Predicate;
@@ -15,7 +10,6 @@ import edu.upc.mpi.logicschema.Predicate;
  * E.g. given the predicate "P", "ins_P" is an augmented predicate representing
  * an insertion in the predicate P.
  * 
- * @author Xavier Oriol Hilari
  */
 public class EventPredicate extends Predicate {
     private final EventType eventType;

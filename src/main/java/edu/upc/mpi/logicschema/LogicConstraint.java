@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.logicschema;
 
 import java.util.HashMap;
@@ -13,7 +8,6 @@ import java.util.Set;
 
 /**
  * Implementation of a logic constraint. That is, a NormalClause  without head
- * @author Xavier Oriol
  */
 public class LogicConstraint extends NormalClause{
     private static int nextID = 1;                    
@@ -41,6 +35,15 @@ public class LogicConstraint extends NormalClause{
     public LogicConstraint(List<Literal> literals){
         super(literals);
         id = nextID++;
+    }
+
+    /**
+     * This function is a quick patch to reset the constraints ID numbering to 1.
+     * This function will be removed
+     */
+    @Deprecated
+    public static void reset(){
+        nextID = 1;
     }
 
     /**
@@ -118,7 +121,7 @@ public class LogicConstraint extends NormalClause{
 
    /**
      *
-     * @param givenConstraint
+     * @param literals
      * @return whether this constraint is a subset of the given literals list
      */
     public boolean isSubsetOf(List<Literal> literals) {

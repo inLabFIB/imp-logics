@@ -10,7 +10,6 @@ import java.util.Set;
 /**
  * Implementation of the logic BuiltInLiteral.
  *
- * @author Guillem Lubary & Xavier Oriol
  */
 public class BuiltInLiteral extends Literal {
 

@@ -13,7 +13,6 @@ import java.util.Set;
 
 /**
  * Implementation of a logic normal clause
- * @author Guillem Lubary & Xavier Oriol
  */
 public abstract class NormalClause {
     	private final List<Literal> literals;               //Body

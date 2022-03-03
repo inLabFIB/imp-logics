@@ -13,7 +13,6 @@ import java.util.Set;
  * Implementation of a logic Atom.
  * An Atom consists of a Predicate (e.g. "Employee") together with a list of Terms.
  *
- * @author Xavier Oriol
  */
 public class Atom {
     private final List<Term> terms;             //List of terms of the atom

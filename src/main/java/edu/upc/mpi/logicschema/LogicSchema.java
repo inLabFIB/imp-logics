@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  * This class implements the logic trnslation representation of a conceptual schema.
  *
- * @author Oriol Hilari
  */
 public class LogicSchema {
 	private LinkedList<LogicConstraint> constraints;    //All the constraints

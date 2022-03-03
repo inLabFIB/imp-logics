@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package edu.upc.mpi.logicschema;
 
 /**
  * Simple implementation of a logic predicate abstract class
  * 
- * @author Xavier Oriol
  */
 public class PredicateImpl extends Predicate{
     private final String name;

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.parser;
 
 
@@ -24,7 +19,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
  - Invoke parse()
  - Invoke getLogicSchema()
  * 
- * @author Xavier Oriol Hilari
  */
 public class LogicSchemaParser {
     private final String stringSchema;

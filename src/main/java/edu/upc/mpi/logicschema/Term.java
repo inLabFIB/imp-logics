@@ -14,7 +14,6 @@ import java.util.Objects;
  *  - strings surrounded by " " (e.g. "John", "Mary").
  * Anything else is a variable (e.g. x, y, John, Mary, etc)
  * 
- * @author Xavier Oriol
  */
 public class Term {
     private String name;

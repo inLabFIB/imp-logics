@@ -9,7 +9,6 @@ import java.util.Set;
 /**
  * Implementation of a logic OrdinaryLiteral
  *
- * @author Guillem Lubary & Xavier Oriol
  */
 public class OrdinaryLiteral extends Literal {
 

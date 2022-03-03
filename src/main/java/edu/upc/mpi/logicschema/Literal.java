@@ -8,7 +8,6 @@ import java.util.Set;
 /**
  * Implementation of the logic literal.
  *
- * @author Guillem Lubary & Xavier Oriol
  */
 public abstract class Literal {
         public abstract Set<String> getVariablesNames();

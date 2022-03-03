@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.logicschema;
 
 import java.util.HashMap;
@@ -15,7 +10,6 @@ import java.util.Set;
 /**
  * Implementation of a logic derivation rule. That is, a NormalClause with head
  * 
- * @author Xavier Oriol
  */
 public class DerivationRule extends NormalClause{
         private final Atom head;

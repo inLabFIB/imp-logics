@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.logicschema;
 
 import java.util.HashSet;
@@ -14,7 +9,6 @@ import java.util.Set;
 /**
  * Implementation of a logic predicate.
  *
- * @author Xavier Oriol
  */
 public abstract class Predicate{
     private final List<DerivationRule> definitionRules = new LinkedList();

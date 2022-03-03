@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.upc.mpi.logicschema_normalizer;
 
 import edu.upc.mpi.logicschema.Atom;
@@ -30,7 +25,6 @@ import java.util.Set;
  * Important: this method corrupts the input logicSchema. Please, use
  * only the output logic schema after calling augment()
  * 
- * @author Xavier Oriol Hilari
  */
 public class LogicSchemaNormalizer{
     private final LogicSchema inputLogicSchema;

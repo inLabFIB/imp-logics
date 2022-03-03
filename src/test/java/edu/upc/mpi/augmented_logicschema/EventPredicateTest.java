@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.upc.mpi.augmented_logicschema;
 
 import edu.upc.mpi.augmented_logicschema.EventPredicate;
@@ -15,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  *
- * @author Xavier
  */
 public class EventPredicateTest {
     

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edu.upc.mpi.parser;
 
 import edu.upc.mpi.augmented_logicschema.EventPredicate;
@@ -26,7 +21,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  *
- * @author Oriol Hilari
  */
 public class LogicSchemaGrammarVisitorImpl extends LogicSchemaGrammarBaseVisitor{
     private LogicSchema logicSchema;
