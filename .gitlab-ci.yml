@@ -1,0 +1,37 @@
+image: maven:3-openjdk-8-slim
+cache:
+  paths:
+    - ./.m2/repository
+  key: ${CI_COMMIT_REF_SLUG}
+
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+stages:
+  - test
+  - build
+  - deploy
+
+test:unit:
+  stage: test
+  script:
+    - mvn clean test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+
+build:release:
+  stage: build
+  script:
+    - mvn package -DskipTests
+  artifacts:
+    paths:
+      - target/mpilogics-*.jar
+
+deploy:release:
+  stage: deploy
+  script:
+    - mvn deploy -DskipTests -s ci_settings.xml
+

@@ -16,20 +16,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.8.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>4.7.2</version>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.1</version>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -37,19 +32,35 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.1</version>
+                <configuration>
+                    <listener>true</listener>
+                    <visitor>true</visitor>
+                </configuration>
                 <executions>
-                    <!-- Run shade goal on package phase -->
                     <execution>
-                        <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>antlr4</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>inlab-nexe-repository</id>
+            <name>Internal Releases</name>
+            <url>https://nexe.fib.upc.edu/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>inlab-nexe-repository</id>
+            <name>Internal Snapshots</name>
+            <url>https://nexe.fib.upc.edu/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
