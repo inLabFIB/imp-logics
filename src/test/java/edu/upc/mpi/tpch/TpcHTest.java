@@ -7,6 +7,7 @@ import edu.upc.mpi.parser.LogicSchemaParser;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,8 +23,8 @@ public class TpcHTest {
     }
     
     @Test
-    public void test(){
-        File tpcFile = new File("src\\test\\resources\\tpc-h.txt");
+    public void test() throws URISyntaxException {
+        File tpcFile = new File(ClassLoader.getSystemResource("tpc-h.txt").toURI());
         assert tpcFile.exists():"File "+tpcFile.getAbsolutePath()+" does not exists";
         
         System.out.println("Parsing file");
