@@ -45,7 +45,7 @@ public class LogicSchemaNormalizer {
     }
 
     /**
-     * Sort the literals of all Logic constraints and derivation rules
+     * Sort the literals of all Logic constraints and derivaton rules
      * so that, positive literals appear before negative literals, and
      * negative literals before built-in literals
      */
@@ -158,10 +158,13 @@ public class LogicSchemaNormalizer {
                     pred = this.inputLogicSchema.getPredicate(predicateName);
                 }
 
-                pred = new PredicateImpl(predicateName, olit.getTerms().size());
-                this.normalizedLogicSchema.addPredicate(pred);
-                Atom atomHead = new Atom(pred, olit.getTermsCopied());
-                new DerivationRule(atomHead, literals);
+                pred = this.normalizedLogicSchema.getPredicate(predicateName);
+                if(pred == null) {
+                    pred = new PredicateImpl(predicateName, olit.getTerms().size());
+                    this.normalizedLogicSchema.addPredicate(pred);
+                    Atom atomHead = new Atom(pred, olit.getTermsCopied());
+                    new DerivationRule(atomHead, literals);
+                }
 
                 result.add(new OrdinaryLiteral(new Atom(pred, olit.getTermsCopied()), olit.isPositive()));
                 n++;
