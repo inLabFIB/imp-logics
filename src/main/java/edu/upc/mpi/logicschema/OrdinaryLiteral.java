@@ -115,10 +115,10 @@ public class OrdinaryLiteral extends Literal {
         return result;
     }
 
-    @Override
     /**
      * Two OrdinaryLiterals are equals if their atoms are equal
      */
+    @Override
     public boolean equals(Object o) {
         try {
             OrdinaryLiteral l = (OrdinaryLiteral) o;
@@ -138,7 +138,7 @@ public class OrdinaryLiteral extends Literal {
 
     @Override
     public String toString() {
-        String s = new String();
+        String s = "";
         if (!isPositive()) {
             s += "not(";
             s += getAtom().toString();
@@ -247,35 +247,32 @@ public class OrdinaryLiteral extends Literal {
      */
     public List<List<Literal>> getDefinitionRulesWhenCalled(NormalClause rule) {
         Set<String> variablesOfRuleNotToUnify = rule.getVariablesNames();
-        //variablesOfRuleNotToUnify.removeAll(this.getVariablesNames());
         return this.getDefinitionRulesWhenCalled(variablesOfRuleNotToUnify);
     }
 
     public List<List<Literal>> getDefinitionRulesWhenCalled(List<Literal> literals) {
-        Set<String> forbiddenVariables = new HashSet();
+        Set<String> forbiddenVariables = new HashSet<>();
         for(Literal lit: literals){
             forbiddenVariables.addAll(lit.getVariablesNames());
         }
-        //forbiddenVariables.removeAll(this.getVariablesNames());
         return this.getDefinitionRulesWhenCalled(forbiddenVariables);
     }
 
     /**
-     * @rule rule
      * @return a list containing the different possible lists of literals after unfolding this literal recursively.
      * If the literal is base or negated, it just returns a list containing one list of just this.
      * The unfolding takes care not to accidentally bound to some variable of rule.
      */
     public List<List<Literal>> getUnfoldedLiteral(Set<String> forbiddenTerms){
-        List<List<Literal>> result = new LinkedList();
+        List<List<Literal>> result = new LinkedList<>();
         if(this.isBase() || this.isNegated()){
-            List<Literal> list = new LinkedList();
+            List<Literal> list = new LinkedList<>();
             list.add(new OrdinaryLiteral(this));
             result.add(list);
         }else {
             for(List<Literal> literalsList: getDefinitionRulesWhenCalled(forbiddenTerms)){
-                List<List<Literal>> resultForOneDerivationRule = new LinkedList();
-                resultForOneDerivationRule.add(new LinkedList());
+                List<List<Literal>> resultForOneDerivationRule = new LinkedList<>();
+                resultForOneDerivationRule.add(new LinkedList<>());
                 for(Literal literal: literalsList){
                     if(literal instanceof BuiltInLiteral){
                         for(List<Literal> list: resultForOneDerivationRule){
@@ -291,10 +288,10 @@ public class OrdinaryLiteral extends Literal {
     }
 
     private List<List<Literal>> cartesianProduct(List<List<Literal>> list1, List<List<Literal>> list2) {
-        List<List<Literal>> result = new LinkedList();
+        List<List<Literal>> result = new LinkedList<>();
         for(List<Literal> list11: list1){
             for(List<Literal> list22: list2){
-                List<Literal> list1122 = new LinkedList();
+                List<Literal> list1122 = new LinkedList<>();
                 list1122.addAll(list11);
                 list1122.addAll(list22);
                 result.add(list1122);

@@ -1,12 +1,6 @@
 package edu.upc.mpi.logicschema;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -20,13 +14,13 @@ public class Atom {
 
     /**
      * Constructs a new Atom copying the terms of the given atom and using the same predicate.
-     * 
+     *
      * @param atom
      */
     public Atom(Atom atom) {
-        assert atom != null:"Atom cannot be null";
-        
-        terms = new LinkedList();
+        assert atom != null : "Atom cannot be null";
+
+        terms = new LinkedList<>();
         for (Term term : atom.terms) {
             terms.add(term.copy());
         }
@@ -41,13 +35,13 @@ public class Atom {
      * @param terms
      */
     public Atom(Predicate predicate, List<Term> terms) {
-        assert predicate != null:"Predicate cannot be null";
-        assert terms != null:"Terms cannot be null";
-        assert terms.size() == predicate.getArity(): "Predicate " + predicate.getName() + " has arity " + predicate.getArity() + " but you are giving " + terms.size() +" terms";
+        assert predicate != null : "Predicate cannot be null";
+        assert terms != null : "Terms cannot be null";
+        assert terms.size() == predicate.getArity() : "Predicate " + predicate.getName() + " has arity " + predicate.getArity() + " but you are giving " + terms.size() + " terms";
         for (Term term : terms) {
-            assert term != null:"Null term found in "+terms.toString();
+            assert term != null : "Null term found in " + terms;
         }
-        
+
         this.terms = terms;
         this.predicate = predicate;
     }
@@ -56,31 +50,31 @@ public class Atom {
      * @return a copied list of the actual terms
      */
     public List<Term> getTerms() {
-        return new LinkedList(terms);
+        return new LinkedList<>(terms);
     }
-    
+
     /**
      * @return a list of copied terms
      */
     public List<Term> getTermsCopied() {
-        List<Term> result = new LinkedList();
-        for(Term term: this.terms){
+        List<Term> result = new LinkedList<>();
+        for (Term term : this.terms) {
             result.add(term.copy());
         }
         return result;
     }
-    
+
     /**
      * @return a list containing the names of all the terms in this atom
      */
     public List<String> getTermsNamesList() {
-        List<String> result = new LinkedList();
-        for(Term t: this.getTerms()){
+        List<String> result = new LinkedList<>();
+        for (Term t : this.getTerms()) {
             result.add(t.getName());
         }
         return result;
     }
-    
+
     /**
      * @param index
      * @return the actual term appearing in the given index
@@ -88,12 +82,12 @@ public class Atom {
     public Term getTerm(int index) {
         return this.terms.get(index);
     }
-       
+
     /**
      * @return a set containing the names of the variable terms of this atom
      */
     public Set<String> getVariablesNames() {
-        Set<String> result = new HashSet();
+        Set<String> result = new HashSet<>();
         for (Term term : this.getTerms()) {
             if (term.isVariable()) {
                 result.add(term.getName());
@@ -101,14 +95,14 @@ public class Atom {
         }
         return result;
     }
-    
+
     /**
      * @return a copied list of the actual variables of this atom
      */
     public List<Term> getVariables() {
-        List<Term> result = new LinkedList();
-        for(Term term: this.getTerms()){
-            if(term.isVariable()){
+        List<Term> result = new LinkedList<>();
+        for (Term term : this.getTerms()) {
+            if (term.isVariable()) {
                 result.add(term);
             }
         }
@@ -116,14 +110,13 @@ public class Atom {
     }
 
     /**
-     *
      * @param term
      * @return the indexes of the term appearances of the given term in this atom, in ascending order. It might be empty
      */
     public List<Integer> getIndexesOfTerm(Term term) {
-        List<Integer> result = new LinkedList();
-        for(int i = 0; i < this.getPredicateArity(); ++i){
-            if(this.terms.get(i).equals(term)){
+        List<Integer> result = new LinkedList<>();
+        for (int i = 0; i < this.getPredicateArity(); ++i) {
+            if (this.terms.get(i).equals(term)) {
                 result.add(i);
             }
         }
@@ -150,7 +143,7 @@ public class Atom {
     public String getPredicateName() {
         return this.predicate.getName();
     }
-    
+
     /**
      * @return the predicate's arity
      */
@@ -164,21 +157,21 @@ public class Atom {
      * it retuns a copy of this atom.
      */
     public Atom getSubstitutedAtom(Map<String, String> substitution) {
-        List<Term> newTerms = new LinkedList();
-        for (Term term: this.getTerms()) {
+        List<Term> newTerms = new LinkedList<>();
+        for (Term term : this.getTerms()) {
             newTerms.add(term.getSubstitutedTerm(substitution));
         }
         return new Atom(this.predicate, newTerms);
     }
-    
+
     /**
      * @param target
      * @return the substitution of this terms that unifies this atom with the given target atom, or
      * null if no unifying substitution exists.
      */
     public Map<String, String> getUnification(Atom target) {
-        assert target!=null:"Target atom cannot be nulll";
-        
+        assert target != null : "Target atom cannot be nulll";
+
         if (!this.getPredicateName().equals(target.getPredicateName())) {
             return null;
         }
@@ -186,7 +179,7 @@ public class Atom {
             return null;
         }
 
-        Map<String, String> result = new HashMap();
+        Map<String, String> result = new HashMap<>();
 
         Iterator<Term> thisIterator = this.getTerms().iterator();
         Iterator<Term> targetIterator = target.getTerms().iterator();
@@ -207,7 +200,7 @@ public class Atom {
                 return null;
             }
         }
-        assert thisIterator.hasNext() == targetIterator.hasNext() && targetIterator.hasNext() == false;
+        assert thisIterator.hasNext() == targetIterator.hasNext();
 
         return result;
     }
@@ -219,24 +212,21 @@ public class Atom {
      * target, but without substituting any variable for a constant; or null if such substitution
      * does not exists
      */
-    public Map<String, String> getVariableToVariableUnification(Atom target, Map<String, String> currentSubstitution){
-         if(this.getPredicateName().equals(target.getPredicateName())){
+    public Map<String, String> getVariableToVariableUnification(Atom target, Map<String, String> currentSubstitution) {
+        if (this.getPredicateName().equals(target.getPredicateName())) {
             Iterator<Term> thisTerms = this.terms.iterator();
             Iterator<Term> targetTerms = target.getTerms().iterator();
-            Map<String, String> substitution = new HashMap(currentSubstitution);
-            while(thisTerms.hasNext()){
+            Map<String, String> substitution = new HashMap<>(currentSubstitution);
+            while (thisTerms.hasNext()) {
                 Term thisTerm = thisTerms.next();
                 Term targetTerm = targetTerms.next();
                 substitution = thisTerm.getVariableToVariableUnification(targetTerm, substitution);
-                if(substitution == null) return null;
+                if (substitution == null) return null;
             }
             assert !targetTerms.hasNext();
             return substitution;
-        }
-         else return null;
+        } else return null;
     }
-
-    
 
 
     /**
@@ -246,23 +236,13 @@ public class Atom {
      * - unify this atom with the head of the derivation rule.
      * - replace any variable appearing in the given forbiddenVariableNames for another variable name.
      * If the atom is base, it returns an empty list.
-     *
      */
     public List<List<Literal>> getDefinitionRulesWhenCalled(Set<String> forbiddenVariableNames) {
-        List<List<Literal>> result = new LinkedList();
-        Set<String> currentForbiddenVariableNames = forbiddenVariableNames;
-        
-        for(DerivationRule rule: this.getPredicate().getDefinitionRules()){
-            List<Literal> substitutedLiteralsList = rule.applyCallSubstitution(this, currentForbiddenVariableNames);
+        List<List<Literal>> result = new LinkedList<>();
+        for (DerivationRule rule : this.getPredicate().getDefinitionRules()) {
+            List<Literal> substitutedLiteralsList = rule.applyCallSubstitution(this, forbiddenVariableNames);
             result.add(substitutedLiteralsList);
-            Set<String> newVariableNamesToForbid = new HashSet();
-//            for(Literal lit: substitutedLiteralsList){
-//                    newVariableNamesToForbid.addAll(lit.getVariablesNames());
-//            }
-//            newVariableNamesToForbid.removeAll(this.getVariablesNames());
-            currentForbiddenVariableNames.addAll(newVariableNamesToForbid);
         }
-        
         return result;
     }
 
@@ -270,10 +250,10 @@ public class Atom {
      * @param suffix
      * @return a copy of this atom but adding to its current variables the given suffix
      */
-    public Atom getAtomWithVariableSuffix(String suffix){
+    public Atom getAtomWithVariableSuffix(String suffix) {
         Atom result = new Atom(this);
-        for(Term term: result.terms){
-            if(term.isVariable()){
+        for (Term term : result.terms) {
+            if (term.isVariable()) {
                 term.setSuffix(suffix);
             }
         }
@@ -281,7 +261,6 @@ public class Atom {
     }
 
     /**
-     *
      * @return the number of definition rules of its predicate
      */
     public int getNumberOfDefinitionRules() {
@@ -322,15 +301,15 @@ public class Atom {
 
     @Override
     public String toString() {
-        String result = this.getPredicateName() + "(";
+        StringBuilder result = new StringBuilder(this.getPredicateName() + "(");
         boolean commaRequired = false;
         for (Term term : this.terms) {
             if (commaRequired) {
-                result += ",";
+                result.append(",");
             }
-            result += term.toString();
-            commaRequired=true;
+            result.append(term.toString());
+            commaRequired = true;
         }
-        return result += ")";
+        return result + ")";
     }
 }
