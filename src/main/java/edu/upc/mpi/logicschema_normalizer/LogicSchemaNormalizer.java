@@ -45,7 +45,7 @@ public class LogicSchemaNormalizer {
     }
 
     /**
-     * Sort the literals of all Logic constraints and derivaton rules
+     * Sort the literals of all Logic constraints and derivation rules
      * so that, positive literals appear before negative literals, and
      * negative literals before built-in literals
      */
@@ -141,28 +141,33 @@ public class LogicSchemaNormalizer {
      */
     protected List<Literal> getMultipleDerivationRuleUnfolding(OrdinaryLiteral olit) {
         List<Literal> result = new LinkedList<>();
-        
-        if(olit.isBase() || olit.getDefinitionRulesWhenCalled(new LinkedList<>()).size() == 1){
+
+        if (olit.isBase() || olit.getDefinitionRulesWhenCalled(new LinkedList<>()).size() == 1) {
             result.add(olit);
-            return result;
-        }
-        else {
+        } else {
             int n = 1;
-            for(List<Literal> literals: olit.getDefinitionRulesWhenCalled(olit.getVariablesNames())){
-                String predicateName = olit.getPredicateName()+n;
-                Predicate pred = this.normalizedLogicSchema.getPredicate(predicateName);
-                if(pred == null){
-                    //If it does not exist, we create it
-                    pred = new PredicateImpl(predicateName, olit.getTerms().size());
-                    this.normalizedLogicSchema.addPredicate(pred);
-                    Atom atomHead = new Atom(pred, olit.getTermsCopied());
-                    new DerivationRule(atomHead, literals);
+            for (DerivationRule dr: olit.getPredicate().getDefinitionRules()) {
+                List<Literal> literals = dr.getLiterals();
+                String predicateName = olit.getPredicateName() + n;
+
+                //Avoid duplicates with already existing predicates(of the input Schema)
+                Predicate pred = this.inputLogicSchema.getPredicate(predicateName);
+                int m = 0;
+                while(pred != null) {
+                    predicateName = olit.getPredicateName() + n + "." + m++;
+                    pred = this.inputLogicSchema.getPredicate(predicateName);
                 }
+
+                pred = new PredicateImpl(predicateName, olit.getTerms().size());
+                this.normalizedLogicSchema.addPredicate(pred);
+                Atom atomHead = new Atom(pred, olit.getTermsCopied());
+                new DerivationRule(atomHead, literals);
+
                 result.add(new OrdinaryLiteral(new Atom(pred, olit.getTermsCopied()), olit.isPositive()));
                 n++;
             }
-            return result;
         }
+        return result;
     }
 
     /**

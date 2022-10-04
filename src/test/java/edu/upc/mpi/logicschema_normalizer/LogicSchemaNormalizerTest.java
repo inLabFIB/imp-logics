@@ -179,4 +179,40 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         List<List<Literal>> result = instance.getUnfoldedLiterals(literals);
         assertEquals(expResult, result);
     }
+
+    /**
+     * Assert that negative unfolding does not produce duplicate predicate names adding numbers at the end of the old name
+     * INPUT:  [[P11(X,Y), not(P1(X,Y))]]
+     * OUTPUT: [[P11(X,Y), not(P11.0(X,Y)), not(P12(X,Y))]]
+     * ERROR:  [[P11(X,Y), not(P11(X,Y)), not(P12(X,Y))]]
+     */
+    @Test
+    public void testPositiveDerivationRulesNegativeUnfoldingsDontCausePredicateNameRepetitions() {
+        System.out.println("Negative Unfoldings and Predicate Name Repetitions");
+
+        LogicSchemaNormalizer instance = new LogicSchemaNormalizer(this.logicSchema);
+        OrdinaryLiteral olitP11 = this.getOrdinaryLiteral(logicSchema, "P11", new String[]{"X", "Y"});
+        OrdinaryLiteral olitP1 = this.getOrdinaryLiteral(logicSchema, "P1", new String[]{"X", "Y"}, false);
+
+        List<Literal> qDerivationBody1 = new LinkedList<>();
+        qDerivationBody1.add(this.getOrdinaryLiteral(logicSchema, "A", new String[]{"X", "Y"}));
+        new DerivationRule(this.getAtom(logicSchema, "P1", new String[]{"X", "Y"}), qDerivationBody1);
+        List<Literal> qDerivationBody2 = new LinkedList<>();
+        qDerivationBody2.add(this.getOrdinaryLiteral(logicSchema, "B", new String[]{"X", "Y"}));
+        new DerivationRule(this.getAtom(logicSchema, "P1", new String[]{"X", "Y"}), qDerivationBody2);
+
+        List<Literal> negativeUnfoldingResult = instance.getMultipleDerivationRuleUnfolding(olitP1);
+        negativeUnfoldingResult.add(0, olitP11);
+
+        List<List<Literal>> expResult = new LinkedList<>();
+        List<Literal> result1 = new LinkedList<>();
+        result1.add(this.getOrdinaryLiteral(logicSchema, "P11", new String[]{"X", "Y"}));
+        result1.add(this.getOrdinaryLiteral(logicSchema, "P11.0", new String[]{"X", "Y"}, false));
+        result1.add(this.getOrdinaryLiteral(logicSchema, "P12", new String[]{"X", "Y"}, false));
+        expResult.add(result1);
+
+        List<List<Literal>> result = new LinkedList<>();
+        result.add(negativeUnfoldingResult);
+        assertEquals(expResult, result);
+    }
 }
