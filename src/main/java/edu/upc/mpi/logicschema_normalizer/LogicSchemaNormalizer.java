@@ -162,7 +162,7 @@ public class LogicSchemaNormalizer {
                 if(pred == null) {
                     pred = new PredicateImpl(predicateName, olit.getTerms().size());
                     this.normalizedLogicSchema.addPredicate(pred);
-                    Atom atomHead = new Atom(pred, olit.getTermsCopied());
+                    Atom atomHead = new Atom(pred, dr.getHead().getTermsCopied());
                     new DerivationRule(atomHead, literals);
                 }
 
