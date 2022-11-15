@@ -5,6 +5,7 @@ import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema_normalizer.LogicSchemaNormalizer;
 import edu.upc.mpi.parser.LogicSchemaParser;
 import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -12,25 +13,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MPILogicsIntegrationTest {
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
 
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
 
     //Main objective: check time consumption of the whole process(parse + normalise + augment)
@@ -58,6 +45,6 @@ public class MPILogicsIntegrationTest {
         schema = normalizer.getNormalizedLogicSchema();
 
         // Assert (should be improved)
-        assertNotNull(schema.getAllConstraints());
+        assertThat(schema.getAllConstraints()).isNotNull();
     }
 }

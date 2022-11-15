@@ -2,12 +2,13 @@ package edu.upc.mpi.logicschema_normalizer;
 
 import edu.upc.mpi.logicschema.*;
 import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -15,21 +16,9 @@ import static org.junit.Assert.assertEquals;
 public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
     private LogicSchema logicSchema;
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         logicSchema = new LogicSchema();
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**
@@ -54,7 +43,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         expResult.add(this.getOrdinaryLiteral(logicSchema, "R", new String[]{"X", "Y"}, false));
         expResult.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<"));
         List<Literal> result = instance.getSortedLiterals(literals);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -70,7 +59,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         List<Literal> expResult = new LinkedList<>();
         expResult.add(olit);
         List<Literal> result = instance.getMultipleDerivationRuleUnfolding(olit);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
 
         //Testing that a derived literal with only one derivation rule is not modified
         List<Literal> body1 = new LinkedList<>();
@@ -80,7 +69,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         expResult = new LinkedList<>();
         expResult.add(olit);
         result = instance.getMultipleDerivationRuleUnfolding(olit);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
 
         //Testing that a derived literal with two derivation rules is modified
         List<Literal> body2 = new LinkedList<>();
@@ -92,13 +81,13 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         expResult = new LinkedList<>();
         expResult.add(this.getOrdinaryLiteral(logicSchema, "P1", new String[]{"X"}));
         expResult.add(this.getOrdinaryLiteral(logicSchema, "P2", new String[]{"X"}));
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         OrdinaryLiteral P1 = (OrdinaryLiteral) result.get(0);
         OrdinaryLiteral P2 = (OrdinaryLiteral) result.get(1);
-        assertEquals(1, P1.getDefinitionRulesWhenCalled(new LinkedList<>()).size());
-        assertEquals(1, P2.getDefinitionRulesWhenCalled(new LinkedList<>()).size());
-        assertEquals(body1, P1.getDefinitionRulesWhenCalled(new LinkedList<>()).get(0));
-        assertEquals(body2, P2.getDefinitionRulesWhenCalled(new LinkedList<>()).get(0));
+        assertThat(P1.getDefinitionRulesWhenCalled(new LinkedList<>())).size().isEqualTo(1);
+        assertThat(P2.getDefinitionRulesWhenCalled(new LinkedList<>())).size().isEqualTo(1);
+        assertThat(P1.getDefinitionRulesWhenCalled(new LinkedList<>())).first().isEqualTo(body1);
+        assertThat(P2.getDefinitionRulesWhenCalled(new LinkedList<>())).first().isEqualTo(body2);
     }
 
     /**
@@ -139,7 +128,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
 
 
         List<List<Literal>> result = instance.getUnfoldedLiterals(literals);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -177,7 +166,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         expResult.add(result1);
 
         List<List<Literal>> result = instance.getUnfoldedLiterals(literals);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -213,6 +202,6 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
 
         List<List<Literal>> result = new LinkedList<>();
         result.add(negativeUnfoldingResult);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 }

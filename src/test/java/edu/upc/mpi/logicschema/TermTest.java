@@ -1,13 +1,12 @@
 package edu.upc.mpi.logicschema;
 
-import edu.upc.mpi.logicschema.Term;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  *
@@ -17,21 +16,6 @@ public class TermTest {
     public TermTest() {
     }
     
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of getName method, of class Term.
@@ -46,32 +30,32 @@ public class TermTest {
         instance = new Term("\"John\"");
         expResult = "\"John\"";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new Term("John");
         expResult = "John";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
 
         instance = new Term("1");
         expResult = "1";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new Term(1);
         expResult = "1";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new Term(-1);
         expResult = "-1";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new Term("-1.5");
         expResult = "-1.5";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -79,27 +63,17 @@ public class TermTest {
      */
     @Test
     public void testSetName() {
-        System.out.println("setName");
-        Term instance;
-        String expResult, result;
-        
-        instance = new Term("John");
-        try {
-            instance.setName("John Snow");
-            expResult = "John Snow";
-            result = instance.getName();
-            assertEquals(expResult, result);
-        } catch (AssertionError ex) {
-            fail(instance+ "should have been correctly renamed");
-        }
-        
-        instance = new Term("\"John Snow\"");
-        try {
-            instance.setName("John Snow");
-            fail(instance+ "should have not been renamed");
-        } catch (AssertionError ex) {
-            //Ok
-        }
+        Term instance = new Term("John");
+        instance.setName("John Snow");
+        String expResult = "John Snow";
+        String result = instance.getName();
+        assertThat(result).isEqualTo(expResult);
+
+        assertThatExceptionOfType(AssertionError.class)
+                .isThrownBy(() -> {
+                    Term term = new Term("\"John Snow\"");
+                    term.setName("John Snow");
+                });
     }
 
     /**
@@ -107,40 +81,33 @@ public class TermTest {
      */
     @Test
     public void testIsConstant() {
-        System.out.println("isConstant");
 
         Term instance;
-        boolean expResult, result;
+        boolean result;
         
         instance = new Term("\"John\"");
-        expResult = true;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
         
         instance = new Term("John");
-        expResult = false;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
 
         instance = new Term("1");
-        expResult = true;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
         
         instance = new Term(1);
-        expResult = true;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
         
         instance = new Term(-1);
-        expResult = true;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
         
         instance = new Term("-1.5");
-        expResult = true;
         result = instance.isConstant();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
     }
 
     /**
@@ -151,37 +118,31 @@ public class TermTest {
         System.out.println("isVariable");
         
         Term instance;
-        boolean expResult, result;
+        boolean result;
         
         instance = new Term("\"John\"");
-        expResult = false;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
         
         instance = new Term("John");
-        expResult = true;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isTrue();
 
         instance = new Term("1");
-        expResult = false;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
         
         instance = new Term(1);
-        expResult = false;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
         
         instance = new Term(-1);
-        expResult = false;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
         
         instance = new Term("-1.5");
-        expResult = false;
         result = instance.isVariable();
-        assertEquals(expResult, result);
+        assertThat(result).isFalse();
     }
     
     /**
@@ -189,26 +150,19 @@ public class TermTest {
      */
     @Test
     public void testSetSuffix() {
-        System.out.println("setSuffix");
-        
+
         String suffix = "_0";
         Term instance = new Term("x");
-        try {
-            instance.setSuffix(suffix);
-            String expResult = "x_0";
-            String result = instance.getName();
-            assertEquals(expResult, result);
-        } catch (AssertionError ex) {
-            fail("Term should have been correctly renamed");
-        }
+        instance.setSuffix(suffix);
+        String expResult = "x_0";
+        String result = instance.getName();
+        assertThat(result).isEqualTo(expResult);
 
-        instance = new Term("1");
-        try {
-            instance.setSuffix(suffix);
-            fail("Term should have not been renamed");
-        } catch (AssertionError ex) {
-            //Ok
-        }
+        assertThatExceptionOfType(AssertionError.class)
+                .isThrownBy(() -> {
+                    Term term = new Term("1");
+                    term.setSuffix("_0");
+                });
     }
 
     /**
@@ -216,50 +170,49 @@ public class TermTest {
      */
     @Test
     public void testGetSubstitutedTerm() {
-        System.out.println("getSubstitutedTerm");
-        
+
         Term instance;
         Term expResult, result;
         Map<String, String> substitution;
         
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("a", "b");
         instance = new Term("a");
         expResult = instance.getSubstitutedTerm(substitution);
         result = new Term("b");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
 
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("a", "b");
         instance = new Term("b");
         expResult = instance.getSubstitutedTerm(substitution);
         result = new Term("b");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("0", "1");
         instance = new Term("0");
         expResult = instance.getSubstitutedTerm(substitution);
         result = new Term("0");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("a", "b");
         instance = new Term("c");
         expResult = instance.getSubstitutedTerm(substitution);
         result = new Term("c");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         instance = new Term("c");
         expResult = instance.getSubstitutedTerm(substitution);
         result = new Term("c");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new Term("c");
         expResult = instance.getSubstitutedTerm(null);
         result = new Term("c");
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -267,58 +220,55 @@ public class TermTest {
      */
     @Test
     public void testGetVariableToVariableUnification() {
-        System.out.println("getVariableToVariableUnification");
-        
+
         Term thatVariable, instance;
         Map<String, String> substitution, expResult, result;
         
         thatVariable = new Term("b");
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         instance = new Term("a");
-        expResult = new HashMap();
+        expResult = new HashMap<>();
         expResult.put("a","b");
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
 
         thatVariable = new Term("b");
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("a","b");
         instance = new Term("a");
-        expResult = new HashMap();
+        expResult = new HashMap<>();
         expResult.put("a","b");
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         thatVariable = new Term("b");
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         substitution.put("a","c");
         instance = new Term("a");
-        expResult = null;
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isNull();
         
         thatVariable = new Term(1);
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         instance = new Term("a");
-        expResult = null;
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isNull();
         
         thatVariable = new Term(1);
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         instance = new Term(1);
-        expResult = new HashMap();
+        expResult = new HashMap<>();
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         thatVariable = new Term(1);
-        substitution = new HashMap();
+        substitution = new HashMap<>();
         instance = new Term("a");
         substitution.put("a", "1");
-        expResult = new HashMap();
+        expResult = new HashMap<>();
         expResult.put("a","1");
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     

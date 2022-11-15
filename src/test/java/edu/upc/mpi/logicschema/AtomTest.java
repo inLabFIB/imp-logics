@@ -1,14 +1,16 @@
 package edu.upc.mpi.logicschema;
 
 import edu.upc.mpi.logicschema.*;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.*;
+
 
 /**
  *
@@ -26,45 +28,34 @@ public class AtomTest {
                                 //Hero(x) :- Knows(x, y)
     
     //TODO: Still not finished!!
-    
-    public AtomTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
+
+    @BeforeEach
     public void setUp() {
         knows = new PredicateImpl("Knows",2);
-        List<Term> terms = new LinkedList();
+        List<Term> terms = new LinkedList<>();
         terms.add(new Term("\"John Snow\""));
         terms.add(new Term("x"));
         johnSnowAtom = new Atom(knows, terms);
         
         kills = new PredicateImpl("Kills",3);
-        terms = new LinkedList();
+        terms = new LinkedList<>();
         terms.add(new Term("\"Sam\""));
         terms.add(new Term("1"));
         terms.add(new Term("x"));
         samAtom = new Atom(kills, terms);
         
         loves = new PredicateImpl("Loves",2);
-        terms = new LinkedList();
+        terms = new LinkedList<>();
         terms.add(new Term("\"Lannister\""));
         terms.add(new Term("\"Lannister\""));
         lannisterAtom = new Atom(loves, terms);
         
         hero = new PredicateImpl("Hero",1);
-        terms = new LinkedList();
+        terms = new LinkedList<>();
         terms.add(new Term("x"));
         Atom headAtom = new Atom(hero, terms);
-        LinkedList<Literal> literals = new LinkedList();
-        LinkedList<Term> killTerms = new LinkedList();
+        LinkedList<Literal> literals = new LinkedList<>();
+        LinkedList<Term> killTerms = new LinkedList<>();
         killTerms.add(new Term("x"));
         killTerms.add(new Term("y"));
         killTerms.add(new Term("z"));
@@ -72,43 +63,39 @@ public class AtomTest {
         literals.add(new BuiltInLiteral(new Term("y"),new Term(0),">"));
         DerivationRule derivationRuleForKills = new DerivationRule(headAtom, literals);
         
-        literals = new LinkedList();
-        LinkedList<Term> knowsTerms = new LinkedList();
+        literals = new LinkedList<>();
+        LinkedList<Term> knowsTerms = new LinkedList<>();
         knowsTerms.add(new Term("x"));
         knowsTerms.add(new Term("y"));
         literals.add(new OrdinaryLiteral(new Atom(knows, knowsTerms)));
         DerivationRule derivationRuleForKnows = new DerivationRule(new Atom(headAtom), literals);
         
-        terms = new LinkedList();
+        terms = new LinkedList<>();
         terms.add(new Term("\"John Snow\""));
         heroAtom = new Atom(hero, terms);
     }
     
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of getTerms method, of class Atom.
      */
     @Test
     public void testGetTerms() {
-        System.out.println("getTerms");
 
-        List<Term> expResult = new LinkedList();
+        List<Term> expResult = new LinkedList<>();
         expResult.add(new Term("\"John Snow\""));
         expResult.add(new Term("x"));
         List<Term> result = johnSnowAtom.getTerms();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         //Checking that modifying the returned terms list actually modifies the atom
         johnSnowAtom.getTerms().get(1).setName("\"Nothing\"");
         
-        expResult = new LinkedList();
+        expResult = new LinkedList<>();
         expResult.add(new Term("\"John Snow\""));
         expResult.add(new Term("\"Nothing\""));
         result = johnSnowAtom.getTerms();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -116,22 +103,21 @@ public class AtomTest {
      */
     @Test
     public void testGetTermsCopied() {
-        System.out.println("getTermsCopied");
-        
-        List<Term> expResult = new LinkedList();
+
+        List<Term> expResult = new LinkedList<>();
         expResult.add(new Term("\"John Snow\""));
         expResult.add(new Term("x"));
         List<Term> result = johnSnowAtom.getTerms();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         //Checking that modifying the returned terms list does not modify the atom
         johnSnowAtom.getTermsCopied().get(1).setName("\"Nothing\"");
         
-        expResult = new LinkedList();
+        expResult = new LinkedList<>();
         expResult.add(new Term("\"John Snow\""));
         expResult.add(new Term("x"));
         result = johnSnowAtom.getTerms();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -139,13 +125,12 @@ public class AtomTest {
      */
     @Test
     public void testGetTermsNamesList() {
-        System.out.println("getTermsNamesList");
-        
-        List<String> expResult = new LinkedList();
+
+        List<String> expResult = new LinkedList<>();
         expResult.add("\"John Snow\"");
         expResult.add("x");
         List<String> result = johnSnowAtom.getTermsNamesList();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -153,15 +138,14 @@ public class AtomTest {
      */
     @Test
     public void testGetTerm() {
-        System.out.println("getTerm");
-        
+
         Term expResult = new Term("\"John Snow\"");
         Term result = johnSnowAtom.getTerm(0);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         expResult = new Term("x");
         result = johnSnowAtom.getTerm(1);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -169,13 +153,12 @@ public class AtomTest {
      */
     @Test
     public void testGetVariablesNames() {
-        System.out.println("getVariablesNames");
-        
+
         Set<String> result = samAtom.getVariablesNames();
-        Set<String> expResult = new HashSet();
+        Set<String> expResult = new HashSet<>();
         expResult.add("x");
-        
-        assertEquals(expResult, result);
+
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -183,25 +166,24 @@ public class AtomTest {
      */
     @Test
     public void testGetIndexesOfTerm() {
-        System.out.println("getIndexesOfTerm");
-        
+
         Term term = new Term("\"Lannister\"");
-        List<Integer> expResult = new LinkedList();
+        List<Integer> expResult = new LinkedList<>();
         expResult.add(0);
         expResult.add(1);
         List<Integer> result = lannisterAtom.getIndexesOfTerm(term);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         term = new Term("\"Sam\"");
-        expResult = new LinkedList();
+        expResult = new LinkedList<>();
         expResult.add(0);
         result = samAtom.getIndexesOfTerm(term);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         term = new Term("A term not appearing anywhere");
-        expResult = new LinkedList();
+        expResult = new LinkedList<>();
         result = samAtom.getIndexesOfTerm(term);
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -209,13 +191,12 @@ public class AtomTest {
      */
     @Test
     public void testIsBase() {
-        System.out.println("isBase");
 
         boolean expResult = true;
         boolean result = samAtom.isBase();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
-        assertEquals(heroAtom.isBase(), false);
+        assertThat(heroAtom.isBase()).isEqualTo(false);
         
         
     }
@@ -225,12 +206,11 @@ public class AtomTest {
      */
     @Test
     public void testGetPredicateName() {
-        System.out.println("getPredicateName");
-        
+
         Atom instance = samAtom;
         String expResult = "Kills";
         String result = instance.getPredicateName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -238,12 +218,11 @@ public class AtomTest {
      */
     @Test
     public void testGetPredicateArity() {
-        System.out.println("getPredicateArity");
-        
+
         Atom instance = samAtom;
         int expResult = 3;
         int result = instance.getPredicateArity();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 
     /**
@@ -251,19 +230,18 @@ public class AtomTest {
      */
     @Test
     public void testGetDefinitionRulesWhenCalled() {
-        System.out.println("getDefinitionRulesWhenCalled");
-        
+
         Atom instance = samAtom;
-        List<List<Literal>> expResult = new LinkedList();
-        List<List<Literal>> result = instance.getDefinitionRulesWhenCalled(new HashSet());
-        assertEquals(expResult, result);
+        List<List<Literal>> expResult = new LinkedList<>();
+        List<List<Literal>> result = instance.getDefinitionRulesWhenCalled(new HashSet<>());
+        assertThat(result).isEqualTo(expResult);
         
         //Checking for derivation Rules
         instance = heroAtom;
-        expResult = new LinkedList();
+        expResult = new LinkedList<>();
         
-        LinkedList<Literal> literals = new LinkedList();
-        LinkedList<Term> killTerms = new LinkedList();
+        LinkedList<Literal> literals = new LinkedList<>();
+        LinkedList<Term> killTerms = new LinkedList<>();
         killTerms.add(new Term("\"John Snow\""));
         killTerms.add(new Term("y"));
         killTerms.add(new Term("z"));
@@ -271,15 +249,15 @@ public class AtomTest {
         literals.add(new BuiltInLiteral(new Term("y"),new Term(0),">"));
         expResult.add(literals);
         
-        literals = new LinkedList();
-        LinkedList<Term> knowsTerms = new LinkedList();
+        literals = new LinkedList<>();
+        LinkedList<Term> knowsTerms = new LinkedList<>();
         knowsTerms.add(new Term("\"John Snow\""));
         knowsTerms.add(new Term("y"));
         literals.add(new OrdinaryLiteral(new Atom(knows, knowsTerms)));
         expResult.add(literals);
         
-        result = instance.getDefinitionRulesWhenCalled(new HashSet());
-        assertEquals(expResult, result);
+        result = instance.getDefinitionRulesWhenCalled(new HashSet<>());
+        assertThat(result).isEqualTo(expResult);
     }
 
 //    /**

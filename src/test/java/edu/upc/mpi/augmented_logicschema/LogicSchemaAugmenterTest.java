@@ -5,12 +5,13 @@ import edu.upc.mpi.logicschema.Literal;
 import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema.Term;
 import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -21,24 +22,11 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
     public LogicSchemaAugmenterTest() {
     }
     
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
+    @BeforeEach
     public void setUp() {
         logicSchema = new LogicSchema();
     }
     
-    @After
-    public void tearDown() {
-    }
-
-
 
     /**
      * Test of getAumgentedLiterals method, of class LogicSchemaAugmenter.
@@ -47,7 +35,7 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
     public void testGetAugmentedLiterals() {
         System.out.println("getAugmentedLiterals");
         
-        List<Literal> body = new LinkedList();
+        List<Literal> body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "Q", new String[]{"X", "Y"}, false));
         body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
@@ -57,36 +45,36 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
         List<List<Literal>> result = instance.getAugmentedLiterals(body);
         System.out.println(result);
         
-        List<List<Literal>> expResult = new LinkedList();
-        body = new LinkedList();
+        List<List<Literal>> expResult = new LinkedList<>();
+        body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "ins_P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "del_Q", new String[]{"X", "Y"}));
         body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
         expResult.add(body);
         
-        body = new LinkedList();
+        body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "ins_P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "Q", new String[]{"X", "Y"}, false));
         body.add(this.getOrdinaryLiteral(logicSchema, "ins_Q", new String[]{"X", "Y"}, false));
         body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
         expResult.add(body);
         
-        body = new LinkedList();
+        body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "del_P", new String[]{"X","Y"}, false));
         body.add(this.getOrdinaryLiteral(logicSchema, "del_Q", new String[]{"X", "Y"}));
         body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
         expResult.add(body);
         
-        body = new LinkedList();
+        body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "del_P", new String[]{"X","Y"}, false));
         body.add(this.getOrdinaryLiteral(logicSchema, "Q", new String[]{"X", "Y"}, false));
         body.add(this.getOrdinaryLiteral(logicSchema, "ins_Q", new String[]{"X", "Y"}, false));
         body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
         expResult.add(body);
-        
-        assertEquals(expResult, result);
+
+        assertThat(result).isEqualTo(expResult);
     }
     
 }

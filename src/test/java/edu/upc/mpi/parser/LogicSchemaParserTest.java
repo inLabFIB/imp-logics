@@ -2,7 +2,7 @@ package edu.upc.mpi.parser;
 
 import edu.upc.mpi.logicschema.*;
 import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,8 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  *
@@ -18,22 +19,6 @@ import static org.junit.Assert.*;
 public class LogicSchemaParserTest extends LogicSchemaTestHelper {
     
     public LogicSchemaParserTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
     }
     
    
@@ -61,7 +46,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -88,7 +73,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
      /**
@@ -116,7 +101,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -145,7 +130,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
 
     /**
@@ -172,7 +157,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -200,7 +185,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -229,7 +214,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -258,7 +243,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(lc)){
             fail("Expected: "+lc+"\n"+ " but result is: "+result);
         }
-        assertEquals(lc.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(lc.toString());
     }
     
     /**
@@ -296,8 +281,8 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result2.equals(lc2)){
             fail("Expected: "+lc2+"\n"+ " but result is: "+result2);
         }
-        assertEquals(lc1.toString(), result1.toString());
-        assertEquals(lc2.toString(), result2.toString());
+        assertThat(result1.toString()).isEqualTo(lc1.toString());
+        assertThat(result2.toString()).isEqualTo(lc2.toString());
     }
     
     /**
@@ -324,7 +309,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -351,7 +336,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -378,7 +363,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -405,7 +390,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -432,7 +417,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -459,7 +444,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result.equals(expected)){
             fail("Expected: "+expected+"\n"+ " but result is: "+result);
         }
-        assertEquals(expected.toString(), result.toString());
+        assertThat(result.toString()).isEqualTo(expected.toString());
     }
     
     /**
@@ -498,8 +483,8 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         if(!result2.equals(lc2)){
             fail("Expected: "+lc2+"\n"+ " but result is: "+result2);
         }
-        assertEquals(lc1.toString(), result1.toString());
-        assertEquals(lc2.toString(), result2.toString());
+        assertThat(result1.toString()).isEqualTo(lc1.toString());
+        assertThat(result2.toString()).isEqualTo(lc2.toString());
     }
 
     /**
@@ -516,14 +501,14 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         DerivationRule result1 = resultLogicSchema.getDerivationRulesByHead("P").get(0);
         BuiltInLiteral lit = (BuiltInLiteral) result1.getLiterals().get(1);
         System.out.println(lit.getTermNamesList().get(1));
-        assertTrue(lit.getRightTerm().isConstant());
+        assertThat(lit.getRightTerm().isConstant()).isTrue();
     }
     
     /**
      * Test of getReadFile method, of class LogicSchemaParser.
      */
     @Test
-    public void testGetReadFile() {
+    public void testGetReadFile() throws IOException {
         System.out.println("getReadFile");
         
         String schema = ":- P(X), Q(X)\n";
@@ -533,7 +518,7 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         try{
             file = File.createTempFile("testGetReadFile", "");
         } catch(Exception ex){
-            fail(ex.getMessage());
+            throw ex;
         }
         assert file != null:"File should not bu null a this point";
         
@@ -541,11 +526,11 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
             writer.write(schema);
             writer.flush();
         } catch (IOException ex) {
-            fail(ex.getMessage());
+            throw ex;
         }
         
         LogicSchemaParser instance = new LogicSchemaParser(file);
         String result = instance.getReadFile(file);
-        assertEquals(schema, result);
+        assertThat(result).isEqualTo(schema);
     }
 }

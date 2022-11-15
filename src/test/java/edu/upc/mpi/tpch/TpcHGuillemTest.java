@@ -4,14 +4,13 @@ import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
 import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema_normalizer.LogicSchemaNormalizer;
 import edu.upc.mpi.parser.LogicSchemaParser;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -21,10 +20,11 @@ public class TpcHGuillemTest {
     private void assertEqualsNoSpaces(String expected, String result) {
         expected = expected.replaceAll(" ","");
         result = result.replaceAll(" ", "");
-        assertEquals(expected, result);
+        assertThat(result).isEqualTo(expected);
     }
     
-    @Test @Ignore
+    @Test
+    @Disabled
     public void test() throws URISyntaxException {
         File tpcFile = new File(ClassLoader.getSystemResource("tpc-h-guillem.txt").toURI());
         assert tpcFile.exists():"File "+tpcFile.getAbsolutePath()+" does not exists";
@@ -71,10 +71,10 @@ public class TpcHGuillemTest {
         assertEqualsNoSpaces(expected6, schema.getDerivationRulesByHead("??aux13").get(0).toString());
         
         int numberOfRules = schema.getAllConstraints().size();
-        assertEquals(4, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(4);
         
         numberOfRules = schema.getAllDerivationRules().size();
-        assertEquals(2, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(2);
     }
 
     private void checkAugmentedConstraints(LogicSchema augmentedLogicSchema) {
@@ -183,7 +183,7 @@ public class TpcHGuillemTest {
         assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4030).toString());      
         
         int numberOfRules = augmentedLogicSchema.getAllConstraints().size();
-        assertEquals(304, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(304);
     }
 
     private void checkDerivationRules(LogicSchema augmentedLogicSchema) {
@@ -280,7 +280,7 @@ public class TpcHGuillemTest {
         assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("del_??aux13").get(3).toString());               
         
         int numberOfRules = augmentedLogicSchema.getAllDerivationRules().size();
-        assertEquals(41, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(41);
     }
 
     private void checkNormalizedConstraints(LogicSchema schema) {
@@ -334,11 +334,11 @@ public class TpcHGuillemTest {
         assertEqualsNoSpaces(expected, schema.getConstraintByNumber(400002).toString());
         expected = "@400003 :- ins_LINEITEM_L_PARTKEY(_0, _1), ins_LINEITEM_L_SUPPKEY(_0, _2), ins_SUPPLIER_S_SUPPKEY(_3, _4), ins_SUPPLIER_S_NATIONKEY(_3, _5), SUPPLIER_S_SUPPKEY(_2_0, _3_0), SUPPLIER_S_NATIONKEY(_2_0, _4_0), PARTSUPP_PS_PARTKEY(_5_0, _6), del_PARTSUPP_PS_SUPPKEY(_5_0, _7), not(??aux13'1(_1, _5)), not(??aux13'2(_1, _5)), not(??aux13'3(_1, _5)), not(??aux13'4(_1, _5)), not(??aux13'5(_1, _5)), not(??aux13'6(_1, _5)), not(??aux13'7(_1, _5)), not(??aux13'8(_1, _5)), not(??aux13'9(_1, _5)), not(??aux13'10(_1, _5)), not(??aux13'11(_1, _5)), not(??aux13'12(_1, _5)), not(??aux13'13(_1, _5)), not(??aux13'14(_1, _5)), not(??aux13'15(_1, _5)), not(??aux13'16(_1, _5)), _2=_4, _3_0=_7, _6=_1, _4_0<>_5";
         assertEqualsNoSpaces(expected, schema.getConstraintByNumber(400003).toString());
-        assertNull(schema.getConstraintByNumber(400004));
+        assertThat(schema.getConstraintByNumber(400004)).isNull();
         
         expected = "@400100 :- ins_LINEITEM_L_PARTKEY(_0, _1), ins_LINEITEM_L_SUPPKEY(_0, _2), ins_SUPPLIER_S_SUPPKEY(_3, _4), ins_SUPPLIER_S_NATIONKEY(_3, _5), not(??aux13(_1, _5)), not(ins_??aux131(_1, _5)), not(ins_??aux132(_1, _5)), not(ins_??aux133(_1, _5)), not(ins_??aux134(_1, _5)), not(ins_??aux135(_1, _5)), not(ins_??aux136(_1, _5)), not(ins_??aux137(_1, _5)), not(ins_??aux138(_1, _5)), not(ins_??aux139(_1, _5)), not(ins_??aux1310(_1, _5)), not(ins_??aux1311(_1, _5)), not(ins_??aux1312(_1, _5)), not(ins_??aux1313(_1, _5)), not(ins_??aux1314(_1, _5)), not(ins_??aux1315(_1, _5)), _2=_4";
         assertEqualsNoSpaces(expected, schema.getConstraintByNumber(400100).toString());
-        assertNull(schema.getConstraintByNumber(400101));
+        assertThat(schema.getConstraintByNumber(400101)).isNull();
     }
 
     private void checkNormalizedDerivationRules(LogicSchema schema) {
@@ -423,7 +423,7 @@ public class TpcHGuillemTest {
         assertEqualsNoSpaces(expected, schema.getDerivationRulesByHead("ins_??aux1315").get(0).toString());
  
         int numberOfRules = schema.getAllDerivationRules().size();
-        assertEquals(36, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(36);
     }
    
 

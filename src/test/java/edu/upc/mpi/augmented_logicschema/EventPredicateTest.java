@@ -1,12 +1,11 @@
 package edu.upc.mpi.augmented_logicschema;
 
-import edu.upc.mpi.augmented_logicschema.EventPredicate;
 import edu.upc.mpi.augmented_logicschema.EventPredicate.EventType;
 import edu.upc.mpi.logicschema.Predicate;
 import edu.upc.mpi.logicschema.PredicateImpl;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -14,22 +13,6 @@ import static org.junit.Assert.assertEquals;
 public class EventPredicateTest {
     
     public EventPredicateTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
     }
 
     /**
@@ -44,11 +27,11 @@ public class EventPredicateTest {
         EventPredicate instance = new EventPredicate(p,EventType.INSERT);
         String expResult = "ins_P";
         String result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
         
         instance = new EventPredicate(p,EventType.DELETE);
         expResult = "del_P";
         result = instance.getName();
-        assertEquals(expResult, result);
+        assertThat(result).isEqualTo(expResult);
     }
 }

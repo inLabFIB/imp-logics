@@ -1,22 +1,22 @@
 package edu.upc.mpi.logicschema;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalClauseSubstitutionsTest {
-    private Predicate P = new PredicateImpl("P",2);
-    private Predicate Q = new PredicateImpl("Q",2);
-    private Predicate R = new PredicateImpl("R",2);
+    private Predicate P = new PredicateImpl("P", 2);
+    private Predicate Q = new PredicateImpl("Q", 2);
+    private Predicate R = new PredicateImpl("R", 2);
 
-    public List<Term> createTermsList(String termNames[]){
+    public List<Term> createTermsList(String[] termNames) {
         List<Term> result = new LinkedList<>();
-        for(String termName: termNames){
+        for (String termName : termNames) {
             result.add(new Term(termName));
         }
         return result;
@@ -43,9 +43,9 @@ public class NormalClauseSubstitutionsTest {
         Map<String, String> substitution = NormalClause.getVariableToVariableSubstitutionForLiterals(new HashMap<>(), listXY, listAB);
 
         //Assert
-        assertEquals(2, substitution.size());
-        assertEquals("a", substitution.get("x"));
-        assertEquals( "b", substitution.get("y"));
+        assertThat(substitution).size().isEqualTo(2);
+        assertThat(substitution.get("x")).isEqualTo("a");
+        assertThat(substitution.get("y")).isEqualTo("b");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class NormalClauseSubstitutionsTest {
         Map<String, String> substitution = NormalClause.getVariableToVariableSubstitutionForLiterals(new HashMap<>(), listAA, listXY);
 
         //Assert
-        assertEquals(null, substitution);
+        assertThat(substitution).isNull();
     }
 
     @Test
@@ -97,8 +97,8 @@ public class NormalClauseSubstitutionsTest {
         Map<String, String> substitution = NormalClause.getVariableToVariableSubstitutionForLiterals(new HashMap<>(), listXY, listAB);
 
         //Assert
-        assertEquals(2, substitution.size());
-        assertEquals("a", substitution.get("x"));
-        assertEquals( "b", substitution.get("y"));
+        assertThat(substitution).size().isEqualTo(2);
+        assertThat(substitution.get("x")).isEqualTo("a");
+        assertThat(substitution.get("y")).isEqualTo("b");
     }
 }

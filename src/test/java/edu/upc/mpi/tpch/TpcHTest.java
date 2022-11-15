@@ -4,12 +4,12 @@ import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
 import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema_normalizer.LogicSchemaNormalizer;
 import edu.upc.mpi.parser.LogicSchemaParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -19,7 +19,7 @@ public class TpcHTest {
     private void assertEqualsNoSpaces(String expected, String result) {
         expected = expected.replaceAll(" ","");
         result = result.replaceAll(" ", "");
-        assertEquals(expected, result);
+        assertThat(result).isEqualTo(expected);
     }
     
     @Test
@@ -69,10 +69,10 @@ public class TpcHTest {
         assertEqualsNoSpaces(expected6, schema.getDerivationRulesByHead("Aux2").get(0).toString());
         
         int numberOfRules = schema.getAllConstraints().size();
-        assertEquals(4, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(4);
         
         numberOfRules = schema.getAllDerivationRules().size();
-        assertEquals(2, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(2);
     }
 
     private void checkAugmentedConstraints(LogicSchema augmentedLogicSchema) {
@@ -154,7 +154,7 @@ public class TpcHTest {
         assertEqualsNoSpaces(expected, augmentedLogicSchema.getConstraintByNumber(4014).toString());
     
         int numberOfRules = augmentedLogicSchema.getAllConstraints().size();
-        assertEquals(36, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(36);
     }
 
     private void checkDerivationRules(LogicSchema augmentedLogicSchema) {
@@ -200,7 +200,7 @@ public class TpcHTest {
         assertEqualsNoSpaces(expected, augmentedLogicSchema.getDerivationRulesByHead("del_Aux2").get(1).toString());
         
         int numberOfRules = augmentedLogicSchema.getAllDerivationRules().size();
-        assertEquals(15, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(15);
     }
 
     private void checkNormalizedConstraints(LogicSchema schema) {
@@ -298,7 +298,7 @@ public class TpcHTest {
         assertEqualsNoSpaces(expected, schema.getConstraintByNumber(401401).toString());
     
         int numberOfRules = schema.getAllConstraints().size();
-        assertEquals(44, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(44);
     }
 
     private void checkNormalizedDerivationRules(LogicSchema schema) {
@@ -335,7 +335,7 @@ public class TpcHTest {
         assertEqualsNoSpaces(expected, schema.getDerivationRulesByHead("ins_Aux23").get(0).toString());
  
         int numberOfRules = schema.getAllDerivationRules().size();
-        assertEquals(12, numberOfRules);
+        assertThat(numberOfRules).isEqualTo(12);
     }
    
 
