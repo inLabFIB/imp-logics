@@ -10,9 +10,8 @@ import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema.OrdinaryLiteral;
 import edu.upc.mpi.logicschema.Predicate;
 import edu.upc.mpi.logicschema.PredicateImpl;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * Class for augmenting a logic schema.
@@ -26,7 +25,7 @@ import java.util.List;
  * only the output logic schema after calling augment()
  * 
  */
-public class LogicSchemaAugmenter{
+public class LogicSchemaAugmenter extends LogicSchemaProcess {
     private final LogicSchema inputLogicSchema;
     private final LogicSchema augmentedSchema;
     
@@ -70,9 +69,12 @@ public class LogicSchemaAugmenter{
         for(LogicConstraint logicConstraint: inputLogicSchema.getAllConstraints()){
             for(LogicConstraint augmentedLogicConstraint: this.getAumgentedLogicConstraint(logicConstraint)){
                 this.augmentedSchema.addConstraint(augmentedLogicConstraint);
+                this.recordOriginalConstraint(augmentedLogicConstraint, logicConstraint);
             }
         }
     }
+
+
 
     /**
      * 
@@ -261,4 +263,5 @@ public class LogicSchemaAugmenter{
         }
         return positiveEventFound;
     }
+
 }

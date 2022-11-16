@@ -1,5 +1,6 @@
 package edu.upc.mpi.logicschema_normalizer;
 
+import edu.upc.mpi.augmented_logicschema.LogicSchemaProcess;
 import edu.upc.mpi.logicschema.*;
 
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import java.util.Set;
  * only the output logic schema after calling augment()
  *
  */
-public class LogicSchemaNormalizer {
+public class LogicSchemaNormalizer extends LogicSchemaProcess {
     private final LogicSchema inputLogicSchema;
     private final LogicSchema normalizedLogicSchema;
 
@@ -56,6 +57,7 @@ public class LogicSchemaNormalizer {
             LogicConstraint sortedLiteralsLc = new LogicConstraint(lc.getID(), sortedLiterals);
             this.normalizedLogicSchema.deleteConstraint(lc.getID());
             this.normalizedLogicSchema.addConstraint(sortedLiteralsLc);
+            this.replaceOriginalConstraint(sortedLiteralsLc, lc);
         }
 
         //Apply literals sorting on DerivationRules
@@ -114,6 +116,7 @@ public class LogicSchemaNormalizer {
             LogicConstraint lcUnfolded = new LogicConstraint(lc.getID(), literals);
             this.normalizedLogicSchema.deleteConstraint(lc.getID());
             this.normalizedLogicSchema.addConstraint(lcUnfolded);
+            replaceOriginalConstraint(lcUnfolded, lc);
         }
 
         //Apply negative unfolding on DerivationRule
@@ -133,6 +136,8 @@ public class LogicSchemaNormalizer {
             new DerivationRule(dr.getHead(), sortedLiterals);
         }
     }
+
+
 
     /**
      * @param olit
@@ -190,7 +195,9 @@ public class LogicSchemaNormalizer {
         for (LogicConstraint lc : this.inputLogicSchema.getAllConstraints()) {
             int id = lc.getID() * 100;
             for (List<Literal> unfoldedLiterals : getUnfoldedLiterals(lc.getLiterals())) {
-                this.normalizedLogicSchema.addConstraint(new LogicConstraint(id, unfoldedLiterals));
+                LogicConstraint newConstraint = new LogicConstraint(id, unfoldedLiterals);
+                this.normalizedLogicSchema.addConstraint(newConstraint);
+                this.recordOriginalConstraint(newConstraint, lc);
                 id++;
             }
         }
@@ -260,4 +267,6 @@ public class LogicSchemaNormalizer {
             }
         }
     }
+
+
 }

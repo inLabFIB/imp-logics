@@ -1,10 +1,6 @@
 package edu.upc.mpi.augmented_logicschema;
 
-import edu.upc.mpi.logicschema.BuiltInLiteral;
-import edu.upc.mpi.logicschema.Literal;
-import edu.upc.mpi.logicschema.LogicSchema;
-import edu.upc.mpi.logicschema.Term;
-import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
+import edu.upc.mpi.logicschema.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +29,6 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
      */
     @Test
     public void testGetAugmentedLiterals() {
-        System.out.println("getAugmentedLiterals");
-        
         List<Literal> body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "P", new String[]{"X","Y"}));
         body.add(this.getOrdinaryLiteral(logicSchema, "Q", new String[]{"X", "Y"}, false));
@@ -43,8 +37,7 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
         LogicSchemaAugmenter instance = new LogicSchemaAugmenter(logicSchema);
         instance.augment(); //It is mandatory to call augment so that the ins/del literals exists
         List<List<Literal>> result = instance.getAugmentedLiterals(body);
-        System.out.println(result);
-        
+
         List<List<Literal>> expResult = new LinkedList<>();
         body = new LinkedList<>();
         body.add(this.getOrdinaryLiteral(logicSchema, "ins_P", new String[]{"X","Y"}));
@@ -75,6 +68,25 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
         expResult.add(body);
 
         assertThat(result).isEqualTo(expResult);
+    }
+
+    @Test
+    public void testAugmenterRemembersOriginalConstraint(){
+        List<Literal> body = new LinkedList<>();
+        body.add(this.getOrdinaryLiteral(logicSchema, "P", new String[]{"X","Y"}));
+        body.add(this.getOrdinaryLiteral(logicSchema, "Q", new String[]{"X", "Y"}, false));
+        body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
+        LogicConstraint logicConstraint = new LogicConstraint(10, body);
+        logicSchema.addConstraint(logicConstraint);
+        LogicSchemaAugmenter instance = new LogicSchemaAugmenter(logicSchema);
+        instance.augment();
+
+        assertThat(instance.getAugmentedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
+            //Action
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            assertThat(originalConstraint).isEqualTo(logicConstraint);
+        });
+
     }
     
 }

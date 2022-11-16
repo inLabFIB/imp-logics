@@ -177,8 +177,6 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
      */
     @Test
     public void testPositiveDerivationRulesNegativeUnfoldingsDontCausePredicateNameRepetitions() {
-        System.out.println("Negative Unfoldings and Predicate Name Repetitions");
-
         LogicSchemaNormalizer instance = new LogicSchemaNormalizer(this.logicSchema);
         OrdinaryLiteral olitP11 = this.getOrdinaryLiteral(logicSchema, "P11", new String[]{"X", "Y"});
         OrdinaryLiteral olitP1 = this.getOrdinaryLiteral(logicSchema, "P1", new String[]{"X", "Y"}, false);
@@ -204,4 +202,47 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
         result.add(negativeUnfoldingResult);
         assertThat(result).isEqualTo(expResult);
     }
+
+    @Test
+    public void testNormalizerRemembersOriginalConstraintWithoutUnfolding() {
+        LogicConstraint logicConstraint = createBasicLogicConstraint(logicSchema);
+        logicSchema.addConstraint(logicConstraint);
+        LogicSchemaNormalizer instance = new LogicSchemaNormalizer(logicSchema);
+        instance.normalize();
+
+        assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
+            //Action
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            assertThat(originalConstraint).isEqualTo(logicConstraint);
+        });
+    }
+
+    @Test
+    public void testNormalizerRemembersOriginalConstraintWithPositiveUnfolding() {
+        LogicSchema logicSchema = createLogicSchemaWithPositiveUnfolding();
+        LogicConstraint logicConstraint = logicSchema.getAllConstraints().get(0);
+        LogicSchemaNormalizer instance = new LogicSchemaNormalizer(logicSchema);
+        instance.normalize();
+
+        assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
+            //Action
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            assertThat(originalConstraint).isEqualTo(logicConstraint);
+        });
+    }
+
+    @Test
+    public void testNormalizerRemembersOriginalConstraintWithNegativeUnfolding() {
+        LogicSchema logicSchema = createLogicSchemaWithNegativeUnfolding();
+        LogicConstraint logicConstraint = logicSchema.getAllConstraints().get(0);
+        LogicSchemaNormalizer instance = new LogicSchemaNormalizer(logicSchema);
+        instance.normalize();
+
+        assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
+            //Action
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            assertThat(originalConstraint).isEqualTo(logicConstraint);
+        });
+    }
+
 }

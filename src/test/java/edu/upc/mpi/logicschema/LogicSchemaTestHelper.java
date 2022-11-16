@@ -1,8 +1,10 @@
 package edu.upc.mpi.logicschema;
 
 import edu.upc.mpi.logicschema.*;
+import edu.upc.mpi.parser.LogicSchemaParser;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -30,5 +32,35 @@ public class LogicSchemaTestHelper {
     public OrdinaryLiteral getOrdinaryLiteral(LogicSchema ls, String predicateName, String[] terms, boolean truth){
         Atom atom = this.getAtom(ls, predicateName, terms);
         return new OrdinaryLiteral(atom, truth);
+    }
+
+    protected LogicConstraint createBasicLogicConstraint(LogicSchema schema) {
+        List<Literal> body = new LinkedList<>();
+        body.add(this.getOrdinaryLiteral(schema, "P", new String[]{"X", "Y"}));
+        body.add(this.getOrdinaryLiteral(schema, "Q", new String[]{"X", "Y"}, false));
+        body.add(new BuiltInLiteral(new Term("X"), new Term("Y"), "<>"));
+        return new LogicConstraint(10, body);
+    }
+
+    protected LogicSchema createLogicSchemaWithPositiveUnfolding() {
+        String positiveUnfoldingConstraint =
+                "@1 :- P(x)\n" +
+                        "P(x) :- A(x)\n" +
+                        "P(x) :- B(x)\n";
+
+        LogicSchemaParser parser = new LogicSchemaParser(positiveUnfoldingConstraint);
+        parser.parse();
+        return parser.getLogicSchema();
+    }
+
+    protected LogicSchema createLogicSchemaWithNegativeUnfolding() {
+        String negativeUnfoldingConstraint =
+                "@1 :- R(x), not(P(x))\n" +
+                        "P(x) :- A(x)\n" +
+                        "P(x) :- B(x)\n";
+
+        LogicSchemaParser parser = new LogicSchemaParser(negativeUnfoldingConstraint);
+        parser.parse();
+        return parser.getLogicSchema();
     }
 }
