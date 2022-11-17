@@ -10,6 +10,7 @@ import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema.OrdinaryLiteral;
 import edu.upc.mpi.logicschema.Predicate;
 import edu.upc.mpi.logicschema.PredicateImpl;
+import edu.upc.mpi.pipeline.LogicSchemaProcess;
 
 import java.util.*;
 
@@ -82,7 +83,7 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
      * @return an augmented logic constraint corresponding to the given one
      */
     private List<LogicConstraint> getAumgentedLogicConstraint(LogicConstraint logicConstraint) {
-        List<LogicConstraint> result = new LinkedList();
+        List<LogicConstraint> result = new LinkedList<>();
         
         int i = 0;
         for(List<Literal> body: getAugmentedLiterals(logicConstraint.getLiterals())){
@@ -104,7 +105,7 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
      * @return a list containing the augmented literals list of literalsToAugment
      */
     protected List<List<Literal>> getAugmentedLiterals(List<Literal> literalsToAugment) {
-        return this.getAugmentedLiterals(new LinkedList<Literal>(), literalsToAugment);
+        return this.getAugmentedLiterals(new LinkedList<>(), literalsToAugment);
     }
 
     /**
@@ -113,9 +114,9 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
      * @return a list containing the augmented literals list of literalsToAugment with augmentedLiterals in the front.
      */
     private List<List<Literal>> getAugmentedLiterals(List<Literal> augmentedLiterals, List<Literal> literalsToAugment) {
-        List<List<Literal>> result = new LinkedList();
+        List<List<Literal>> result = new LinkedList<>();
         if(literalsToAugment.isEmpty()){
-            result.add(new LinkedList(augmentedLiterals));
+            result.add(new LinkedList<>(augmentedLiterals));
         } else {
             Literal literalToAugment = literalsToAugment.remove(0);
             if(literalToAugment instanceof BuiltInLiteral){
@@ -213,7 +214,7 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
                 new DerivationRule(new Atom(postHead), postBody);
                 
                 Atom insHead = new Atom(insPredicate, head.getTermsCopied());
-                List<Literal> insBody = new LinkedList();
+                List<Literal> insBody = new LinkedList<>();
                 for(Literal lit: postBody){
                     insBody.add(lit.copy());
                 }
@@ -229,9 +230,8 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
                 Literal literal = derivationRule.getLiterals().get(i);
                 if(literal instanceof OrdinaryLiteral){
                     Atom delHead = new Atom(delPredicate, head.getTermsCopied());
-                    
-                    List<Literal> delBody = new LinkedList();
-                    delBody.addAll(derivationRule.getLiteralsCopied().subList(0, i));
+
+                    List<Literal> delBody = new LinkedList<>(derivationRule.getLiteralsCopied().subList(0, i));
                     OrdinaryLiteral oliteral = (OrdinaryLiteral) literal;
                     
                     if(oliteral.isPositive()){
@@ -264,4 +264,13 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
         return positiveEventFound;
     }
 
+    @Override
+    public void execute() {
+        this.augment();
+    }
+
+    @Override
+    public LogicSchema getOutputSchema() {
+        return this.getAugmentedLogicSchema();
+    }
 }

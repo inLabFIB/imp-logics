@@ -80,7 +80,7 @@ public class LogicConstraint extends NormalClause{
     }
 
     @Override
-    public NormalClause copyChangingBody(List<Literal> bodyCopy) {
+    public LogicConstraint copyChangingBody(List<Literal> bodyCopy) {
         return new LogicConstraint(this, bodyCopy);
     }
 

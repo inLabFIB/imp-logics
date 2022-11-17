@@ -1,6 +1,7 @@
-package edu.upc.mpi.augmented_logicschema;
+package edu.upc.mpi.pipeline;
 
 import edu.upc.mpi.logicschema.LogicConstraint;
+import edu.upc.mpi.logicschema.LogicSchema;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,4 +23,8 @@ public abstract class LogicSchemaProcess {
     public LogicConstraint getOriginalConstraint(LogicConstraint newConstraint) {
         return this.newToOriginalConstraintMap.get(newConstraint);
     }
+
+    public abstract void execute();
+
+    public abstract LogicSchema getOutputSchema();
 }

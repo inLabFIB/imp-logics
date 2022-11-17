@@ -1,6 +1,6 @@
 package edu.upc.mpi.logicschema_normalizer;
 
-import edu.upc.mpi.augmented_logicschema.LogicSchemaProcess;
+import edu.upc.mpi.pipeline.LogicSchemaProcess;
 import edu.upc.mpi.logicschema.*;
 
 import java.util.HashSet;
@@ -269,4 +269,13 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
     }
 
 
+    @Override
+    public void execute() {
+        this.normalize();
+    }
+
+    @Override
+    public LogicSchema getOutputSchema() {
+        return this.getNormalizedLogicSchema();
+    }
 }
