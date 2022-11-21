@@ -83,7 +83,7 @@ public class LogicSchemaAugmenterTest extends LogicSchemaTestHelper {
 
         assertThat(instance.getAugmentedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
             //Action
-            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint.getID());
             assertThat(originalConstraint).isEqualTo(logicConstraint);
         });
 

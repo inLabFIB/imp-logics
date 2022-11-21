@@ -212,7 +212,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
 
         assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
             //Action
-            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint.getID());
             assertThat(originalConstraint).isEqualTo(logicConstraint);
         });
     }
@@ -226,7 +226,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
 
         assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
             //Action
-            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint.getID());
             assertThat(originalConstraint).isEqualTo(logicConstraint);
         });
     }
@@ -240,7 +240,7 @@ public class LogicSchemaNormalizerTest extends LogicSchemaTestHelper {
 
         assertThat(instance.getNormalizedLogicSchema().getAllConstraints()).allSatisfy(newConstraint -> {
             //Action
-            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint);
+            LogicConstraint originalConstraint = instance.getOriginalConstraint(newConstraint.getID());
             assertThat(originalConstraint).isEqualTo(logicConstraint);
         });
     }

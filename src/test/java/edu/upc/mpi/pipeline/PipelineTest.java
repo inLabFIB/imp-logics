@@ -1,24 +1,40 @@
 package edu.upc.mpi.pipeline;
 
 import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
-import edu.upc.mpi.logicschema.Literal;
 import edu.upc.mpi.logicschema.LogicConstraint;
 import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
-import edu.upc.mpi.logicschema_normalizer.LogicSchemaNormalizer;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.Mockito.*;
 
 class PipelineTest extends LogicSchemaTestHelper {
+
+
+    @Test
+    public void testPipelineGetLogicSchemaGetOutput() {
+        List<Function<LogicSchema, LogicSchemaProcess>> logicParsersCreators = new LinkedList<>();
+
+        LogicSchema expectedOutputSchema = new LogicSchema();
+        LogicSchemaProcess mock = mock(LogicSchemaProcess.class);
+        when(mock.getOutputSchema()).thenReturn(expectedOutputSchema);
+
+        logicParsersCreators.add((l) -> mock);
+        LogicSchema logicSchema = this.createLogicSchemaWithPositiveUnfolding();
+        Pipeline pipeline = new Pipeline(logicSchema, logicParsersCreators);
+        pipeline.execute();
+
+        LogicSchema logicSchemaOutput = pipeline.getLogicSchema();
+        assertThat(logicSchemaOutput).isEqualTo(expectedOutputSchema);
+    }
 
     @Test
     public void testPipelineExecutesOneTransformation() {
@@ -59,46 +75,74 @@ class PipelineTest extends LogicSchemaTestHelper {
 
     @Test
     public void testPipelineReturnsLogicConstraintTraceWithOneProcess() {
-        LogicSchema logicSchema = new LogicSchema();
-        LogicConstraint originalConstraint = this.createBasicLogicConstraint(logicSchema);
-        List<Literal> differentBody = originalConstraint.getLiteralsCopied().subList(0, 1);
-        LogicConstraint finalConstraint = originalConstraint.copyChangingBody(differentBody);
+        LogicSchema logicSchema = this.createLogicSchemaWithConstraints("@1 :- P(x), R(x)");
+        LogicConstraint originalConstraint = logicSchema.getAllConstraints().get(0);
+        LogicSchema finalSchema = this.createLogicSchemaWithConstraints("@2 :- S(x,y)");
+        LogicConstraint finalConstraint = finalSchema.getAllConstraints().get(0);
 
-        Function<LogicSchema, LogicSchemaProcess> processCreatorMock = createProcessCreatorMock(originalConstraint, finalConstraint);
+        Function<LogicSchema, LogicSchemaProcess> processCreatorMock = createProcessCreatorMock(originalConstraint, finalConstraint, finalSchema);
 
         Pipeline pipeline = executePipeline(logicSchema, processCreatorMock);
 
-        Trace trace = pipeline.getTrace(finalConstraint);
+        Trace trace = pipeline.getTrace(finalConstraint.getID());
 
         List<LogicConstraint> list = trace.getList();
-        assertThat(list).hasSize(2);
-        assertThat(list).first().isEqualTo(originalConstraint);
-        assertThat(list).last().isEqualTo(finalConstraint);
+        assertThat(list).containsExactly(originalConstraint, finalConstraint);
     }
 
-    private Pipeline executePipeline(LogicSchema logicSchema, Function<LogicSchema, LogicSchemaProcess>... processors) {
+    @SafeVarargs
+    private final Pipeline executePipeline(LogicSchema logicSchema, Function<LogicSchema, LogicSchemaProcess>... processors) {
         List<Function<LogicSchema, LogicSchemaProcess>> logicParsersCreators = new LinkedList<>(Arrays.asList(processors));
         Pipeline pipeline = new Pipeline(logicSchema, logicParsersCreators);
         pipeline.execute();
         return pipeline;
     }
 
-    private LogicSchemaProcess createProcessMock(LogicConstraint originalConstraint, LogicConstraint finalConstraint) {
-        LogicSchemaProcess processMock = mock(LogicSchemaProcess.class);
-        when(processMock.getOriginalConstraint(finalConstraint)).thenReturn(originalConstraint);
-        return processMock;
+    private Function<LogicSchema, LogicSchemaProcess> createProcessCreatorMock(LogicConstraint originalConstraint, LogicConstraint finalConstraint, LogicSchema outputSchema) {
+        LogicSchemaProcess processMock = createProcessMock(originalConstraint, finalConstraint, outputSchema);
+        return (l) -> processMock;
     }
 
-    private Function<LogicSchema, LogicSchemaProcess> createProcessCreatorMock(LogicConstraint originalConstraint, LogicConstraint finalConstraint) {
-        LogicSchemaProcess processMock = createProcessMock(originalConstraint, finalConstraint);
-        Function<LogicSchema, LogicSchemaProcess> processCreatorMock = (l) -> processMock;
-        return processCreatorMock;
+    private LogicSchemaProcess createProcessMock(LogicConstraint originalConstraint, LogicConstraint finalConstraint, LogicSchema outputSchema) {
+        LogicSchemaProcess processMock = mock(LogicSchemaProcess.class);
+        when(processMock.getOriginalConstraint(finalConstraint.getID())).thenReturn(originalConstraint);
+        when(processMock.getOutputSchema()).thenReturn(outputSchema);
+        return processMock;
     }
 
     @Test
     public void testPipelineReturnsLogicConstraintTraceWithTwoProcesses() {
+        LogicSchema logicSchema = this.createLogicSchemaWithConstraints("@1 :- P(x), R(x)");
+        LogicConstraint constraint1 = logicSchema.getAllConstraints().get(0);
+        LogicSchema logicSchema2 = this.createLogicSchemaWithConstraints("@2 :- S(x,y)");
+        LogicConstraint constraint2 = logicSchema2.getAllConstraints().get(0);
+        LogicSchema logicSchema3 = this.createLogicSchemaWithConstraints("@3 :- T(x,y,z)");
+        LogicConstraint constraint3 = logicSchema3.getAllConstraints().get(0);
 
+        Function<LogicSchema, LogicSchemaProcess> processCreatorMock1 = createProcessCreatorMock(constraint1, constraint2, logicSchema2);
+        Function<LogicSchema, LogicSchemaProcess> processCreatorMock2 = createProcessCreatorMock(constraint2, constraint3, logicSchema3);
+
+        Pipeline pipeline = executePipeline(logicSchema, processCreatorMock1, processCreatorMock2);
+
+        Trace trace = pipeline.getTrace(constraint3.getID());
+
+        List<LogicConstraint> list = trace.getList();
+        assertThat(list).containsExactly(constraint1, constraint2, constraint3);
     }
+
+    @Test
+    public void testPipelineThrowsExceptionWhenLogicConstraintDoesNotExistsInFinalSchema() {
+        LogicSchema logicSchema = this.createLogicSchemaWithConstraints("@1 :- P(x), R(x)");
+        LogicConstraint originalConstraint = logicSchema.getAllConstraints().get(0);
+
+        Pipeline pipeline = executePipeline(logicSchema, LogicSchemaAugmenter::new);
+
+        assertThatRuntimeException()
+                .isThrownBy(() -> pipeline.getTrace(originalConstraint.getID()))
+                .withMessage("Logic constraint " + originalConstraint.getID() + " does not appear in output schema");
+    }
+
+
 
     @SuppressWarnings("unchecked")
     static <T, P extends T> P spyLambda(Class<T> lambdaType, P lambda) {

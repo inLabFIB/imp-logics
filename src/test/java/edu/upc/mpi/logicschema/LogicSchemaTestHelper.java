@@ -17,7 +17,7 @@ public class LogicSchemaTestHelper {
             ls.addPredicate(p);
         }
         
-        LinkedList<Term> termsList = new LinkedList();
+        LinkedList<Term> termsList = new LinkedList<>();
         for(String term: terms){
             termsList.add(new Term(term));
         }
@@ -32,6 +32,12 @@ public class LogicSchemaTestHelper {
     public OrdinaryLiteral getOrdinaryLiteral(LogicSchema ls, String predicateName, String[] terms, boolean truth){
         Atom atom = this.getAtom(ls, predicateName, terms);
         return new OrdinaryLiteral(atom, truth);
+    }
+
+    protected LogicSchema createLogicSchemaWithConstraints(String constraints) {
+        LogicSchemaParser parser = new LogicSchemaParser(constraints+"\n");
+        parser.parse();
+        return parser.getLogicSchema();
     }
 
     protected LogicConstraint createBasicLogicConstraint(LogicSchema schema) {

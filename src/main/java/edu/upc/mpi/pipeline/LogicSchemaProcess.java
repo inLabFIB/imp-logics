@@ -8,20 +8,20 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class LogicSchemaProcess {
-    private final Map<LogicConstraint, LogicConstraint> newToOriginalConstraintMap = new HashMap<>();
+    private final Map<Integer, LogicConstraint> newToOriginalConstraintMap = new HashMap<>();
 
     protected void recordOriginalConstraint(LogicConstraint newConstraint, LogicConstraint originalConstraint) {
-        this.newToOriginalConstraintMap.put(newConstraint, originalConstraint);
+        this.newToOriginalConstraintMap.put(newConstraint.getID(), originalConstraint);
     }
 
     protected void replaceOriginalConstraint(LogicConstraint newConstraint, LogicConstraint constraintToReplace) {
-        LogicConstraint originalConstraint = this.newToOriginalConstraintMap.remove(constraintToReplace);
+        LogicConstraint originalConstraint = this.newToOriginalConstraintMap.remove(constraintToReplace.getID());
         if(Objects.isNull(originalConstraint)) throw new RuntimeException("Non existent constraintToReplace: "+constraintToReplace.getID());
-        newToOriginalConstraintMap.put(newConstraint, originalConstraint);
+        newToOriginalConstraintMap.put(newConstraint.getID(), originalConstraint);
     }
 
-    public LogicConstraint getOriginalConstraint(LogicConstraint newConstraint) {
-        return this.newToOriginalConstraintMap.get(newConstraint);
+    public LogicConstraint getOriginalConstraint(int constraintId) {
+        return this.newToOriginalConstraintMap.get(constraintId);
     }
 
     public abstract void execute();
