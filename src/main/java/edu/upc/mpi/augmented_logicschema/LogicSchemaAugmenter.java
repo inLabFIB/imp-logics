@@ -68,7 +68,7 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
      */
     private void augmentConstraints() {
         for(LogicConstraint logicConstraint: inputLogicSchema.getAllConstraints()){
-            for(LogicConstraint augmentedLogicConstraint: this.getAumgentedLogicConstraint(logicConstraint)){
+            for(LogicConstraint augmentedLogicConstraint: this.getAugmentedLogicConstraint(logicConstraint)){
                 this.augmentedSchema.addConstraint(augmentedLogicConstraint);
                 this.recordOriginalConstraint(augmentedLogicConstraint, logicConstraint);
             }
@@ -82,17 +82,14 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
      * @param logicConstraint
      * @return an augmented logic constraint corresponding to the given one
      */
-    private List<LogicConstraint> getAumgentedLogicConstraint(LogicConstraint logicConstraint) {
+    private List<LogicConstraint> getAugmentedLogicConstraint(LogicConstraint logicConstraint) {
         List<LogicConstraint> result = new LinkedList<>();
         
-        int i = 0;
         for(List<Literal> body: getAugmentedLiterals(logicConstraint.getLiterals())){
             //Checking for a positive event in the body
             boolean positiveEventFound = getHasPositiveEvent(body);
             if(positiveEventFound){
-                int identifier = logicConstraint.getID()*1000+i;
-                result.add(new LogicConstraint(identifier, body));
-                i++;
+                result.add(new LogicConstraint(body));
             }
         }
         
@@ -258,7 +255,7 @@ public class LogicSchemaAugmenter extends LogicSchemaProcess {
             Literal lit = it.next();
             if(lit instanceof OrdinaryLiteral){
                 OrdinaryLiteral olit = (OrdinaryLiteral) lit;
-                positiveEventFound = positiveEventFound || (olit.isPositive() && olit.getPredicate() instanceof EventPredicate);
+                positiveEventFound = (olit.isPositive() && olit.getPredicate() instanceof EventPredicate);
             }
         }
         return positiveEventFound;

@@ -54,7 +54,7 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
         //Apply literals sorting on LogicConstraints
         for (LogicConstraint lc : this.normalizedLogicSchema.getAllConstraints()) {
             List<Literal> sortedLiterals = getSortedLiterals(lc.getLiterals());
-            LogicConstraint sortedLiteralsLc = new LogicConstraint(lc.getID(), sortedLiterals);
+            LogicConstraint sortedLiteralsLc = new LogicConstraint(sortedLiterals);
             this.normalizedLogicSchema.deleteConstraint(lc.getID());
             this.normalizedLogicSchema.addConstraint(sortedLiteralsLc);
             this.replaceOriginalConstraint(sortedLiteralsLc, lc);
@@ -113,7 +113,7 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
                 } else literals.add(l);
             }
 
-            LogicConstraint lcUnfolded = new LogicConstraint(lc.getID(), literals);
+            LogicConstraint lcUnfolded = new LogicConstraint(literals);
             this.normalizedLogicSchema.deleteConstraint(lc.getID());
             this.normalizedLogicSchema.addConstraint(lcUnfolded);
             replaceOriginalConstraint(lcUnfolded, lc);
@@ -193,12 +193,10 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
 
         //Apply unfoldings on Constraints
         for (LogicConstraint lc : this.inputLogicSchema.getAllConstraints()) {
-            int id = lc.getID() * 100;
             for (List<Literal> unfoldedLiterals : getUnfoldedLiterals(lc.getLiterals())) {
-                LogicConstraint newConstraint = new LogicConstraint(id, unfoldedLiterals);
+                LogicConstraint newConstraint = new LogicConstraint(unfoldedLiterals);
                 this.normalizedLogicSchema.addConstraint(newConstraint);
                 this.recordOriginalConstraint(newConstraint, lc);
-                id++;
             }
         }
     }
