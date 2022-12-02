@@ -21,7 +21,6 @@ public class DerivationRule extends NormalClause {
      * It also inserts this as a definitionRule of the head's predicate.
      *
      * @param head != null
-     * @param body
      */
     public DerivationRule(Atom head, List<Literal> body) {
         this(head, body, true);
@@ -30,9 +29,6 @@ public class DerivationRule extends NormalClause {
     /**
      * Constructs a new Derivation rule by taking the head of the given rule and the
      * given body literals
-     *
-     * @param rule
-     * @param body
      */
     private DerivationRule(DerivationRule rule, List<Literal> body) {
         super(body);
@@ -65,7 +61,6 @@ public class DerivationRule extends NormalClause {
      * Given the atom callingAtom to unfold
      *
      * @param callingAtom            an atom that has the same predicate as the head of this
-     * @param forbiddenVariableNames
      * @return a copy of the List of Literals after substituting the head terms
      * with the terms of callingAtom, and all the other variables X with
      * another variable X+suffix in case they appear in forbiddenVariableNames

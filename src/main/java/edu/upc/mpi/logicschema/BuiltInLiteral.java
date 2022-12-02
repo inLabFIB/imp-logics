@@ -1,26 +1,19 @@
 package edu.upc.mpi.logicschema;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of the logic BuiltInLiteral.
- *
  */
 public class BuiltInLiteral extends Literal {
 
-    private Term leftTerm;
-    private Term rightTerm;
-    private String operation;
+    private final Term leftTerm;
+    private final Term rightTerm;
+    private final String operation;
 
     /**
      * Constructs a new BuiltInLiteral with the given terms and operation.
-     * @param left
-     * @param right
+     *
      * @param operation an string like ">=",">", ...
      */
     public BuiltInLiteral(Term left, Term right, String operation) {
@@ -32,7 +25,6 @@ public class BuiltInLiteral extends Literal {
     /**
      * Constructs a new BuiltInLiteral by copying the terms and operation
      * of the given builtInLiteral
-     * @param ol
      */
     public BuiltInLiteral(BuiltInLiteral builtInLiteral) {
         this.leftTerm = builtInLiteral.leftTerm.copy();
@@ -63,7 +55,7 @@ public class BuiltInLiteral extends Literal {
 
     @Override
     public Set<String> getVariablesNames() {
-        Set<String> result = new HashSet();
+        Set<String> result = new HashSet<>();
         if (this.leftTerm.isVariable()) {
             result.add(leftTerm.getName());
         }
@@ -96,7 +88,7 @@ public class BuiltInLiteral extends Literal {
                 return true;
             }
             //Case a < b is equal to b > a
-            else if(this.getRightTerm().equals(bil.getLeftTerm())
+            else if (this.getRightTerm().equals(bil.getLeftTerm())
                     && this.getLeftTerm().equals(bil.getRightTerm())
                     && this.getMirroredOperator().equals(bil.getOperator()))
                 return true;
@@ -115,9 +107,7 @@ public class BuiltInLiteral extends Literal {
 
     @Override
     public String toString() {
-        String s = new String();
-        s += getLeftTerm().getName() + getOperator() + getRightTerm().getName();
-        return s;
+        return getLeftTerm().getName() + getOperator() + getRightTerm().getName();
     }
 
     @Override
@@ -163,7 +153,7 @@ public class BuiltInLiteral extends Literal {
      * if this operation is "<" this funciton returns ">".
      */
     private String getMirroredOperator() {
-        Map<String, String> mirrorringMap = new HashMap();
+        Map<String, String> mirrorringMap = new HashMap<>();
         mirrorringMap.put("<", ">");
         mirrorringMap.put("<=", ">=");
         mirrorringMap.put("=", "=");
@@ -172,11 +162,6 @@ public class BuiltInLiteral extends Literal {
         mirrorringMap.put("<>", "<>");
         assert mirrorringMap.containsKey(this.operation):"Unknown operation " + this.operation+ " for mirrorring";
         return mirrorringMap.get(this.operation);
-
-
-
-
-
     }
 
     @Override
@@ -189,7 +174,7 @@ public class BuiltInLiteral extends Literal {
 
     @Override
     public List<String> getTermNamesList() {
-        List<String> result = new LinkedList();
+        List<String> result = new LinkedList<>();
         result.add(this.leftTerm.getName());
         result.add(this.rightTerm.getName());
         return result;

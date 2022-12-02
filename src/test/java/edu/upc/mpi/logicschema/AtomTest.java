@@ -1,6 +1,5 @@
 package edu.upc.mpi.logicschema;
 
-import edu.upc.mpi.logicschema.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,12 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
-/**
- *
- */
 public class AtomTest {
     private Atom johnSnowAtom;  //Knows("John Snow", x)
     private Atom samAtom;       //Kills("Sam", 1, x)

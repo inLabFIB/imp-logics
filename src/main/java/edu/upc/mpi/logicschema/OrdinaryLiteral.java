@@ -1,10 +1,6 @@
 package edu.upc.mpi.logicschema;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of a logic OrdinaryLiteral
@@ -18,8 +14,6 @@ public class OrdinaryLiteral extends Literal {
     /**
      * Constructots a new OrdinaryLiteral by copying the atom of the given
      * literal and taking its same sign (positive or negative).
-     *
-     * @param ol
      */
     public OrdinaryLiteral(OrdinaryLiteral ol) {
         this(ol, ol.sign);
@@ -28,8 +22,6 @@ public class OrdinaryLiteral extends Literal {
     /**
      * Constructots a new OrdinaryLiteral by copying the atom of the given
      * literal and taking the sign (positive or negative) given by parameter
-     *
-     * @param ol
      */
     public OrdinaryLiteral(OrdinaryLiteral ol, boolean sign) {
         assert ol != null;
@@ -40,8 +32,6 @@ public class OrdinaryLiteral extends Literal {
 
     /**
      * Constructs a new positive ordinary literal by using the given atom
-     *
-     * @param atom
      */
     public OrdinaryLiteral(Atom atom) {
         this(atom, true);
@@ -49,8 +39,6 @@ public class OrdinaryLiteral extends Literal {
 
     /**
      * Constructts a new ordinary literal using the given atom and sign
-     *
-     * @param atom
      */
     public OrdinaryLiteral(Atom atom, boolean sign) {
         assert atom != null;
@@ -93,7 +81,6 @@ public class OrdinaryLiteral extends Literal {
     }
 
     /**
-     * @param target
      * @return the substitutions that when applied to this, unifies with target, or null
      * if such substitution does not exists
      */
@@ -102,8 +89,6 @@ public class OrdinaryLiteral extends Literal {
     }
 
     /**
-     *
-     * @param substitution
      * @return a copy of this after applying the substitution. If substitution is null
      * it returns a copy of this literal
      */
@@ -214,8 +199,6 @@ public class OrdinaryLiteral extends Literal {
 
 
     /**
-     *
-     * @param term
      * @return the indexes of the term appearances of the given term or an empty list
      */
     public List<Integer> getIndexesOfTerm(Term term) {

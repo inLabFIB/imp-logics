@@ -1,5 +1,6 @@
 package edu.upc.mpi.augmented_logicschema;
 
+import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema.Predicate;
 
 
@@ -9,58 +10,67 @@ import edu.upc.mpi.logicschema.Predicate;
  * some predicate.
  * E.g. given the predicate "P", "ins_P" is an augmented predicate representing
  * an insertion in the predicate P.
- * 
  */
 public class EventPredicate extends Predicate {
     private final EventType eventType;
     private final Predicate containedPredicate;
 
-    public enum EventType{INSERT, DELETE};
-    
-    /**
-     * Craete a new EventPredicate with the given eventType and and predicate
-     *
-     * @param predicate
-     * @param eventType
-     */
-    public EventPredicate(Predicate predicate, EventType eventType){
-        this.eventType = eventType;
-        this.containedPredicate = predicate;
-    }
-    
+    public enum EventType {INSERT, DELETE}
+
     public static String getPredicateNameFor(EventType eventType, Predicate predicate) {
         String prefix = "";
-        switch(eventType){
-            case INSERT: prefix = "ins_"; break;
-            case DELETE: prefix = "del_"; break;
+        switch (eventType) {
+            case INSERT:
+                prefix = "ins_";
+                break;
+            case DELETE:
+                prefix = "del_";
+                break;
             default:
-                assert false :"Configure the prefix for the EventType " + eventType;
+                assert false : "Configure the prefix for the EventType " + eventType;
         }
 
         return prefix + predicate.getName();
     }
-    
-    public Predicate getPredicate(){
-        return this.containedPredicate;
+
+
+    /**
+     * Create a new EventPredicate with the given eventType and predicate
+     */
+    public EventPredicate(Predicate predicate, EventType eventType) {
+        this.eventType = eventType;
+        this.containedPredicate = predicate;
     }
 
+
     @Override
-    public String getName(){
+    public String getName() {
         return getPredicateNameFor(this.eventType, this.containedPredicate);
     }
-    
+
     @Override
     public int getArity() {
         return containedPredicate.getArity();
     }
 
-    public EventType getEventType(){
+    public Predicate getPredicate() {
+        return this.containedPredicate;
+    }
+
+    public EventType getEventType() {
         return eventType;
     }
-    
+
     public boolean getIsInsertion() {
         return this.eventType.equals(EventType.INSERT);
     }
-    
+
+
+    @Override
+    public void copyToLogicSchema(LogicSchema logicSchema) {
+        this.containedPredicate.copyToLogicSchema(logicSchema);
+        Predicate newContainedPredicate = logicSchema.getPredicate(this.containedPredicate.getName());
+        logicSchema.addPredicate(new EventPredicate(newContainedPredicate, this.eventType));
+    }
 
 }

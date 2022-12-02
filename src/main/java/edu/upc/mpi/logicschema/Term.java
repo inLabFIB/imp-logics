@@ -1,10 +1,6 @@
 package edu.upc.mpi.logicschema;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -13,19 +9,16 @@ import java.util.Objects;
  *  - reals (e.g. -1.0, 0, 2, 2.5, ...)
  *  - strings surrounded by " " (e.g. "John", "Mary").
  * Anything else is a variable (e.g. x, y, John, Mary, etc)
- * 
  */
 public class Term {
     private String name;
     
     
     /**
-     * 
-     * @param name
      * @return true iff name does not contain any invalid character (',','(', ...)
      */
     private boolean isValidName(String name){
-        List<Character> forbiddenSymbols = new LinkedList();
+        List<Character> forbiddenSymbols = new LinkedList<>();
         forbiddenSymbols.add(',');
         forbiddenSymbols.add('(');
         forbiddenSymbols.add(')');
@@ -55,7 +48,6 @@ public class Term {
 
     /**
      * Constructs a new constant term with the given value
-     * @param value
      */
     public Term(int value) {
         name = Integer.toString(value);
@@ -63,7 +55,6 @@ public class Term {
 
     /**
      * Constructs a copy of the term
-     * @return 
      */
     public Term copy(){
         Term copy = this.copySpecific();
@@ -73,7 +64,6 @@ public class Term {
     
     /**
      * Hook method
-     * @return 
      */
     protected Term copySpecific(){
         return new Term(this.name);
@@ -123,9 +113,6 @@ public class Term {
     /**
      * Returns a copy of this term after applying the given substitution, if
      * substitution is not null. Otherwise, it just returns a copy of this.
-     *
-     * @param substitution
-     * @return 
      */
     public Term getSubstitutedTerm(Map<String, String> substitution) {
         if (substitution != null && this.isVariable() && substitution.containsKey(this.getName())) {
@@ -136,8 +123,6 @@ public class Term {
     /**
      * Adds the given suffix to the term name if it is a variable.
      * You should ensure that this term is a variable before calling this method.
-     *
-     * @param suffix
      */
     public void setSuffix(String suffix) {
         String newName = this.getName()+suffix;
@@ -154,20 +139,20 @@ public class Term {
      * a copy of the given substitution.
      */
     protected Map<String, String> getVariableToVariableUnification(Term thatVariable, Map<String, String> substitution) {
-        assert thatVariable != null:"thatVariable cannot be null";
-        assert substitution != null:"substitution cannot be null";
-        
-        Map<String, String> result = new HashMap(substitution);
-        if(result.containsKey(this.getName())){
-            assert this.isVariable():"The substitution should not map the constant term: "+this.getName();
+        assert thatVariable != null : "thatVariable cannot be null";
+        assert substitution != null : "substitution cannot be null";
+
+        Map<String, String> result = new HashMap<>(substitution);
+        if (result.containsKey(this.getName())) {
+            assert this.isVariable() : "The substitution should not map the constant term: " + this.getName();
             String thisSubstituted = substitution.get(this.getName());
-            if(thatVariable.getName().equals(thisSubstituted)) return result;
+            if (thatVariable.getName().equals(thisSubstituted)) return result;
             else return null;
         } else {
-            if(this.isConstant()) {
-                return this.getName().equals(thatVariable.getName())? result: null;
+            if (this.isConstant()) {
+                return this.getName().equals(thatVariable.getName()) ? result : null;
             } else {
-                if(thatVariable.isVariable()){
+                if (thatVariable.isVariable()) {
                     result.put(this.getName(), thatVariable.getName());
                     return result;
                 } else return null;
@@ -197,7 +182,7 @@ public class Term {
     }
     
     public static List<Term> getTermList(String[] terms){
-        List<Term> result = new LinkedList();
+        List<Term> result = new LinkedList<>();
         for(String term: terms){
             result.add(new Term(term));
         }

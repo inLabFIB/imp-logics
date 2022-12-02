@@ -3,7 +3,7 @@ package edu.upc.mpi.pipeline;
 import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
 import edu.upc.mpi.logicschema.LogicConstraint;
 import edu.upc.mpi.logicschema.LogicSchema;
-import edu.upc.mpi.logicschema.LogicSchemaTestHelper;
+import edu.upc.mpi.utils.LogicSchemaTestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -141,7 +141,6 @@ class PipelineTest extends LogicSchemaTestHelper {
                 .isThrownBy(() -> pipeline.getTrace(originalConstraint.getID()))
                 .withMessage("Logic constraint " + originalConstraint.getID() + " does not appear in output schema");
     }
-
 
 
     @SuppressWarnings("unchecked")

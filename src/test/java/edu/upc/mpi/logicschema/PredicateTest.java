@@ -9,9 +9,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- *
- */
 public class PredicateTest {
     
     public PredicateTest() {
@@ -67,7 +64,7 @@ public class PredicateTest {
         Atom qAtom = new Atom(q, qTerms);
         List<Literal> literals = new LinkedList<>();
         literals.add(new OrdinaryLiteral(qAtom));
-        DerivationRule derivationRule = new DerivationRule(head, literals);
+        new DerivationRule(head, literals);
         
         expResult = false;
         result = instance.isBase();
@@ -134,7 +131,7 @@ public class PredicateTest {
     public void testGetNumberOfDefinitionRules() {
         System.out.println("getNumberOfDefinitionRules");
 
-        Predicate instance = new PredicateImpl("P",2);
+        Predicate instance = new PredicateImpl("P", 2);
         int expResult = 0;
         int result = instance.getNumberOfDefinitionRules();
         assertThat(result).isEqualTo(expResult);
@@ -143,29 +140,29 @@ public class PredicateTest {
         headTerms.add(new Term("x"));
         headTerms.add(new Term("y"));
         Atom head = new Atom(instance, headTerms);
-        
-        Predicate q = new PredicateImpl("Q",2);
+
+        Predicate q = new PredicateImpl("Q", 2);
         List<Term> qTerms = new LinkedList<>();
         qTerms.add(new Term("x"));
         qTerms.add(new Term("y"));
         Atom qAtom = new Atom(q, qTerms);
         List<Literal> literals = new LinkedList<>();
         literals.add(new OrdinaryLiteral(qAtom));
-        DerivationRule derivationRule = new DerivationRule(head, literals);
-        
+        new DerivationRule(head, literals);
+
         expResult = 1;
         result = instance.getNumberOfDefinitionRules();
         assertThat(result).isEqualTo(expResult);
-        
-        Predicate r = new PredicateImpl("R",2);
+
+        Predicate r = new PredicateImpl("R", 2);
         List<Term> rTerms = new LinkedList<>();
         rTerms.add(new Term("x"));
         rTerms.add(new Term("y"));
         Atom rAtom = new Atom(r, rTerms);
         literals = new LinkedList<>();
         literals.add(new OrdinaryLiteral(rAtom));
-        derivationRule = new DerivationRule(head, literals);
-        
+        new DerivationRule(head, literals);
+
         expResult = 2;
         result = instance.getNumberOfDefinitionRules();
         assertThat(result).isEqualTo(expResult);
@@ -209,7 +206,7 @@ public class PredicateTest {
         Atom rAtom = new Atom(r, rTerms);
         literals = new LinkedList<>();
         literals.add(new OrdinaryLiteral(rAtom));
-        derivationRule = new DerivationRule(head, literals);
+        new DerivationRule(head, literals);
         
         expResult.add(r);
         result = instance.getAllPredicatesClosureInDefinitionRules();
@@ -223,7 +220,7 @@ public class PredicateTest {
         literals = new LinkedList<>();
         literals.add(new OrdinaryLiteral(sAtom));
         head = new Atom(rAtom);
-        derivationRule = new DerivationRule(head, literals);
+        new DerivationRule(head, literals);
         
         expResult.add(s);
         result = instance.getAllPredicatesClosureInDefinitionRules();

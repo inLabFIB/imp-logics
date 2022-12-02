@@ -6,7 +6,6 @@ import java.util.*;
 /**
  * Implementation of a logic Atom.
  * An Atom consists of a Predicate (e.g. "Employee") together with a list of Terms.
- *
  */
 public class Atom {
     private final List<Term> terms;             //List of terms of the atom
@@ -14,8 +13,6 @@ public class Atom {
 
     /**
      * Constructs a new Atom copying the terms of the given atom and using the same predicate.
-     *
-     * @param atom
      */
     public Atom(Atom atom) {
         assert atom != null : "Atom cannot be null";
@@ -30,9 +27,6 @@ public class Atom {
     /**
      * Constructs a new Atom using the predicate and list of terms passed by
      * parameter.
-     *
-     * @param predicate
-     * @param terms
      */
     public Atom(Predicate predicate, List<Term> terms) {
         assert predicate != null : "Predicate cannot be null";
@@ -76,7 +70,6 @@ public class Atom {
     }
 
     /**
-     * @param index
      * @return the actual term appearing in the given index
      */
     public Term getTerm(int index) {
@@ -110,7 +103,6 @@ public class Atom {
     }
 
     /**
-     * @param term
      * @return the indexes of the term appearances of the given term in this atom, in ascending order. It might be empty
      */
     public List<Integer> getIndexesOfTerm(Term term) {
@@ -152,7 +144,6 @@ public class Atom {
     }
 
     /**
-     * @param substitution
      * @return a copy of this atom after applying the given substitution. If the substitution is null,
      * it retuns a copy of this atom.
      */
@@ -165,7 +156,6 @@ public class Atom {
     }
 
     /**
-     * @param target
      * @return the substitution of this terms that unifies this atom with the given target atom, or
      * null if no unifying substitution exists.
      */
@@ -206,8 +196,6 @@ public class Atom {
     }
 
     /**
-     * @param target
-     * @param currentSubstitution
      * @return the substitution containing the currentSubstitution such that unifies this atom with
      * target, but without substituting any variable for a constant; or null if such substitution
      * does not exists
@@ -247,7 +235,6 @@ public class Atom {
     }
 
     /**
-     * @param suffix
      * @return a copy of this atom but adding to its current variables the given suffix
      */
     public Atom getAtomWithVariableSuffix(String suffix) {

@@ -1,4 +1,4 @@
-package edu.upc.mpi.logicschema;
+package edu.upc.mpi.utils;
 
 import edu.upc.mpi.logicschema.*;
 import edu.upc.mpi.parser.LogicSchemaParser;
@@ -6,9 +6,6 @@ import edu.upc.mpi.parser.LogicSchemaParser;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- */
 public class LogicSchemaTestHelper {
      public Atom getAtom(LogicSchema ls, String predicateName, String[] terms){
         Predicate p = ls.getPredicate(predicateName);
