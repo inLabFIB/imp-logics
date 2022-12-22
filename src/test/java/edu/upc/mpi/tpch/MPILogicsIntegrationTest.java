@@ -4,7 +4,6 @@ import edu.upc.mpi.augmented_logicschema.LogicSchemaAugmenter;
 import edu.upc.mpi.logicschema.LogicSchema;
 import edu.upc.mpi.logicschema_normalizer.LogicSchemaNormalizer;
 import edu.upc.mpi.parser.LogicSchemaParser;
-import org.junit.*;
 import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
@@ -18,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MPILogicsIntegrationTest {
 
 
-
-
-    //Main objective: check time consumption of the whole process(parse + normalise + augment)
+    /**
+     * Main objective: check time consumption of the whole process(parse + normalise + augment)
+     */
     @Test
     public void shouldParseAugmentAndNormalise_whenAssertionsFileIsLoaded() throws URISyntaxException {
         // Arrange -> load assertion to logic file

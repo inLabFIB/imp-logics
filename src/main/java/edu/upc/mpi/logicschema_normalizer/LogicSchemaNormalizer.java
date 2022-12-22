@@ -3,10 +3,7 @@ package edu.upc.mpi.logicschema_normalizer;
 import edu.upc.mpi.logicschema.*;
 import edu.upc.mpi.pipeline.LogicSchemaProcess;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class for obtaining a normalized version of a LogicSchema.
@@ -90,7 +87,7 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
      * Recursively unfolds all the positive derived literals for all the logic constraints and for all the
      * derivation rules.
      * <p>
-     * TODO: maybe could be optimized using DP and avoiding redundant unfoldings between this method and
+     * TODO: Works BUT: maybe could be optimized using DP or DFS avoiding redundant unfoldings between this method and
      *  computeUnfoldedLiterals
      */
     private void applyPositiveUnfolding() {
@@ -129,39 +126,93 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
      * This step Modifies each NormalClause previouslly added to the normalizedLogicSchema and applies a negative unfolding process
      */
     private void applyNegativeUnfolding() {
-        //Apply negative unfolding on LogicConstraints
-        for (LogicConstraint lc : this.normalizedLogicSchema.getAllConstraints()) {
-            List<Literal> literals = getLiteralsAfterNegativeUnfolding(lc);
-            LogicConstraint lcUnfolded = new LogicConstraint(literals);
-            this.normalizedLogicSchema.deleteConstraint(lc.getID());
-            this.normalizedLogicSchema.addConstraint(lcUnfolded);
-            replaceOriginalConstraint(lcUnfolded, lc);
+        List<String> visitedPredicates = new ArrayList<>();
+        for (LogicConstraint lc : normalizedLogicSchema.getAllConstraints()) {
+            applyRecursiveNegativeUnfolding(lc, 0, visitedPredicates);
+        }
+    }
+
+    private void applyRecursiveNegativeUnfolding(NormalClause nc, int depth, List<String> visitedPredicates) {
+        List<Literal> newBody = new ArrayList<>();
+        boolean unfoldingPerformed = false;
+
+        for (Literal l : nc.getLiterals()) {
+            if (l instanceof OrdinaryLiteral) {
+                OrdinaryLiteral olit = (OrdinaryLiteral) l;
+                if (!olit.isBase()) {
+                    String predicateName = olit.getPredicateName();
+                    if (!visitedPredicates.contains(predicateName)) {
+                        for (DerivationRule dr : olit.getPredicate().getDefinitionRules()) {
+                            applyRecursiveNegativeUnfolding(dr, depth + 1, visitedPredicates);
+                        }
+                        visitedPredicates.add(predicateName);
+                    }
+                    if (olit.getNumberOfDerivationRules() > 1) {
+                        newBody.addAll(getMultipleDerivationRuleUnfolding(olit));
+                        unfoldingPerformed = true;
+                    } else newBody.add(l);
+                } else newBody.add(l);
+            } else newBody.add(l);
         }
 
-        //Apply negative unfolding on DerivationRule
-        for (DerivationRule dr : this.normalizedLogicSchema.getAllDerivationRules()) {
-            List<Literal> literals = getLiteralsAfterNegativeUnfolding(dr);
-            List<Literal> sortedLiterals = getSortedLiterals(literals);
-            dr.getPredicate().deleteDerivationRule(dr); // Delete Predicate reference
-            new DerivationRule(dr.getHead(), sortedLiterals);
+        //Sorting literals shouldn't be needed
+        if (unfoldingPerformed) {
+            if (depth == 0) { //LC
+                LogicConstraint lc = (LogicConstraint) nc;
+                LogicConstraint lcUnfolded = new LogicConstraint(newBody);
+                this.normalizedLogicSchema.deleteConstraint(lc.getID());
+                this.normalizedLogicSchema.addConstraint(lcUnfolded);
+                replaceOriginalConstraint(lcUnfolded, lc);
+            } else { //DR
+                DerivationRule dr = (DerivationRule) nc;
+                dr.getPredicate().deleteDerivationRule(dr); // Delete Predicate reference
+                new DerivationRule(dr.getHead(), newBody);
+            }
         }
     }
 
     /**
-     * @param nc Can be either a DerivationRule or a LogicConstraint
-     * @return literals for new constraint after negative unfolding
+     * @return a list of literals L1...LN each one with one derivation rule taken from the list of derivation rules of
+     * olit. If olit is base, or it has only one derivation rule it returns olit.
      */
-    private List<Literal> getLiteralsAfterNegativeUnfolding(NormalClause nc) {
-        List<Literal> literals = new LinkedList<>();
-        for (Literal l : nc.getLiterals()) {
-            if (l instanceof OrdinaryLiteral) {
-                OrdinaryLiteral olit = (OrdinaryLiteral) l;
-                if (!olit.isPositive()) {
-                    literals.addAll(getMultipleDerivationRuleUnfolding(olit));
-                } else literals.add(l);
-            } else literals.add(l);
+    protected List<Literal> getMultipleDerivationRuleUnfolding(OrdinaryLiteral olit) {
+        List<Literal> result = new LinkedList<>();
+
+        //No unfolding needed
+        if (olit.isBase() || olit.getPredicate().getDefinitionRules().size() == 1) {
+            result.add(olit);
+            return result;
         }
-        return literals;
+
+        int n = 1;
+        for (DerivationRule dr : olit.getPredicate().getDefinitionRules()) {
+            List<Literal> literals = dr.getLiterals();
+            String predicateName = olit.getPredicateName() + n;
+
+            // Avoid collisions with already existing predicates of the input Schema. ".m" is added to the end of
+            // the predicate name.
+            Predicate pred = this.inputLogicSchema.getPredicate(predicateName);
+            int m = 0;
+            while (pred != null) {
+                predicateName = olit.getPredicateName() + n + "." + m++;
+                pred = this.inputLogicSchema.getPredicate(predicateName);
+            }
+
+            // New Predicates + Derivation Rules are added if no previous olit with the same predicate was already
+            // processed before.
+            pred = this.normalizedLogicSchema.getPredicate(predicateName);
+            if (pred == null) {
+                pred = new PredicateImpl(predicateName, olit.getTerms().size());
+                this.normalizedLogicSchema.addPredicate(pred);
+                Atom atomHead = new Atom(pred, dr.getHead().getTermsCopied());
+                new DerivationRule(atomHead, literals);
+            }
+
+            // Adds new Ordinary Literal with new predicate linked.
+            result.add(new OrdinaryLiteral(new Atom(pred, olit.getTermsCopied()), olit.isPositive()));
+            n++;
+        }
+        return result;
     }
 
     /**
@@ -201,48 +252,6 @@ public class LogicSchemaNormalizer extends LogicSchemaProcess {
         }
     }
 
-
-    /**
-     * @return a list of literals L1...LN each one with one derivation rule taken from the list of derivation rules of
-     * olit. If olit is base, or it has only one derivation rule it returns olit.
-     */
-    protected List<Literal> getMultipleDerivationRuleUnfolding(OrdinaryLiteral olit) {
-        List<Literal> result = new LinkedList<>();
-
-        if (olit.isBase() || olit.getDefinitionRulesWhenCalled(new LinkedList<>()).size() == 1) {
-            result.add(olit);
-        } else {
-            int n = 1;
-            for (DerivationRule dr : olit.getPredicate().getDefinitionRules()) {
-                List<Literal> literals = dr.getLiterals();
-                String predicateName = olit.getPredicateName() + n;
-
-                // Avoid collisions with already existing predicates of the input Schema. ".m" is added to the end of
-                // the predicate name.
-                Predicate pred = this.inputLogicSchema.getPredicate(predicateName);
-                int m = 0;
-                while (pred != null) {
-                    predicateName = olit.getPredicateName() + n + "." + m++;
-                    pred = this.inputLogicSchema.getPredicate(predicateName);
-                }
-
-                // New Predicates + Derivation Rules are added if no previous olit with the same predicate was already
-                // processed before.
-                pred = this.normalizedLogicSchema.getPredicate(predicateName);
-                if (pred == null) {
-                    pred = new PredicateImpl(predicateName, olit.getTerms().size());
-                    this.normalizedLogicSchema.addPredicate(pred);
-                    Atom atomHead = new Atom(pred, dr.getHead().getTermsCopied());
-                    new DerivationRule(atomHead, literals);
-                }
-
-                // Adds new Ordinary Literal with new predicate linked.
-                result.add(new OrdinaryLiteral(new Atom(pred, olit.getTermsCopied()), olit.isPositive()));
-                n++;
-            }
-        }
-        return result;
-    }
 
     /**
      * @return a copy of this list in which positive literals appear before negative literals
