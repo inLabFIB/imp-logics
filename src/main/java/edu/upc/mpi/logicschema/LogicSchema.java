@@ -29,19 +29,21 @@ public class LogicSchema {
 
     public List<Literal> getCopiedLiterals(List<Literal> literals) {
         List<Literal> result = new ArrayList<>();
-        for (Literal l : literals) {
-            if (l instanceof OrdinaryLiteral) {
-                OrdinaryLiteral ol = (OrdinaryLiteral) l;
-                result.add(new OrdinaryLiteral(
-                        new Atom(
-                                this.getPredicate(ol.getPredicateName()),
-                                ol.getTermsCopied()),
-                        ol.isPositive()));
-            } else {
-                result.add(l.copy());
-            }
-        }
+        for (Literal l : literals) result.add(getCopiedLiteral(l));
         return result;
+    }
+
+    public Literal getCopiedLiteral(Literal l) {
+        if (l instanceof OrdinaryLiteral) {
+            OrdinaryLiteral ol = (OrdinaryLiteral) l;
+            return new OrdinaryLiteral(
+                    new Atom(
+                            this.getPredicate(ol.getPredicateName()),
+                            ol.getTermsCopied()),
+                    ol.isPositive());
+        } else {
+            return l.copy();
+        }
     }
 
     /**
