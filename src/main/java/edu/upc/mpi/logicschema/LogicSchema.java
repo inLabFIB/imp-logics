@@ -141,22 +141,22 @@ public class LogicSchema {
 
     @Override
     public String toString() {
-        String result = "% Constraints\n";
+        StringBuilder result = new StringBuilder("% Constraints\n");
         for (LogicConstraint c : this.constraints) {
-            result += (c.toString()) + "\n";
+            result.append(c.toString()).append("\n");
         }
-        result += "\n";
-        result += "% DerivationRules\n";
+        result.append("\n");
+        result.append("% DerivationRules\n");
         for (DerivationRule r : this.getAllDerivationRules()) {
-            result += (r.toString()) + "\n";
+            result.append(r.toString()).append("\n");
         }
-        result += "\n";
+        result.append("\n");
         if (goal != null) {
-            result += "% Goal\n";
-            result += goal.toString();
-            result += "\n";
+            result.append("% Goal\n");
+            result.append(goal);
+            result.append("\n");
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -176,15 +176,8 @@ public class LogicSchema {
      * @param fileName fileName of the file in which the schema will be printed
      */
     public void printSchema(String fileName) throws Exception {
-        FileWriter writer = null;
-        PrintWriter pw = null;
-        try {
-            writer = new FileWriter(fileName);
-            pw = new PrintWriter(writer);
+        try (FileWriter writer = new FileWriter(fileName); PrintWriter pw = new PrintWriter(writer)) {
             printSchema(pw);
-        } finally {
-            if (pw != null) pw.close();
-            if (writer != null) writer.close();
         }
     }
 
@@ -247,5 +240,15 @@ public class LogicSchema {
 
     public void deletePredicate(Predicate pred) {
         this.predicates.remove(pred.getName());
+    }
+
+    public void deleteUnusedPredicates() {
+        Set<Predicate> usedPredicates = new HashSet<>();
+        for (LogicConstraint lc : this.constraints) {
+            usedPredicates.addAll(lc.getAllPredicatesClosure());
+        }
+        for (Predicate p : this.getAllPredicates()) {
+            if (!usedPredicates.contains(p)) this.deletePredicate(p);
+        }
     }
 }
