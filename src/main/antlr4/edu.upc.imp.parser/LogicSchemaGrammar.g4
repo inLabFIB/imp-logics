@@ -2,7 +2,7 @@ grammar LogicSchemaGrammar;
 
 NOT: 'not';
 OPERATOR: '='|'<>'|'<'|'>'|'<='|'>=';
-ID: ([A-Za-z0-9_'\?])+;
+ID: ([A-Za-z0-9_'?])+;
 CONSTRAINTID: '@'[0-9]+;
 NEWLINE:'\r'? '\n';
 WS : [ \t]+ -> skip ; // toss out whitespace

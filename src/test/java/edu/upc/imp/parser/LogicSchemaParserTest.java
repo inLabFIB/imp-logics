@@ -525,4 +525,23 @@ public class LogicSchemaParserTest extends LogicSchemaTestHelper {
         String result = instance.getReadFile(file);
         assertThat(result).isEqualTo(schema);
     }
+
+    @Test
+    public void test_interrogant_in_predicate_name() {
+        String schema = ":- P?(X)\n";
+        LogicSchemaParser instance = new LogicSchemaParser(schema);
+        instance.parse();
+        LogicSchema resultLogicSchema = instance.getLogicSchema();
+        assertThat(resultLogicSchema.getPredicate("P?")).isNotNull();
+    }
+
+
+    @Test
+    public void test_interrogant_in_variable_name() {
+        String schema = ":- P(X?)\n";
+        LogicSchemaParser instance = new LogicSchemaParser(schema);
+        instance.parse();
+        LogicSchema resultLogicSchema = instance.getLogicSchema();
+        assertThat(resultLogicSchema.getAllConstraints().get(0).getLiterals().get(0).getTermNamesList().get(0)).isEqualTo("X?");
+    }
 }
