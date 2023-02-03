@@ -1,4 +1,4 @@
-# MpiLogics
+# IMP Logics
 
 ## Build 
 
