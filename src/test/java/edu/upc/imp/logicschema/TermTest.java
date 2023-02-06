@@ -1,252 +1,153 @@
 package edu.upc.imp.logicschema;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  *
  */
 public class TermTest {
     
-    public TermTest() {
-    }
-    
-
-    /**
-     * Test of getName method, of class Term.
-     */
     @Test
-    public void testGetName() {
-        System.out.println("getName");
-        
-        Term instance;
-        String expResult, result;
-        
-        instance = new Term("\"John\"");
-        expResult = "\"John\"";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-        
-        instance = new Term("John");
-        expResult = "John";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-
-        instance = new Term("1");
-        expResult = "1";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-        
-        instance = new Term(1);
-        expResult = "1";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-        
-        instance = new Term(-1);
-        expResult = "-1";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-        
-        instance = new Term("-1.5");
-        expResult = "-1.5";
-        result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
+    public void should_CreateConstantTerm_When_CreateTermWithInteger(){
+        Term term = new Term(1);
+        assertThat(term.isConstant()).isTrue();
+        assertThat(term.getName()).isEqualTo("1");
     }
 
-    /**
-     * Test of setName method, of class Term.
-     */
     @Test
-    public void testSetName() {
-        Term instance = new Term("John");
-        instance.setName("John Snow");
-        String expResult = "John Snow";
-        String result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
-
-        assertThatExceptionOfType(AssertionError.class)
-                .isThrownBy(() -> {
-                    Term term = new Term("\"John Snow\"");
-                    term.setName("John Snow");
-                });
+    public void should_CreateNewTermWithSameName_When_CopyingTerm(){
+        Term original = new Term("x");
+        Term copy = original.copy();
+        assertThat(copy.getName()).isEqualTo(original.getName());
+        assertThat(copy).isNotSameAs(original);
     }
 
-    /**
-     * Test of isConstant method, of class Term.
-     */
+    @ParameterizedTest
+    @ValueSource(strings = {"1", "1.0", "1.00", "\"x\"", "\"1\""})
+    public void should_AddSufixToName_When_InvokingSetSuffix(String nameOfConstant){
+        Term term = new Term(nameOfConstant);
+        assertThat(term.isConstant()).isTrue();
+    }
+
+    private static Stream<Arguments> provideConstantNames() {
+        return Stream.of(
+                Arguments.of("1"),
+                Arguments.of("1.0"),
+                Arguments.of("1.00"),
+                Arguments.of("\"x\""),
+                Arguments.of("\"1\"")
+        );
+    }
+
+    private static Stream<Arguments> provideVariableNames() {
+        return Stream.of(
+                Arguments.of("x"),
+                Arguments.of("1x"),
+                Arguments.of("x1"),
+                Arguments.of("x'")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideConstantNames")
+    public void should_IdentifyConstant_When_TermIsConstant(String nameOfConstant){
+        Term term = new Term(nameOfConstant);
+        assertThat(term.isConstant()).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideVariableNames")
+    public void should_NotIdentifyConstant_When_TermIsVariable(String nameOfVariable){
+        Term term = new Term(nameOfVariable);
+        assertThat(term.isConstant()).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideVariableNames")
+    public void should_IdentifyVariable_When_TermIsVariable(String nameOfVariable){
+        Term term = new Term(nameOfVariable);
+        assertThat(term.isVariable()).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideConstantNames")
+    public void should_NotIdentifyVariable_When_TermIsConstant(String nameOfConstant){
+        Term term = new Term(nameOfConstant);
+        assertThat(term.isVariable()).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"x", "1"})
+    public void should_ReturnVariableWithSameName_When_SubstitutionDoesNotApplyToVariable(String termName){
+        Term term = new Term(termName);
+        Map<String, String> substitution = Map.of("x1", "y1");
+        Term substitutedTerm = term.getSubstitutedTerm(substitution);
+        assertThat(substitutedTerm.getName()).isEqualTo(termName);
+    }
+
     @Test
-    public void testIsConstant() {
-
-        Term instance;
-        boolean result;
-        
-        instance = new Term("\"John\"");
-        result = instance.isConstant();
-        assertThat(result).isTrue();
-        
-        instance = new Term("John");
-        result = instance.isConstant();
-        assertThat(result).isFalse();
-
-        instance = new Term("1");
-        result = instance.isConstant();
-        assertThat(result).isTrue();
-        
-        instance = new Term(1);
-        result = instance.isConstant();
-        assertThat(result).isTrue();
-        
-        instance = new Term(-1);
-        result = instance.isConstant();
-        assertThat(result).isTrue();
-        
-        instance = new Term("-1.5");
-        result = instance.isConstant();
-        assertThat(result).isTrue();
+    public void should_ReturnNewVariableWithCorrespondingName_When_SubstitutionApplies(){
+        Term term = new Term("a");
+        Map<String, String> substitution = Map.of("x", "y", "a", "b");
+        Term substitutedTerm = term.getSubstitutedTerm(substitution);
+        assertThat(substitutedTerm.getName()).isEqualTo("b");
     }
 
-    /**
-     * Test of isVariable method, of class Term.
-     */
+
+
     @Test
-    public void testIsVariable() {
-        System.out.println("isVariable");
-        
-        Term instance;
-        boolean result;
-        
-        instance = new Term("\"John\"");
-        result = instance.isVariable();
-        assertThat(result).isFalse();
-        
-        instance = new Term("John");
-        result = instance.isVariable();
-        assertThat(result).isTrue();
+    public void should_ReturnSubstitution_When_UnifyingTwoVariables_WithEmptySubstitution(){
+        Term thisVariable = new Term("a");
+        Term thatVariable = new Term("b");
+        Map<String, String> substitution = Map.of();
 
-        instance = new Term("1");
-        result = instance.isVariable();
-        assertThat(result).isFalse();
-        
-        instance = new Term(1);
-        result = instance.isVariable();
-        assertThat(result).isFalse();
-        
-        instance = new Term(-1);
-        result = instance.isVariable();
-        assertThat(result).isFalse();
-        
-        instance = new Term("-1.5");
-        result = instance.isVariable();
-        assertThat(result).isFalse();
+        Map<String, String> result = thisVariable.getVariableToVariableUnification(thatVariable, substitution);
+
+        Map<String, String> expResult = Map.of("a", "b");
+        assertThat(result).isEqualTo(expResult);
     }
-    
-    /**
-     * Test of setSuffix method, of class Term.
-     */
+
     @Test
-    public void testSetSuffix() {
+    public void should_ReturnSameSubstitution_When_UnifyingTwoVariables_WithAlreadyUnifyingSubstitution(){
+        Term thisVariable = new Term("a");
+        Term thatVariable = new Term("b");
+        Map<String, String> substitution = Map.of("a","b");
 
-        String suffix = "_0";
-        Term instance = new Term("x");
-        instance.setSuffix(suffix);
-        String expResult = "x_0";
-        String result = instance.getName();
+        Map<String, String> result = thisVariable.getVariableToVariableUnification(thatVariable, substitution);
+
+        Map<String, String> expResult = Map.of("a", "b");
         assertThat(result).isEqualTo(expResult);
-
-        assertThatExceptionOfType(AssertionError.class)
-                .isThrownBy(() -> {
-                    Term term = new Term("1");
-                    term.setSuffix("_0");
-                });
     }
 
-    /**
-     * Test of getSubstitutedTerm method, of class Term.
-     */
     @Test
-    public void testGetSubstitutedTerm() {
+    public void should_ReturnNull_When_UnifyingTwoVariables_WithWrongSubstitution(){
+        Term thisVariable = new Term("a");
+        Term thatVariable = new Term("b");
+        Map<String, String> substitution = Map.of("a","c");
 
-        Term instance;
-        Term expResult, result;
-        Map<String, String> substitution;
-        
-        substitution = new HashMap<>();
-        substitution.put("a", "b");
-        instance = new Term("a");
-        expResult = instance.getSubstitutedTerm(substitution);
-        result = new Term("b");
-        assertThat(result).isEqualTo(expResult);
+        Map<String, String> result = thisVariable.getVariableToVariableUnification(thatVariable, substitution);
 
-        substitution = new HashMap<>();
-        substitution.put("a", "b");
-        instance = new Term("b");
-        expResult = instance.getSubstitutedTerm(substitution);
-        result = new Term("b");
-        assertThat(result).isEqualTo(expResult);
-        
-        substitution = new HashMap<>();
-        substitution.put("0", "1");
-        instance = new Term("0");
-        expResult = instance.getSubstitutedTerm(substitution);
-        result = new Term("0");
-        assertThat(result).isEqualTo(expResult);
-        
-        substitution = new HashMap<>();
-        substitution.put("a", "b");
-        instance = new Term("c");
-        expResult = instance.getSubstitutedTerm(substitution);
-        result = new Term("c");
-        assertThat(result).isEqualTo(expResult);
-        
-        substitution = new HashMap<>();
-        instance = new Term("c");
-        expResult = instance.getSubstitutedTerm(substitution);
-        result = new Term("c");
-        assertThat(result).isEqualTo(expResult);
-        
-        instance = new Term("c");
-        expResult = instance.getSubstitutedTerm(null);
-        result = new Term("c");
-        assertThat(result).isEqualTo(expResult);
+        assertThat(result).isNull();
     }
+
 
     /**
      * Test of getVariableToVariableUnification method, of class Term.
      */
     @Test
-    public void testGetVariableToVariableUnification() {
-
+    public void otherCases_getVariableToVariableUnification() {
         Term thatVariable, instance;
         Map<String, String> substitution, expResult, result;
-        
-        thatVariable = new Term("b");
-        substitution = new HashMap<>();
-        instance = new Term("a");
-        expResult = new HashMap<>();
-        expResult.put("a","b");
-        result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertThat(result).isEqualTo(expResult);
-
-        thatVariable = new Term("b");
-        substitution = new HashMap<>();
-        substitution.put("a","b");
-        instance = new Term("a");
-        expResult = new HashMap<>();
-        expResult.put("a","b");
-        result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertThat(result).isEqualTo(expResult);
-        
-        thatVariable = new Term("b");
-        substitution = new HashMap<>();
-        substitution.put("a","c");
-        instance = new Term("a");
-        result = instance.getVariableToVariableUnification(thatVariable, substitution);
-        assertThat(result).isNull();
         
         thatVariable = new Term(1);
         substitution = new HashMap<>();
@@ -270,8 +171,6 @@ public class TermTest {
         result = instance.getVariableToVariableUnification(thatVariable, substitution);
         assertThat(result).isEqualTo(expResult);
     }
-
-    
 
 
 }

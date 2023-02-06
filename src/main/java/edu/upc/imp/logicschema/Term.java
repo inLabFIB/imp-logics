@@ -12,31 +12,13 @@ import java.util.*;
  */
 public class Term {
     private String name;
-    
-    
-    /**
-     * @return true iff name does not contain any invalid character (',','(', ...)
-     */
-    private boolean isValidName(String name){
-        List<Character> forbiddenSymbols = new LinkedList<>();
-        forbiddenSymbols.add(',');
-        forbiddenSymbols.add('(');
-        forbiddenSymbols.add(')');
-        forbiddenSymbols.add('%');
-        
-        for(char c: name.toCharArray()){
-            if(forbiddenSymbols.contains(c)) return false;
-        }
-        
-        return true;
-    }
-    
+
 
     /**
      * Constructs a new Term term with the given name.
      * The term will be considered a constant if the given name starts and ends with the
      * symbol ", or if it can be cast to a Real Number.
-     * 
+     *
      * @param name != null && name != ""
      */
     public Term(String name) {
@@ -61,7 +43,7 @@ public class Term {
         copy.name = this.name;
         return copy;
     }
-    
+
     /**
      * Hook method
      */
@@ -72,13 +54,15 @@ public class Term {
     public String getName() {
         return name;
     }
-    
+
+
     /**
      * Renames the term with the given name. You should ensure that this term
      * is a variable before calling this method.
-     * 
+     *
      * @param name != null && name != ""
      */
+    @Deprecated
     public void setName(String name) {
         assert name != null:"The name of a term cannot be null";
         assert !name.equals(""):"The name of a term cannot be empty";
@@ -86,6 +70,32 @@ public class Term {
         assert this.isValidName(name):"Given term name is not valid: "+name;
         this.name = name;
     }
+
+    /**
+     * Adds the given suffix to the term name if it is a variable.
+     * You should ensure that this term is a variable before calling this method.
+     */
+    public void setSuffix(String suffix) {
+        this.setName(this.getName()+suffix);
+    }
+
+    /**
+     * @return true iff name does not contain any invalid character (',','(', ...)
+     */
+    private boolean isValidName(String name){
+        List<Character> forbiddenSymbols = new LinkedList<>();
+        forbiddenSymbols.add(',');
+        forbiddenSymbols.add('(');
+        forbiddenSymbols.add(')');
+        forbiddenSymbols.add('%');
+
+        for(char c: name.toCharArray()){
+            if(forbiddenSymbols.contains(c)) return false;
+        }
+
+        return true;
+    }
+
 
     public boolean isConstant() {
         if(name.startsWith("\"") && name.endsWith("\"") ||
@@ -102,12 +112,13 @@ public class Term {
         }
     }
 
-    public boolean nameIsModifiable(){
-        return !this.isConstant();
-    }
-
     public boolean isVariable() {
         return !isConstant();
+    }
+
+    @Deprecated
+    public boolean nameIsModifiable(){
+        return !this.isConstant();
     }
 
     /**
@@ -121,23 +132,15 @@ public class Term {
     }
 
     /**
-     * Adds the given suffix to the term name if it is a variable.
-     * You should ensure that this term is a variable before calling this method.
-     */
-    public void setSuffix(String suffix) {
-        String newName = this.getName()+suffix;
-        this.setName(this.getName()+suffix);
-    }
-
-    /**
      * @param thatVariable != null
      * @param substitution != null
      * @return a new substitution containing the given substitution, but possibly adding
      * a replacement from this variable to thatVariable. If thatVariable is not a variable
-     * (whereas this is) or such substitution does not exists, it returns null.
+     * (whereas this is) or such substitution does not exist, it returns null.
      * If this and thatVariable are constants with the same value, it returns
      * a copy of the given substitution.
      */
+    @Deprecated
     protected Map<String, String> getVariableToVariableUnification(Term thatVariable, Map<String, String> substitution) {
         assert thatVariable != null : "thatVariable cannot be null";
         assert substitution != null : "substitution cannot be null";
@@ -164,11 +167,10 @@ public class Term {
     public String toString() {
         return this.name;
     }
-    
+
     @Override
     public boolean equals(Object o){
-        if(o instanceof Term){
-            Term to = (Term)o;
+        if(o instanceof Term to){
             return this.name.equals(to.name);
         }
         return false;
@@ -177,16 +179,8 @@ public class Term {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.name);       
+        hash = 97 * hash + Objects.hashCode(this.name);
         return hash;
-    }
-    
-    public static List<Term> getTermList(String[] terms){
-        List<Term> result = new LinkedList<>();
-        for(String term: terms){
-            result.add(new Term(term));
-        }
-        return result;
     }
 
 }
