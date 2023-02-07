@@ -18,14 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TermTest {
     
     @Test
-    public void should_CreateConstantTerm_When_CreateTermWithInteger(){
+    public void should_CreateConstantTerm_WhenCreateTermWithInteger(){
         Term term = new Term(1);
         assertThat(term.isConstant()).isTrue();
         assertThat(term.getName()).isEqualTo("1");
     }
 
     @Test
-    public void should_CreateNewTermWithSameName_When_CopyingTerm(){
+    public void should_CreateNewTermWithSameName_WhenCopyingTerm(){
         Term original = new Term("x");
         Term copy = original.copy();
         assertThat(copy.getName()).isEqualTo(original.getName());
@@ -34,7 +34,7 @@ public class TermTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"1", "1.0", "1.00", "\"x\"", "\"1\""})
-    public void should_AddSufixToName_When_InvokingSetSuffix(String nameOfConstant){
+    public void should_AddSufixToName_WhenInvokingSetSuffix(String nameOfConstant){
         Term term = new Term(nameOfConstant);
         assertThat(term.isConstant()).isTrue();
     }
@@ -60,35 +60,35 @@ public class TermTest {
 
     @ParameterizedTest
     @MethodSource("provideConstantNames")
-    public void should_IdentifyConstant_When_TermIsConstant(String nameOfConstant){
+    public void should_IdentifyConstant_WhenTermIsConstant(String nameOfConstant){
         Term term = new Term(nameOfConstant);
         assertThat(term.isConstant()).isTrue();
     }
 
     @ParameterizedTest
     @MethodSource("provideVariableNames")
-    public void should_NotIdentifyConstant_When_TermIsVariable(String nameOfVariable){
+    public void should_NotIdentifyConstant_WhenTermIsVariable(String nameOfVariable){
         Term term = new Term(nameOfVariable);
         assertThat(term.isConstant()).isFalse();
     }
 
     @ParameterizedTest
     @MethodSource("provideVariableNames")
-    public void should_IdentifyVariable_When_TermIsVariable(String nameOfVariable){
+    public void should_IdentifyVariable_WhenTermIsVariable(String nameOfVariable){
         Term term = new Term(nameOfVariable);
         assertThat(term.isVariable()).isTrue();
     }
 
     @ParameterizedTest
     @MethodSource("provideConstantNames")
-    public void should_NotIdentifyVariable_When_TermIsConstant(String nameOfConstant){
+    public void should_NotIdentifyVariable_WhenTermIsConstant(String nameOfConstant){
         Term term = new Term(nameOfConstant);
         assertThat(term.isVariable()).isFalse();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"x", "1"})
-    public void should_ReturnVariableWithSameName_When_SubstitutionDoesNotApplyToVariable(String termName){
+    public void should_ReturnVariableWithSameName_WhenSubstitutionDoesNotApplyToVariable(String termName){
         Term term = new Term(termName);
         Map<String, String> substitution = Map.of("x1", "y1");
         Term substitutedTerm = term.getSubstitutedTerm(substitution);
@@ -96,7 +96,7 @@ public class TermTest {
     }
 
     @Test
-    public void should_ReturnNewVariableWithCorrespondingName_When_SubstitutionApplies(){
+    public void should_ReturnNewVariableWithCorrespondingName_WhenSubstitutionApplies(){
         Term term = new Term("a");
         Map<String, String> substitution = Map.of("x", "y", "a", "b");
         Term substitutedTerm = term.getSubstitutedTerm(substitution);
@@ -106,7 +106,7 @@ public class TermTest {
 
 
     @Test
-    public void should_ReturnSubstitution_When_UnifyingTwoVariables_WithEmptySubstitution(){
+    public void should_ReturnSubstitution_WhenUnifyingTwoVariables_WithEmptySubstitution(){
         Term thisVariable = new Term("a");
         Term thatVariable = new Term("b");
         Map<String, String> substitution = Map.of();
@@ -118,7 +118,7 @@ public class TermTest {
     }
 
     @Test
-    public void should_ReturnSameSubstitution_When_UnifyingTwoVariables_WithAlreadyUnifyingSubstitution(){
+    public void should_ReturnSameSubstitution_WhenUnifyingTwoVariables_WithAlreadyUnifyingSubstitution(){
         Term thisVariable = new Term("a");
         Term thatVariable = new Term("b");
         Map<String, String> substitution = Map.of("a","b");
@@ -130,7 +130,7 @@ public class TermTest {
     }
 
     @Test
-    public void should_ReturnNull_When_UnifyingTwoVariables_WithWrongSubstitution(){
+    public void should_ReturnNull_WhenUnifyingTwoVariables_WithWrongSubstitution(){
         Term thisVariable = new Term("a");
         Term thatVariable = new Term("b");
         Map<String, String> substitution = Map.of("a","c");

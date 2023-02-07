@@ -3,7 +3,7 @@ package edu.upc.imp.logicschema;
 import java.util.*;
 
 /**
- * Implementation of a logic predicate.
+ * Representation of a logic predicate.
  */
 public abstract class Predicate {
     private final List<DerivationRule> definitionRules = new LinkedList<>();
@@ -20,6 +20,14 @@ public abstract class Predicate {
     }
 
     /**
+     * @return a copied list of the actual definition rules for the predicate. It returns an empty
+     * list if the predicate is base
+     */
+    public List<DerivationRule> getDefinitionRules() {
+        return new LinkedList<>(definitionRules);
+    }
+
+    /**
      * Add a definition rule for this predicate.
      *
      * @param definitionRule a rule whose head's predicate is this
@@ -31,12 +39,8 @@ public abstract class Predicate {
         this.definitionRules.add(definitionRule);
     }
 
-    /**
-     * @return a copied list of the actual definition rules for the predicate. It returns an empty
-     * list if the predicate is base
-     */
-    public List<DerivationRule> getDefinitionRules() {
-        return new LinkedList<>(definitionRules);
+    public void deleteDerivationRule(DerivationRule dr) {
+        this.definitionRules.remove(dr);
     }
 
     /**
@@ -68,10 +72,29 @@ public abstract class Predicate {
         }
     }
 
+
+    //TODO: decouple method from logicSchema
+    /**
+     * Create a copy of this predicate into the given logicSchema.
+     * The copy will have the same name and arity, but will be base (i.e., will not have any derivation rule)
+     *
+     * @param logicSchema, should not be null
+     */
+    public abstract void copyToLogicSchema(LogicSchema logicSchema);
+
+    @Override
+    public String toString() {
+        String result = this.getName() + "(";
+        for (int i = 0; i < this.getArity(); ++i) {
+            if (i > 0) result += ",";
+            result += "X" + i;
+        }
+        return result + ")";
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Predicate) {
-            Predicate p = (Predicate) o;
+        if (o instanceof Predicate p) {
             return this.getName().equals(p.getName());
         }
         return false;
@@ -85,24 +108,5 @@ public abstract class Predicate {
     }
 
 
-    @Override
-    public String toString() {
-        String result = this.getName() + "(";
-        for (int i = 0; i < this.getArity(); ++i) {
-            if (i > 0) result += ",";
-            result += "X" + i;
-        }
-        return result + ")";
-    }
 
-    public void deleteDerivationRule(DerivationRule dr) {
-        this.definitionRules.remove(dr);
-    }
-
-    //TODO: decouple method from logicSchema
-
-    /**
-     * Doesn't copy derivation rules!!
-     */
-    public abstract void copyToLogicSchema(LogicSchema logicSchema);
 }

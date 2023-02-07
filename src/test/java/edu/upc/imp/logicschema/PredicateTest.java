@@ -1,229 +1,105 @@
 package edu.upc.imp.logicschema;
 
+import edu.upc.imp.utils.LogicSchemaMother;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PredicateTest {
-    
-    public PredicateTest() {
-    }
-    
-    /**
-     * Test of getName method, of class Predicate.
-     */
+
     @Test
-    public void testGetName() {
-        System.out.println("getName");
-        
-        Predicate instance = new PredicateImpl("P",2);
-        String expResult = "P";
-        String result = instance.getName();
-        assertThat(result).isEqualTo(expResult);
+    public void should_BeBase_WhenPredicateHasNoDerivationRule() {
+        Predicate predicate = new PredicateImpl("P",2);
+        assertThat(predicate.isBase()).isTrue();
     }
 
-    /**
-     * Test of getArity method, of class Predicate.
-     */
     @Test
-    public void testGetArity() {
-        System.out.println("getArity");
-        
-        Predicate instance = new PredicateImpl("P",2);
-        int expResult = 2;
-        int result = instance.getArity();
-        assertThat(result).isEqualTo(expResult);
+    public void should_BeNotBase_WhenPredicateHasDerivationRule() {
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(" P(x) :- Q(x, y)");
+        Predicate predicateP = schema.getPredicate("P");
+        assertThat(predicateP.isBase()).isFalse();
     }
 
-    /**
-     * Test of isBase method, of class Predicate.
-     */
     @Test
-    public void testIsBase() {
-        System.out.println("isBase");
-        
-        Predicate instance = new PredicateImpl("P",2);
-        boolean expResult = true;
-        boolean result = instance.isBase();
-        assertThat(result).isEqualTo(expResult);
-
-        List<Term> headTerms = new LinkedList<>();
-        headTerms.add(new Term("x"));
-        headTerms.add(new Term("y"));
-        Atom head = new Atom(instance, headTerms);
-        
-        Predicate q = new PredicateImpl("Q",2);
-        List<Term> qTerms = new LinkedList<>();
-        qTerms.add(new Term("x"));
-        qTerms.add(new Term("y"));
-        Atom qAtom = new Atom(q, qTerms);
-        List<Literal> literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(qAtom));
-        new DerivationRule(head, literals);
-        
-        expResult = false;
-        result = instance.isBase();
-        assertThat(result).isEqualTo(expResult);
+    public void should_computePredicateClosure_WhenPredicateIsBase() {
+        Predicate predicate = new PredicateImpl("P", 2);
+        Set<Predicate> result = predicate.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).isEmpty();
     }
 
-    /**
-     * Test of addDerivationRule method, of class Predicate.
-     */
     @Test
-    public void testAddDerivationRule() {
-        //This is tested with test get definition rules
+    public void should_computePredicateClosure_WhenPredicateHasOneDerivationRule(){
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(" P(x) :- Q(x, y), R(y, z)");
+        Predicate predicateP = schema.getPredicate("P");
+        Predicate predicateQ = schema.getPredicate("Q");
+        Predicate predicateR = schema.getPredicate("R");
+        Set<Predicate> result = predicateP.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).containsExactlyInAnyOrder(predicateQ,predicateR);
     }
 
-    /**
-     * Test of getDefinitionRules method, of class Predicate.
-     */
     @Test
-    public void testGetDefinitionRules() {
-        System.out.println("getDefinitionRules");
-        
-        Predicate instance = new PredicateImpl("P",2);
-        List<DerivationRule> expResult = new LinkedList<>();
-        List<DerivationRule> result = instance.getDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
+    public void should_computePredicateClosure_WhenPredicateHasSeveralDerivationRules() {
+        String schemaString = """
+                P(x, y) :- Q(x, y)
+                P(x, y) :- R(x), S(x, y)
+                """;
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(schemaString);
+        Predicate p = schema.getPredicate("P");
+        Predicate q = schema.getPredicate("Q");
+        Predicate r = schema.getPredicate("R");
+        Predicate s = schema.getPredicate("S");
 
-        List<Term> headTerms = new LinkedList<>();
-        headTerms.add(new Term("x"));
-        headTerms.add(new Term("y"));
-        Atom head = new Atom(instance, headTerms);
-        
-        Predicate q = new PredicateImpl("Q",2);
-        List<Term> qTerms = new LinkedList<>();
-        qTerms.add(new Term("x"));
-        qTerms.add(new Term("y"));
-        Atom qAtom = new Atom(q, qTerms);
-        List<Literal> literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(qAtom));
-        DerivationRule derivationRule = new DerivationRule(head, literals);
-        
-        expResult = new LinkedList<>();
-        expResult.add(derivationRule);
-        result = instance.getDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
-        
-        Predicate r = new PredicateImpl("R",2);
-        List<Term> rTerms = new LinkedList<>();
-        rTerms.add(new Term("x"));
-        rTerms.add(new Term("y"));
-        Atom rAtom = new Atom(r, rTerms);
-        literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(rAtom));
-        derivationRule = new DerivationRule(head, literals);
-        
-        expResult.add(derivationRule);
-        result = instance.getDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
+        Set<Predicate> result = p.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).containsExactlyInAnyOrder(q,r,s);
     }
 
-    /**
-     * Test of getNumberOfDefinitionRules method, of class Predicate.
-     */
     @Test
-    public void testGetNumberOfDefinitionRules() {
-        System.out.println("getNumberOfDefinitionRules");
+    public void should_computePredicateClosure_WhenDerivationRulesContainsMoreDerivations() {
+        String schemaString = """
+                P(x, y) :- Q(x, y)
+                P(x, y) :- R(x), S(x, y)
+                R(x) :- T(x, y), U(y)
+                """;
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(schemaString);
+        Predicate p = schema.getPredicate("P");
+        Predicate q = schema.getPredicate("Q");
+        Predicate r = schema.getPredicate("R");
+        Predicate s = schema.getPredicate("S");
+        Predicate t = schema.getPredicate("T");
+        Predicate u = schema.getPredicate("U");
 
-        Predicate instance = new PredicateImpl("P", 2);
-        int expResult = 0;
-        int result = instance.getNumberOfDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
-
-        List<Term> headTerms = new LinkedList<>();
-        headTerms.add(new Term("x"));
-        headTerms.add(new Term("y"));
-        Atom head = new Atom(instance, headTerms);
-
-        Predicate q = new PredicateImpl("Q", 2);
-        List<Term> qTerms = new LinkedList<>();
-        qTerms.add(new Term("x"));
-        qTerms.add(new Term("y"));
-        Atom qAtom = new Atom(q, qTerms);
-        List<Literal> literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(qAtom));
-        new DerivationRule(head, literals);
-
-        expResult = 1;
-        result = instance.getNumberOfDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
-
-        Predicate r = new PredicateImpl("R", 2);
-        List<Term> rTerms = new LinkedList<>();
-        rTerms.add(new Term("x"));
-        rTerms.add(new Term("y"));
-        Atom rAtom = new Atom(r, rTerms);
-        literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(rAtom));
-        new DerivationRule(head, literals);
-
-        expResult = 2;
-        result = instance.getNumberOfDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
+        Set<Predicate> result = p.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).containsExactlyInAnyOrder(q,r,s,t,u);
     }
 
-    /**
-     * Test of getAllPredicatesClosureInDefinitionRules method, of class Predicate.
-     */
     @Test
-    public void testGetAllPredicatesClosureInDefinitionRules() {
-        System.out.println("getAllPredicatesClosureInDefinitionRules");
-        
-        Predicate instance = new PredicateImpl("P",2);
-        Set<Predicate> expResult = new HashSet<>();
-        Set<Predicate> result = instance.getAllPredicatesClosureInDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
+    public void should_computePredicateClosure_WhenPredicateIsRecursive() {
+        String schemaString = """
+                P(x, y) :- P(x, z), Q(z), P(z, y)
+                P(x, y) :- R(x, y)
+                """;
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(schemaString);
+        Predicate p = schema.getPredicate("P");
+        Predicate q = schema.getPredicate("Q");
+        Predicate r = schema.getPredicate("R");
 
-        List<Term> headTerms = new LinkedList<>();
-        headTerms.add(new Term("x"));
-        headTerms.add(new Term("y"));
-        Atom head = new Atom(instance, headTerms);
-        
-        Predicate q = new PredicateImpl("Q",2);
-        List<Term> qTerms = new LinkedList<>();
-        qTerms.add(new Term("x"));
-        qTerms.add(new Term("y"));
-        Atom qAtom = new Atom(q, qTerms);
-        List<Literal> literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(qAtom));
-        DerivationRule derivationRule = new DerivationRule(head, literals);
-        
-        expResult = new HashSet<>();
-        expResult.add(q);
-        result = instance.getAllPredicatesClosureInDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
-        
-        Predicate r = new PredicateImpl("R",2);
-        List<Term> rTerms = new LinkedList<>();
-        rTerms.add(new Term("x"));
-        rTerms.add(new Term("y"));
-        Atom rAtom = new Atom(r, rTerms);
-        literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(rAtom));
-        new DerivationRule(head, literals);
-        
-        expResult.add(r);
-        result = instance.getAllPredicatesClosureInDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
-        
-        Predicate s = new PredicateImpl("S",2);
-        List<Term> sTerms = new LinkedList<>();
-        sTerms.add(new Term("x"));
-        sTerms.add(new Term("y"));
-        Atom sAtom = new Atom(s, sTerms);
-        literals = new LinkedList<>();
-        literals.add(new OrdinaryLiteral(sAtom));
-        head = new Atom(rAtom);
-        new DerivationRule(head, literals);
-        
-        expResult.add(s);
-        result = instance.getAllPredicatesClosureInDefinitionRules();
-        assertThat(result).isEqualTo(expResult);
+        Set<Predicate> result = p.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).containsExactlyInAnyOrder(p,q,r);
+    }
+
+    @Test
+    public void should_computePredicateClosure_WhenThereArePredicatesNotInClosure() {
+        String schemaString = """
+                P(x, y) :- Q(z)
+                R(x, y) :- S(x, y)
+                """;
+        LogicSchema schema = LogicSchemaMother.buildLogicSchema(schemaString);
+        Predicate p = schema.getPredicate("P");
+        Predicate q = schema.getPredicate("Q");
+
+        Set<Predicate> result = p.getAllPredicatesClosureInDefinitionRules();
+        assertThat(result).containsExactlyInAnyOrder(q);
     }
 }

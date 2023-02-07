@@ -9,9 +9,9 @@
 
 ### Test Naming Conventions
 
-**Should_ExpectedBehavior_When_StateUnderTest:** This technique is also used by many as it makes it easy to read the tests. Following is how tests in first example would read like if named using this technique:
-- Should_ThrowException_When_AgeLessThan18
-- Should_FailToWithdrawMoney_ForInvalidAccount
-- Should_FailToAdmit_IfMandatoryFieldsAreMissing
+Taking inspiration from https://dzone.com/articles/7-popular-unit-test-naming we use the following convention:
 
-Extracted from: https://dzone.com/articles/7-popular-unit-test-naming
+**should_featureTested_whenStateUnderTest**
+
+We prefer not to use the method name in the test, but prefer the feature, to decouple from the method name. E.g.:
+- should_BeBase_WhenPredicateHasNoDerivationRule
