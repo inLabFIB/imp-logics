@@ -8,8 +8,8 @@ import java.util.*;
  * An Atom consists of a Predicate (e.g. "Employee") together with a list of Terms.
  */
 public class Atom {
-    private final List<Term> terms;             //List of terms of the atom
-    private final Predicate predicate;          //Predicate
+    private final List<Term> terms;
+    private final Predicate predicate;
 
     /**
      * Constructs a new Atom copying the terms of the given atom and using the same predicate.
@@ -145,7 +145,7 @@ public class Atom {
 
     /**
      * @return a copy of this atom after applying the given substitution. If the substitution is null,
-     * it retuns a copy of this atom.
+     * it returns a copy of this atom.
      */
     public Atom getSubstitutedAtom(Map<String, String> substitution) {
         List<Term> newTerms = new LinkedList<>();
