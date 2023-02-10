@@ -3,6 +3,8 @@ package edu.upc.imp.logics.schema;
 import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
 import edu.upc.imp.logics.schema.exceptions.NegativeArity;
 
+import java.util.List;
+
 /**
  * Value object that represents an arity, for instance, of a Predicate.
  * It is a non-negative integer.
@@ -24,7 +26,13 @@ public class Arity {
         return arity;
     }
 
-    public void checkMatches(int size) {
-        if(arity != size) throw new ArityMismatch(arity, size);
+    /**
+     * Checks whether the number of given elements matches this arity, and throws an Exception if
+     * this is not the case.
+     *
+     * @param elements non-null list
+     */
+    public void checkMatches(List elements) {
+        if(arity != elements.size()) throw new ArityMismatch(arity, elements.size());
     }
 }

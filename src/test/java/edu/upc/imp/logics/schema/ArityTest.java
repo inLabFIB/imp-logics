@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -23,12 +25,12 @@ public class ArityTest {
     @Test
     public void should_NotThrowException_WhenMatchingArity(){
         Arity arity = new Arity(1);
-        assertThatNoException().isThrownBy(() -> arity.checkMatches(1));
+        assertThatNoException().isThrownBy(() -> arity.checkMatches(List.of(new Variable("x"))));
     }
 
     @Test
     public void should_ThrowException_WhenMatchingArity(){
         Arity arity = new Arity(1);
-        assertThatThrownBy(() -> arity.checkMatches(2)).isInstanceOf(ArityMismatch.class);
+        assertThatThrownBy(() -> arity.checkMatches(List.of(new Variable("x"), new Variable("y")))).isInstanceOf(ArityMismatch.class);
     }
 }

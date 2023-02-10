@@ -1,5 +1,13 @@
 # Developers guide
 
+## Guidance for creating a LogicSchema
+Terms are Value Objects, so, they can be reused among several constructions. E.g, a variable term "x" can
+be reused in several atoms, or built-in literals, even from different schemas.
+
+Predicates can be reused to create several atoms inside the schema they belong to, but should not be used in different schemas.
+
+Atoms, and Literals should not be reused in several NormalClauses, neither twice in the same NormalClause.
+
 ## Testing code
 
 ### To test or not to test
@@ -12,6 +20,3 @@
 Taking inspiration from https://dzone.com/articles/7-popular-unit-test-naming we use the following convention:
 
 **should_featureTested_whenStateUnderTest**
-
-We prefer not to use the method name in the test, but prefer the feature, to decouple from the method name. E.g.:
-- should_BeBase_WhenPredicateHasNoDerivationRule

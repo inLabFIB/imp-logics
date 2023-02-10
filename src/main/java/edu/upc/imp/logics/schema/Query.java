@@ -4,6 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A Query is composed of a list of terms, and a body
+ * E.g.: (x,y) :- P(x, y), not(R(x))
+ * Queries are used to define DerivedPredicates.
+ * For instance, the derived predicate D, with arity 2, is defined by the queries:
+ *  (x,y) :- P(x, y), not(R(x))
+ *  (x,y) :- P(x, y), not(S(x))
+ */
 public class Query {
     /**
      * Invariants:

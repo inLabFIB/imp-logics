@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 /**
- * Implementation of binary arithmetic comparison operators such as <, <=.
+ * Implementation of binary arithmetic comparison operators such as <, or <=.
  */
 public enum BinaryOperation {
     LESS_THAN("<"),

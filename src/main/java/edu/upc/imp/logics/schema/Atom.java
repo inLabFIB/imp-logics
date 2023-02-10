@@ -24,12 +24,11 @@ public class Atom {
     public Atom(Predicate predicate, List<Term> terms) {
         if (Objects.isNull(predicate)) throw new IllegalArgumentException("Predicate cannot be null");
         if (Objects.isNull(terms)) throw new IllegalArgumentException("Terms cannot be null");
-        predicate.getArity().checkMatches(terms.size());
+        predicate.getArity().checkMatches(terms);
 
         this.predicate = predicate;
         this.terms = Collections.unmodifiableList(terms);
     }
-
 
     public Predicate getPredicate() {
         return predicate;

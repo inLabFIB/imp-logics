@@ -5,6 +5,7 @@ import java.util.Objects;
 /**
  * Implementation of a logic OrdinaryLiteral.
  * E.g. "not Emp(x)"
+ * Ordinary literals should not be reused among several normal clauses
  *
  */
 public class OrdinaryLiteral extends Literal {

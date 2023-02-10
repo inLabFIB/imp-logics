@@ -7,7 +7,6 @@ import java.util.Objects;
 /**
  * Implementation of a logic normal clause. Normal clauses might be LogicConstraints, or DerivationRules
  * A NormalClause should be used, at most, in one LogicSchema.
- * That is, NormalClause cannot be reused.
  */
 public abstract class NormalClause {
     /**

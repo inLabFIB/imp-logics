@@ -6,6 +6,7 @@ import java.util.*;
 
 /**
  * This class implements the representation of a logic schema.
+ * A logic schema bounds several predicates and constraints together guaranteeing their consistency.
  *
  */
 public class LogicSchema {

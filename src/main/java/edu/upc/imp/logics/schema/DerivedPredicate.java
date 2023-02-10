@@ -3,6 +3,17 @@ package edu.upc.imp.logics.schema;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A predicate whose definition depends on several derivation rules
+ * E.g. predicate P, with arity 2, is a derived predicate defined by:
+ * P(x, y) :- R(x, y)
+ * P(x, w) :- S(x, w), T(w)
+ * To instantiate a DerivedPredicate, we use Queries, that is, a list of terms together a body:
+ *  (x, y) :- R(x, y)
+ *  (x, w) :- S(x, w), T(w)
+ * Indeed, it is redundant to include the predicate P in the rules that derive P.
+ *
+ */
 public class DerivedPredicate extends Predicate{
     /**
      * Invariants:
@@ -23,16 +34,15 @@ public class DerivedPredicate extends Predicate{
         this.derivationRules = createDerivationRules(definitionQueries);
     }
 
-    private static void checkArityOfDefinitionRules(Arity arity, List<Query> definitionRules) {
-        definitionRules.stream().forEach(q-> {
-                arity.checkMatches(q.getHeadTerms().size());
-            }
-        );
-    }
-
-
     public List<DerivationRule> getDerivationRules() {
         return derivationRules;
+    }
+
+    private static void checkArityOfDefinitionRules(Arity arity, List<Query> definitionRules) {
+        definitionRules.stream().forEach(q-> {
+                    arity.checkMatches(q.getHeadTerms());
+                }
+        );
     }
 
     private List<DerivationRule> createDerivationRules(List<Query> definitionQueries) {

@@ -7,7 +7,6 @@ import java.util.Objects;
  * A Predicate is a weak entity w.r.t. LogicSchema. That is:
  * - One Predicate can only belong to one LogicSchema
  * - A LogicSchema cannot contain two predicates with the same name
- * Predicates are mutable w.r.t. their definition rules. That is, a predicate can add new definition rules dynamically.
  *
  */
 public abstract class Predicate {

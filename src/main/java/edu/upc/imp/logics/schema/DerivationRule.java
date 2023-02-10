@@ -9,9 +9,20 @@ import java.util.List;
  *
  */
 public class DerivationRule extends NormalClause {
+    /**
+     * Invariants:
+     * - head cannot be null
+     * - head's predicate must be a derived predicate
+     */
     private final Atom head;
 
-    public DerivationRule(Atom head, List<Literal> body) {
+    /**
+     * DerivationRules should be created by their corresponding DerivedLiteral.
+     *
+     * @param head non-null
+     * @param body non-null and not empty
+     */
+    protected DerivationRule(Atom head, List<Literal> body) {
         super(body);
         this.head = head;
     }
