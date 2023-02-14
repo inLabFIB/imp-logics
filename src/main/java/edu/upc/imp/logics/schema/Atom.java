@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -12,11 +14,11 @@ import java.util.Objects;
  */
 public class Atom {
     /**
-     *  Invariants:
-     *   - Predicate must not be null
-     *   - terms must not be null
-     *   - The arity of the predicate should coincide with its list of terms
-     *   - Terms list is inmutable
+     * Invariants:
+     * - Predicate must not be null
+     * - terms must not be null
+     * - The arity of the predicate should coincide with its list of terms
+     * - Terms list is immutable
      */
     private final Predicate predicate;
     private final List<Term> terms;
@@ -24,7 +26,7 @@ public class Atom {
     public Atom(Predicate predicate, List<Term> terms) {
         if (Objects.isNull(predicate)) throw new IllegalArgumentException("Predicate cannot be null");
         if (Objects.isNull(terms)) throw new IllegalArgumentException("Terms cannot be null");
-        predicate.getArity().checkMatches(terms);
+        checkArityMatches(predicate.getArity(), terms);
 
         this.predicate = predicate;
         this.terms = Collections.unmodifiableList(terms);
@@ -36,5 +38,9 @@ public class Atom {
 
     public List<Term> getTerms() {
         return terms;
+    }
+
+    private static void checkArityMatches(Arity arity, List<Term> terms) {
+        if (arity.getNumber() != terms.size()) throw new ArityMismatch(arity.getNumber(), terms.size());
     }
 }

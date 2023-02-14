@@ -13,21 +13,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DerivedPredicateTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingDerivedPredicate_WithNullDefinitionRules(){
+    public void should_ThrowException_WhenCreatingDerivedPredicate_WithNullDefinitionRules() {
         assertThatThrownBy(() -> new DerivedPredicate("p", new Arity(1), null)).isInstanceOf(
                 IllegalArgumentException.class
         );
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingDerivedPredicate_WithEmptyDefinitionRules(){
+    public void should_ThrowException_WhenCreatingDerivedPredicate_WithEmptyDefinitionRules() {
         assertThatThrownBy(() -> new DerivedPredicate("p", new Arity(1), List.of())).isInstanceOf(
                 IllegalArgumentException.class
         );
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingDerivedPredicate_WithQueriesNotMatchinArity(){
+    public void should_ThrowException_WhenCreatingDerivedPredicate_WithQueriesNotMatchInArity() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         assertThatThrownBy(() -> new DerivedPredicate("p", new Arity(0), List.of(definitionRule))).isInstanceOf(
                 ArityMismatch.class
@@ -35,7 +35,7 @@ public class DerivedPredicateTest {
     }
 
     @Test
-    public void should_MakeDefinitionRulesInmutable_WhenCreatingDerivedPredicate(){
+    public void should_MakeDefinitionRulesImmutable_WhenCreatingDerivedPredicate() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         List<Query> definitionRules = new LinkedList<>();
         definitionRules.add(definitionRule);
@@ -44,7 +44,7 @@ public class DerivedPredicateTest {
     }
 
     @Test
-    public void should_ReturnOneDerivationRule_ForEachDefinedQuery(){
+    public void should_ReturnOneDerivationRule_ForEachDefinedQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         Query definitionRule2 = QueryMother.createTrivialQuery(1, "q");
         DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule1, definitionRule2));
@@ -52,20 +52,21 @@ public class DerivedPredicateTest {
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithThisPredicateInHead(){
+    public void should_ReturnDerivationRule_WithThisPredicateInHead() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule1));
         assertThat(derivedPredicate.getDerivationRules().get(0).getHead().getPredicate()).isSameAs(derivedPredicate);
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery(){
+    public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule));
         assertThat(derivedPredicate.getDerivationRules().get(0).getHead().getTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
     }
+
     @Test
-    public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery(){
+    public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule1));
         assertThat(derivedPredicate.getDerivationRules().get(0).getBody()).isSameAs(definitionRule1.getBody());

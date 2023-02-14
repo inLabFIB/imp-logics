@@ -1,7 +1,6 @@
 package edu.upc.imp.logics.schema.utils;
 
 
-
 import edu.upc.imp.logics.schema.*;
 
 import java.util.LinkedList;

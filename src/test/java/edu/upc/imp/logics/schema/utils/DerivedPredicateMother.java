@@ -13,8 +13,8 @@ public class DerivedPredicateMother {
      * Each definition rule is composed of only one predicate
      *
      * @param derivedPredicateName must be non-null
-     * @param arity must be non-negative
-     * @param predicatesList must be non-null, and non-empty
+     * @param arity                must be non-negative
+     * @param predicatesList       must be non-null, and non-empty
      * @return a derived predicate
      */
     public static DerivedPredicate createTrivialDerivedPredicate(String derivedPredicateName, int arity, List<BasePredicate> predicatesList) {

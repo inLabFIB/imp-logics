@@ -16,19 +16,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 public class AtomTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingAtomWithNullPredicate(){
+    public void should_ThrowException_WhenCreatingAtomWithNullPredicate() {
         assertThatThrownBy(() -> new Atom(null, List.of()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingAtomWithNullListOfTerms(){
+    public void should_ThrowException_WhenCreatingAtomWithNullListOfTerms() {
         assertThatThrownBy(() -> new Atom(new BasePredicate("P", new Arity(0)), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_MakeTermsListInmutable_WhenCreatingTheAtom(){
+    public void should_MakeTermsListImmutable_WhenCreatingTheAtom() {
         List<Term> terms = new LinkedList<>();
         terms.add(new Variable("x"));
         Atom atom = new Atom(new BasePredicate("P", new Arity(1)), terms);
@@ -46,7 +46,7 @@ public class AtomTest {
 
     @ParameterizedTest
     @MethodSource("provideWrongAritiesAndLists")
-    public void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms){
+    public void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms) {
         assertThatThrownBy(() -> new Atom(new BasePredicate("P", new Arity(arity)), terms))
                 .isInstanceOf(ArityMismatch.class);
     }

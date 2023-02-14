@@ -13,18 +13,17 @@ public abstract class NormalClause {
      * Invariants:
      * - body must not be null
      * - body must not be empty
-     * - body must be inmutable
+     * - body must be immutable
      */
     private final List<Literal> body; //TODO: alias problem
 
     public NormalClause(List<Literal> body) {
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
         if (body.isEmpty()) throw new IllegalArgumentException("Body cannot be empty");
-
-        this.body = body;
+        this.body = Collections.unmodifiableList(body);
     }
 
     public List<Literal> getBody() {
-        return Collections.unmodifiableList(body);
+        return body;
     }
 }

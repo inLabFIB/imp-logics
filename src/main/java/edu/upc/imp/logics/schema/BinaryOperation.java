@@ -16,4 +16,8 @@ public enum BinaryOperation {
     BinaryOperation(String symbol) {
         this.symbol = symbol;
     }
+
+    public String getSymbol() {
+        return symbol;
+    }
 }

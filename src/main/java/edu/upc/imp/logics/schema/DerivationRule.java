@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * Implementation of a logic derivation rule. That is, a NormalClause with head
  * E.g. "P(x) :- R(x, y)"
- *
  */
 public class DerivationRule extends NormalClause {
     /**

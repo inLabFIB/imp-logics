@@ -9,10 +9,9 @@ import java.util.Objects;
  * P(x, y) :- R(x, y)
  * P(x, w) :- S(x, w), T(w)
  * To instantiate a DerivedPredicate, we use Queries, that is, a list of terms together a body:
- *  (x, y) :- R(x, y)
- *  (x, w) :- S(x, w), T(w)
+ * (x, y) :- R(x, y)
+ * (x, w) :- S(x, w), T(w)
  * Indeed, it is redundant to include the predicate P in the rules that derive P.
- *
  */
 public class DerivedPredicate extends Predicate{
     /**
@@ -20,29 +19,20 @@ public class DerivedPredicate extends Predicate{
      * - the list of derivationRules is not null
      * - the list of derivationRules it not empty
      * - derivationRules head terms size matches with arity
-     * - derivationRules are inmutable
+     * - derivationRules are immutable
      */
 
     private final List<DerivationRule> derivationRules;
 
     public DerivedPredicate(String name, Arity arity, List<Query> definitionQueries) {
         super(name, arity);
-        if(Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
-        if(definitionQueries.isEmpty()) throw new IllegalArgumentException("Definition rules cannot be empty");
-        checkArityOfDefinitionRules(arity, definitionQueries);
-
+        if (Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
+        if (definitionQueries.isEmpty()) throw new IllegalArgumentException("Definition rules cannot be empty");
         this.derivationRules = createDerivationRules(definitionQueries);
     }
 
     public List<DerivationRule> getDerivationRules() {
         return derivationRules;
-    }
-
-    private static void checkArityOfDefinitionRules(Arity arity, List<Query> definitionRules) {
-        definitionRules.stream().forEach(q-> {
-                    arity.checkMatches(q.getHeadTerms());
-                }
-        );
     }
 
     private List<DerivationRule> createDerivationRules(List<Query> definitionQueries) {

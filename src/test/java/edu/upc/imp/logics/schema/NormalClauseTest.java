@@ -13,19 +13,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 public class NormalClauseTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingNormalClause_WithNullBody(){
+    public void should_ThrowException_WhenCreatingNormalClause_WithNullBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID(1);
-        assertThatThrownBy(() -> new LogicConstraint(constraintID,null));
+        assertThatThrownBy(() -> new LogicConstraint(constraintID, null));
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingNormalClause_WithEmptyBody(){
+    public void should_ThrowException_WhenCreatingNormalClause_WithEmptyBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID(1);
         assertThatThrownBy(() -> new LogicConstraint(constraintID, List.of()));
     }
 
     @Test
-    public void should_MakeBodyInmutable_WhenCreatingNormalClause(){
+    public void should_MakeBodyImmutable_WhenCreatingNormalClause() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID(1);
         Literal literal = LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x"));
         List<Literal> body = new LinkedList<>();

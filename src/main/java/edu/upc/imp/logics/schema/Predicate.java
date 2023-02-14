@@ -7,7 +7,6 @@ import java.util.Objects;
  * A Predicate is a weak entity w.r.t. LogicSchema. That is:
  * - One Predicate can only belong to one LogicSchema
  * - A LogicSchema cannot contain two predicates with the same name
- *
  */
 public abstract class Predicate {
     /**
@@ -21,8 +20,8 @@ public abstract class Predicate {
     private final Arity arity;
 
     public Predicate(String name, Arity arity) {
-        if(Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
-        if(Objects.isNull(arity)) throw new IllegalArgumentException("Arity cannot be null");
+        if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
+        if (Objects.isNull(arity)) throw new IllegalArgumentException("Arity cannot be null");
 
         this.name = name;
         this.arity = arity;
