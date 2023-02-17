@@ -42,4 +42,9 @@ public class DerivedPredicate extends Predicate{
                         q.getBody())
         ).toList();
     }
+
+    @Override
+    public boolean isDerived(){
+        return true;
+    }
 }

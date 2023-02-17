@@ -56,7 +56,7 @@ public class LogicSchema {
         }
     }
 
-    public Predicate getPredicate(String predicateName) {
+    public Predicate getPredicateByName(String predicateName) {
         if (!this.predicates.containsKey(predicateName)) {
             throw new PredicateNotExists(predicateName);
         }
@@ -68,7 +68,7 @@ public class LogicSchema {
         return constraints.get(constraintID);
     }
 
-    public List<DerivationRule> getDerivationRules(String derivedPredicateName) {
+    public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
         if (!predicates.containsKey(derivedPredicateName)) throw new PredicateNotExists(derivedPredicateName);
 
         Predicate predicate = predicates.get(derivedPredicateName);
@@ -84,4 +84,6 @@ public class LogicSchema {
     public Set<LogicConstraint> getAllLogicConstraints() {
         return new HashSet<>(constraints.values());
     }
+
+
 }

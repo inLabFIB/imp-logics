@@ -14,13 +14,13 @@ public class OrdinaryLiteral extends Literal {
      * - Atom must not be null
      */
     private final Atom atom;
-    private final boolean sign;
+    private final boolean isPositive;
 
 
-    public OrdinaryLiteral(Atom atom, boolean sign) {
+    public OrdinaryLiteral(Atom atom, boolean isPositive) {
         if(Objects.isNull(atom)) throw new IllegalArgumentException("Atom cannot be null");
         this.atom = atom;
-        this.sign = sign;
+        this.isPositive = isPositive;
     }
 
     /**
@@ -33,7 +33,7 @@ public class OrdinaryLiteral extends Literal {
     }
 
     public boolean isPositive(){
-        return sign;
+        return isPositive;
     }
 
     public Atom getAtom(){

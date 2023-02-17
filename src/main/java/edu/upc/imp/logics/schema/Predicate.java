@@ -35,4 +35,7 @@ public abstract class Predicate {
         return name;
     }
 
+    public boolean isDerived() {
+        return false;
+    }
 }
