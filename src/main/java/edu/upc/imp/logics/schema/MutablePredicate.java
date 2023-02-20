@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.schema;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,23 +14,25 @@ import java.util.Objects;
  * (x, w) :- S(x, w), T(w)
  * Indeed, it is redundant to include the predicate P in the rules that derive P.
  */
-@Deprecated
-public class DerivedPredicate extends Predicate{
+public class MutablePredicate extends Predicate {
     /**
      * Invariants:
      * - the list of derivationRules is not null
-     * - the list of derivationRules it not empty
      * - derivationRules head terms size matches with arity
-     * - derivationRules are immutable
+     * - derivationRules are mutable
      */
 
-    private final List<DerivationRule> derivationRules;
+    private List<DerivationRule> derivationRules;
 
-    public DerivedPredicate(String name, Arity arity, List<Query> definitionQueries) {
+    public MutablePredicate(String name, Arity arity, List<Query> definitionQueries) {
         super(name, arity);
         if (Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
-        if (definitionQueries.isEmpty()) throw new IllegalArgumentException("Definition rules cannot be empty");
-        this.derivationRules = createDerivationRules(definitionQueries);
+        derivationRules = createDerivationRules(definitionQueries);
+    }
+
+    public MutablePredicate(String name, Arity arity) {
+        super(name, arity);
+        derivationRules = List.of();
     }
 
     public List<DerivationRule> getDerivationRules() {
@@ -37,15 +40,23 @@ public class DerivedPredicate extends Predicate{
     }
 
     private List<DerivationRule> createDerivationRules(List<Query> definitionQueries) {
-        return definitionQueries.stream().map(q->
+        return definitionQueries.stream().map(q ->
                 new DerivationRule(
                         new Atom(this, q.getHeadTerms()),
                         q.getBody())
         ).toList();
     }
 
+    public void addDerivationRule(Query definitionRule) {
+        derivationRules = new ArrayList<>(derivationRules);
+        derivationRules.add(new DerivationRule(
+                new Atom(this, definitionRule.getHeadTerms()),
+                definitionRule.getBody()));
+        derivationRules = derivationRules.stream().toList();
+    }
+
     @Override
-    public boolean isDerived(){
-        return true;
+    public boolean isDerived() {
+        return !derivationRules.isEmpty();
     }
 }

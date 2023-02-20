@@ -1,8 +1,8 @@
 package edu.upc.imp.logics.schema.utils;
 
 import edu.upc.imp.logics.schema.Arity;
-import edu.upc.imp.logics.schema.BasePredicate;
-import edu.upc.imp.logics.schema.DerivedPredicate;
+import edu.upc.imp.logics.schema.MutablePredicate;
+import edu.upc.imp.logics.schema.Predicate;
 import edu.upc.imp.logics.schema.Query;
 
 import java.util.List;
@@ -17,9 +17,9 @@ public class DerivedPredicateMother {
      * @param predicatesList       must be non-null, and non-empty
      * @return a derived predicate
      */
-    public static DerivedPredicate createTrivialDerivedPredicate(String derivedPredicateName, int arity, List<BasePredicate> predicatesList) {
+    public static MutablePredicate createTrivialDerivedPredicate(String derivedPredicateName, int arity, List<Predicate> predicatesList) {
         List<Query> queries = predicatesList.stream().map(p -> QueryMother.createTrivialQuery(1, p)).toList();
-        return new DerivedPredicate(derivedPredicateName, new Arity(arity), queries);
+        return new MutablePredicate(derivedPredicateName, new Arity(arity), queries);
     }
 
 

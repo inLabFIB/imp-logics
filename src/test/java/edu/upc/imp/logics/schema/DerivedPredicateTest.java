@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class DerivedPredicateTest {
 
@@ -67,8 +67,16 @@ public class DerivedPredicateTest {
 
     @Test
     public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
-        Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
-        DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule1));
-        assertThat(derivedPredicate.getDerivationRules().get(0).getBody()).isSameAs(definitionRule1.getBody());
+        Query definitionRule = QueryMother.createTrivialQuery(1, "p");
+        DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule));
+        assertThat(derivedPredicate.getDerivationRules().get(0).getBody()).isSameAs(definitionRule.getBody());
     }
+
+    @Test
+    public void should_AlwaysBeDerived() {
+        Query definitionRule = QueryMother.createTrivialQuery(1, "p");
+        DerivedPredicate derivedPredicate = new DerivedPredicate("p", new Arity(1), List.of(definitionRule));
+        assertThat(derivedPredicate.isDerived()).isTrue();
+    }
+
 }
