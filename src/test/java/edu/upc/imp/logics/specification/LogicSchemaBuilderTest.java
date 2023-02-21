@@ -53,7 +53,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addDerivedPredicate_whenAddingDerivationRuleSpecification() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -73,7 +73,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addDerivationRuleAndPredicates_whenAddDerivationRuleSpecWithNotExistentPredicates() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -103,7 +103,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
@@ -117,7 +117,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
@@ -137,7 +137,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")

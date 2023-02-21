@@ -12,9 +12,13 @@ public class LogicSchemaBuilder {
     private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
 
     public LogicSchemaBuilder addPredicate(String predicateName, int arity) {
+        addPredicateIfAbsent(predicateName, arity);
+        return this;
+    }
+
+    private void addPredicateIfAbsent(String predicateName, int arity) {
         checkRepeatedNameWithDifferentArity(predicateName, arity);
         predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, new Arity(arity)));
-        return this;
     }
 
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
@@ -49,20 +53,17 @@ public class LogicSchemaBuilder {
     }
 
     private List<Literal> buildBody(List<LiteralSpec> bodySpec) {
-        List<Literal> body = new LinkedList<>();
-        for (LiteralSpec literalSpec : bodySpec) {
-            if (literalSpec instanceof OrdinaryLiteralSpec olSpec) {
-                body.add(buildOrdinaryLiteral(olSpec));
-            } else throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
-        }
-        return body;
+        addPredicatesFromBody(bodySpec);
+        return new BodyBuilder(predicatesByName).addLiterals(bodySpec).build();
     }
 
-    private Literal buildOrdinaryLiteral(OrdinaryLiteralSpec olSpec) {
-        List<Term> terms = TermSpecToTermFactory.buildTerms(olSpec.getTermSpecList());
-        predicatesByName.putIfAbsent(olSpec.getPredicateName(), new MutablePredicate(olSpec.getPredicateName(), new Arity(terms.size())));
-        Predicate predicate = predicatesByName.get(olSpec.getPredicateName());
-        return new OrdinaryLiteral(new Atom(predicate, terms), olSpec.isPositive());
+    private void addPredicatesFromBody(List<LiteralSpec> bodySpec) {
+        for (LiteralSpec literalSpec : bodySpec) {
+            if (literalSpec instanceof OrdinaryLiteralSpec olSpec) {
+                int numberOfTerms = olSpec.getTermSpecList().size();
+                addPredicateIfAbsent(olSpec.getPredicateName(), numberOfTerms);
+            } else throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+        }
     }
 
     public LogicSchema build() {

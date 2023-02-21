@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.specification;
 
 
-public class DefaultStringToTermFactory extends StringToTermFactory {
+public class DefaultStringToTermSpecFactory extends StringToTermSpecFactory {
 
     @Override
     public boolean isVariable(String name) {

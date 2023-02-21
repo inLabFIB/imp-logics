@@ -1,0 +1,21 @@
+package edu.upc.imp.logics.specification;
+
+import java.util.List;
+
+public class BuiltInLiteralSpec extends LiteralSpec {
+    private final String operator;
+    private final List<TermSpec> termSpecs;
+
+    public BuiltInLiteralSpec(String operator, List<TermSpec> termSpecs) {
+        this.operator = operator;
+        this.termSpecs = termSpecs;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public List<TermSpec> getTermSpecs() {
+        return termSpecs;
+    }
+}

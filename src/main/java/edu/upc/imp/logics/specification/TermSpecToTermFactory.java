@@ -11,15 +11,19 @@ public class TermSpecToTermFactory {
 
     public static List<Term> buildTerms(List<TermSpec> termSpecList) {
         List<Term> terms = new LinkedList<>();
-        for (TermSpec termSpec: termSpecList) {
-            if (termSpec instanceof VariableSpec){
-                terms.add(new Variable(termSpec.getName()));
-            }
-            else if (termSpec instanceof ConstantSpec) {
-                terms.add(new Constant(termSpec.getName()));
-            }
-            else throw new RuntimeException("Unrecognized term spec "+termSpec.getClass().getName());
+        for (TermSpec termSpec : termSpecList) {
+            Term term = buildTerm(termSpec);
+            terms.add(term);
         }
         return terms;
     }
+
+    public static Term buildTerm(TermSpec termSpec) {
+        if (termSpec instanceof VariableSpec) {
+            return new Variable(termSpec.getName());
+        } else if (termSpec instanceof ConstantSpec) {
+            return new Constant(termSpec.getName());
+        } else throw new RuntimeException("Unrecognized term spec " + termSpec.getClass().getName());
+    }
+
 }

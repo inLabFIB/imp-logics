@@ -4,19 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public abstract class StringToTermFactory {
+public abstract class StringToTermSpecFactory {
 
-    public List<TermSpec> createTerms(String[] termNames) {
+    public List<TermSpec> createTermSpecs(String... termNames) {
         List<TermSpec> termSpecList = new LinkedList<>();
-        for(String name: termNames) {
+        for (String name : termNames) {
             if (isConstant(name)) {
                 termSpecList.add(new ConstantSpec(name));
-            }
-            else if (isVariable(name)) {
+            } else if (isVariable(name)) {
                 termSpecList.add(new VariableSpec(name));
-            }
-            else {
-                throw new RuntimeException("Unrecognized term name: "+name);
+            } else {
+                throw new RuntimeException("Unrecognized term name: " + name);
             }
         }
         return termSpecList;
