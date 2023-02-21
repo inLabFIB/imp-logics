@@ -31,4 +31,41 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         }
         return this;
     }
+
+    public LiteralAssert isOrdinaryLiteral() {
+        Assertions.assertThat(actual).isInstanceOf(OrdinaryLiteral.class);
+        return this;
+    }
+
+    public LiteralAssert hasPredicate(String predicateName, int arity) {
+        Assertions.assertThat(actual).isInstanceOf(OrdinaryLiteral.class);
+        OrdinaryLiteralAssert.assertThat((OrdinaryLiteral) actual).hasPredicate(predicateName, arity);
+        return this;
+    }
+
+    public LiteralAssert hasVariable(int index, String variableName) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Index must be greater than 0");
+        }
+        Assertions.assertThat(actual.getTerms()).hasSizeGreaterThan(index);
+        TermAssert.assertThat(actual.getTerms().get(index)).isVariable(variableName);
+        return this;
+    }
+
+    public LiteralAssert hasConstant(int index, String constantName) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Index must be greater than 0");
+        }
+        Assertions.assertThat(actual.getTerms()).hasSizeGreaterThan(index);
+        TermAssert.assertThat(actual.getTerms().get(index)).isConstant(constantName);
+        return this;
+    }
+
+    public LiteralAssert containsVariables(String... variableNames) {
+        for (int i = 0; i < variableNames.length; i++) {
+            String variableName = variableNames[i];
+            hasVariable(i, variableName);
+        }
+        return this;
+    }
 }

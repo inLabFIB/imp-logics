@@ -33,4 +33,16 @@ public class TermAssert extends AbstractAssert<TermAssert, Term> {
         return this;
     }
 
+    public TermAssert isVariable(String variableName) {
+        Assertions.assertThat(actual).isInstanceOf(Variable.class);
+        Assertions.assertThat(actual.getName()).isEqualTo(variableName);
+        return this;
+    }
+
+    public TermAssert isConstant(String constantName) {
+        Assertions.assertThat(actual).isInstanceOf(Constant.class);
+        Assertions.assertThat(actual.getName()).isEqualTo(constantName);
+        return this;
+    }
+
 }

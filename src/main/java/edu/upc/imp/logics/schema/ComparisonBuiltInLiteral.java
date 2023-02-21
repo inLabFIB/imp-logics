@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.schema;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,5 +39,10 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
 
     public ComparisonOperator getOperator() {
         return operator;
+    }
+
+    @Override
+    public List<Term> getTerms() {
+        return List.of(leftTerm, rightTerm);
     }
 }

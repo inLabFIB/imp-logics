@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.schema;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,11 +33,16 @@ public class OrdinaryLiteral extends Literal {
         this(atom, true);
     }
 
-    public boolean isPositive(){
+    public boolean isPositive() {
         return isPositive;
     }
 
-    public Atom getAtom(){
+    public Atom getAtom() {
         return atom;
+    }
+
+    @Override
+    public List<Term> getTerms() {
+        return atom.getTerms();
     }
 }

@@ -5,5 +5,5 @@ package edu.upc.imp.logics.schema;
  * That is, a literal whose interpretation is fixed, rather than checked over a database.
  * E.g. "3 < 4" is a built-in literal since it can be checked without accessing a database
  */
-public class BuiltInLiteral extends Literal {
+public abstract class BuiltInLiteral extends Literal {
 }
