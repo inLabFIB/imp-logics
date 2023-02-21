@@ -15,13 +15,15 @@ public class NormalClauseTest {
     @Test
     public void should_ThrowException_WhenCreatingNormalClause_WithNullBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
-        assertThatThrownBy(() -> new LogicConstraint(constraintID, null));
+        assertThatThrownBy(() -> new LogicConstraint(constraintID, null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void should_ThrowException_WhenCreatingNormalClause_WithEmptyBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
-        assertThatThrownBy(() -> new LogicConstraint(constraintID, List.of()));
+        assertThatThrownBy(() -> new LogicConstraint(constraintID, List.of()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

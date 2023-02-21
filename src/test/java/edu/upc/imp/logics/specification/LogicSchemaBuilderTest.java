@@ -1,9 +1,9 @@
 package edu.upc.imp.logics.specification;
 
 import edu.upc.imp.logics.assertions.DerivationRuleAssert;
+import edu.upc.imp.logics.assertions.LogicConstraintAssert;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicSchema;
-import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
 import edu.upc.imp.logics.schema.exceptions.RepeatedConstraintID;
 import edu.upc.imp.logics.schema.exceptions.RepeatedPredicateName;
 import org.junit.jupiter.api.Test;
@@ -102,60 +102,52 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_throwsArityMismatch_whenAddDerivationRuleWithExistentPredicateNameAndDifferentArityInHead() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
-        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
-                .addHead("P", "x", "y")
-                .addOrdinaryLiteral("Q", "x", "y")
-                .build();
-
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addPredicate("P", 3)
-                .addDerivationRuleSpec(derivationRuleSpec)).isInstanceOf(ArityMismatch.class);
-    }
-
-    @Test
-    public void should_throwsArityMismatch_whenAddDerivationRule_withExistentPredicateNameAndDifferentArityInLiteral() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
-        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
-                .addHead("P", "x", "y")
-                .addOrdinaryLiteral("Q", "x", "y")
-                .build();
-
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addPredicate("Q", 3)
-                .addDerivationRuleSpec(derivationRuleSpec)).isInstanceOf(ArityMismatch.class);
-    }
-
-    @Test
     public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
         StringToTermFactory termFactory = new DefaultStringToTermFactory();
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
         assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addLogicConstraint("@1", logicConstraintSpec)
-                .addLogicConstraint("@1", logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
+                .addLogicConstraint(logicConstraintSpec)
+                .addLogicConstraint(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
     }
 
     @Test
     public void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
         StringToTermFactory termFactory = new DefaultStringToTermFactory();
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
         LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraint("@1", logicConstraintSpec)
+                .addLogicConstraint(logicConstraintSpec)
                 .build();
 
         assertThat(logicSchema.getAllLogicConstraints()).hasSize(1);
         assertThat(logicSchema.getAllLogicConstraints()).first().satisfies(
-                logicConstraint -> assertThat(logicConstraint.getBody()).hasSize(2)
+                lc -> LogicConstraintAssert.assertThat(lc).correspondsSpec(logicConstraintSpec)
         );
+    }
+
+
+    @Test
+    public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
+        StringToTermFactory termFactory = new DefaultStringToTermFactory();
+        LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("1")
+                .addOrdinaryLiteral("P", "x", "y")
+                .addOrdinaryLiteral("Q", "x", "y")
+                .build();
+
+        LogicSchema logicSchema = new LogicSchemaBuilder()
+                .addLogicConstraint(logicConstraintSpec)
+                .build();
+
         assertThat(logicSchema.getAllPredicates()).hasSize(2);
         assertThat(logicSchema.getPredicateByName("P")).satisfies(
                 p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
@@ -163,34 +155,6 @@ public class LogicSchemaBuilderTest {
         assertThat(logicSchema.getPredicateByName("Q")).satisfies(
                 p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
         );
-    }
-
-    @Test
-    public void should_throwArityMismatch_whenAddingLogicConstraintSpecWithExistentPredicateNameAndDiferentArity() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
-        LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
-                .addOrdinaryLiteral("P", "x", "y")
-                .build();
-
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addPredicate("P", 3)
-                .addLogicConstraint("@1", logicConstraintSpec)).isInstanceOf(ArityMismatch.class);
-    }
-
-    @Test
-    public void should_throwArityMismatch_whenAddingTwoLogicConstraintSpecWithSamePredicateNameAndDiferentArity() {
-        StringToTermFactory termFactory = new DefaultStringToTermFactory();
-        LogicConstraintSpec logicConstraintSpec1 = new LogicConstraintSpecBuilder(termFactory)
-                .addOrdinaryLiteral("P", "x", "y")
-                .build();
-
-        LogicConstraintSpec logicConstraintSpec2 = new LogicConstraintSpecBuilder(termFactory)
-                .addOrdinaryLiteral("P", "x", "y", "z")
-                .build();
-
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addLogicConstraint("@1", logicConstraintSpec1)
-                .addLogicConstraint("@2", logicConstraintSpec2)).isInstanceOf(ArityMismatch.class);
     }
 
 }

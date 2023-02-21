@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of a logic constraint. That is, a NormalClause  without head.
@@ -10,10 +11,16 @@ import java.util.List;
  * - A LogicConstraint cannot appear in two schemas
  */
 public class LogicConstraint extends NormalClause {
+    /**
+     * Invariants:
+     * - constraintID must not be null
+     * - constraintID must be immutable
+     */
     private final ConstraintID constraintID;
 
     public LogicConstraint(ConstraintID constraintID, List<Literal> body) {
         super(body);
+        if (Objects.isNull(constraintID)) throw new IllegalArgumentException("ConstraintID cannot be null");
         this.constraintID = constraintID;
     }
 

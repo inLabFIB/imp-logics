@@ -1,4 +1,12 @@
 package edu.upc.imp.logics.schema;
 
-public record ConstraintID(String id){}
+import java.util.Objects;
+
+public record ConstraintID(String id) {
+    public ConstraintID {
+        if (Objects.isNull(id)) {
+            throw new IllegalArgumentException("ConstraintID cannot be null");
+        }
+    }
+}
 

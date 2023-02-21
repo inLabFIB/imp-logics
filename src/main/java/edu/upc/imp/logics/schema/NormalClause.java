@@ -15,7 +15,7 @@ public abstract class NormalClause {
      * - body must not be empty
      * - body must be immutable
      */
-    private final List<Literal> body; //TODO: alias problem
+    private final List<Literal> body;
 
     public NormalClause(List<Literal> body) {
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
