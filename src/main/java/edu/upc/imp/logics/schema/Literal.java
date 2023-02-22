@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.visitor.Visitable;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,6 @@ import java.util.List;
  * A literal should appear, at most, inside the body of one NormalClause.
  * That is, literals should not be reused among several NormalClauses.
  */
-public abstract class Literal {
+public abstract class Literal implements Visitable {
     public abstract List<Term> getTerms();
 }

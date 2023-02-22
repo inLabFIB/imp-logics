@@ -1,6 +1,8 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
+import edu.upc.imp.logics.schema.visitor.Visitable;
+import edu.upc.imp.logics.schema.visitor.Visitor;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.Objects;
  * An atom should belong, at most, to one NormalClause, or one literal. That is,
  * atoms should not be reused several times.
  */
-public class Atom {
+public class Atom implements Visitable {
     /**
      * Invariants:
      * - Predicate must not be null
@@ -42,5 +44,10 @@ public class Atom {
 
     private static void checkArityMatches(Arity arity, List<Term> terms) {
         if (arity.getNumber() != terms.size()) throw new ArityMismatch(arity.getNumber(), terms.size());
+    }
+
+    @Override
+    public <T, R> T accept(Visitor<T, R> visitor, R context) {
+        return visitor.visitAtom(this, context);
     }
 }

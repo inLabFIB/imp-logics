@@ -1,13 +1,16 @@
 package edu.upc.imp.logics.schema;
 
 
+import edu.upc.imp.logics.schema.visitor.Visitable;
+import edu.upc.imp.logics.schema.visitor.Visitor;
+
 import java.util.List;
 
 /**
  * Implementation of a logic derivation rule. That is, a NormalClause with head
  * E.g. "P(x) :- R(x, y)"
  */
-public class DerivationRule extends NormalClause {
+public class DerivationRule extends NormalClause implements Visitable {
     /**
      * Invariants:
      * - head cannot be null
@@ -28,5 +31,10 @@ public class DerivationRule extends NormalClause {
 
     public Atom getHead() {
         return head;
+    }
+
+    @Override
+    public <T, R> T accept(Visitor<T, R> visitor, R context) {
+        return visitor.visitDerivationRule(this, context);
     }
 }

@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.visitor.Visitor;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -44,5 +46,10 @@ public class OrdinaryLiteral extends Literal {
     @Override
     public List<Term> getTerms() {
         return atom.getTerms();
+    }
+
+    @Override
+    public <T, R> T accept(Visitor<T, R> visitor, R context) {
+        return visitor.visitOrdinaryLiteral(this, context);
     }
 }
