@@ -6,11 +6,10 @@ import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.specification.DerivationRuleSpec;
 import edu.upc.imp.logics.specification.LiteralSpec;
 import edu.upc.imp.logics.specification.TermSpec;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
 
-public class DerivationRuleAssert extends AbstractAssert<DerivationRuleAssert, DerivationRule> {
+public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
 
     public DerivationRuleAssert(DerivationRule actual) {
         super(actual, DerivationRuleAssert.class);
@@ -37,4 +36,6 @@ public class DerivationRuleAssert extends AbstractAssert<DerivationRuleAssert, D
 
         return this;
     }
+
+
 }

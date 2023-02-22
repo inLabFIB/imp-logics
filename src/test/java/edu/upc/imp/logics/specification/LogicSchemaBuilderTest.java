@@ -2,6 +2,7 @@ package edu.upc.imp.logics.specification;
 
 import edu.upc.imp.logics.assertions.DerivationRuleAssert;
 import edu.upc.imp.logics.assertions.LogicConstraintAssert;
+import edu.upc.imp.logics.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.schema.exceptions.RepeatedConstraintID;
@@ -62,7 +63,7 @@ public class LogicSchemaBuilderTest {
         LogicSchema logicSchema = new LogicSchemaBuilder()
                 .addPredicate("P", 2)
                 .addPredicate("Q", 2)
-                .addDerivationRuleSpec(derivationRuleSpec)
+                .addDerivationRule(derivationRuleSpec)
                 .build();
 
         assertThat(logicSchema.getPredicateByName("P").isDerived()).isTrue();
@@ -80,7 +81,7 @@ public class LogicSchemaBuilderTest {
                 .build();
 
         LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addDerivationRuleSpec(derivationRuleSpec)
+                .addDerivationRule(derivationRuleSpec)
                 .build();
 
         assertThat(logicSchema.getAllPredicates()).hasSize(2);
@@ -134,7 +135,6 @@ public class LogicSchemaBuilderTest {
         );
     }
 
-
     @Test
     public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
@@ -156,5 +156,62 @@ public class LogicSchemaBuilderTest {
                 p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
         );
     }
+
+    @Test
+    public void should_createSchema_whenDefiningSchema() {
+//            :- WorksIn(E, D), not(Emp(E))
+//            :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
+//            :- Dept(D), not(MinOneSpecialEmployee(D))
+//            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
+//            MinOneSpecialEmployee(D) :- WorksIn(E, D), Rich(E)
+//            % Existing but unused predicates: Project(p)
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
+        LogicConstraintSpec logicConstraint1 = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("1")
+                .addOrdinaryLiteral("WorksIn", "E", "D")
+                .addNegatedOrdinaryLiteral("Emp", "E")
+                .build();
+
+        LogicConstraintSpec logicConstraint2 = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("2")
+                .addOrdinaryLiteral("WorksIn", "E", "D")
+                .addOrdinaryLiteral("Manages", "E", "D")
+                .addOrdinaryLiteral("CrucialDept", "D")
+                .addNegatedOrdinaryLiteral("Emp", "E")
+                .build();
+
+        LogicConstraintSpec logicConstraint3 = new LogicConstraintSpecBuilder(termFactory)
+                .addConstraintId("3")
+                .addOrdinaryLiteral("Dept", "D")
+                .addOrdinaryLiteral("MinOneSpecialEmployee", false, "D")
+                .build();
+
+        DerivationRuleSpec derivationRule1 = new DerivationRuleSpecBuilder(termFactory)
+                .addHead("MinOneSpecialEmployee", "D")
+                .addOrdinaryLiteral("WorksIn", "E", "D")
+                .addOrdinaryLiteral("Happy", "E")
+                .build();
+
+        DerivationRuleSpec derivationRule2 = new DerivationRuleSpecBuilder(termFactory)
+                .addHead("MinOneSpecialEmployee", "D")
+                .addOrdinaryLiteral("WorksIn", "E", "D")
+                .addOrdinaryLiteral("Rich", "E")
+                .build();
+
+        LogicSchema logicSchema = new LogicSchemaBuilder()
+                .addLogicConstraints(logicConstraint1, logicConstraint2, logicConstraint3)
+                .addDerivationRules(derivationRule1, derivationRule2)
+                .addPredicate("Project", 1)
+                .build();
+
+        LogicSchemaAssert.assertThat(logicSchema)
+                .containsExactlyThesePredicateNames(
+                        "Dept", "Rich", "WorksIn", "Emp", "Manages", "CrucialDept", "MinOneSpecialEmployee", "Happy", "Project")
+                .containsExactlyTheseConstraintIDs("1", "2", "3");
+
+        List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("MinOneSpecialEmployee");
+        assertThat(derivationRules).hasSize(2);
+    }
+
 
 }

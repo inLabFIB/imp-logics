@@ -2,7 +2,7 @@ package edu.upc.imp.logics.specification;
 
 import java.util.List;
 
-public class BuiltInLiteralSpec extends LiteralSpec {
+public class BuiltInLiteralSpec extends LiteralSpec implements LogicElementSpec {
     private final String operator;
     private final List<TermSpec> termSpecs;
 

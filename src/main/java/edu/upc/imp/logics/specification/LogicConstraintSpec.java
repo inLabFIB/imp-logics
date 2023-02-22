@@ -2,12 +2,16 @@ package edu.upc.imp.logics.specification;
 
 import java.util.List;
 
-public class LogicConstraintSpec extends NormalClauseSpec {
+public class LogicConstraintSpec extends NormalClauseSpec implements LogicElementSpec {
     private final String id;
 
-    public LogicConstraintSpec(String id, List<LiteralSpec> body) {
+    public LogicConstraintSpec(String id, BodySpec body) {
         super(body);
         this.id = id;
+    }
+
+    public LogicConstraintSpec(String id, List<LiteralSpec> bodyLiterals) {
+        this(id, new BodySpec(bodyLiterals));
     }
 
     public String getId() {

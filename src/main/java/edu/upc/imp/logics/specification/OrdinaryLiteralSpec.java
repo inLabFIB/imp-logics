@@ -3,7 +3,7 @@ package edu.upc.imp.logics.specification;
 import java.util.Collections;
 import java.util.List;
 
-public class OrdinaryLiteralSpec extends LiteralSpec {
+public class OrdinaryLiteralSpec extends LiteralSpec implements LogicElementSpec {
     private final String predicateName;
     private final List<TermSpec> termsList;
     private final boolean isPositive;

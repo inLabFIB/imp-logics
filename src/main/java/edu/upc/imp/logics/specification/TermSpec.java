@@ -1,6 +1,6 @@
 package edu.upc.imp.logics.specification;
 
-public class TermSpec {
+public class TermSpec implements LogicElementSpec {
     private final String name;
 
     public TermSpec(String name) {

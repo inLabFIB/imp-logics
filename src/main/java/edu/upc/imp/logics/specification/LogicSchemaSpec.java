@@ -1,31 +1,33 @@
 package edu.upc.imp.logics.specification;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LogicSchemaSpecification {
+public class LogicSchemaSpec implements LogicElementSpec {
     private final List<PredicateSpec> predicateSpecList;
     private final List<DerivationRuleSpec> derivationRuleSpecList;
     private final List<LogicConstraintSpec> logicConstraintSpecList;
 
-    public LogicSchemaSpecification() {
+    public LogicSchemaSpec() {
         predicateSpecList = new LinkedList<>();
         derivationRuleSpecList = new LinkedList<>();
         logicConstraintSpecList = new LinkedList<>();
     }
 
-    public void addPredicateSpecification(PredicateSpec predicateSpec){
-        this.predicateSpecList.add(predicateSpec);
+    public void addPredicateSpecs(PredicateSpec... predicateSpecs) {
+        this.predicateSpecList.addAll(Arrays.asList(predicateSpecs));
     }
 
-    public void addDerivationRuleSpec(DerivationRuleSpec derivationRuleSpec){
-        this.derivationRuleSpecList.add(derivationRuleSpec);
+    public void addDerivationRuleSpecs(DerivationRuleSpec... derivationRuleSpecs) {
+        this.derivationRuleSpecList.addAll(Arrays.asList(derivationRuleSpecs));
     }
 
-    public void addLogicConstraintSpec(LogicConstraintSpec logicConstraintSpec){
-        this.logicConstraintSpecList.add(logicConstraintSpec);
+    public void addLogicConstraintSpecs(LogicConstraintSpec... logicConstraintSpecs) {
+        this.logicConstraintSpecList.addAll(Arrays.asList(logicConstraintSpecs));
     }
+
     public List<PredicateSpec> getPredicateSpecList() {
         return Collections.unmodifiableList(predicateSpecList);
     }
@@ -35,6 +37,6 @@ public class LogicSchemaSpecification {
     }
 
     public List<LogicConstraintSpec> getLogicConstraintSpecList() {
-        return  Collections.unmodifiableList(logicConstraintSpecList);
+        return Collections.unmodifiableList(logicConstraintSpecList);
     }
 }

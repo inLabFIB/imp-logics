@@ -18,7 +18,15 @@ public class LogicConstraintSpecBuilder {
     }
 
     public LogicConstraintSpecBuilder addOrdinaryLiteral(String predicateName, String... terms) {
-        bodySpec.add(new OrdinaryLiteralSpec(predicateName, stringToTermSpecFactory.createTermSpecs(terms), true));
+        return addOrdinaryLiteral(predicateName, true, terms);
+    }
+
+    public LogicConstraintSpecBuilder addNegatedOrdinaryLiteral(String predicateName, String... terms) {
+        return addOrdinaryLiteral(predicateName, false, terms);
+    }
+
+    public LogicConstraintSpecBuilder addOrdinaryLiteral(String predicateName, boolean isPositive, String... terms) {
+        bodySpec.add(new OrdinaryLiteralSpec(predicateName, stringToTermSpecFactory.createTermSpecs(terms), isPositive));
         return this;
     }
 

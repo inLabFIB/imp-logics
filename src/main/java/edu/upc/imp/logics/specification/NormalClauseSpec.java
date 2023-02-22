@@ -2,14 +2,14 @@ package edu.upc.imp.logics.specification;
 
 import java.util.List;
 
-public class NormalClauseSpec {
-    private final List<LiteralSpec> body;
+public abstract class NormalClauseSpec {
+    private final BodySpec body;
 
-    public NormalClauseSpec(List<LiteralSpec> body) {
-        this.body = body;
+    public NormalClauseSpec(BodySpec bodySpec) {
+        body = bodySpec;
     }
 
     public List<LiteralSpec> getBody() {
-        return body;
+        return body.getLiterals();
     }
 }

@@ -2,13 +2,11 @@ package edu.upc.imp.logics.assertions;
 
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.LogicConstraint;
-import edu.upc.imp.logics.schema.OrdinaryLiteral;
 import edu.upc.imp.logics.specification.LiteralSpec;
 import edu.upc.imp.logics.specification.LogicConstraintSpec;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
-public class LogicConstraintAssert extends AbstractAssert<LogicConstraintAssert, LogicConstraint> {
+public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
     public LogicConstraintAssert(LogicConstraint logicConstraint) {
         super(logicConstraint, LogicConstraintAssert.class);
     }
@@ -35,32 +33,4 @@ public class LogicConstraintAssert extends AbstractAssert<LogicConstraintAssert,
         return this;
     }
 
-    public LogicConstraintAssert hasBodySize(int size) {
-        Assertions.assertThat(actual.getBody()).hasSize(size);
-        return this;
-    }
-
-    public LogicConstraintAssert containsOrdinaryLiteral(String predicateName, int arity) {
-        return containsOrdinaryLiteral(predicateName, arity, true);
-    }
-
-    public LogicConstraintAssert containsOrdinaryLiteral(String predicateName, int arity, boolean positive) {
-        Assertions.assertThat(actual.getBody()).anySatisfy(lit -> {
-            Assertions.assertThat(lit).isInstanceOf(OrdinaryLiteral.class);
-            OrdinaryLiteral ol = (OrdinaryLiteral) lit;
-            OrdinaryLiteralAssert.assertThat(ol).isPositive(positive);
-            OrdinaryLiteralAssert.assertThat(ol).hasPredicate(predicateName, arity);
-        });
-        return this;
-    }
-
-    public LogicConstraintAssert containsOrdinaryLiteral(String predicateName, String... variableNames) {
-        Assertions.assertThat(actual.getBody()).anySatisfy(
-                lit -> LiteralAssert.assertThat(lit)
-                        .isOrdinaryLiteral()
-                        .hasPredicate(predicateName, variableNames.length)
-                        .containsVariables("x", "y")
-        );
-        return this;
-    }
 }

@@ -1,6 +1,9 @@
 package edu.upc.imp.logics.assertions;
 
+import edu.upc.imp.logics.schema.ConstraintID;
+import edu.upc.imp.logics.schema.LogicConstraint;
 import edu.upc.imp.logics.schema.LogicSchema;
+import edu.upc.imp.logics.schema.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
@@ -25,6 +28,21 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         Assertions.assertThat(actual.getAllLogicConstraints())
                 .anySatisfy(constraint -> LogicConstraintAssert.assertThat(constraint)
                         .hasID(constraintID));
+        return this;
+    }
+
+    public LogicSchemaAssert containsExactlyThesePredicateNames(String... predicateNames) {
+        Assertions.assertThat(actual.getAllPredicates())
+                .map(Predicate::getName)
+                .containsExactlyInAnyOrder(predicateNames);
+        return this;
+    }
+
+    public LogicSchemaAssert containsExactlyTheseConstraintIDs(String... constraintIDs) {
+        Assertions.assertThat(actual.getAllLogicConstraints())
+                .map(LogicConstraint::getID)
+                .map(ConstraintID::id)
+                .containsExactlyInAnyOrder(constraintIDs);
         return this;
     }
 }
