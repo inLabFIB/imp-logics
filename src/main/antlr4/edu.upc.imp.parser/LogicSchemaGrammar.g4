@@ -11,11 +11,10 @@ COMMA: ',';
 OPENPAR: '(';
 CLOSEPAR: ')';
 ARROW: ':-';
-EXTRAINFO: '[' ~[\r\n]* ']' | '{' ~[\r\n]* '}' ;
 
 
-prog: ((line)? NEWLINE)* ;
-line: (COMMENT | EXTRAINFO | constraint | derivationRule);
+prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
+line: (COMMENT | constraint | derivationRule);
 constraint: (CONSTRAINTID)? ARROW body;
 derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;
