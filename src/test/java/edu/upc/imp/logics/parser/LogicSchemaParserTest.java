@@ -5,11 +5,9 @@ import edu.upc.imp.logics.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.ConstraintID;
 import edu.upc.imp.logics.schema.LogicConstraint;
 import edu.upc.imp.logics.schema.LogicSchema;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 
-@Disabled
 public class LogicSchemaParserTest {
 
     @Test

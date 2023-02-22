@@ -16,6 +16,10 @@ public class LogicSchemaBuilder {
         return this;
     }
 
+    public void addPredicate(PredicateSpec predicateSpec) {
+        this.addPredicate(predicateSpec.name(), predicateSpec.arity());
+    }
+
     private void addPredicateIfAbsent(String predicateName, int arity) {
         checkRepeatedNameWithDifferentArity(predicateName, arity);
         predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, new Arity(arity)));
@@ -71,5 +75,4 @@ public class LogicSchemaBuilder {
         Set<LogicConstraint> constraints = new HashSet<>(logicConstraintById.values());
         return new LogicSchema(predicates, constraints);
     }
-
 }

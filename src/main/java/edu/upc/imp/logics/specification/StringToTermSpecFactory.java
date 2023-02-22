@@ -9,18 +9,25 @@ public abstract class StringToTermSpecFactory {
     public List<TermSpec> createTermSpecs(String... termNames) {
         List<TermSpec> termSpecList = new LinkedList<>();
         for (String name : termNames) {
-            if (isConstant(name)) {
-                termSpecList.add(new ConstantSpec(name));
-            } else if (isVariable(name)) {
-                termSpecList.add(new VariableSpec(name));
-            } else {
-                throw new RuntimeException("Unrecognized term name: " + name);
-            }
+            TermSpec termSpec = createTermSpec(name);
+
+            termSpecList.add(termSpec);
         }
         return termSpecList;
     }
 
 
+    public TermSpec createTermSpec(String name) {
+        if (isConstant(name)) {
+            return new ConstantSpec(name);
+        } else if (isVariable(name)) {
+            return new VariableSpec(name);
+        } else {
+            throw new RuntimeException("Unrecognized term name: " + name);
+        }
+    }
+
     protected abstract boolean isConstant(String name);
+
     protected abstract boolean isVariable(String name);
 }
