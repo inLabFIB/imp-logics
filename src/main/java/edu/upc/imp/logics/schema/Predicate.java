@@ -1,7 +1,5 @@
 package edu.upc.imp.logics.schema;
 
-import edu.upc.imp.logics.schema.exceptions.NegativeArity;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +19,7 @@ public class Predicate {
     /**
      * Invariants:
      * - name cannot be null
+     * - name cannot be empty
      * - arity >= 0
      * - the list of derivationRules is not null
      * - the list of derivationRules it not empty
@@ -49,7 +48,8 @@ public class Predicate {
 
     private static void checkPredicateInfo(String name, int arity) {
         if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
-        if (arity < 0) throw new NegativeArity(arity);
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        if (arity < 0) throw new IllegalArgumentException("Arity cannot be negative");
     }
 
     private static void checkQueries(List<Query> definitionQueries) {

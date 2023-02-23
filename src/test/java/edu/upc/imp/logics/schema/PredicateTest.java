@@ -16,8 +16,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 public class PredicateTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicateWithNullName() {
+    public void should_ThrowException_WhenCreatingPredicate_WithNullName() {
         assertThatThrownBy(() -> new Predicate(null, 1))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void should_ThrowException_WhenCreatingPredicate_WithEmptyName() {
+        assertThatThrownBy(() -> new Predicate("", 1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -29,7 +35,8 @@ public class PredicateTest {
 
     @Test
     public void should_ThrowException_WhenCreatingPredicate_withNegativeArity() {
-        assertThatThrownBy(() -> new Predicate("name", -1));
+        assertThatThrownBy(() -> new Predicate("name", -1))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
