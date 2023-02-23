@@ -11,14 +11,18 @@ public class LogicSchemaBuilder {
 
     private final Map<ConstraintID, LogicConstraint> logicConstraintById = new HashMap<>();
     private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
+    private final ConstraintIDGenerator constraintIDGenerator;
 
-    public LogicSchemaBuilder addPredicate(PredicateSpec predicateSpec) {
-        this.addPredicate(predicateSpec.name(), predicateSpec.arity());
-        return this;
+    public LogicSchemaBuilder() {
+        this(new IncrementalConstraintIDGenerator(1));
+    }
+
+    public LogicSchemaBuilder(ConstraintIDGenerator constraintIDGenerator) {
+        this.constraintIDGenerator = constraintIDGenerator;
     }
 
     public LogicSchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {
-        Arrays.stream(predicateSpecs).forEach(this::addPredicate);
+        Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
         return this;
     }
 
@@ -39,7 +43,12 @@ public class LogicSchemaBuilder {
         }
     }
 
-    public LogicSchemaBuilder addDerivationRule(DerivationRuleSpec drs) {
+    public LogicSchemaBuilder addDerivationRule(DerivationRuleSpec... drs) {
+        Arrays.stream(drs).forEach(this::addDerivationRule);
+        return this;
+    }
+
+    private LogicSchemaBuilder addDerivationRule(DerivationRuleSpec drs) {
         predicatesByName.putIfAbsent(
                 drs.getPredicateName(),
                 new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
@@ -49,28 +58,44 @@ public class LogicSchemaBuilder {
         return this;
     }
 
-    public LogicSchemaBuilder addDerivationRules(DerivationRuleSpec... drs) {
-        Arrays.stream(drs).forEach(this::addDerivationRule);
-        return this;
-    }
-
     private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
         List<Term> headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
         List<Literal> body = buildBody(bodySpec);
         return new Query(headTerms, body);
     }
 
-    public LogicSchemaBuilder addLogicConstraint(LogicConstraintSpec lcs) {
-        ConstraintID constraintID = new ConstraintID(lcs.getId());
-        if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintID(constraintID);
-        List<Literal> body = buildBody(lcs.getBody());
-        logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
+    public void addLogicConstraint(LogicConstraintSpec... logicConstraintSpecs) {
+        Arrays.stream(logicConstraintSpecs).forEach(
+                lcs -> {
+                    if (lcs instanceof LogicConstraintWithIDSpec withIDSpec) addLogicConstraintWithID(withIDSpec);
+                    else if (lcs instanceof LogicConstraintWithoutIDSpec withoutIDSpec)
+                        addLogicConstraintWithoutID(withoutIDSpec);
+                    else
+                        throw new RuntimeException("Unknown LogicConstraintSpec implementation: " + lcs.getClass().getName());
+                }
+        );
+    }
+
+    public LogicSchemaBuilder addLogicConstraintWithID(LogicConstraintWithIDSpec... logicConstraints) {
+        Arrays.stream(logicConstraints).forEach(lcs -> {
+            ConstraintID constraintID = new ConstraintID(lcs.getId());
+            addLogicConstraint(constraintID, lcs);
+        });
         return this;
     }
 
-    public LogicSchemaBuilder addLogicConstraints(LogicConstraintSpec... logicConstraints) {
-        Arrays.stream(logicConstraints).forEach(this::addLogicConstraint);
+    public LogicSchemaBuilder addLogicConstraintWithoutID(LogicConstraintWithoutIDSpec... logicConstraints) {
+        Arrays.stream(logicConstraints).forEach(lcs -> {
+            ConstraintID constraintID = constraintIDGenerator.newConstraintID();
+            addLogicConstraint(constraintID, lcs);
+        });
         return this;
+    }
+
+    private void addLogicConstraint(ConstraintID constraintID, LogicConstraintSpec lcs) {
+        if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintID(constraintID);
+        List<Literal> body = buildBody(lcs.getBody());
+        logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
     }
 
     private List<Literal> buildBody(List<LiteralSpec> bodySpec) {

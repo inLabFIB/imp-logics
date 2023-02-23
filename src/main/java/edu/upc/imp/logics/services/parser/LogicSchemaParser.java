@@ -2,6 +2,7 @@ package edu.upc.imp.logics.services.parser;
 
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
@@ -11,18 +12,19 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-public class LogicSchemaParser {
+public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
 
-    private final StringToTermSpecFactory stringToTermSpecFactory;
+    private final LogicSchemaGrammarToSpecVisitor<T> visitor;
 
     public LogicSchemaParser() {
         this(new DefaultStringToTermSpecFactory());
     }
 
     public LogicSchemaParser(StringToTermSpecFactory stringToTermSpecFactory) {
-        this.stringToTermSpecFactory = stringToTermSpecFactory;
+        visitor = createVisitor(stringToTermSpecFactory);
     }
 
+    protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);
 
     public LogicSchema parse(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
@@ -30,11 +32,8 @@ public class LogicSchemaParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
-
-        LogicSchemaGrammarToSpecVisitor visitor = new LogicSchemaGrammarToSpecVisitor(stringToTermSpecFactory);
-        LogicSchemaSpec logicSchemaSpec = visitor.visitProg(tree);
-
-        LogicSchemaFactory factory = new LogicSchemaFactory();
+        LogicSchemaSpec<T> logicSchemaSpec = visitor.visitProg(tree);
+        LogicSchemaFactory<T> factory = new LogicSchemaFactory<>();
         return factory.createLogicSchema(logicSchemaSpec);
     }
 }

@@ -45,4 +45,8 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
                 .containsExactlyInAnyOrder(constraintIDs);
         return this;
     }
+
+    public void hasConstraintsSize(int size) {
+        Assertions.assertThat(actual.getAllLogicConstraints()).hasSize(size);
+    }
 }

@@ -8,40 +8,24 @@ import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LogicSchemaGrammarToSpecVisitor extends LogicSchemaGrammarBaseVisitor<LogicElementSpec> {
+public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintSpec> extends LogicSchemaGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
-    private final LogicSchemaSpec logicSchemaSpec = new LogicSchemaSpec();
+    protected final LogicSchemaSpec<T> logicSchemaSpec = new LogicSchemaSpec<>();
 
     public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
     }
 
     @Override
-    public LogicSchemaSpec visitProg(LogicSchemaGrammarParser.ProgContext ctx) {
+    public LogicSchemaSpec<T> visitProg(LogicSchemaGrammarParser.ProgContext ctx) {
         visitChildren(ctx);
         return logicSchemaSpec;
     }
 
-    @Override
-    public LogicConstraintSpec visitConstraint(LogicSchemaGrammarParser.ConstraintContext ctx) {
-        BodySpec body = createBody(ctx.body());
-
-        LogicConstraintSpec constraintSpec;
-        if (ctx.CONSTRAINTID() != null) {
-            String id = ctx.CONSTRAINTID().getText().substring(1); //skipping '@' symbol
-            constraintSpec = new LogicConstraintSpec(id, body);
-        } else {
-            throw new RuntimeException("Currently we do not support constraint specs without id");
-        }
-
-        logicSchemaSpec.addLogicConstraintSpecs(constraintSpec);
-        return constraintSpec;
-    }
-
-    private BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
+    protected BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
         List<LiteralSpec> literals = new LinkedList<>();
-        for (LogicSchemaGrammarParser.LiteralContext litContext: ctx.literal()) {
+        for (LogicSchemaGrammarParser.LiteralContext litContext : ctx.literal()) {
             literals.add((LiteralSpec) this.visitLiteral(litContext));
         }
         return new BodySpec(literals);

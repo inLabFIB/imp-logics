@@ -4,12 +4,12 @@ import edu.upc.imp.logics.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
-import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.imp.logics.services.creation.spec.PredicateSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
 import edu.upc.imp.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
-import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintSpecBuilder;
+import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import org.junit.jupiter.api.Test;
 
@@ -28,13 +28,13 @@ public class LogicSchemaFactoryTest {
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
 //            % Existing but unused predicates: Project(p)
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintSpec logicConstraint1 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintSpec logicConstraint2 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("2")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Manages", "E", "D")
@@ -42,7 +42,7 @@ public class LogicSchemaFactoryTest {
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintSpec logicConstraint3 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("3")
                 .addOrdinaryLiteral("Dept", "D")
                 .addOrdinaryLiteral("MinOneSpecialEmployee", false, "D")
@@ -60,12 +60,12 @@ public class LogicSchemaFactoryTest {
                 .addOrdinaryLiteral("Rich", false, "E")
                 .build();
 
-        LogicSchemaSpec logicSchemaSpec = new LogicSchemaSpec();
+        LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec = new LogicSchemaSpec<>();
         logicSchemaSpec.addLogicConstraintSpecs(logicConstraint1, logicConstraint2, logicConstraint3);
         logicSchemaSpec.addDerivationRuleSpecs(derivationRule1, derivationRule2);
         logicSchemaSpec.addPredicateSpecs(new PredicateSpec("Project", 1));
 
-        LogicSchema logicSchema = new LogicSchemaFactory().createLogicSchema(logicSchemaSpec);
+        LogicSchema logicSchema = new LogicSchemaFactory<LogicConstraintWithIDSpec>().createLogicSchema(logicSchemaSpec);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsExactlyThesePredicateNames(
@@ -75,4 +75,6 @@ public class LogicSchemaFactoryTest {
         List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("MinOneSpecialEmployee");
         assertThat(derivationRules).hasSize(2);
     }
+
+
 }

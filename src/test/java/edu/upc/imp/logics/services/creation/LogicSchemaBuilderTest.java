@@ -3,16 +3,16 @@ package edu.upc.imp.logics.services.creation;
 import edu.upc.imp.logics.assertions.DerivationRuleAssert;
 import edu.upc.imp.logics.assertions.LogicConstraintAssert;
 import edu.upc.imp.logics.assertions.LogicSchemaAssert;
+import edu.upc.imp.logics.schema.ConstraintID;
 import edu.upc.imp.logics.schema.DerivationRule;
+import edu.upc.imp.logics.schema.LogicConstraint;
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.schema.exceptions.RepeatedConstraintID;
 import edu.upc.imp.logics.schema.exceptions.RepeatedPredicateName;
 import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
-import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
-import edu.upc.imp.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
-import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintSpecBuilder;
-import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
+import edu.upc.imp.logics.services.creation.spec.helpers.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -111,47 +111,47 @@ public class LogicSchemaBuilderTest {
     @Test
     public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
         assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addLogicConstraint(logicConstraintSpec)
-                .addLogicConstraint(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
+                .addLogicConstraintWithID(logicConstraintSpec)
+                .addLogicConstraintWithID(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
     }
 
     @Test
     public void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
         LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraint(logicConstraintSpec)
+                .addLogicConstraintWithID(logicConstraintSpec)
                 .build();
 
         assertThat(logicSchema.getAllLogicConstraints()).hasSize(1);
         assertThat(logicSchema.getAllLogicConstraints()).first().satisfies(
-                lc -> LogicConstraintAssert.assertThat(lc).correspondsSpec(logicConstraintSpec)
+                lc -> LogicConstraintAssert.assertThat(lc).correspondsSpecWithId(logicConstraintSpec)
         );
     }
 
     @Test
     public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
         LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraint(logicConstraintSpec)
+                .addLogicConstraintWithID(logicConstraintSpec)
                 .build();
 
         assertThat(logicSchema.getAllPredicates()).hasSize(2);
@@ -172,13 +172,13 @@ public class LogicSchemaBuilderTest {
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
 //            % Existing but unused predicates: Project(p)
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintSpec logicConstraint1 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintSpec logicConstraint2 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("2")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Manages", "E", "D")
@@ -186,7 +186,7 @@ public class LogicSchemaBuilderTest {
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintSpec logicConstraint3 = new LogicConstraintSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder(termFactory)
                 .addConstraintId("3")
                 .addOrdinaryLiteral("Dept", "D")
                 .addOrdinaryLiteral("MinOneSpecialEmployee", false, "D")
@@ -205,8 +205,8 @@ public class LogicSchemaBuilderTest {
                 .build();
 
         LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraints(logicConstraint1, logicConstraint2, logicConstraint3)
-                .addDerivationRules(derivationRule1, derivationRule2)
+                .addLogicConstraintWithID(logicConstraint1, logicConstraint2, logicConstraint3)
+                .addDerivationRule(derivationRule1, derivationRule2)
                 .addPredicate("Project", 1)
                 .build();
 
@@ -217,6 +217,29 @@ public class LogicSchemaBuilderTest {
 
         List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("MinOneSpecialEmployee");
         assertThat(derivationRules).hasSize(2);
+    }
+
+    @Test
+    public void should_addDifferentConstraintIDs_whenDefiningLogicConstraints_withoutIDs() {
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
+        LogicConstraintWithoutIDSpec logicConstraintSpec1 = new LogicConstraintWithoutIDSpecBuilder(termFactory)
+                .addOrdinaryLiteral("P")
+                .build();
+
+        LogicConstraintWithoutIDSpec logicConstraintSpec2 = new LogicConstraintWithoutIDSpecBuilder(termFactory)
+                .addOrdinaryLiteral("R")
+                .build();
+
+        LogicSchema logicSchema = new LogicSchemaBuilder()
+                .addLogicConstraintWithoutID(logicConstraintSpec1, logicConstraintSpec2)
+                .build();
+
+        LogicSchemaAssert.assertThat(logicSchema).containsExactlyTheseConstraintIDs("1", "2");
+
+        LogicConstraint logicConstraint1 = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
+        LogicConstraintAssert.assertThat(logicConstraint1).containsOrdinaryLiteral("P");
+        LogicConstraint logicConstraint2 = logicSchema.getLogicConstraintByID(new ConstraintID("2"));
+        LogicConstraintAssert.assertThat(logicConstraint2).containsOrdinaryLiteral("R");
     }
 
 

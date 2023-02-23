@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LogicSchemaSpec implements LogicElementSpec {
+public class LogicSchemaSpec<T extends LogicConstraintSpec> implements LogicElementSpec {
     private final List<PredicateSpec> predicateSpecList;
     private final List<DerivationRuleSpec> derivationRuleSpecList;
-    private final List<LogicConstraintSpec> logicConstraintSpecList;
+    private final List<T> logicConstraintSpecList;
 
     public LogicSchemaSpec() {
         predicateSpecList = new LinkedList<>();
@@ -24,7 +24,8 @@ public class LogicSchemaSpec implements LogicElementSpec {
         this.derivationRuleSpecList.addAll(Arrays.asList(derivationRuleSpecs));
     }
 
-    public void addLogicConstraintSpecs(LogicConstraintSpec... logicConstraintSpecs) {
+    @SafeVarargs
+    public final void addLogicConstraintSpecs(T... logicConstraintSpecs) {
         this.logicConstraintSpecList.addAll(Arrays.asList(logicConstraintSpecs));
     }
 
@@ -36,7 +37,7 @@ public class LogicSchemaSpec implements LogicElementSpec {
         return Collections.unmodifiableList(derivationRuleSpecList);
     }
 
-    public List<LogicConstraintSpec> getLogicConstraintSpecList() {
+    public List<T> getLogicConstraintSpecList() {
         return Collections.unmodifiableList(logicConstraintSpecList);
     }
 }

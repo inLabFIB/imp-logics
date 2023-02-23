@@ -21,7 +21,7 @@ public class LogicSchemaParserTest {
     public void should_containPredicate_whenPredicateAppearsInConstraint() {
         String schemaString = "@1 :- p()";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsPredicate("p", 0);
@@ -31,7 +31,7 @@ public class LogicSchemaParserTest {
     public void should_containPredicate_whenPredicateAppearsInConstraint_withNonZeroArity() {
         String schemaString = "@1 :- p(x, y)";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsPredicate("p", 2);
@@ -41,7 +41,7 @@ public class LogicSchemaParserTest {
     public void should_containConstraint_whenConstraintIsDefined() {
         String schemaString = "@1 :- p()";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsConstraintID("1");
@@ -57,7 +57,7 @@ public class LogicSchemaParserTest {
     public void should_containConstraint_whenConstraintIsDefined_withOrdinaryLiteral_withNonZeroArity() {
         String schemaString = "@1 :- p(x, y)";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsConstraintID("1");
@@ -73,7 +73,7 @@ public class LogicSchemaParserTest {
     public void should_containDerivationRule_whenDerivationRuleIsDefined_withOrdinaryLiteral_withNonZeroArity() {
         String schemaString = "q(x) :- p(x, y)";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
         Assertions.assertThat(derivationRulesList).hasSize(1);
@@ -87,7 +87,7 @@ public class LogicSchemaParserTest {
     public void should_containBodyWithSeveralLiterals_whenBodyIsDefined_withSeveralLiterals() {
         String schemaString = "q(x) :- p(x, y), r(y)";
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
         Assertions.assertThat(derivationRulesList).hasSize(1);
@@ -105,7 +105,7 @@ public class LogicSchemaParserTest {
                                 q(x) :- r(x)
                                 """;
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
         Assertions.assertThat(derivationRulesList).hasSize(2);
@@ -130,7 +130,7 @@ public class LogicSchemaParserTest {
                             MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
                 """;
 
-        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+        LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
 
         LogicSchemaAssert.assertThat(logicSchema)
