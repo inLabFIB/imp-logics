@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.assertions;
 
 import edu.upc.imp.logics.schema.ComparisonBuiltInLiteral;
-import edu.upc.imp.logics.specification.BuiltInLiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 

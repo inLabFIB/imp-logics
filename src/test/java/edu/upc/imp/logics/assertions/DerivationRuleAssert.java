@@ -3,9 +3,9 @@ package edu.upc.imp.logics.assertions;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.Term;
-import edu.upc.imp.logics.specification.DerivationRuleSpec;
-import edu.upc.imp.logics.specification.LiteralSpec;
-import edu.upc.imp.logics.specification.TermSpec;
+import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
+import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.TermSpec;
 import org.assertj.core.api.Assertions;
 
 

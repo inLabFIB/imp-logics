@@ -3,9 +3,9 @@ package edu.upc.imp.logics.assertions;
 import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
-import edu.upc.imp.logics.specification.ConstantSpec;
-import edu.upc.imp.logics.specification.TermSpec;
-import edu.upc.imp.logics.specification.VariableSpec;
+import edu.upc.imp.logics.services.creation.spec.ConstantSpec;
+import edu.upc.imp.logics.services.creation.spec.TermSpec;
+import edu.upc.imp.logics.services.creation.spec.VariableSpec;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 

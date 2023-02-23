@@ -2,8 +2,8 @@ package edu.upc.imp.logics.assertions;
 
 import edu.upc.imp.logics.schema.OrdinaryLiteral;
 import edu.upc.imp.logics.schema.Term;
-import edu.upc.imp.logics.specification.OrdinaryLiteralSpec;
-import edu.upc.imp.logics.specification.TermSpec;
+import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.TermSpec;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 

@@ -2,8 +2,8 @@ package edu.upc.imp.logics.assertions;
 
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.LogicConstraint;
-import edu.upc.imp.logics.specification.LiteralSpec;
-import edu.upc.imp.logics.specification.LogicConstraintSpec;
+import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
 import org.assertj.core.api.Assertions;
 
 public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {

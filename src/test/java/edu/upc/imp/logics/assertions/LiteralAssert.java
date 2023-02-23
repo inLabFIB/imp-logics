@@ -3,9 +3,9 @@ package edu.upc.imp.logics.assertions;
 import edu.upc.imp.logics.schema.ComparisonBuiltInLiteral;
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.OrdinaryLiteral;
-import edu.upc.imp.logics.specification.BuiltInLiteralSpec;
-import edu.upc.imp.logics.specification.LiteralSpec;
-import edu.upc.imp.logics.specification.OrdinaryLiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
+import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
