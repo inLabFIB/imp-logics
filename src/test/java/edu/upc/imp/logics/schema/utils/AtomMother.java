@@ -13,7 +13,7 @@ public class AtomMother {
     }
 
     public static Atom createAtom(String predicateName, List<Term> terms) {
-        Predicate predicate = new MutablePredicate(predicateName, new Arity(terms.size()));
+        Predicate predicate = new MutablePredicate(predicateName, terms.size());
         return new Atom(predicate, terms);
     }
 }

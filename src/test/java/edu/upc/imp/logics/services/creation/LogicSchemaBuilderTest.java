@@ -31,9 +31,9 @@ public class LogicSchemaBuilderTest {
                 .build();
 
         assertThat(logicSchema.getAllPredicates()).hasSize(3);
-        assertThat(logicSchema.getPredicateByName("arity2").getArity().getNumber()).isEqualTo(2);
-        assertThat(logicSchema.getPredicateByName("arity3").getArity().getNumber()).isEqualTo(3);
-        assertThat(logicSchema.getPredicateByName("arity4").getArity().getNumber()).isEqualTo(4);
+        assertThat(logicSchema.getPredicateByName("arity2").getArity()).isEqualTo(2);
+        assertThat(logicSchema.getPredicateByName("arity3").getArity()).isEqualTo(3);
+        assertThat(logicSchema.getPredicateByName("arity4").getArity()).isEqualTo(4);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class LogicSchemaBuilderTest {
 
         assertThat(logicSchema.getAllPredicates()).hasSize(1);
         assertThat(logicSchema.getPredicateByName("p")).satisfies(
-                p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
+                p -> assertThat(p.getArity()).isEqualTo(2)
         );
     }
 
@@ -94,13 +94,13 @@ public class LogicSchemaBuilderTest {
         assertThat(logicSchema.getPredicateByName("P")).satisfies(
                 p -> {
                     assertThat(p.isDerived()).isTrue();
-                    assertThat(p.getArity().getNumber()).isEqualTo(2);
+                    assertThat(p.getArity()).isEqualTo(2);
                 }
         );
         assertThat(logicSchema.getPredicateByName("Q")).satisfies(
                 p -> {
                     assertThat(p.isDerived()).isFalse();
-                    assertThat(p.getArity().getNumber()).isEqualTo(2);
+                    assertThat(p.getArity()).isEqualTo(2);
                 }
         );
         List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("P");
@@ -156,10 +156,10 @@ public class LogicSchemaBuilderTest {
 
         assertThat(logicSchema.getAllPredicates()).hasSize(2);
         assertThat(logicSchema.getPredicateByName("P")).satisfies(
-                p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
+                p -> assertThat(p.getArity()).isEqualTo(2)
         );
         assertThat(logicSchema.getPredicateByName("Q")).satisfies(
-                p -> assertThat(p.getArity().getNumber()).isEqualTo(2)
+                p -> assertThat(p.getArity()).isEqualTo(2)
         );
     }
 

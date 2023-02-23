@@ -19,9 +19,9 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
 
     public OrdinaryLiteralAssert correspondsSpec(OrdinaryLiteralSpec spec) {
         Assertions.assertThat(actual.getAtom().getPredicate().getName()).isEqualTo(spec.getPredicateName());
-        Assertions.assertThat(actual.getAtom().getPredicate().getArity().getNumber()).isEqualTo(spec.getTermSpecList().size());
+        Assertions.assertThat(actual.getAtom().getPredicate().getArity()).isEqualTo(spec.getTermSpecList().size());
         Assertions.assertThat(actual.isPositive()).isEqualTo(spec.isPositive());
-        for (int i = 0; i < actual.getAtom().getPredicate().getArity().getNumber(); ++i) {
+        for (int i = 0; i < actual.getAtom().getPredicate().getArity(); ++i) {
             Term actualTerm = actual.getAtom().getTerms().get(i);
             TermSpec termSpec = spec.getTermSpecList().get(i);
             TermAssert.assertThat(actualTerm).correspondsSpec(termSpec);

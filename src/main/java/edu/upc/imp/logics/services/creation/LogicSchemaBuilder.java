@@ -29,12 +29,12 @@ public class LogicSchemaBuilder {
 
     private void addPredicateIfAbsent(String predicateName, int arity) {
         checkRepeatedNameWithDifferentArity(predicateName, arity);
-        predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, new Arity(arity)));
+        predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, arity));
     }
 
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
         if (predicatesByName.containsKey(predicateName)
-                && predicatesByName.get(predicateName).getArity().getNumber() != arity) {
+                && predicatesByName.get(predicateName).getArity() != arity) {
             throw new RepeatedPredicateName(predicateName);
         }
     }
@@ -42,7 +42,7 @@ public class LogicSchemaBuilder {
     public LogicSchemaBuilder addDerivationRule(DerivationRuleSpec drs) {
         predicatesByName.putIfAbsent(
                 drs.getPredicateName(),
-                new MutablePredicate(drs.getPredicateName(), new Arity(drs.getTermSpecList().size())));
+                new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
         Query query = buildQuery(drs.getTermSpecList(), drs.getBody());
         MutablePredicate mutablePredicate = predicatesByName.get(drs.getPredicateName());
         mutablePredicate.addDerivationRule(query);

@@ -24,15 +24,15 @@ public class MutablePredicate extends Predicate {
 
     private List<DerivationRule> derivationRules;
 
-    public MutablePredicate(String name, Arity arity, List<Query> definitionQueries) {
+    public MutablePredicate(String name, int arity) {
+        super(name, arity);
+        derivationRules = List.of();
+    }
+
+    public MutablePredicate(String name, int arity, List<Query> definitionQueries) {
         super(name, arity);
         if (Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
         derivationRules = createDerivationRules(definitionQueries);
-    }
-
-    public MutablePredicate(String name, Arity arity) {
-        super(name, arity);
-        derivationRules = List.of();
     }
 
     public List<DerivationRule> getDerivationRules() {

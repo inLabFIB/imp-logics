@@ -42,8 +42,8 @@ public class Atom implements Visitable {
         return terms;
     }
 
-    private static void checkArityMatches(Arity arity, List<Term> terms) {
-        if (arity.getNumber() != terms.size()) throw new ArityMismatch(arity.getNumber(), terms.size());
+    private static void checkArityMatches(int arity, List<Term> terms) {
+        if (arity != terms.size()) throw new ArityMismatch(arity, terms.size());
     }
 
     @Override

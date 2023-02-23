@@ -1,7 +1,6 @@
 package edu.upc.imp.logics.services.creation;
 
 import edu.upc.imp.logics.assertions.LiteralAssert;
-import edu.upc.imp.logics.schema.Arity;
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.MutablePredicate;
 import edu.upc.imp.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
@@ -24,7 +23,7 @@ public class BodyBuilderTest {
 
     @Test
     public void should_addOrdinaryLiteral_whenAddingOrdinaryLiteralSpec() {
-        BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new MutablePredicate("P", new Arity(2))));
+        BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new MutablePredicate("P", 2)));
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         OrdinaryLiteralSpec literalSpec = new OrdinaryLiteralSpec("P", termFactory.createTermSpecs("x", "y"), true);
         bodyBuilder.addLiteral(literalSpec);

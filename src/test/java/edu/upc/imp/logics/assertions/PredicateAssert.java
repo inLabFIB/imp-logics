@@ -20,7 +20,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     public PredicateAssert hasArity(int arity) {
-        Assertions.assertThat(actual.getArity().getNumber()).isEqualTo(arity);
+        Assertions.assertThat(actual.getArity()).isEqualTo(arity);
         return this;
     }
 

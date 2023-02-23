@@ -23,7 +23,7 @@ public class AtomTest {
 
     @Test
     public void should_ThrowException_WhenCreatingAtomWithNullListOfTerms() {
-        assertThatThrownBy(() -> new Atom(new MutablePredicate("P", new Arity(0)), null))
+        assertThatThrownBy(() -> new Atom(new MutablePredicate("P", 0), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -31,7 +31,7 @@ public class AtomTest {
     public void should_MakeTermsListImmutable_WhenCreatingTheAtom() {
         List<Term> terms = new LinkedList<>();
         terms.add(new Variable("x"));
-        Atom atom = new Atom(new MutablePredicate("P", new Arity(1)), terms);
+        Atom atom = new Atom(new MutablePredicate("P", 1), terms);
         assertThat(atom.getTerms()).isUnmodifiable();
     }
 
@@ -47,7 +47,7 @@ public class AtomTest {
     @ParameterizedTest
     @MethodSource("provideWrongAritiesAndLists")
     public void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms) {
-        assertThatThrownBy(() -> new Atom(new MutablePredicate("P", new Arity(arity)), terms))
+        assertThatThrownBy(() -> new Atom(new MutablePredicate("P", arity), terms))
                 .isInstanceOf(ArityMismatch.class);
     }
 }

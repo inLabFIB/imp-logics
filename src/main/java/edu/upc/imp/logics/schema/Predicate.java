@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.exceptions.NegativeArity;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +21,7 @@ public class Predicate {
     /**
      * Invariants:
      * - name cannot be null
-     * - arity cannot be null
+     * - arity >= 0
      * - the list of derivationRules is not null
      * - the list of derivationRules it not empty
      * - derivationRules head terms size matches with arity
@@ -29,25 +31,25 @@ public class Predicate {
     protected final List<DerivationRule> derivationRules;
 
     private final String name;
-    private final Arity arity;
+    private final int arity;
 
-    public Predicate(String name, Arity arity) {
+    public Predicate(String name, int arity) {
         checkPredicateInfo(name, arity);
         this.name = name;
         this.arity = arity;
         this.derivationRules = new LinkedList<>();
     }
 
-    public Predicate(String name, Arity arity, List<Query> definitionQueries) {
+    public Predicate(String name, int arity, List<Query> definitionQueries) {
         this(name, arity);
         checkQueries(definitionQueries);
         List<DerivationRule> derivationRuleList = createDerivationRules(definitionQueries);
         derivationRules.addAll(derivationRuleList);
     }
 
-    private static void checkPredicateInfo(String name, Arity arity) {
+    private static void checkPredicateInfo(String name, int arity) {
         if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
-        if (Objects.isNull(arity)) throw new IllegalArgumentException("Arity cannot be null");
+        if (arity < 0) throw new NegativeArity(arity);
     }
 
     private static void checkQueries(List<Query> definitionQueries) {
@@ -63,7 +65,7 @@ public class Predicate {
         ).toList();
     }
 
-    public Arity getArity() {
+    public int getArity() {
         return arity;
     }
 

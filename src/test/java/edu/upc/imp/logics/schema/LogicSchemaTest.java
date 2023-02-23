@@ -16,15 +16,15 @@ public class LogicSchemaTest {
 
     @Test
     public void should_throwException_WhenCreatingLogicSchema_WithRepeatedPredicateName() {
-        Predicate p1 = new MutablePredicate("p", new Arity(1));
-        Predicate p2 = new MutablePredicate("p", new Arity(1));
+        Predicate p1 = new MutablePredicate("p", 1);
+        Predicate p2 = new MutablePredicate("p", 1);
         assertThatThrownBy(() -> new LogicSchema(Set.of(p1, p2), Set.of()))
                 .isInstanceOf(RepeatedPredicateName.class);
     }
 
     @Test
     public void should_throwException_WhenCreatingLogicSchema_WithRepeatedConstraintID() {
-        Predicate p = new MutablePredicate("p", new Arity(1));
+        Predicate p = new MutablePredicate("p", 1);
         LogicConstraint c1 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), p);
         LogicConstraint c2 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), p);
         assertThatThrownBy(() -> new LogicSchema(Set.of(p), Set.of(c1, c2)))
@@ -33,7 +33,7 @@ public class LogicSchemaTest {
 
     @Test
     public void should_throwException_WhenCreatingLogicSchema_WithConstraint_UsingPredicateNotFromSchema() {
-        Predicate predicateNotInSchema = new MutablePredicate("p", new Arity(1));
+        Predicate predicateNotInSchema = new MutablePredicate("p", 1);
         LogicConstraint c1 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), predicateNotInSchema);
         assertThatThrownBy(() -> new LogicSchema(Set.of(), Set.of(c1)))
                 .isInstanceOf(PredicateOutsideSchema.class);
@@ -42,7 +42,7 @@ public class LogicSchemaTest {
     @Test
     public void should_throwException_WhenCreatingLogicSchema_WithDerivedPredicate_UsingPredicateNotFromSchema() {
         Query query = QueryMother.createTrivialQuery(1, "predicateNotInSchemaName");
-        Predicate derivedPredicate = new MutablePredicate("p", new Arity(1), List.of(query));
+        Predicate derivedPredicate = new MutablePredicate("p", 1, List.of(query));
 
         assertThatThrownBy(() -> new LogicSchema(Set.of(derivedPredicate), Set.of()))
                 .isInstanceOf(PredicateOutsideSchema.class);
@@ -50,7 +50,7 @@ public class LogicSchemaTest {
 
     @Test
     public void should_notThrowException_WhenCreatingTheLogicSchema_BringingFirstDerivedPredicates_AndThenBasePredicates() {
-        Predicate basePredicate = new MutablePredicate("q", new Arity(1));
+        Predicate basePredicate = new MutablePredicate("q", 1);
         String derivedPredicateName = "p";
         Predicate derivedPredicate = DerivedPredicateMother.createTrivialDerivedPredicate(derivedPredicateName, 1, List.of(basePredicate));
         assertThatNoException().isThrownBy(() -> new LogicSchema(Set.of(derivedPredicate, basePredicate), Set.of()));
@@ -60,7 +60,7 @@ public class LogicSchemaTest {
     @Test
     public void should_retrievePredicate_WhenGivingTheirName() {
         String predicateName = "p";
-        Predicate p = new MutablePredicate(predicateName, new Arity(1));
+        Predicate p = new MutablePredicate(predicateName, 1);
         LogicSchema logicSchema = new LogicSchema(Set.of(p), Set.of());
         assertThat(logicSchema.getPredicateByName(predicateName)).isSameAs(p);
     }
@@ -73,7 +73,7 @@ public class LogicSchemaTest {
 
     @Test
     public void should_retrieveLogicConstraint_WhenGivingItsID() {
-        Predicate p = new MutablePredicate("p", new Arity(1));
+        Predicate p = new MutablePredicate("p", 1);
         LogicConstraint logicConstraint = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), p);
 
         LogicSchema logicSchema = new LogicSchema(Set.of(p), Set.of(logicConstraint));
@@ -91,8 +91,8 @@ public class LogicSchemaTest {
 
     @Test
     public void should_retrieveDerivationRules_WhenGivingTheirPredicateName() {
-        MutablePredicate basePredicate1 = new MutablePredicate("q", new Arity(1));
-        MutablePredicate basePredicate2 = new MutablePredicate("r", new Arity(1));
+        MutablePredicate basePredicate1 = new MutablePredicate("q", 1);
+        MutablePredicate basePredicate2 = new MutablePredicate("r", 1);
         String derivedPredicateName = "p";
         MutablePredicate derivedPredicate = DerivedPredicateMother.createTrivialDerivedPredicate(derivedPredicateName, 1, List.of(basePredicate1, basePredicate2));
         List<DerivationRule> derivationRules = derivedPredicate.getDerivationRules();
@@ -111,7 +111,7 @@ public class LogicSchemaTest {
     @Test
     public void should_throwException_WhenRetrievingDerivationRules_WithNonDerivedPredicateName() {
         String basePredicateName = "p";
-        Predicate basePredicate = new MutablePredicate(basePredicateName, new Arity(2));
+        Predicate basePredicate = new MutablePredicate(basePredicateName, 2);
         LogicSchema logicSchema = new LogicSchema(Set.of(basePredicate), Set.of());
         assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName(basePredicateName))
                 .isInstanceOf(PredicateIsNotDerived.class);

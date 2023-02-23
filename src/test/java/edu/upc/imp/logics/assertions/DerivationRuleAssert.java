@@ -21,8 +21,8 @@ public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
 
     public DerivationRuleAssert correspondsSpec(DerivationRuleSpec spec) {
         Assertions.assertThat(actual.getHead().getPredicate().getName()).isEqualTo(spec.getPredicateName());
-        Assertions.assertThat(actual.getHead().getPredicate().getArity().getNumber()).isEqualTo(spec.getTermSpecList().size());
-        for (int i = 0; i < actual.getHead().getPredicate().getArity().getNumber(); ++i) {
+        Assertions.assertThat(actual.getHead().getPredicate().getArity()).isEqualTo(spec.getTermSpecList().size());
+        for (int i = 0; i < actual.getHead().getPredicate().getArity(); ++i) {
             Term actualTerm = actual.getHead().getTerms().get(i);
             TermSpec termSpec = spec.getTermSpecList().get(i);
             TermAssert.assertThat(actualTerm).correspondsSpec(termSpec);
