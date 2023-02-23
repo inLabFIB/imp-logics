@@ -4,6 +4,7 @@ import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.imp.parser.LogicSchemaGrammarLexer;
 import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import org.antlr.v4.runtime.CharStream;
@@ -11,6 +12,18 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 public class LogicSchemaParser {
+
+    private final StringToTermSpecFactory stringToTermSpecFactory;
+
+    public LogicSchemaParser() {
+        this(new DefaultStringToTermSpecFactory());
+    }
+
+    public LogicSchemaParser(StringToTermSpecFactory stringToTermSpecFactory) {
+        this.stringToTermSpecFactory = stringToTermSpecFactory;
+    }
+
+
     public LogicSchema parse(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input);
@@ -18,7 +31,7 @@ public class LogicSchemaParser {
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
 
-        LogicSchemaGrammarToSpecVisitor visitor = new LogicSchemaGrammarToSpecVisitor(new DefaultStringToTermSpecFactory());
+        LogicSchemaGrammarToSpecVisitor visitor = new LogicSchemaGrammarToSpecVisitor(stringToTermSpecFactory);
         LogicSchemaSpec logicSchemaSpec = visitor.visitProg(tree);
 
         LogicSchemaFactory factory = new LogicSchemaFactory();

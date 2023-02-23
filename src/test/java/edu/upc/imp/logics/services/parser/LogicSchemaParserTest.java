@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class LogicSchemaParserTest {
 
@@ -118,5 +120,26 @@ public class LogicSchemaParserTest {
                 .containsOrdinaryLiteral("r", "x");
     }
 
+    @Test
+    public void should_parseWholeSchema_whenDefiningSchema_withSeveralLogicConstraints_andSeveralDerivationRules() {
+        String schemaString = """
+                            @1 :- WorksIn(E, D), not(Emp(E))
+                            @2 :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
+                            @3 :- Dept(D), not(MinOneSpecialEmployee(D))
+                            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
+                            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
+                """;
+
+        LogicSchema logicSchema = new LogicSchemaParser().parse(schemaString);
+
+
+        LogicSchemaAssert.assertThat(logicSchema)
+                .containsExactlyThesePredicateNames(
+                        "Dept", "Rich", "WorksIn", "Emp", "Manages", "CrucialDept", "MinOneSpecialEmployee", "Happy")
+                .containsExactlyTheseConstraintIDs("1", "2", "3");
+
+        List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("MinOneSpecialEmployee");
+        assertThat(derivationRules).hasSize(2);
+    }
 
 }
