@@ -24,7 +24,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addPredicates_whenAddingSeveralPredicates_withNoDerivationRules() {
-        LogicSchema logicSchema = new LogicSchemaBuilder()
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("arity2", 2)
                 .addPredicate("arity3", 3)
                 .addPredicate("arity4", 4)
@@ -38,7 +38,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_notAddDerivedPredicate_whenAddingSeveralPredicateWithSameNameAndArity() {
-        LogicSchema logicSchema = new LogicSchemaBuilder()
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("p", 2)
                 .addPredicate("p", 2)
                 .addPredicate("p", 2)
@@ -52,7 +52,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_throwsRepeatedPredicateName_whenAddingPredicateWithSameNameAndDiferentArity() {
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
+        assertThatThrownBy(() -> LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("p", 2)
                 .addPredicate("p", 3)
         ).isInstanceOf(RepeatedPredicateName.class);
@@ -66,7 +66,7 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("P", 2)
                 .addPredicate("Q", 2)
                 .addDerivationRule(derivationRuleSpec)
@@ -86,7 +86,7 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addDerivationRule(derivationRuleSpec)
                 .build();
 
@@ -117,9 +117,9 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        assertThatThrownBy(() -> new LogicSchemaBuilder()
-                .addLogicConstraintWithID(logicConstraintSpec)
-                .addLogicConstraintWithID(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
+        assertThatThrownBy(() -> LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec)
+                .addLogicConstraint(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
     }
 
     @Test
@@ -131,8 +131,8 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraintWithID(logicConstraintSpec)
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec)
                 .build();
 
         assertThat(logicSchema.getAllLogicConstraints()).hasSize(1);
@@ -150,8 +150,8 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraintWithID(logicConstraintSpec)
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec)
                 .build();
 
         assertThat(logicSchema.getAllPredicates()).hasSize(2);
@@ -204,8 +204,8 @@ public class LogicSchemaBuilderTest {
                 .addNegatedOrdinaryLiteral("Rich", "E")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraintWithID(logicConstraint1, logicConstraint2, logicConstraint3)
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraint1, logicConstraint2, logicConstraint3)
                 .addDerivationRule(derivationRule1, derivationRule2)
                 .addPredicate("Project", 1)
                 .build();
@@ -230,8 +230,8 @@ public class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("R")
                 .build();
 
-        LogicSchema logicSchema = new LogicSchemaBuilder()
-                .addLogicConstraintWithoutID(logicConstraintSpec1, logicConstraintSpec2)
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec1, logicConstraintSpec2)
                 .build();
 
         LogicSchemaAssert.assertThat(logicSchema).containsExactlyTheseConstraintIDs("1", "2");

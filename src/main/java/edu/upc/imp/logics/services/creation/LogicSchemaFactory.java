@@ -2,17 +2,24 @@ package edu.upc.imp.logics.services.creation;
 
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 
 public class LogicSchemaFactory<T extends LogicConstraintSpec> {
-    private final LogicSchemaBuilder logicSchemaBuilder;
+    private final LogicSchemaBuilder<T> logicSchemaBuilder;
 
-    public LogicSchemaFactory(ConstraintIDGenerator constraintIDGenerator) {
-        logicSchemaBuilder = new LogicSchemaBuilder(constraintIDGenerator);
+    public static LogicSchemaFactory<LogicConstraintWithIDSpec> defaultLogicSchemaWithIDsFactory() {
+        return new LogicSchemaFactory<>(new UseSpecIDGenerator());
     }
 
-    public LogicSchemaFactory() {
-        this.logicSchemaBuilder = new LogicSchemaBuilder();
+    public static LogicSchemaFactory<LogicConstraintWithoutIDSpec> defaultLogicSchemaWithoutIDsFactory() {
+        return new LogicSchemaFactory<>(new IncrementalConstraintIDGenerator());
+
+    }
+
+    public LogicSchemaFactory(ConstraintIDGenerator<T> constraintIDGenerator) {
+        logicSchemaBuilder = new LogicSchemaBuilder<>(constraintIDGenerator);
     }
 
     public LogicSchema createLogicSchema(LogicSchemaSpec<T> logicSchemaSpec) {

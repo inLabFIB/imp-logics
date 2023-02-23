@@ -26,6 +26,8 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
 
     protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);
 
+    protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
+
     public LogicSchema parse(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input);
@@ -33,7 +35,7 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
         LogicSchemaSpec<T> logicSchemaSpec = visitor.visitProg(tree);
-        LogicSchemaFactory<T> factory = new LogicSchemaFactory<>();
+        LogicSchemaFactory<T> factory = createLogicSchemaFactory();
         return factory.createLogicSchema(logicSchemaSpec);
     }
 }

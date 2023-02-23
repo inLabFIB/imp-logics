@@ -65,7 +65,7 @@ public class LogicSchemaFactoryTest {
         logicSchemaSpec.addDerivationRuleSpecs(derivationRule1, derivationRule2);
         logicSchemaSpec.addPredicateSpecs(new PredicateSpec("Project", 1));
 
-        LogicSchema logicSchema = new LogicSchemaFactory<LogicConstraintWithIDSpec>().createLogicSchema(logicSchemaSpec);
+        LogicSchema logicSchema = LogicSchemaFactory.defaultLogicSchemaWithIDsFactory().createLogicSchema(logicSchemaSpec);
 
         LogicSchemaAssert.assertThat(logicSchema)
                 .containsExactlyThesePredicateNames(

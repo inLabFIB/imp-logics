@@ -1,8 +1,9 @@
 package edu.upc.imp.logics.services.creation;
 
 import edu.upc.imp.logics.schema.ConstraintID;
+import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
 
-public interface ConstraintIDGenerator {
+public interface ConstraintIDGenerator<T extends LogicConstraintSpec> {
 
-    ConstraintID newConstraintID();
+    ConstraintID newConstraintID(T lcs);
 }

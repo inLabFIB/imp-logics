@@ -7,26 +7,31 @@ import edu.upc.imp.logics.services.creation.spec.*;
 
 import java.util.*;
 
-public class LogicSchemaBuilder {
+public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     private final Map<ConstraintID, LogicConstraint> logicConstraintById = new HashMap<>();
     private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
-    private final ConstraintIDGenerator constraintIDGenerator;
+    private final ConstraintIDGenerator<T> constraintIDGenerator;
 
-    public LogicSchemaBuilder() {
-        this(new IncrementalConstraintIDGenerator(1));
+
+    public static LogicSchemaBuilder<LogicConstraintWithoutIDSpec> defaultLogicSchemaWithoutIDsBuilder() {
+        return new LogicSchemaBuilder<>(new IncrementalConstraintIDGenerator());
     }
 
-    public LogicSchemaBuilder(ConstraintIDGenerator constraintIDGenerator) {
+    public static LogicSchemaBuilder<LogicConstraintWithIDSpec> defaultLogicSchemaWithIDsBuilder() {
+        return new LogicSchemaBuilder<>(new UseSpecIDGenerator());
+    }
+
+    public LogicSchemaBuilder(ConstraintIDGenerator<T> constraintIDGenerator) {
         this.constraintIDGenerator = constraintIDGenerator;
     }
 
-    public LogicSchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {
+    public LogicSchemaBuilder<T> addPredicate(PredicateSpec... predicateSpecs) {
         Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
         return this;
     }
 
-    public LogicSchemaBuilder addPredicate(String predicateName, int arity) {
+    public LogicSchemaBuilder<T> addPredicate(String predicateName, int arity) {
         addPredicateIfAbsent(predicateName, arity);
         return this;
     }
@@ -43,19 +48,18 @@ public class LogicSchemaBuilder {
         }
     }
 
-    public LogicSchemaBuilder addDerivationRule(DerivationRuleSpec... drs) {
+    public LogicSchemaBuilder<T> addDerivationRule(DerivationRuleSpec... drs) {
         Arrays.stream(drs).forEach(this::addDerivationRule);
         return this;
     }
 
-    private LogicSchemaBuilder addDerivationRule(DerivationRuleSpec drs) {
+    private void addDerivationRule(DerivationRuleSpec drs) {
         predicatesByName.putIfAbsent(
                 drs.getPredicateName(),
                 new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
         Query query = buildQuery(drs.getTermSpecList(), drs.getBody());
         MutablePredicate mutablePredicate = predicatesByName.get(drs.getPredicateName());
         mutablePredicate.addDerivationRule(query);
-        return this;
     }
 
     private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
@@ -64,29 +68,10 @@ public class LogicSchemaBuilder {
         return new Query(headTerms, body);
     }
 
-    public void addLogicConstraint(LogicConstraintSpec... logicConstraintSpecs) {
-        Arrays.stream(logicConstraintSpecs).forEach(
-                lcs -> {
-                    if (lcs instanceof LogicConstraintWithIDSpec withIDSpec) addLogicConstraintWithID(withIDSpec);
-                    else if (lcs instanceof LogicConstraintWithoutIDSpec withoutIDSpec)
-                        addLogicConstraintWithoutID(withoutIDSpec);
-                    else
-                        throw new RuntimeException("Unknown LogicConstraintSpec implementation: " + lcs.getClass().getName());
-                }
-        );
-    }
-
-    public LogicSchemaBuilder addLogicConstraintWithID(LogicConstraintWithIDSpec... logicConstraints) {
-        Arrays.stream(logicConstraints).forEach(lcs -> {
-            ConstraintID constraintID = new ConstraintID(lcs.getId());
-            addLogicConstraint(constraintID, lcs);
-        });
-        return this;
-    }
-
-    public LogicSchemaBuilder addLogicConstraintWithoutID(LogicConstraintWithoutIDSpec... logicConstraints) {
-        Arrays.stream(logicConstraints).forEach(lcs -> {
-            ConstraintID constraintID = constraintIDGenerator.newConstraintID();
+    @SafeVarargs
+    public final LogicSchemaBuilder<T> addLogicConstraint(T... logicConstraintSpecs) {
+        Arrays.stream(logicConstraintSpecs).forEach(lcs -> {
+            ConstraintID constraintID = constraintIDGenerator.newConstraintID(lcs);
             addLogicConstraint(constraintID, lcs);
         });
         return this;
