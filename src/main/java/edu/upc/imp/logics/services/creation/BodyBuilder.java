@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class BodyBuilder {
-    private final Map<String, MutablePredicate> predicatesByName;
+/**
+ * Class in charge of instantiating the body of some normal clause given the predicates of the schema
+ */
+class BodyBuilder {
+    private final Map<String, Predicate> predicatesByName;
     private final List<Literal> body;
 
-    public BodyBuilder(Map<String, MutablePredicate> predicatesByName) {
-        this.predicatesByName = predicatesByName;
+    public BodyBuilder(Map<String, ? extends Predicate> predicatesByName) {
+        this.predicatesByName = Collections.unmodifiableMap(predicatesByName);
         body = new LinkedList<>();
     }
 

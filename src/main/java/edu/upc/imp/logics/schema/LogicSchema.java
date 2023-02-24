@@ -39,7 +39,7 @@ public class LogicSchema {
     private void checkDerivedPredicatesUsesPredicatesFromSchema() {
         for (Predicate p : predicatesByName.values()) {
             if (p.isDerived()) {
-                ((MutablePredicate) p).getDerivationRules().forEach(this::checkPredicatesBelongsToSchema);
+                p.getDerivationRules().forEach(this::checkPredicatesBelongsToSchema);
             }
         }
     }
@@ -73,7 +73,7 @@ public class LogicSchema {
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {
-            return ((MutablePredicate) predicate).getDerivationRules();
+            return predicate.getDerivationRules();
         } else throw new PredicateIsNotDerived(derivedPredicateName);
     }
 

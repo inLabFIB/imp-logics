@@ -2,7 +2,7 @@ package edu.upc.imp.logics.services.creation;
 
 import edu.upc.imp.logics.assertions.LiteralAssert;
 import edu.upc.imp.logics.schema.Literal;
-import edu.upc.imp.logics.schema.MutablePredicate;
+import edu.upc.imp.logics.schema.Predicate;
 import edu.upc.imp.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
 import edu.upc.imp.logics.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
 import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
@@ -23,12 +23,13 @@ public class BodyBuilderTest {
 
     @Test
     public void should_addOrdinaryLiteral_whenAddingOrdinaryLiteralSpec() {
-        BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new MutablePredicate("P", 2)));
         StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
         OrdinaryLiteralSpec literalSpec = new OrdinaryLiteralSpec("P", termFactory.createTermSpecs("x", "y"), true);
-        bodyBuilder.addLiteral(literalSpec);
 
-        List<Literal> body = bodyBuilder.build();
+        BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new Predicate("P", 2)));
+        List<Literal> body = bodyBuilder
+                .addLiteral(literalSpec)
+                .build();
 
         assertThat(body).hasSize(1);
         assertThat(body).first().satisfies(
