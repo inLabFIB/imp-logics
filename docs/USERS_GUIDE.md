@@ -5,13 +5,16 @@ manual assumes that the user is comfortable with the traditional logic concepts 
 Atom, Literal, OrdinaryLiteral, Built-in-Literal, NormalClause, LogicConstraint, and DerivationRule.
 
 By contract, almost all IMP Logics entities are immutable. For instance, if we have the literal "Emp(x)" and apply a
-substitution to obtain "Emp(John)",
-we are obtaining a new object "Emp(John)", rather than modifying the original "Emp(x)".
+substitution to obtain "Emp(John)", we are obtaining a new object "Emp(John)", rather than modifying the original "Emp(
+x)".
+Since, transformations over logic objects generates new logic objects, a user can apply as many transformations as
+he/she
+wants without any side effect on its originally created objects.
 
 Users of IMP logics can freely create the instances of the metamodel as they wish. For instance, they can freely
 create Terms, Atoms, Literals, etc. and manage them manually.
 
-However, to better manage such objects, we strongly recommend the usage of LogicSchema.
+However, to better manage such objects, we strongly recommend the usage of a LogicSchema.
 
 Structurally, a LogicSchema is a set of:
 
@@ -26,42 +29,107 @@ A logic schema bounds all such objects together and ensures their consistency. T
 
 ## Instantiating a logic schema
 
-To better instantiate a logic schema, we provide two mechanisms:
+To better instantiate a logic schema, we provide three mechanisms:
 
-- LogicSchemaBuilder
-- LogicSchemaFactory
+- LogicSchemaParser: parses a String codifying a logic schema according to some grammar
+- LogicSchemaBuilder: programatically creates, in an incremental fashion, a logic schema
+- LogicSchemaFactory: programatically creates, in a single step, a logic schema
 
-### LogicSchemaBuilder
+To better grasp the intuition between the three methods, we provide an easy example for each of them.
 
-The LogicSchemaBuilder is meant to create the LogicSchema incrementally. That is, it offers some operations to add
-predicates, logic constraints, and derivation rules into it, and the LogicSchemaBuilder immediately checks their
-consistency. E.g. a LogicSchemaBuilder will throw an error if trying to add a LogicConstraint `:-P(), P(x)`
-since predicate `P` is being used as a 2-ary and 3-ary predicate at the same time.
+Example of usage of a LogicSchemaParser:
 
-To add such entities, the LogicSchemaBuilder receives as input some specification classes `PredicateSpec`,
-`LogicConstraintSpec` and `DerivationRuleSpec`. Such classes are Value Objects used to specify the real
-entities `Predicate`,
-`LogicConstraint` and `DerivationRule` that the user wants to create.
+```java
+String schemaString="""
+       :- Dept(D), not(MinOneEmp(E))
+       MinOneEmp(D) :- Empd(E, D), Happy(E)
+    """;
 
-With regards to the `LogicConstraintSpec`, the user can decide to instantiate `LogicConstraintWithIDSpec`
-or `LogicConstraintWithoutIDSpec`.
-In the first case, the user is forced to specify the ID he wants to use for the constraints, whereas in the second, the
-user cannot specify
-any ID.
+        LogicSchema logicSchema=new LogicSchemaWithoutIDsParser().parse(schemaString);
+```
 
-The user cannot create a logic schema using both, `LogicConstraintWithIDSpec` and `LogicConstraintWithoutIDSpec`, hence
-the LogicSchemaBuilder is type parametrized to ensure so, and force the user take a decision when instantiating the
-builder.
+Example of usage of a LogicSchemaBuilder:
 
-Finally, to facilitate the creation of such specification classes, we provide some builders and helpers:
+```java
+LogicSchemaBuilder<LogicConstraintWithoutIDSpec> logicSchemaBuilder=LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder();
 
-- StringToTermSpecFactory: it is used to specify
-- ... //TODO
+        LogicConstraintWithoutIDSpec logicConstraint=new LogicConstraintWithoutIDSpecBuilder()
+        .addOrdinaryLiteral("Dept","D")
+        .addNegatedOrdinaryLiteral("MinOneEmp","D")
+        .build();
+        logicSchemaBuilder.addLogicConstraint(logicConstraint)
 
-//TODO: add code examples
+        DerivationRuleSpec derivationRule=new DerivationRuleSpecBuilder()
+        .addHead("MinOneEmp","D")
+        .addOrdinaryLiteral("Emp","E","D")
+        .build();
+        logicSchemaBuilder.addDerivationRule(derivationRule)
 
-### LogicSchemaFactory
+        LogicSchema logicSchema=logicSchemaBuilder.build();
+```
 
-//TODO
+Example of usage of a LogicSchemaFactory:
 
+```java
+LogicConstraintWithoutIDSpec logicConstraint=new LogicConstraintWithoutIDSpecBuilder()
+        .addOrdinaryLiteral("Dept","D")
+        .addNegatedOrdinaryLiteral("MinOneEmp","D")
+        .build();
+        logicSchemaSpec.addLogicConstraint(logicConstraint)
 
+        DerivationRuleSpec derivationRule=new DerivationRuleSpecBuilder()
+        .addHead("MinOneEmp","D")
+        .addOrdinaryLiteral("Emp","E","D")
+        .build();
+        logicSchemaSpec.addDerivationRule(derivationRule)
+
+        LogicSchema logicSchema=LogicSchemaFactory.defaultLogicSchemaWithoutIDsFactory().createLogicSchema(logicSchemaSpec)
+```
+
+### How to use the LogicSchemaBuilder and LogicSchemaFactory?
+
+We recommend using the `LogicSchemaBuilder` and `LogicSchemaFactory` on the following fashion:
+
+1. Instantiate all the logic constraints and derivation rules you like, in the order you like
+2. Add the predicates that are not appearing in the logic constraints and derivation rules through the `addPredicate`
+   operation (`LogicSchemaBuilder::addPredicate`, or `LogicSchemaSpecification::addPredicate`). The other predicates
+   are automatically managed by the builder/factory and hence, you do not require to specify them.
+
+### How to manage the logic constraint IDs?
+
+Every logic constraint has an ID that permits identifying it. You can decide to create such identifiers manually,
+or delegate IMP logics to decide them for you.
+
+#### Managing the logic constraint IDs manually
+
+If you want to manage the IDs manually, you should use:
+
+- LogicSchemaParserWithIDs in case you are parsing.
+- LogicSchemaBuilder<LogicConstraintWithIDSpec> in case you are using the builder.
+- LogicSchemaFactory<LogicConstraintWithIDSpec> in case you are using the factory.
+
+If you are using the LogicSchemaParserWithIDs, every constraint should be preceded by '@ID'.
+E.g. "@1 :- Dept(D), not(MinOneEmp(D))"
+
+If you are using the factory, or the builder, you might be interested in using the operation
+`LogicConstraintWithIDSpecBuilder::addConstraintId` to add constraint ids to your logic constraint specifications.
+
+#### Managing the logic constraint through IMP logics
+
+If you want to manage the IDs automatically, you should use:
+
+- LogicSchemaParserWithoutIDs in case you are parsing.
+- LogicSchemaBuilder<LogicConstraintWithoutIDSpec> in case you are using the builder.
+- LogicSchemaFactory<LogicConstraintWithoutIDSpec> in case you are using the factory.
+
+By default, IMP logics will use consecutive numbers, starting form 1, to identify your constraints (e.g. 1, 2, 3, ...)
+However, such strategy can be overriden by providing a new implementation of the class `ConstraintIDGenerator`.
+
+### Creating constants or variables
+
+When using the parser, and the builders, IMP logics will, by default, interpret that:
+
+- Constants are specified with numbers and (single or doubled) quoted strings. E.g.: 1, 2, "Socrates", 'Plato'...
+- Variables are the rest of strings
+
+However, such strategy can be overridden by providing a new implementation of the class `StringToTermSpecFactory`.

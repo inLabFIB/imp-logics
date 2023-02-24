@@ -5,14 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A predicate whose definition depends on several derivation rules
- * E.g. predicate P, with arity 2, is a derived predicate defined by:
- * P(x, y) :- R(x, y)
- * P(x, w) :- S(x, w), T(w)
- * To instantiate a DerivedPredicate, we use Queries, that is, a list of terms together a body:
- * (x, y) :- R(x, y)
- * (x, w) :- S(x, w), T(w)
- * Indeed, it is redundant to include the predicate P in the rules that derive P.
+ * Mutable implementation of a logic predicate.
+ * The logic predicate is mutable in the sense that we can add derivation rules to it at runtime.
  */
 public class MutablePredicate extends Predicate {
     /**

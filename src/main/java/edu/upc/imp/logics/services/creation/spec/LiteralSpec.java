@@ -1,4 +1,7 @@
 package edu.upc.imp.logics.services.creation.spec;
 
-public class LiteralSpec {
+/**
+ * Specification of a Literal.
+ */
+public abstract class LiteralSpec {
 }

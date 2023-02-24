@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec;
 
 import java.util.List;
 
+/**
+ * Specification of a built-in literal.
+ */
 public class BuiltInLiteralSpec extends LiteralSpec implements LogicElementSpec {
     private final String operator;
     private final List<TermSpec> termSpecs;

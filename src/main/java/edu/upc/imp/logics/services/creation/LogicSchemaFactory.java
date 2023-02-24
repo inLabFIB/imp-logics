@@ -6,6 +6,17 @@ import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 
+/**
+ * <p> Class responsible for creating a logic schema for a given logic schema specification.
+ * The factory will ensure that there is a Predicate for each predicate name used in the specification.
+ * That is, if a logic constraint or derivation rule specification uses a predicate name "P", which
+ * has not been specified as a predicate, the factory will automatically create such predicate P. </p>
+ *
+ * <p> The factory must work with either LogicConstraintSpecWithIDs, or LogicConstraintSpecWithoutIDs, but not
+ * both at the same time.</p>
+ *
+ * @param <T> kind of LogicConstraintSpec this class works with
+ */
 public class LogicSchemaFactory<T extends LogicConstraintSpec> {
     private final LogicSchemaBuilder<T> logicSchemaBuilder;
 

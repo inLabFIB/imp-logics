@@ -6,7 +6,12 @@ import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<T>> {
+/**
+ * Common part of the LogicConstraintSpec and DerivationRuleSpec builders
+ *
+ * @param <T> kind of NormalClauseSpecBuilder being extended.
+ */
+public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<T>> {
     /**
      * This class implements a hierarchy of builders as discussed in
      * <a href="https://stackoverflow.com/questions/21086417/builder-pattern-and-inheritance">stackoverflow</a>

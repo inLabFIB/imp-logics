@@ -5,6 +5,9 @@ import edu.upc.imp.logics.services.creation.spec.TermSpec;
 
 import java.util.List;
 
+/**
+ * Builder to facilitate the creation of DerivationRuleSpec.
+ */
 public class DerivationRuleSpecBuilder extends NormalClauseSpecBuilder<DerivationRuleSpecBuilder> {
     private String predicateName;
     private List<TermSpec> terms;

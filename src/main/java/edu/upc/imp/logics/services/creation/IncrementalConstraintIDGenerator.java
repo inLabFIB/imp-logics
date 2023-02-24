@@ -3,6 +3,11 @@ package edu.upc.imp.logics.services.creation;
 import edu.upc.imp.logics.schema.ConstraintID;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 
+/**
+ * Incremental strategy for obtaining the IDs of newly created logic constraints.
+ * It will return identifiers starting from a given start (1 by default).
+ * E.g.: 1, 2, 3, ...
+ */
 public class IncrementalConstraintIDGenerator implements ConstraintIDGenerator<LogicConstraintWithoutIDSpec> {
     private int nextID;
 

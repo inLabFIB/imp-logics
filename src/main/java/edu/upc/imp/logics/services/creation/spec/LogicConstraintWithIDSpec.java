@@ -3,6 +3,9 @@ package edu.upc.imp.logics.services.creation.spec;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Specification of a logic constraint including an ID for it.
+ */
 public class LogicConstraintWithIDSpec extends LogicConstraintSpec {
 
     private final String id;

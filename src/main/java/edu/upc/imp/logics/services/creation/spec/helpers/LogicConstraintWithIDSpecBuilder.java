@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec.helpers;
 
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 
+/**
+ * Builder to facilitate the creation of LogicConstraintWithIDs.
+ */
 public class LogicConstraintWithIDSpecBuilder extends NormalClauseSpecBuilder<LogicConstraintWithIDSpecBuilder> {
     private String id;
 

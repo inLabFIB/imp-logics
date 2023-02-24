@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec;
 
 import java.util.List;
 
+/**
+ * Specification of a LogicConstraint.
+ */
 public abstract class LogicConstraintSpec extends NormalClauseSpec implements LogicElementSpec {
 
     public LogicConstraintSpec(BodySpec body) {

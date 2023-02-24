@@ -7,10 +7,7 @@ import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Class in charge of instantiating the body of some normal clause given the predicates of the schema

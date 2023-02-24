@@ -6,7 +6,17 @@ import edu.upc.imp.logics.schema.exceptions.RepeatedPredicateName;
 import edu.upc.imp.logics.services.creation.spec.*;
 
 import java.util.*;
-
+/**
+ * Builder for a logic schema.
+ * The builder will ensure that there is a Predicate for each predicate name used in the specification.
+ * That is, if a logic constraint or derivation rule specification uses a predicate name "P", which
+ * has not been specified as a predicate, the builder will automatically create such predicate P.
+ *
+ * <p> The builder must work with either LogicConstraintSpecWithIDs, or LogicConstraintSpecWithoutIDs, but not
+ * both at the same time.</p>
+ *
+ * @param <T> kind of LogicConstraintSpec this class works with
+ */
 public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     private final Map<ConstraintID, LogicConstraint> logicConstraintById = new HashMap<>();

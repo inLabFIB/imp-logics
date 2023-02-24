@@ -1,6 +1,11 @@
 package edu.upc.imp.logics.services.creation.spec.helpers;
 
-
+/**
+ * StringToTermSpecFactory that interprets numbers as constants, or quoted strings as constants. The rest of strings
+ * are interpreted as variables.
+ * Examples of Strings that would be interpreted as Constants: 4, 4.0, "Socrates", 'Plato'.
+ * Examples of Strings that would be interpreted as Variables: x, y, Person, etc.
+ */
 public class DefaultStringToTermSpecFactory extends StringToTermSpecFactory {
 
     @Override

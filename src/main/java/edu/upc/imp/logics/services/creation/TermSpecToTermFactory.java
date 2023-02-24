@@ -10,6 +10,9 @@ import edu.upc.imp.logics.services.creation.spec.VariableSpec;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Factory in charge of creating the corresponding subclass of Term for a given subclass of TermSpec
+ */
 public class TermSpecToTermFactory {
 
     public static List<Term> buildTerms(List<TermSpec> termSpecList) {

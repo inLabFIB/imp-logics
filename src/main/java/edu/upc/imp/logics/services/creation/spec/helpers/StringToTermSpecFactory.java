@@ -7,7 +7,10 @@ import edu.upc.imp.logics.services.creation.spec.VariableSpec;
 import java.util.LinkedList;
 import java.util.List;
 
-
+/**
+ * Factory in charge of instantiating the corresponding subclass of Term (Constant, or Variable)
+ * for a given String.
+ */
 public abstract class StringToTermSpecFactory {
 
     public List<TermSpec> createTermSpecs(String... termNames) {

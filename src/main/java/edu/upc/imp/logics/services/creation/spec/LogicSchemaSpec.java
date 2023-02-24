@@ -5,6 +5,18 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * <p> Specification of a whole logic schema, that is, a specification of a set of predicates,
+ * logic constraints, and derivation rules. </p>
+ *
+ * <p> A LogicSchemaSpec can only deal with logic constraints including an id, or logic constraints
+ * not including an id, but not both at the same time.
+ * Hence, when instantiating a LogicSchemaSpec, we must declare which type
+ * of LogicConstraintSpec are we going to use.
+ * </p>
+ *
+ * @param <T> kind of LogicConstraintSpec this LogicSchemaSpec will work with
+ */
 public class LogicSchemaSpec<T extends LogicConstraintSpec> implements LogicElementSpec {
     private final List<PredicateSpec> predicateSpecList;
     private final List<DerivationRuleSpec> derivationRuleSpecList;

@@ -10,10 +10,11 @@ import java.util.Objects;
  * A Predicate is a weak entity w.r.t. LogicSchema. That is:
  * - One Predicate can only belong to one LogicSchema
  * - A LogicSchema cannot contain two predicates with the same name
- * <p>
- * To instantiate a derived prediacte, we use Queries, that is, a list of terms together a body:
+ * To instantiate a derived predicate, we use Queries, that is, a list of terms together a body
+ * For instance, if we have a mutable Predicate P, we can include some Queries to make it derived:
  * (x, y) :- R(x, y)
  * (x, w) :- S(x, w), T(w)
+ * Do note that the queries do not require to include the predicate "P" on the head, since it would be redundant.
  */
 public class Predicate {
     /**

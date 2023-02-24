@@ -3,6 +3,9 @@ package edu.upc.imp.logics.services.creation.spec;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Specification of an ordinary literal.
+ */
 public class OrdinaryLiteralSpec extends LiteralSpec implements LogicElementSpec {
     private final String predicateName;
     private final List<TermSpec> termsList;

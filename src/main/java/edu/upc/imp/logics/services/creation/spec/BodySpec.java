@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec;
 
 import java.util.List;
 
+/**
+ * Specification of a body of a normal clause.
+ */
 public class BodySpec implements LogicElementSpec {
 
     private final List<LiteralSpec> literals;

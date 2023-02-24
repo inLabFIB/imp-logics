@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec.helpers;
 
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 
+/**
+ * Builder to facilitate the creation of LogicConstraintWithoutIDs.
+ */
 public class LogicConstraintWithoutIDSpecBuilder extends NormalClauseSpecBuilder<LogicConstraintWithoutIDSpecBuilder> {
 
     /**

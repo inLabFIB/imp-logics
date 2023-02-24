@@ -2,6 +2,9 @@ package edu.upc.imp.logics.services.creation.spec;
 
 import java.util.List;
 
+/**
+ * Specification of a derivation rule.
+ */
 public class DerivationRuleSpec extends NormalClauseSpec implements LogicElementSpec {
     private final String predicateName;
     private final List<TermSpec> termSpecList;
