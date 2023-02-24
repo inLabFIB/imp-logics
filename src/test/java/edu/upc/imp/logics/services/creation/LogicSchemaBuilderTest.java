@@ -171,14 +171,13 @@ public class LogicSchemaBuilderTest {
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
 //            % Existing but unused predicates: Project(p)
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("2")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Manages", "E", "D")
@@ -186,19 +185,19 @@ public class LogicSchemaBuilderTest {
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("3")
                 .addOrdinaryLiteral("Dept", "D")
                 .addOrdinaryLiteral("MinOneSpecialEmployee", false, "D")
                 .build();
 
-        DerivationRuleSpec derivationRule1 = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRule1 = new DerivationRuleSpecBuilder()
                 .addHead("MinOneSpecialEmployee", "D")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Happy", "E")
                 .build();
 
-        DerivationRuleSpec derivationRule2 = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRule2 = new DerivationRuleSpecBuilder()
                 .addHead("MinOneSpecialEmployee", "D")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addNegatedOrdinaryLiteral("Rich", "E")
