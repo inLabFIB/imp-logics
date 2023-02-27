@@ -1,19 +1,16 @@
 package edu.upc.imp.logics.services.creation.spec;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Specification of a body of a normal clause.
  */
-public class BodySpec implements LogicElementSpec {
+public record BodySpec(List<LiteralSpec> literals) implements LogicElementSpec {
 
-    private final List<LiteralSpec> literals;
-
-    public BodySpec(List<LiteralSpec> literals) {
-        this.literals = literals;
+    public BodySpec {
+        if (Objects.isNull(literals)) throw new IllegalArgumentException("Literals cannot be null");
+        if (literals.isEmpty()) throw new IllegalArgumentException("Literals cannot be empty");
     }
 
-    public List<LiteralSpec> getLiterals() {
-        return literals;
-    }
 }
