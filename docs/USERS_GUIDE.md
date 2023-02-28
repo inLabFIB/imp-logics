@@ -45,7 +45,7 @@ String schemaString="""
        MinOneEmp(D) :- Empd(E, D), Happy(E)
     """;
 
-        LogicSchema logicSchema=new LogicSchemaWithoutIDsParser().parse(schemaString);
+LogicSchema logicSchema = new LogicSchemaWithoutIDsParser().parse(schemaString);
 ```
 
 Example of usage of a LogicSchemaBuilder:
@@ -53,37 +53,41 @@ Example of usage of a LogicSchemaBuilder:
 ```java
 LogicSchemaBuilder<LogicConstraintWithoutIDSpec> logicSchemaBuilder=LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder();
 
-        LogicConstraintWithoutIDSpec logicConstraint=new LogicConstraintWithoutIDSpecBuilder()
-        .addOrdinaryLiteral("Dept","D")
-        .addNegatedOrdinaryLiteral("MinOneEmp","D")
-        .build();
-        logicSchemaBuilder.addLogicConstraint(logicConstraint)
+LogicConstraintWithoutIDSpec logicConstraint = new LogicConstraintWithoutIDSpecBuilder()
+   .addOrdinaryLiteral("Dept","D")
+   .addNegatedOrdinaryLiteral("MinOneEmp","D")
+   .build();
 
-        DerivationRuleSpec derivationRule=new DerivationRuleSpecBuilder()
-        .addHead("MinOneEmp","D")
-        .addOrdinaryLiteral("Emp","E","D")
-        .build();
-        logicSchemaBuilder.addDerivationRule(derivationRule)
+logicSchemaBuilder.addLogicConstraint(logicConstraint);
+        
+DerivationRuleSpec derivationRule = new DerivationRuleSpecBuilder()
+    .addHead("MinOneEmp","D")
+    .addOrdinaryLiteral("Emp","E","D")
+    .build();
 
-        LogicSchema logicSchema=logicSchemaBuilder.build();
+logicSchemaBuilder.addDerivationRule(derivationRule);
+        
+LogicSchema logicSchema = logicSchemaBuilder.build();
 ```
 
 Example of usage of a LogicSchemaFactory:
 
 ```java
-LogicConstraintWithoutIDSpec logicConstraint=new LogicConstraintWithoutIDSpecBuilder()
-        .addOrdinaryLiteral("Dept","D")
-        .addNegatedOrdinaryLiteral("MinOneEmp","D")
-        .build();
-        logicSchemaSpec.addLogicConstraint(logicConstraint)
+LogicConstraintWithoutIDSpec logicConstraint = new LogicConstraintWithoutIDSpecBuilder()
+   .addOrdinaryLiteral("Dept","D")
+   .addNegatedOrdinaryLiteral("MinOneEmp","D")
+   .build();
 
-        DerivationRuleSpec derivationRule=new DerivationRuleSpecBuilder()
-        .addHead("MinOneEmp","D")
-        .addOrdinaryLiteral("Emp","E","D")
-        .build();
-        logicSchemaSpec.addDerivationRule(derivationRule)
+logicSchemaSpec.addLogicConstraint(logicConstraint);
 
-        LogicSchema logicSchema=LogicSchemaFactory.defaultLogicSchemaWithoutIDsFactory().createLogicSchema(logicSchemaSpec)
+DerivationRuleSpec derivationRule = new DerivationRuleSpecBuilder()
+  .addHead("MinOneEmp","D")
+  .addOrdinaryLiteral("Emp","E","D")
+  .build();
+
+logicSchemaSpec.addDerivationRule(derivationRule);
+
+LogicSchema logicSchema = LogicSchemaFactory.defaultLogicSchemaWithoutIDsFactory().createLogicSchema(logicSchemaSpec);
 ```
 
 ### How to use the LogicSchemaBuilder and LogicSchemaFactory?
