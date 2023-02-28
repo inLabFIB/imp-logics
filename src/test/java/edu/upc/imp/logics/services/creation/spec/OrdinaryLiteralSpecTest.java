@@ -1,12 +1,10 @@
 package edu.upc.imp.logics.services.creation.spec;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 public class OrdinaryLiteralSpecTest {
 
@@ -38,11 +36,10 @@ public class OrdinaryLiteralSpecTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Disabled("Should we allow empty terms list?")
     @Test
-    public void should_throwException_when_termsListIsEmpty() {
-        assertThatThrownBy(() -> new OrdinaryLiteralSpec("a", List.of(), true))
-                .isInstanceOf(IllegalArgumentException.class);
+    public void should_notThrowException_when_termsListIsEmpty() {
+        assertThatCode(() -> new OrdinaryLiteralSpec("a", List.of(), true))
+                .doesNotThrowAnyException();
     }
 
 }

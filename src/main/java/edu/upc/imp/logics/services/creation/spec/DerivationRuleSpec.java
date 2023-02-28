@@ -15,7 +15,6 @@ public class DerivationRuleSpec extends NormalClauseSpec implements LogicElement
         if (Objects.isNull(predicateName)) throw new IllegalArgumentException("Predicate name cannot be null");
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
         if (Objects.isNull(headTermsSpec)) throw new IllegalArgumentException("Head terms cannot be null");
-        if (headTermsSpec.isEmpty()) throw new IllegalArgumentException("Head terms cannot be empty");
 
         this.predicateName = predicateName;
         this.termSpecList = headTermsSpec;

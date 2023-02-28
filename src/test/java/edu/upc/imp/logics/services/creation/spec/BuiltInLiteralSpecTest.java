@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 public class BuiltInLiteralSpecTest {
 
@@ -30,8 +29,8 @@ public class BuiltInLiteralSpecTest {
     }
 
     @Test
-    public void should_throwException_when_termSpecsListIsEmpty() {
-        assertThatThrownBy(() -> new BuiltInLiteralSpec("=", List.of()))
-                .isInstanceOf(IllegalArgumentException.class);
+    public void should_notThrowAnyException_when_termSpecsListIsEmpty() {
+        assertThatCode(() -> new BuiltInLiteralSpec("f", List.of()))
+                .doesNotThrowAnyException();
     }
 }

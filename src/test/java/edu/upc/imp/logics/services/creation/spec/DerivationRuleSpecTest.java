@@ -6,6 +6,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 public class DerivationRuleSpecTest {
 
@@ -33,9 +34,9 @@ public class DerivationRuleSpecTest {
     }
 
     @Test
-    public void should_throwException_when_termSpecListIsEmpty() {
-        assertThatThrownBy(() -> new DerivationRuleSpec("a", List.of(), new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))))
-                .isInstanceOf(IllegalArgumentException.class);
+    public void should_notThrowException_when_termSpecListIsEmpty() {
+        assertThatCode(() -> new DerivationRuleSpec("a", List.of(), new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))))
+                .doesNotThrowAnyException();
     }
 
     @Test

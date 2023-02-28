@@ -14,7 +14,6 @@ public class BuiltInLiteralSpec extends LiteralSpec implements LogicElementSpec 
     public BuiltInLiteralSpec(String operator, List<TermSpec> termSpecs) {
         if (Objects.isNull(operator)) throw new IllegalArgumentException("Operator cannot be null");
         if (Objects.isNull(termSpecs)) throw new IllegalArgumentException("TermSpecs cannot be null");
-        if (termSpecs.isEmpty()) throw new IllegalArgumentException("TermSpecs cannot be empty");
         this.operator = operator;
         this.termSpecs = termSpecs;
     }
