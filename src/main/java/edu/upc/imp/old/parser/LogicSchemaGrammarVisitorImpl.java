@@ -1,24 +1,16 @@
 package edu.upc.imp.old.parser;
 
 import edu.upc.imp.old.augmented_logicschema.EventPredicate;
-import edu.upc.imp.old.logicschema.DerivationRule;
-import edu.upc.imp.old.logicschema.LogicConstraint;
-import edu.upc.imp.old.logicschema.LogicSchema;
-import edu.upc.imp.old.logicschema.Atom;
-import edu.upc.imp.old.logicschema.PredicateImpl;
-import edu.upc.imp.old.logicschema.BuiltInLiteral;
-import edu.upc.imp.old.logicschema.OrdinaryLiteral;
-import edu.upc.imp.old.logicschema.Predicate;
-import edu.upc.imp.old.logicschema.Literal;
-import edu.upc.imp.old.logicschema.Term;
+import edu.upc.imp.old.logicschema.*;
 import edu.upc.imp.parser.LogicSchemaGrammarBaseVisitor;
 import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import edu.upc.imp.parser.LogicSchemaGrammarParser.AtomContext;
 import edu.upc.imp.parser.LogicSchemaGrammarParser.LiteralContext;
 import edu.upc.imp.parser.LogicSchemaGrammarParser.TermContext;
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.LinkedList;
 import java.util.List;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  *
@@ -113,20 +105,20 @@ public class LogicSchemaGrammarVisitorImpl extends LogicSchemaGrammarBaseVisitor
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
 	@Override public LogicConstraint visitConstraint(@NotNull LogicSchemaGrammarParser.ConstraintContext ctx) {
-            List<Literal> body = visitBody(ctx.body());
-            
-            LogicConstraint constraint;
-            if(ctx.CONSTRAINTID() != null){
-                String number = ctx.CONSTRAINTID().getText().replace("@", "");
-                int id = Integer.parseInt(number);
-                constraint = new LogicConstraint(id, body);
-            } else {
-                constraint = new LogicConstraint(body);
-            }
-            
-            logicSchema.addConstraint(constraint);
-            return constraint;
+        List<Literal> body = visitBody(ctx.body());
+
+        LogicConstraint constraint;
+        if (ctx.ID() != null) {
+            String number = ctx.ID().getText().replace("@", "");
+            int id = Integer.parseInt(number);
+            constraint = new LogicConstraint(id, body);
+        } else {
+            constraint = new LogicConstraint(body);
         }
+
+        logicSchema.addConstraint(constraint);
+        return constraint;
+    }
 
 	/**
 	 * {@inheritDoc}

@@ -3,7 +3,7 @@ grammar LogicSchemaGrammar;
 NOT: 'not';
 OPERATOR: '='|'<>'|'<'|'>'|'<='|'>=';
 ID: ([A-Za-z0-9_'?])+;
-CONSTRAINTID: '@'[0-9]+;
+CONSTRAINTIDSTART: '@';
 NEWLINE:'\r'? '\n';
 WS : [ \t]+ -> skip ; // toss out whitespace
 COMMENT : '%' ~[\r\n]*;
@@ -15,7 +15,7 @@ ARROW: ':-';
 
 prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
 line: (COMMENT | constraint | derivationRule);
-constraint: (CONSTRAINTID)? ARROW body;
+constraint: (CONSTRAINTIDSTART ID)? ARROW body;
 derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;
 literal: builtInLiteral | ordinaryLiteral;

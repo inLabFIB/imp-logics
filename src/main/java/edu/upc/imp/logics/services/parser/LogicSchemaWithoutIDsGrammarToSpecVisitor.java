@@ -15,7 +15,7 @@ public class LogicSchemaWithoutIDsGrammarToSpecVisitor extends LogicSchemaGramma
     public LogicConstraintWithoutIDSpec visitConstraint(LogicSchemaGrammarParser.ConstraintContext ctx) {
         BodySpec body = createBody(ctx.body());
 
-        if (ctx.CONSTRAINTID() != null) {
+        if (ctx.ID() != null) {
             throw new NotExpectingConstraintID();
         } else {
             LogicConstraintWithoutIDSpec constraintSpec = new LogicConstraintWithoutIDSpec(body);
