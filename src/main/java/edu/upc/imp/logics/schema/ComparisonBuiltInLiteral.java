@@ -52,4 +52,9 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitBuiltInLiteral(this, context);
     }
+
+    @Override
+    public String getOperationName() {
+        return operator.getSymbol();
+    }
 }

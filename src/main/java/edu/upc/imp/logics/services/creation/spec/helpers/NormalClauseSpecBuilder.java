@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.services.creation.spec.helpers;
 
+import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
 
@@ -33,6 +34,11 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
 
     public T addOrdinaryLiteral(String predicateName, boolean isPositive, String... terms) {
         bodySpec.add(new OrdinaryLiteralSpec(predicateName, stringToTermSpecFactory.createTermSpecs(terms), isPositive));
+        return self();
+    }
+
+    public T addBuiltInLiteral(String builtInOperation, String... terms) {
+        bodySpec.add(new BuiltInLiteralSpec(builtInOperation, stringToTermSpecFactory.createTermSpecs(terms)));
         return self();
     }
 

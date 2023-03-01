@@ -6,4 +6,5 @@ package edu.upc.imp.logics.schema;
  * E.g. "3 < 4" is a built-in literal since it can be checked without accessing a database
  */
 public abstract class BuiltInLiteral extends Literal {
+    public abstract String getOperationName();
 }

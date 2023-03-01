@@ -50,4 +50,8 @@ public class Atom implements Visitable {
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitAtom(this, context);
     }
+
+    public String getPredicateName() {
+        return predicate.getName();
+    }
 }

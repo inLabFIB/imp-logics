@@ -36,4 +36,15 @@ public enum ComparisonOperator {
     public static ComparisonOperator fromSymbol(String symbol) {
         return LOOKUP.get(symbol);
     }
+
+    public boolean isSymmetric(ComparisonOperator rangeOperator) {
+        return switch (this) {
+            case LESS_THAN -> rangeOperator.equals(GREATER_THAN);
+            case LESS_OR_EQUALS -> rangeOperator.equals(GREATER_OR_EQUALS);
+            case EQUALS -> rangeOperator.equals(EQUALS);
+            case GREATER_THAN -> rangeOperator.equals(LESS_THAN);
+            case GREATER_OR_EQUALS -> rangeOperator.equals(LESS_OR_EQUALS);
+            case NOT_EQUALS -> rangeOperator.equals(NOT_EQUALS);
+        };
+    }
 }
