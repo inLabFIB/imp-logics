@@ -142,4 +142,17 @@ public class LogicSchemaParserTest {
         assertThat(derivationRules).hasSize(2);
     }
 
+    @Test
+    public void should_parseOnlyNewSchema_whenInvokingParserTwice() {
+        //Arrange
+        String schemaString1 = "P(x) :- Q(x, y)";
+        LogicSchemaWithIDsParser logicSchemaWithIDsParser = new LogicSchemaWithIDsParser();
+        logicSchemaWithIDsParser.parse(schemaString1);
+
+        //Action
+        String schemaString2 = "R(x) :- S(x, y)";
+        LogicSchema logicSchema2 = logicSchemaWithIDsParser.parse(schemaString2);
+        LogicSchemaAssert.assertThat(logicSchema2).containsExactlyThesePredicateNames("R", "S");
+    }
+
 }

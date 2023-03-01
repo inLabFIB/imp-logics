@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintSpec> extends LogicSchemaGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
-    protected final LogicSchemaSpec<T> logicSchemaSpec = new LogicSchemaSpec<>();
+    protected LogicSchemaSpec<T> logicSchemaSpec;
 
     public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
@@ -19,6 +19,7 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
 
     @Override
     public LogicSchemaSpec<T> visitProg(LogicSchemaGrammarParser.ProgContext ctx) {
+        logicSchemaSpec = new LogicSchemaSpec<>();
         visitChildren(ctx);
         return logicSchemaSpec;
     }
