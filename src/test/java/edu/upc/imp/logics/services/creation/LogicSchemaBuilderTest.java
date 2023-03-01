@@ -241,5 +241,23 @@ public class LogicSchemaBuilderTest {
         LogicConstraintAssert.assertThat(logicConstraint2).containsOrdinaryLiteral("R");
     }
 
+    @Test
+    public void should_addNormalClauseWithBuiltIn_whenSpecContainsBuiltIn() {
+        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
+        LogicConstraintWithIDSpec logicConstraintSpec1 = new LogicConstraintWithIDSpecBuilder(termFactory)
+                .addConstraintId("1")
+                .addOrdinaryLiteral("P")
+                .addBuiltInLiteral("<", "a", "b")
+                .build();
+
+        LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec1)
+                .build();
+
+        LogicConstraint logicConstraint1 = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
+        LogicConstraintAssert.assertThat(logicConstraint1).containsOrdinaryLiteral("P");
+        LogicConstraintAssert.assertThat(logicConstraint1).containsComparisonBuiltInLiteral("<", "a", "b");
+    }
+
 
 }

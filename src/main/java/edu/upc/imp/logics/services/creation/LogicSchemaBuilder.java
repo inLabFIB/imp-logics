@@ -103,7 +103,9 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
             if (literalSpec instanceof OrdinaryLiteralSpec olSpec) {
                 int numberOfTerms = olSpec.getTermSpecList().size();
                 addPredicateIfAbsent(olSpec.getPredicateName(), numberOfTerms);
-            } else throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+            } else if (!(literalSpec instanceof BuiltInLiteralSpec)) {
+                throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+            }
         }
     }
 
