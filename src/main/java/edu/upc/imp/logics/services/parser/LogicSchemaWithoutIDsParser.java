@@ -5,6 +5,15 @@ import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 
 public class LogicSchemaWithoutIDsParser extends LogicSchemaParser<LogicConstraintWithoutIDSpec> {
+
+    public LogicSchemaWithoutIDsParser() {
+        super();
+    }
+
+    public LogicSchemaWithoutIDsParser(StringToTermSpecFactory stringToTermSpecFactory) {
+        super(stringToTermSpecFactory);
+    }
+
     @Override
     protected LogicSchemaGrammarToSpecVisitor<LogicConstraintWithoutIDSpec> createVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         return new LogicSchemaWithoutIDsGrammarToSpecVisitor(stringToTermSpecFactory);
