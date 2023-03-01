@@ -1,8 +1,8 @@
 package edu.upc.imp.logics.services.parser;
 
-import edu.upc.imp.logics.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicSchema;
+import edu.upc.imp.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.services.parser.exceptions.ExpectingConstraintID;
 import org.junit.jupiter.api.Test;
 

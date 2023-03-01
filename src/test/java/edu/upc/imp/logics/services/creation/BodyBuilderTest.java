@@ -1,8 +1,8 @@
 package edu.upc.imp.logics.services.creation;
 
-import edu.upc.imp.logics.assertions.LiteralAssert;
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.Predicate;
+import edu.upc.imp.logics.schema.assertions.LiteralAssert;
 import edu.upc.imp.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
 import edu.upc.imp.logics.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
 import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;

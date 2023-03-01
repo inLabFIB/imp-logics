@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.Predicate;
 import org.assertj.core.api.AbstractAssert;

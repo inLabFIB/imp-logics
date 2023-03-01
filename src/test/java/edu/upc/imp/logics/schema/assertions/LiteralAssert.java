@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.ComparisonBuiltInLiteral;
 import edu.upc.imp.logics.schema.Literal;
@@ -37,9 +37,20 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return this;
     }
 
+    public LiteralAssert isComparisonBuiltInLiteral() {
+        Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
+        return this;
+    }
+
     public LiteralAssert hasPredicate(String predicateName, int arity) {
         Assertions.assertThat(actual).isInstanceOf(OrdinaryLiteral.class);
         OrdinaryLiteralAssert.assertThat((OrdinaryLiteral) actual).hasPredicate(predicateName, arity);
+        return this;
+    }
+
+    public LiteralAssert hasBuiltInComparisonOperation(String comparisonOperator) {
+        Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
+        ComparisonBuiltInLiteralAssert.assertThat((ComparisonBuiltInLiteral) actual).hasComparisonOperation(comparisonOperator);
         return this;
     }
 

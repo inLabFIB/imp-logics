@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.NormalClause;
 import edu.upc.imp.logics.schema.OrdinaryLiteral;
@@ -35,6 +35,16 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                         .isOrdinaryLiteral()
                         .hasPredicate(predicateName, variableNames.length)
                         .containsVariables(variableNames)
+        );
+        return this;
+    }
+
+    public NormalClauseAssert<T> containsComparisonBuiltInLiteral(String comparisonOperator, String leftVariable, String rightVariable) {
+        Assertions.assertThat(actual.getBody()).anySatisfy(
+                lit -> LiteralAssert.assertThat(lit)
+                        .isComparisonBuiltInLiteral()
+                        .hasBuiltInComparisonOperation(comparisonOperator)
+                        .containsVariables(leftVariable, rightVariable)
         );
         return this;
     }

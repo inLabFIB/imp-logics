@@ -1,12 +1,12 @@
 package edu.upc.imp.logics.services.parser;
 
-import edu.upc.imp.logics.assertions.DerivationRuleAssert;
-import edu.upc.imp.logics.assertions.LogicConstraintAssert;
-import edu.upc.imp.logics.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.ConstraintID;
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicConstraint;
 import edu.upc.imp.logics.schema.LogicSchema;
+import edu.upc.imp.logics.schema.assertions.DerivationRuleAssert;
+import edu.upc.imp.logics.schema.assertions.LogicConstraintAssert;
+import edu.upc.imp.logics.schema.assertions.LogicSchemaAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

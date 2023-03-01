@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.Literal;

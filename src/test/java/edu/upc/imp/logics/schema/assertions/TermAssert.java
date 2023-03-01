@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;

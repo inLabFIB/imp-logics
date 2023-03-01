@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.assertions;
+package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.ComparisonBuiltInLiteral;
 import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
@@ -24,4 +24,8 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         return this;
     }
 
+    public ComparisonBuiltInLiteralAssert hasComparisonOperation(String comparisonOperator) {
+        Assertions.assertThat(actual.getOperator().getSymbol()).isEqualTo(comparisonOperator);
+        return this;
+    }
 }
