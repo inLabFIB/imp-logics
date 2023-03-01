@@ -76,5 +76,24 @@ public class LogicSchemaFactoryTest {
         assertThat(derivationRules).hasSize(2);
     }
 
+    @Test
+    public void should_createDifferentSchema_whenReusingTheSameFactory_withDifferentSpec() {
+        //Arrange
+        LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec1 = new LogicSchemaSpec<>();
+        logicSchemaSpec1.addPredicateSpecs(new PredicateSpec("P", 2));
+
+        LogicSchemaFactory<LogicConstraintWithIDSpec> factory = LogicSchemaFactory.defaultLogicSchemaWithIDsFactory();
+        factory.createLogicSchema(logicSchemaSpec1);
+
+        LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec2 = new LogicSchemaSpec<>();
+        logicSchemaSpec2.addPredicateSpecs(new PredicateSpec("Q", 2));
+
+        //Action
+        LogicSchema logicSchema2 = factory.createLogicSchema(logicSchemaSpec2);
+
+        //Assert
+        LogicSchemaAssert.assertThat(logicSchema2).containsExactlyThesePredicateNames("Q");
+
+    }
 
 }

@@ -18,7 +18,7 @@ import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
  * @param <T> kind of LogicConstraintSpec this class works with
  */
 public class LogicSchemaFactory<T extends LogicConstraintSpec> {
-    private final LogicSchemaBuilder<T> logicSchemaBuilder;
+    private final ConstraintIDGenerator<T> constraintIDGenerator;
 
     public static LogicSchemaFactory<LogicConstraintWithIDSpec> defaultLogicSchemaWithIDsFactory() {
         return new LogicSchemaFactory<>(new UseSpecIDGenerator());
@@ -30,10 +30,11 @@ public class LogicSchemaFactory<T extends LogicConstraintSpec> {
     }
 
     public LogicSchemaFactory(ConstraintIDGenerator<T> constraintIDGenerator) {
-        logicSchemaBuilder = new LogicSchemaBuilder<>(constraintIDGenerator);
+        this.constraintIDGenerator = constraintIDGenerator;
     }
 
     public LogicSchema createLogicSchema(LogicSchemaSpec<T> logicSchemaSpec) {
+        LogicSchemaBuilder<T> logicSchemaBuilder = new LogicSchemaBuilder<>(constraintIDGenerator);
         logicSchemaSpec.getPredicateSpecList().forEach(predicateSpec -> logicSchemaBuilder.addPredicate(predicateSpec.name(), predicateSpec.arity()));
         logicSchemaSpec.getDerivationRuleSpecList().forEach(logicSchemaBuilder::addDerivationRule);
         logicSchemaSpec.getLogicConstraintSpecList().forEach(logicSchemaBuilder::addLogicConstraint);
