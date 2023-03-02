@@ -53,7 +53,7 @@ public class Substitution {
 
     private void unifyTermsInSubstitution(Term domainTerm, Term rangeTerm) {
         if (domainTerm instanceof Variable domainVariable) {
-            this.addMappingIfNotIncluded(domainVariable, rangeTerm);
+            this.addMapping(domainVariable, rangeTerm);
         } else {
             if (!domainTerm.equals(rangeTerm)) {
                 throw new SubstitutionException(
@@ -75,20 +75,20 @@ public class Substitution {
 
         Substitution result = new Substitution(this);
         for (Map.Entry<Variable, Term> otherMapping : otherSubstitution.termsMap.entrySet()) {
-            result.addMappingIfNotIncluded(otherMapping.getKey(), otherMapping.getValue());
+            result.addMapping(otherMapping.getKey(), otherMapping.getValue());
         }
         return result;
     }
 
     /**
      * Include in this substitution a new mapping from the domainVariable to the rangeTerm
-     * If such mapping already exist, it throws a SubstitutionException if the rangeTerm is different compared to the current
+     * If such mapping already exists, it throws a SubstitutionException if the rangeTerm is different compared to the current
      * image of the domainVariable
      *
      * @param domainVariable not null
      * @param rangeTerm      not null
      */
-    public void addMappingIfNotIncluded(Variable domainVariable, Term rangeTerm) {
+    public void addMapping(Variable domainVariable, Term rangeTerm) {
         if (Objects.isNull(domainVariable)) throw new IllegalArgumentException("domainVariable cannot be null");
         if (Objects.isNull(rangeTerm)) throw new IllegalArgumentException("rangeTerm cannot be null");
 

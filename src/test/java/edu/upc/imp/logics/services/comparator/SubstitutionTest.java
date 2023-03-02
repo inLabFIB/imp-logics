@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class SubstitutionTest {
 
-
     @Test
     public void should_containAllMappings_whenCopyingSubstitution() {
         Substitution originalSubstitution = new Substitution();
-        originalSubstitution.addMappingIfNotIncluded(new Variable("x"), new Variable("y"));
+        originalSubstitution.addMapping(new Variable("x"), new Variable("y"));
 
         Substitution copiedSubstitution = new Substitution(originalSubstitution);
 
@@ -125,8 +125,8 @@ class SubstitutionTest {
     @Test
     public void should_containAllMappings_whenAddingMappings() {
         Substitution substitution = new Substitution();
-        substitution.addMappingIfNotIncluded(new Variable("x"), new Variable("y"));
-        substitution.addMappingIfNotIncluded(new Variable("y"), new Variable("z"));
+        substitution.addMapping(new Variable("x"), new Variable("y"));
+        substitution.addMapping(new Variable("y"), new Variable("z"));
 
         SubstitutionAssert.assertThat(substitution).hasSize(2);
         SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "y");
@@ -173,4 +173,72 @@ class SubstitutionTest {
                 .isInstanceOf(SubstitutionException.class);
     }
 
+    @Test
+    public void should_throwException_whenAddingMapping_withNullDomainVariable() {
+        Substitution substitution = new Substitution();
+        assertThatThrownBy(() -> substitution.addMapping(null, new Variable("x")))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void should_throwException_whenAddingMapping_withNullRangeTerm() {
+        Substitution substitution = new Substitution();
+        assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void should_containMapping_whenAddingMapping() {
+        // {} add {x->1} OK
+        Substitution substitution = new Substitution();
+        substitution.addMapping(new Variable("x"), new Constant("1"));
+
+        SubstitutionAssert.assertThat(substitution).hasSize(1);
+        SubstitutionAssert.assertThat(substitution).mapsToConstant("x", "1");
+    }
+
+    @Test
+    public void should_throwException_whenAddingMapping_withAlreadyMappedDomainVariable() {
+        // {x -> 1} add {x -> 2} no ok
+        Substitution substitution = new SubstitutionBuilder().addMapping("x", "1").build();
+        assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), new Constant("2")))
+                .isInstanceOf(SubstitutionException.class);
+    }
+
+    @Test
+    public void should_notAddMapping_whenAddingMapping_withExistingDomainVariableAndSameRangeTerm() {
+        // {x -> 1} add {x -> 1} ok
+        Substitution substitution = new SubstitutionBuilder().addMapping("x", "1").build();
+        substitution.addMapping(new Variable("x"), new Constant("1"));
+
+        SubstitutionAssert.assertThat(substitution).hasSize(1);
+        SubstitutionAssert.assertThat(substitution).mapsToConstant("x", "1");
+    }
+
+    @Test
+    public void should_throwException_whenAddingMapping_withExistingDomainVariable_mappedToDifferentTermKind_withSameName() {
+        // {x -> Var(a)} add {x -> Const(a)} not ok
+        Substitution substitution = new SubstitutionBuilder().addMapping("x", "a").build();
+        assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), new Constant("a")))
+                .isInstanceOf(SubstitutionException.class);
+    }
+
+    @Test
+    public void should_throwException_whenGettingNullTerm() {
+        Substitution substitution = new Substitution();
+        assertThatThrownBy(() -> substitution.getTerm(null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void should_returnEmptyOptional_whenGettingTerm_withUnmappedVariable() {
+        Substitution substitution = new Substitution();
+        assertThat(substitution.getTerm(new Variable("x"))).isNotPresent();
+    }
+
+    @Test
+    public void should_returnMappedTerm_whenGettingTerm_withMappedVariable() {
+        Substitution substitution = new SubstitutionBuilder().addMapping("x", "a").build();
+        assertThat(substitution.getTerm(new Variable("x"))).isPresent().contains(new Variable("a"));
+    }
 }

@@ -11,7 +11,7 @@ public class SubstitutionBuilder {
     public SubstitutionBuilder addMapping(String domainTermName, String rangeTermName) {
         Variable domainVariable = new Variable(domainTermName);
         Term rangeTerm = TermMother.createTerm(rangeTermName);
-        substitution.addMappingIfNotIncluded(domainVariable, rangeTerm);
+        substitution.addMapping(domainVariable, rangeTerm);
         return this;
     }
 
