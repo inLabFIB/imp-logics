@@ -4,8 +4,9 @@ import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.TermTypeCriteria;
 import edu.upc.imp.parser.LogicSchemaGrammarLexer;
 import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import org.antlr.v4.runtime.CharStream;
@@ -17,11 +18,11 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     private final LogicSchemaGrammarToSpecVisitor<T> visitor;
 
     public LogicSchemaParser() {
-        this(new DefaultStringToTermSpecFactory());
+        this(new DefaultTermTypeCriteria());
     }
 
-    public LogicSchemaParser(StringToTermSpecFactory stringToTermSpecFactory) {
-        visitor = createVisitor(stringToTermSpecFactory);
+    public LogicSchemaParser(TermTypeCriteria termTypeCriteria) {
+        visitor = createVisitor(new StringToTermSpecFactory(termTypeCriteria));
     }
 
     protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);

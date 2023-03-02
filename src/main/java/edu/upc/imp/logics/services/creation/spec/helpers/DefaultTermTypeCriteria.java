@@ -1,13 +1,12 @@
 package edu.upc.imp.logics.services.creation.spec.helpers;
 
 /**
- * StringToTermSpecFactory that interprets numbers as constants, or quoted strings as constants. The rest of strings
+ * DefaultTermTypeCriteria that interprets numbers as constants, or quoted strings as constants. The rest of strings
  * are interpreted as variables.
  * Examples of Strings that would be interpreted as Constants: 4, 4.0, "Socrates", 'Plato'.
  * Examples of Strings that would be interpreted as Variables: x, y, Person, etc.
  */
-public class DefaultStringToTermSpecFactory extends StringToTermSpecFactory {
-
+public class DefaultTermTypeCriteria implements TermTypeCriteria {
     @Override
     public boolean isVariable(String name) {
         return !isConstant(name);
@@ -19,19 +18,19 @@ public class DefaultStringToTermSpecFactory extends StringToTermSpecFactory {
     }
 
     private static boolean isInteger(String name) {
-        try{
+        try {
             Integer.parseInt(name);
             return true;
-        } catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             return false;
         }
     }
 
     private static boolean isDouble(String name) {
-        try{
+        try {
             Double.parseDouble(name);
             return true;
-        } catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             return false;
         }
     }

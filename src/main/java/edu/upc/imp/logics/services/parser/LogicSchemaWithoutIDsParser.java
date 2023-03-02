@@ -3,6 +3,7 @@ package edu.upc.imp.logics.services.parser;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithoutIDSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.TermTypeCriteria;
 
 public class LogicSchemaWithoutIDsParser extends LogicSchemaParser<LogicConstraintWithoutIDSpec> {
 
@@ -10,7 +11,7 @@ public class LogicSchemaWithoutIDsParser extends LogicSchemaParser<LogicConstrai
         super();
     }
 
-    public LogicSchemaWithoutIDsParser(StringToTermSpecFactory stringToTermSpecFactory) {
+    public LogicSchemaWithoutIDsParser(TermTypeCriteria stringToTermSpecFactory) {
         super(stringToTermSpecFactory);
     }
 

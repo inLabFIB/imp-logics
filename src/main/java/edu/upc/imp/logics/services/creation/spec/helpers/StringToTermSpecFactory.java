@@ -11,7 +11,17 @@ import java.util.List;
  * Factory in charge of instantiating the corresponding subclass of Term (Constant, or Variable)
  * for a given String.
  */
-public abstract class StringToTermSpecFactory {
+public class StringToTermSpecFactory {
+
+    private final TermTypeCriteria termTypeCriteria;
+
+    public StringToTermSpecFactory(TermTypeCriteria termTypeCriteria) {
+        this.termTypeCriteria = termTypeCriteria;
+    }
+
+    public StringToTermSpecFactory() {
+        this(new DefaultTermTypeCriteria());
+    }
 
     public List<TermSpec> createTermSpecs(String... termNames) {
         List<TermSpec> termSpecList = new LinkedList<>();
@@ -23,18 +33,13 @@ public abstract class StringToTermSpecFactory {
         return termSpecList;
     }
 
-
     public TermSpec createTermSpec(String name) {
-        if (isConstant(name)) {
+        if (termTypeCriteria.isConstant(name)) {
             return new ConstantSpec(name);
-        } else if (isVariable(name)) {
+        } else if (termTypeCriteria.isVariable(name)) {
             return new VariableSpec(name);
         } else {
             throw new RuntimeException("Unrecognized term name: " + name);
         }
     }
-
-    protected abstract boolean isConstant(String name);
-
-    protected abstract boolean isVariable(String name);
 }

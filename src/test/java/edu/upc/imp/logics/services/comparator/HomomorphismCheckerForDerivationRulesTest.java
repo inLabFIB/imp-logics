@@ -4,7 +4,7 @@ import edu.upc.imp.logics.schema.DerivationRule;
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import edu.upc.imp.logics.services.parser.LogicSchemaParser;
 import edu.upc.imp.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Test;
@@ -192,18 +192,8 @@ class HomomorphismCheckerForDerivationRulesTest {
 
     @Test
     public void should_notFindHomomorphism_whenDomainUsesConstants() {
-        LogicSchemaParser<LogicConstraintWithIDSpec> parserEverythingIsConstant = new LogicSchemaWithIDsParser(new StringToTermSpecFactory() {
-            @Override
-            protected boolean isConstant(String name) {
-                return true;
-            }
-
-            @Override
-            protected boolean isVariable(String name) {
-                return false;
-            }
-        });
-        LogicSchema domainSchema = parserEverythingIsConstant.parse("P() :- R(x, y), S(x)");
+        LogicSchemaParser<LogicConstraintWithIDSpec> parserEverythingIsConstant = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria());
+        LogicSchema domainSchema = parserEverythingIsConstant.parse("P() :- R(1, 2), S(1)");
         LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), R(c, d), S(c)");
 
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);

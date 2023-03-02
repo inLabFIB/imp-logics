@@ -3,14 +3,15 @@ package edu.upc.imp.logics.services.parser;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.TermTypeCriteria;
 
 public class LogicSchemaWithIDsParser extends LogicSchemaParser<LogicConstraintWithIDSpec> {
     public LogicSchemaWithIDsParser() {
         super();
     }
 
-    public LogicSchemaWithIDsParser(StringToTermSpecFactory stringToTermSpecFactory) {
-        super(stringToTermSpecFactory);
+    public LogicSchemaWithIDsParser(TermTypeCriteria termTypeCriteria) {
+        super(termTypeCriteria);
     }
 
     @Override

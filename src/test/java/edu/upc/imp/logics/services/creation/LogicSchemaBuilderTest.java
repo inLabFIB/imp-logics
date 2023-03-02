@@ -60,8 +60,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addDerivedPredicate_whenAddingDerivationRuleSpecification() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
@@ -80,8 +79,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addDerivationRuleAndPredicates_whenAddDerivationRuleSpecWithNotExistentPredicates() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
@@ -110,8 +108,8 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
+        TermTypeCriteria termTypeCriteria = new DefaultTermTypeCriteria();
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -124,8 +122,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -143,8 +140,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -220,12 +216,11 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addDifferentConstraintIDs_whenDefiningLogicConstraints_withoutIDs() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithoutIDSpec logicConstraintSpec1 = new LogicConstraintWithoutIDSpecBuilder(termFactory)
+        LogicConstraintWithoutIDSpec logicConstraintSpec1 = new LogicConstraintWithoutIDSpecBuilder()
                 .addOrdinaryLiteral("P")
                 .build();
 
-        LogicConstraintWithoutIDSpec logicConstraintSpec2 = new LogicConstraintWithoutIDSpecBuilder(termFactory)
+        LogicConstraintWithoutIDSpec logicConstraintSpec2 = new LogicConstraintWithoutIDSpecBuilder()
                 .addOrdinaryLiteral("R")
                 .build();
 
@@ -243,8 +238,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_addNormalClauseWithBuiltIn_whenSpecContainsBuiltIn() {
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraintSpec1 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraintSpec1 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P")
                 .addBuiltInLiteral("<", "a", "b")

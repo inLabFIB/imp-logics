@@ -7,10 +7,10 @@ import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.imp.logics.services.creation.spec.PredicateSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.DefaultStringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import edu.upc.imp.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
 import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
-import edu.upc.imp.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.imp.logics.services.creation.spec.helpers.TermTypeCriteria;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -27,14 +27,14 @@ public class LogicSchemaFactoryTest {
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
 //            % Existing but unused predicates: Project(p)
-        StringToTermSpecFactory termFactory = new DefaultStringToTermSpecFactory();
-        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        TermTypeCriteria termTypeCriteria = new DefaultTermTypeCriteria();
+        LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint2 = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("2")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Manages", "E", "D")
@@ -42,19 +42,19 @@ public class LogicSchemaFactoryTest {
                 .addNegatedOrdinaryLiteral("Emp", "E")
                 .build();
 
-        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder(termFactory)
+        LogicConstraintWithIDSpec logicConstraint3 = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("3")
                 .addOrdinaryLiteral("Dept", "D")
                 .addOrdinaryLiteral("MinOneSpecialEmployee", false, "D")
                 .build();
 
-        DerivationRuleSpec derivationRule1 = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRule1 = new DerivationRuleSpecBuilder(termTypeCriteria)
                 .addHead("MinOneSpecialEmployee", "D")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Happy", "E")
                 .build();
 
-        DerivationRuleSpec derivationRule2 = new DerivationRuleSpecBuilder(termFactory)
+        DerivationRuleSpec derivationRule2 = new DerivationRuleSpecBuilder(termTypeCriteria)
                 .addHead("MinOneSpecialEmployee", "D")
                 .addOrdinaryLiteral("WorksIn", "E", "D")
                 .addOrdinaryLiteral("Rich", false, "E")

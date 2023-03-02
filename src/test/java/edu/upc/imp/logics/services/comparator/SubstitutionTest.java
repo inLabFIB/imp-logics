@@ -3,6 +3,7 @@ package edu.upc.imp.logics.services.comparator;
 import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
+import edu.upc.imp.logics.schema.utils.TermMother;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +25,7 @@ class SubstitutionTest {
         originalSubstitution.addMappingIfNotIncluded(new Variable("x"), new Variable("y"));
 
         Substitution copiedSubstitution = new Substitution(originalSubstitution);
+
         SubstitutionAssert.assertThat(copiedSubstitution).hasSize(1);
         SubstitutionAssert.assertThat(copiedSubstitution).mapsToVariable("x", "y");
     }
@@ -61,24 +63,33 @@ class SubstitutionTest {
     public static Stream<Arguments> provideCompatibleDomainTermsAndRangeTerms() {
         return Stream.of(
                 Arguments.of(
-                        List.of(new Variable("x"), new Variable("y")),
-                        List.of(new Constant("1"), new Variable("z")),
-                        Map.of(new Variable("x"), new Constant("1"), new Variable("y"), new Variable("z")),
+                        TermMother.createTerms("x", "y"),
+                        TermMother.createTerms("1", "z"),
+                        Map.of(
+                                new Variable("x"), new Constant("1"),
+                                new Variable("y"), new Variable("z")
+                        ),
                         "Mapping vars to vars and constants"),
                 Arguments.of(
-                        List.of(new Variable("x"), new Constant("1")),
-                        List.of(new Variable("a"), new Constant("1")),
+                        TermMother.createTerms("x", "1"),
+                        TermMother.createTerms("a", "1"),
                         Map.of(new Variable("x"), new Variable("a")),
                         "Mapping vars to vars and constant to same constant"),
                 Arguments.of(
-                        List.of(new Variable("x"), new Variable("y")),
-                        List.of(new Variable("a"), new Variable("b")),
-                        Map.of(new Variable("x"), new Variable("a"), new Variable("y"), new Variable("b")),
+                        TermMother.createTerms("x", "y"),
+                        TermMother.createTerms("a", "b"),
+                        Map.of(
+                                new Variable("x"), new Variable("a"),
+                                new Variable("y"), new Variable("b")
+                        ),
                         "Mapping vars to vars"),
                 Arguments.of(
-                        List.of(new Variable("x"), new Variable("y"), new Variable("x")),
-                        List.of(new Variable("a"), new Variable("b"), new Variable("a")),
-                        Map.of(new Variable("x"), new Variable("a"), new Variable("y"), new Variable("b")),
+                        TermMother.createTerms("x", "y", "x"),
+                        TermMother.createTerms("a", "b", "a"),
+                        Map.of(
+                                new Variable("x"), new Variable("a"),
+                                new Variable("y"), new Variable("b")
+                        ),
                         "Mapping vars to vars, repeating domain var")
         );
     }
@@ -92,20 +103,20 @@ class SubstitutionTest {
     public static Stream<Arguments> provideIncompatibleDomainTermsAndRangeTerms() {
         return Stream.of(
                 Arguments.of(
-                        List.of(new Variable("x"), new Variable("x")),
-                        List.of(new Variable("x"), new Variable("y")),
+                        TermMother.createTerms("x", "x"),
+                        TermMother.createTerms("x", "y"),
                         "Cannot map the same variable to different terms"),
                 Arguments.of(
-                        List.of(new Variable("x"), new Constant("1")),
-                        List.of(new Variable("x"), new Constant("2")),
+                        TermMother.createTerms("x", "1"),
+                        TermMother.createTerms("x", "2"),
                         "Cannot map a constant to a different constant"),
                 Arguments.of(
                         List.of(new Constant("x")),
                         List.of(new Variable("x")),
                         "Cannot map a constant to a variable with the same name"),
                 Arguments.of(
-                        List.of(new Variable("x")),
-                        List.of(new Variable("x"), new Constant("1")),
+                        TermMother.createTerms("x"),
+                        TermMother.createTerms("x", "1"),
                         "Mismatch between list sizes")
         );
 
@@ -132,16 +143,34 @@ class SubstitutionTest {
     @Test
     public void should_unifySubstitutions_whenBothSubstitutionsDoNotShareDomainVariables() {
         // {x->a} {y->b} OK {x->a, y->b}
-        Substitution substitution1 = new Substitution(List.of(new Variable("x")), List.of(new Variable("a")));
-        Substitution substitution2 = new Substitution(List.of(new Variable("y")), List.of(new Variable("b")));
+        Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
+        Substitution substitution2 = new SubstitutionBuilder().addMapping("y", "b").build();
+
         Substitution union = substitution1.union(substitution2);
+        SubstitutionAssert.assertThat(union).hasSize(2);
         SubstitutionAssert.assertThat(union).mapsToVariable("x", "a");
         SubstitutionAssert.assertThat(union).mapsToVariable("y", "b");
-        SubstitutionAssert.assertThat(union).hasSize(2);
     }
 
+    @Test
+    public void should_unifySubstitutions_whenBothSubstitutionsAreIdentical() {
+        // {x->a} {x->a} OK {x->a}
+        Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
+        Substitution substitution2 = new SubstitutionBuilder().addMapping("x", "a").build();
 
-    // {x->a} {x->a} OK {x->a}
-    // {x->a} {x->b} Not Ok
+        Substitution union = substitution1.union(substitution2);
+        SubstitutionAssert.assertThat(union).hasSize(1);
+        SubstitutionAssert.assertThat(union).mapsToVariable("x", "a");
+    }
+
+    @Test
+    public void should_throwException_whenBothSubstitutionsShareDomainVariable() {
+        // {x->a} {x->b} Not Ok
+        Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
+        Substitution substitution2 = new SubstitutionBuilder().addMapping("x", "b").build();
+
+        assertThatThrownBy(() -> substitution1.union(substitution2))
+                .isInstanceOf(SubstitutionException.class);
+    }
 
 }

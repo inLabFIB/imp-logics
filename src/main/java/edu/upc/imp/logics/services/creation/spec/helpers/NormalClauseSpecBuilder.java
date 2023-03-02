@@ -20,8 +20,8 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
     protected final StringToTermSpecFactory stringToTermSpecFactory;
     protected final List<LiteralSpec> bodySpec = new LinkedList<>();
 
-    public NormalClauseSpecBuilder(StringToTermSpecFactory stringToTermSpecFactory) {
-        this.stringToTermSpecFactory = stringToTermSpecFactory;
+    public NormalClauseSpecBuilder(TermTypeCriteria termTypeCriteria) {
+        this.stringToTermSpecFactory = new StringToTermSpecFactory(termTypeCriteria);
     }
 
     public T addOrdinaryLiteral(String predicateName, String... terms) {
