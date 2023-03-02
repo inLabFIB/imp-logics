@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.services.comparator.assertions;
 
 
+import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
 import edu.upc.imp.logics.schema.assertions.TermAssert;
@@ -8,6 +9,7 @@ import edu.upc.imp.logics.services.comparator.Substitution;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Substitution> {
@@ -32,6 +34,30 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
         Assertions.assertThat(actualTermImageOpt).isPresent();
         Term actualImage = actualTermImageOpt.get();
         TermAssert.assertThat(actualImage).isVariable(rangeVariableName);
+        return this;
+    }
+
+    public SubstitutionAssert hasSize(int size) {
+        Assertions.assertThat(actual.getSize()).isEqualTo(size);
+        return this;
+    }
+
+    public SubstitutionAssert isEmpty() {
+        Assertions.assertThat(actual.isEmpty()).isTrue();
+        return this;
+    }
+
+    public SubstitutionAssert encodesMapping(Map<Variable, Term> expected) {
+        for (Map.Entry<Variable, Term> expectedEntry : expected.entrySet()) {
+            Term term = expectedEntry.getKey();
+            Term expectedImage = expectedEntry.getValue();
+            if (expectedImage instanceof Variable) {
+                SubstitutionAssert.assertThat(actual).mapsToVariable(term.getName(), expectedImage.getName());
+            } else if (expectedImage instanceof Constant) {
+                SubstitutionAssert.assertThat(actual).mapsToConstant(term.getName(), expectedImage.getName());
+            } else throw new RuntimeException("Unrecognized term type: " + expectedImage.getClass().getName());
+        }
+        SubstitutionAssert.assertThat(actual).hasSize(expected.size());
         return this;
     }
 }

@@ -32,7 +32,9 @@ public class Substitution {
 
     /**
      * Creates a Substitution that replaces each i-th term from domainTerms to unify with the i-th rangeTerm
-     * If such substitution does not exists, it throws a SubstitutionException
+     * If such substitution does not exist, it throws a SubstitutionException.
+     * Such substitution might not exist, for instance, if the domainTerms contains a constant in the i-th position,
+     * and the rangeTerms has a different term (different constant, or variable), in the i-th position.
      *
      * @param domainTerms not null
      * @param rangeTerms  not null
@@ -79,7 +81,7 @@ public class Substitution {
     }
 
     /**
-     * Include in this substitution a new mapping fromt he domainVariable to the rangeTerm
+     * Include in this substitution a new mapping from the domainVariable to the rangeTerm
      * If such mapping already exist, it throws a SubstitutionException if the rangeTerm is different compared to the current
      * image of the domainVariable
      *
@@ -106,8 +108,16 @@ public class Substitution {
      * @return the image of the variable
      */
     public Optional<Term> getTerm(Variable variable) {
-        if (Objects.isNull(variable)) throw new IllegalArgumentException("variable cannot be null");
+        if (Objects.isNull(variable)) throw new IllegalArgumentException("Variable cannot be null");
 
         return Optional.ofNullable(termsMap.get(variable));
+    }
+
+    public int getSize() {
+        return this.termsMap.size();
+    }
+
+    public boolean isEmpty() {
+        return this.termsMap.isEmpty();
     }
 }

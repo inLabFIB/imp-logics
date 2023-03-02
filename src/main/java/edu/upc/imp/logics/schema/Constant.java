@@ -7,4 +7,10 @@ public class Constant extends Term {
     public Constant(String name) {
         super(name);
     }
+
+    @Override
+    public String toString() {
+        return "Const{'" + this.getName() + "'}";
+    }
+
 }

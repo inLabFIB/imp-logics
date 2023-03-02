@@ -7,4 +7,9 @@ public class Variable extends Term {
     public Variable(String name) {
         super(name);
     }
+
+    @Override
+    public String toString() {
+        return "Var{'" + this.getName() + "'}";
+    }
 }
