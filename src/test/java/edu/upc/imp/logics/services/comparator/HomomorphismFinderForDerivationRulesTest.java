@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class HomomorphismCheckerForDerivationRulesTest {
+class HomomorphismFinderForDerivationRulesTest {
 
     /*
      * Tests for ensuring the correctness of the parameters
@@ -27,8 +27,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = null;
         DerivationRule rangeRule = schema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        assertThatThrownBy(() -> homomorphismChecker.computeHomomorphism(domainRule, rangeRule))
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, rangeRule))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -40,8 +40,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = schema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = null;
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        assertThatThrownBy(() -> homomorphismChecker.computeHomomorphism(domainRule, rangeRule))
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, rangeRule))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -57,8 +57,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "x");
@@ -74,8 +74,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "a");
@@ -91,8 +91,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -105,8 +105,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "a");
@@ -122,8 +122,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("Q").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -136,8 +136,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -150,8 +150,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -164,8 +164,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -182,8 +182,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "c");
@@ -199,8 +199,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -212,8 +212,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToConstant("a", "1");
@@ -228,8 +228,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution substitution = homomorphismOpt.get();
         SubstitutionAssert.assertThat(substitution).mapsToVariable("a", "x");
@@ -244,8 +244,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -257,8 +257,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution homomorphism = homomorphismOpt.get();
         SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
@@ -273,8 +273,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isNotPresent();
     }
 
@@ -286,8 +286,8 @@ class HomomorphismCheckerForDerivationRulesTest {
         DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
         DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
-        HomomorphismChecker homomorphismChecker = new HomomorphismChecker();
-        Optional<Substitution> homomorphismOpt = homomorphismChecker.computeHomomorphism(domainRule, rangeRule);
+        HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+        Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
         assertThat(homomorphismOpt).isPresent();
         Substitution homomorphism = homomorphismOpt.get();
         SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");

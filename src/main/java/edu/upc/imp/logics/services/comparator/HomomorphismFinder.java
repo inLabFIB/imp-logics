@@ -20,12 +20,12 @@ import java.util.Optional;
  * to identify whether they are equivalent up to renaming the name of variables </p>
  *
  * <p>
- * It is worth to mention that the checker can realize homomorphisms between built-in literals with their symmetric
+ * It is worth to mention that the finder can find homomorphisms between built-in literals with their symmetric
  * comparison operations.
- * E.g. the checker can realize that "a < b" is homomorphic to "b > a".
- * However, do note that the checker will assert that there is no homomorphism from "P(x,x)" to "P(x, y), x=y".</p>
+ * E.g. the finder can realize that "a < b" is homomorphic to "b > a".
+ * However, do note that the finder will assert that there is no homomorphism from "P(x,x)" to "P(x, y), x=y".</p>
  */
-public class HomomorphismChecker {
+public class HomomorphismFinder {
     /*
      * This class is implemented by means of computing, and extending, an initial substitution.
      *
@@ -45,16 +45,16 @@ public class HomomorphismChecker {
      * @param rangeRule  not null
      * @return optional containing a homomorphism between the two, if exists
      */
-    public Optional<Substitution> computeHomomorphism(DerivationRule domainRule, DerivationRule rangeRule) {
+    public Optional<Substitution> findHomomorphism(DerivationRule domainRule, DerivationRule rangeRule) {
         if (Objects.isNull(domainRule)) throw new IllegalArgumentException("DomainRule cannot be null");
         if (Objects.isNull(rangeRule)) throw new IllegalArgumentException("RangeRule cannot be null");
 
-        Optional<Substitution> homomorphism = computeHomomorphismForHead(domainRule.getHead(), rangeRule.getHead());
+        Optional<Substitution> homomorphism = findHomomorphismForHead(domainRule.getHead(), rangeRule.getHead());
         if (homomorphism.isEmpty()) return Optional.empty();
-        return computeHomomorphism(homomorphism.get(), domainRule.getBody(), rangeRule.getBody());
+        return findHomomorphism(homomorphism.get(), domainRule.getBody(), rangeRule.getBody());
     }
 
-    private Optional<Substitution> computeHomomorphismForHead(Atom domainHead, Atom rangeHead) {
+    private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
         return computeHomomorphismForAtom(new Substitution(), domainHead, rangeHead);
     }
 
@@ -65,14 +65,14 @@ public class HomomorphismChecker {
      * @return an extension of the currentSubstitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    private Optional<Substitution> computeHomomorphism(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+    private Optional<Substitution> findHomomorphism(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (domainLiterals.isEmpty()) return Optional.of(currentSubstitution);
         else {
             Literal domainLiteral = domainLiterals.get(0);
             List<Substitution> possibleSubstitutionsForDomainLiteral = computeAllPossibleHomomorphisms(currentSubstitution, domainLiteral, rangeLiterals);
             for (Substitution possibleSubstitutionForDomainLiteral : possibleSubstitutionsForDomainLiteral) {
                 List<Literal> restOfDomainLiterals = domainLiterals.subList(1, domainLiterals.size());
-                Optional<Substitution> homomorphism = computeHomomorphism(possibleSubstitutionForDomainLiteral, restOfDomainLiterals, rangeLiterals);
+                Optional<Substitution> homomorphism = findHomomorphism(possibleSubstitutionForDomainLiteral, restOfDomainLiterals, rangeLiterals);
                 if (homomorphism.isPresent()) return homomorphism;
             }
             return Optional.empty();
@@ -86,12 +86,12 @@ public class HomomorphismChecker {
      * @return an extension of the currentSubstitution that makes domainLiteral to be included in rangeLiterals, if exists
      */
     private List<Substitution> computeAllPossibleHomomorphisms(Substitution currentSubstitution, Literal domainLiteral, List<Literal> rangeLiterals) {
-        List<Substitution> allPossibleHomorphisms = new LinkedList<>();
+        List<Substitution> allPossibleHomomorphisms = new LinkedList<>();
         for (Literal rangeLiteral : rangeLiterals) {
-            Optional<Substitution> homomorphism = computeHomomorphism(currentSubstitution, domainLiteral, rangeLiteral);
-            homomorphism.ifPresent(allPossibleHomorphisms::add);
+            Optional<Substitution> homomorphism = findHomomorphism(currentSubstitution, domainLiteral, rangeLiteral);
+            homomorphism.ifPresent(allPossibleHomomorphisms::add);
         }
-        return allPossibleHomorphisms;
+        return allPossibleHomomorphisms;
     }
 
     /**
@@ -100,7 +100,7 @@ public class HomomorphismChecker {
      * @param rangeLiteral        is not null
      * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
-    private Optional<Substitution> computeHomomorphism(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
+    private Optional<Substitution> findHomomorphism(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
         if (domainLiteral instanceof OrdinaryLiteral domainOrdinaryLiteral) {
             if (rangeLiteral instanceof OrdinaryLiteral rangeOrdinaryLiteral) {
                 return computeHomomorphismForOrdinaryLiteral(currentSubstitution, domainOrdinaryLiteral, rangeOrdinaryLiteral);
@@ -138,7 +138,7 @@ public class HomomorphismChecker {
      * @param currentSubstitution is not null
      * @param domainComparison    is not null
      * @param rangeComparison     is not null
-     * @return an extension of the currentSubstitution that makes domainComparison to be equal to the symmetric of rangeComparison, if it exists
+     * @return an extension of the currentSubstitution that makes domainComparison to be equal to the symmetric rangeComparison, if it exists
      */
     private Optional<Substitution> computeHomomorphismForSymmetricBuiltInLiteral(Substitution currentSubstitution, ComparisonBuiltInLiteral domainComparison, ComparisonBuiltInLiteral rangeComparison) {
         ComparisonOperator domainOperator = domainComparison.getOperator();
