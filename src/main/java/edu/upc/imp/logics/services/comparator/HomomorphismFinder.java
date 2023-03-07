@@ -58,10 +58,6 @@ public class HomomorphismFinder {
         return computeHomomorphismExtensionForLiteralsList(homomorphism.get(), domainRule.getBody(), rangeRule.getBody());
     }
 
-    private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
-        return computeHomomorphismExtensionForAtom(new Substitution(), domainHead, rangeHead);
-    }
-
     /**
      * Return a homomorphism from the domainLogicConstraint terms to the rangeLogicConstraint terms, if exists
      *
@@ -90,6 +86,10 @@ public class HomomorphismFinder {
         return computeHomomorphismExtensionForLiteralsList(new Substitution(), domainLiterals, rangeLiterals);
     }
 
+    private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
+        return computeHomomorphismExtensionForAtom(new Substitution(), domainHead, rangeHead);
+    }
+
     private static void checkIfExistOrdinaryLiteralWithDerivationRule(List<Literal> literals) {
         if (literals.stream()
                 .filter(l -> l instanceof OrdinaryLiteral)
@@ -104,7 +104,7 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    private Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+    protected Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (domainLiterals.isEmpty()) return Optional.of(currentSubstitution);
         else {
             Literal domainLiteral = domainLiterals.get(0);
@@ -189,31 +189,14 @@ public class HomomorphismFinder {
     }
 
     /**
-     * @param currentSubstitution not null
-     * @param domainTerms         not null
-     * @param rangeTerms          not null
-     * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
-     */
-    private Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, List<Term> domainTerms, List<Term> rangeTerms) {
-        try {
-            Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
-            Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);
-            return Optional.of(unionSubstitution);
-        } catch (SubstitutionException ex) {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * @param currentSubstitution is not null
      * @param domainLiteral       is not null
      * @param rangeLiteral        is not null
      * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
-    private Optional<Substitution> computeHomomorphismExtensionForOrdinaryLiteral(Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
+    protected Optional<Substitution> computeHomomorphismExtensionForOrdinaryLiteral(Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
         if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
         return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
-
     }
 
     /**
@@ -228,5 +211,21 @@ public class HomomorphismFinder {
         }
 
         return computeHomomorphismExtensionForTerms(currentSubstitution, domainAtom.getTerms(), rangeAtom.getTerms());
+    }
+
+    /**
+     * @param currentSubstitution not null
+     * @param domainTerms         not null
+     * @param rangeTerms          not null
+     * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
+     */
+    protected Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, List<Term> domainTerms, List<Term> rangeTerms) {
+        try {
+            Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
+            Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);
+            return Optional.of(unionSubstitution);
+        } catch (SubstitutionException ex) {
+            return Optional.empty();
+        }
     }
 }
