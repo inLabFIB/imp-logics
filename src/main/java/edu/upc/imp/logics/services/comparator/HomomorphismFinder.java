@@ -1,6 +1,8 @@
 package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.*;
+import edu.upc.imp.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
+import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,10 +16,10 @@ import java.util.Optional;
  * between the literals with the same predicate name. </p>
  *
  * <p>
- * Hence, this service can be used to:
- * - Compare two normal clauses from the same schema
- * - Compare two normal clauses of different schemas
- * to identify whether they are equivalent up to renaming the name of variables </p>
+ * This class can only search for homomorphisms between list of literals (or derivation rules, or logic constraints)
+ * which do not have derived literals in their bodies. This is because the traditional notion of homomorphism is
+ * only defined over base literals. It can handle, however, negated ordinary literals and built-in literals.
+ * </p>
  *
  * <p>
  * It is worth to mention that the finder can find homomorphisms between built-in literals with their symmetric
@@ -41,13 +43,15 @@ public class HomomorphismFinder {
     /**
      * Return a homomorphism from the domainRule terms to the rangeRule terms, if exists
      *
-     * @param domainRule not null
-     * @param rangeRule  not null
+     * @param domainRule not null, nor containing derived literals
+     * @param rangeRule  not null, nor containing derived literals
      * @return optional containing a homomorphism between the two, if exists
      */
     public Optional<Substitution> findHomomorphism(DerivationRule domainRule, DerivationRule rangeRule) {
         if (Objects.isNull(domainRule)) throw new IllegalArgumentException("DomainRule cannot be null");
         if (Objects.isNull(rangeRule)) throw new IllegalArgumentException("RangeRule cannot be null");
+        checkIfExistOrdinaryLiteralWithDerivationRule(domainRule.getBody());
+        checkIfExistOrdinaryLiteralWithDerivationRule(rangeRule.getBody());
 
         Optional<Substitution> homomorphism = findHomomorphismForHead(domainRule.getHead(), rangeRule.getHead());
         if (homomorphism.isEmpty()) return Optional.empty();
@@ -61,8 +65,8 @@ public class HomomorphismFinder {
     /**
      * Return a homomorphism from the domainLogicConstraint terms to the rangeLogicConstraint terms, if exists
      *
-     * @param domainLogicConstraint not null
-     * @param rangeLogicConstraint  not null
+     * @param domainLogicConstraint not null, nor containing derived literals
+     * @param rangeLogicConstraint  not null, nor containing derived literals
      * @return optional containing a homomorphism between the two, if exists
      */
     public Optional<Substitution> findHomomorphism(LogicConstraint domainLogicConstraint, LogicConstraint rangeLogicConstraint) {
@@ -72,15 +76,25 @@ public class HomomorphismFinder {
     }
 
     /**
-     * @param domainLiterals is not null, but might be empty
-     * @param rangeLiterals  is not null
+     * @param domainLiterals is not null, but might be empty. Does not contain derived literals
+     * @param rangeLiterals  is not null, neither contains derived literals
      * @return a substitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
     public Optional<Substitution> findHomomorphismForLiteralsList(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (Objects.isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
         if (Objects.isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        checkIfExistOrdinaryLiteralWithDerivationRule(domainLiterals);
+        checkIfExistOrdinaryLiteralWithDerivationRule(rangeLiterals);
+
         return computeHomomorphismExtensionForLiteralsList(new Substitution(), domainLiterals, rangeLiterals);
+    }
+
+    private static void checkIfExistOrdinaryLiteralWithDerivationRule(List<Literal> literals) {
+        if (literals.stream()
+                .filter(l -> l instanceof OrdinaryLiteral)
+                .map(l -> (OrdinaryLiteral) l)
+                .anyMatch(OrdinaryLiteral::isDerived)) throw new DerivedLiteralInHomomorphismCheck();
     }
 
     /**

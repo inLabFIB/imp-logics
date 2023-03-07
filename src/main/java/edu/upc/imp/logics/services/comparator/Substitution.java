@@ -2,6 +2,7 @@ package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
+import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 
 import java.util.*;
 

@@ -1,10 +1,8 @@
 package edu.upc.imp.logics.services.comparator;
 
-import edu.upc.imp.logics.schema.ConstraintID;
-import edu.upc.imp.logics.schema.DerivationRule;
-import edu.upc.imp.logics.schema.LogicConstraint;
-import edu.upc.imp.logics.schema.LogicSchema;
+import edu.upc.imp.logics.schema.*;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
+import edu.upc.imp.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import edu.upc.imp.logics.services.parser.LogicSchemaParser;
@@ -36,6 +34,34 @@ class HomomorphismFinderTest {
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(List.of(), null))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @Test
+            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
+                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                    P() :- R(x, y), S(x)
+                                    R(x, y) :- T(x, y)
+                                """);
+                List<Literal> domainLiteralList = domainSchema.getDerivationRulesByPredicateName("P").get(0).getBody();
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(domainLiteralList, List.of()))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+            }
+
+            @Test
+            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
+                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                    P() :- R(x, y), S(x)
+                                    R(x, y) :- T(x, y)
+                                """);
+                List<Literal> rangeLiteralsList = rangeSchema.getDerivationRulesByPredicateName("P").get(0).getBody();
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(List.of(), rangeLiteralsList))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
         }
 
@@ -238,6 +264,38 @@ class HomomorphismFinderTest {
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(baseLogicConstraint, null))
                         .isInstanceOf(IllegalArgumentException.class);
             }
+
+            @Test
+            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
+                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                  @1 :- R(x, y), S(x)
+                                  R(x, y) :- T(x, y)
+                                """);
+                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("@2 :- R(x, y)");
+                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
+                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+            }
+
+            @Test
+            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
+                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("@1 :- R(x, y)");
+                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                  @2 :- R(x, y), S(x)
+                                  R(x, y) :- T(x, y)
+                                """);
+                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
+                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+            }
         }
 
         @Nested
@@ -319,6 +377,39 @@ class HomomorphismFinderTest {
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, null))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+
+
+            @Test
+            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
+                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                    P() :- R(x, y), S(x)
+                                    R(x, y) :- T(x, y)
+                                """);
+                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), S(x)");
+                DerivationRule domainDerivationRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule rangeDerivationRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+            }
+
+            @Test
+            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
+                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), S(x)");
+                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
+                        """
+                                    P() :- R(x, y), S(x)
+                                    R(x, y) :- T(x, y)
+                                """);
+                DerivationRule domainDerivationRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule rangeDerivationRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
         }
 

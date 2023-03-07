@@ -52,4 +52,8 @@ public class OrdinaryLiteral extends Literal {
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitOrdinaryLiteral(this, context);
     }
+
+    public boolean isDerived() {
+        return atom.isDerived();
+    }
 }

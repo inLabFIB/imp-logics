@@ -5,6 +5,7 @@ import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
 import edu.upc.imp.logics.schema.utils.TermMother;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
+import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

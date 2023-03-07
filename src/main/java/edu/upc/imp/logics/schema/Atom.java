@@ -54,4 +54,8 @@ public class Atom implements Visitable {
     public String getPredicateName() {
         return predicate.getName();
     }
+
+    public boolean isDerived() {
+        return predicate.isDerived();
+    }
 }
