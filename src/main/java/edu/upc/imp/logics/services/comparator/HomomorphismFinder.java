@@ -51,11 +51,36 @@ public class HomomorphismFinder {
 
         Optional<Substitution> homomorphism = findHomomorphismForHead(domainRule.getHead(), rangeRule.getHead());
         if (homomorphism.isEmpty()) return Optional.empty();
-        return findHomomorphism(homomorphism.get(), domainRule.getBody(), rangeRule.getBody());
+        return computeHomomorphismExtensionForLiteralsList(homomorphism.get(), domainRule.getBody(), rangeRule.getBody());
     }
 
     private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
-        return computeHomomorphismForAtom(new Substitution(), domainHead, rangeHead);
+        return computeHomomorphismExtensionForAtom(new Substitution(), domainHead, rangeHead);
+    }
+
+    /**
+     * Return a homomorphism from the domainLogicConstraint terms to the rangeLogicConstraint terms, if exists
+     *
+     * @param domainLogicConstraint not null
+     * @param rangeLogicConstraint  not null
+     * @return optional containing a homomorphism between the two, if exists
+     */
+    public Optional<Substitution> findHomomorphism(LogicConstraint domainLogicConstraint, LogicConstraint rangeLogicConstraint) {
+        if (Objects.isNull(domainLogicConstraint)) throw new IllegalArgumentException("DomainLiterals cannot be null");
+        if (Objects.isNull(rangeLogicConstraint)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        return findHomomorphismForLiteralsList(domainLogicConstraint.getBody(), rangeLogicConstraint.getBody());
+    }
+
+    /**
+     * @param domainLiterals is not null, but might be empty
+     * @param rangeLiterals  is not null
+     * @return a substitution, if exists, that would make domainLiterals to be contained
+     * in rangeLiterals
+     */
+    public Optional<Substitution> findHomomorphismForLiteralsList(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+        if (Objects.isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
+        if (Objects.isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        return computeHomomorphismExtensionForLiteralsList(new Substitution(), domainLiterals, rangeLiterals);
     }
 
     /**
@@ -65,14 +90,14 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    private Optional<Substitution> findHomomorphism(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+    private Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (domainLiterals.isEmpty()) return Optional.of(currentSubstitution);
         else {
             Literal domainLiteral = domainLiterals.get(0);
-            List<Substitution> possibleSubstitutionsForDomainLiteral = computeAllPossibleHomomorphisms(currentSubstitution, domainLiteral, rangeLiterals);
+            List<Substitution> possibleSubstitutionsForDomainLiteral = computeAllPossibleHomomorphismsExtensions(currentSubstitution, domainLiteral, rangeLiterals);
             for (Substitution possibleSubstitutionForDomainLiteral : possibleSubstitutionsForDomainLiteral) {
                 List<Literal> restOfDomainLiterals = domainLiterals.subList(1, domainLiterals.size());
-                Optional<Substitution> homomorphism = findHomomorphism(possibleSubstitutionForDomainLiteral, restOfDomainLiterals, rangeLiterals);
+                Optional<Substitution> homomorphism = computeHomomorphismExtensionForLiteralsList(possibleSubstitutionForDomainLiteral, restOfDomainLiterals, rangeLiterals);
                 if (homomorphism.isPresent()) return homomorphism;
             }
             return Optional.empty();
@@ -83,12 +108,12 @@ public class HomomorphismFinder {
      * @param currentSubstitution is not null
      * @param domainLiteral       is not null
      * @param rangeLiterals       is not null
-     * @return an extension of the currentSubstitution that makes domainLiteral to be included in rangeLiterals, if exists
+     * @return a list of extensions of the currentSubstitution that makes domainLiteral to be included in rangeLiterals
      */
-    private List<Substitution> computeAllPossibleHomomorphisms(Substitution currentSubstitution, Literal domainLiteral, List<Literal> rangeLiterals) {
+    private List<Substitution> computeAllPossibleHomomorphismsExtensions(Substitution currentSubstitution, Literal domainLiteral, List<Literal> rangeLiterals) {
         List<Substitution> allPossibleHomomorphisms = new LinkedList<>();
         for (Literal rangeLiteral : rangeLiterals) {
-            Optional<Substitution> homomorphism = findHomomorphism(currentSubstitution, domainLiteral, rangeLiteral);
+            Optional<Substitution> homomorphism = computeHomomorphismExtensionForLiteral(currentSubstitution, domainLiteral, rangeLiteral);
             homomorphism.ifPresent(allPossibleHomomorphisms::add);
         }
         return allPossibleHomomorphisms;
@@ -100,14 +125,14 @@ public class HomomorphismFinder {
      * @param rangeLiteral        is not null
      * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
-    private Optional<Substitution> findHomomorphism(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
+    private Optional<Substitution> computeHomomorphismExtensionForLiteral(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
         if (domainLiteral instanceof OrdinaryLiteral domainOrdinaryLiteral) {
             if (rangeLiteral instanceof OrdinaryLiteral rangeOrdinaryLiteral) {
-                return computeHomomorphismForOrdinaryLiteral(currentSubstitution, domainOrdinaryLiteral, rangeOrdinaryLiteral);
+                return computeHomomorphismExtensionForOrdinaryLiteral(currentSubstitution, domainOrdinaryLiteral, rangeOrdinaryLiteral);
             } else return Optional.empty();
         } else if (domainLiteral instanceof BuiltInLiteral domainBuiltInLiteral) {
             if (rangeLiteral instanceof BuiltInLiteral rangeBuiltInLiteral) {
-                return computeHomomorphismForBuiltInLiteral(currentSubstitution, domainBuiltInLiteral, rangeBuiltInLiteral);
+                return computeHomomorphismExtensionForBuiltInLiteral(currentSubstitution, domainBuiltInLiteral, rangeBuiltInLiteral);
             } else return Optional.empty();
         } else throw new RuntimeException("Unrecognized literal " + domainLiteral.getClass().getName());
     }
@@ -119,15 +144,15 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution that makes domainBuiltInLiteral to be equal to rangeBuiltInLiteral,
      * or its symmetric, if exists
      */
-    private Optional<Substitution> computeHomomorphismForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
+    private Optional<Substitution> computeHomomorphismExtensionForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
         if (!domainBuiltInLiteral.getOperationName().equals(rangeBuiltInLiteral.getOperationName())) {
             if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
                     rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
-                return computeHomomorphismForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
+                return computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
             } else return Optional.empty();
         }
 
-        return computeHomomorphismForTerms(currentSubstitution, domainBuiltInLiteral.getTerms(), rangeBuiltInLiteral.getTerms());
+        return computeHomomorphismExtensionForTerms(currentSubstitution, domainBuiltInLiteral.getTerms(), rangeBuiltInLiteral.getTerms());
 
     }
 
@@ -140,12 +165,12 @@ public class HomomorphismFinder {
      * @param rangeComparison     is not null
      * @return an extension of the currentSubstitution that makes domainComparison to be equal to the symmetric rangeComparison, if it exists
      */
-    private Optional<Substitution> computeHomomorphismForSymmetricBuiltInLiteral(Substitution currentSubstitution, ComparisonBuiltInLiteral domainComparison, ComparisonBuiltInLiteral rangeComparison) {
+    private Optional<Substitution> computeHomomorphismExtensionForSymmetricBuiltInLiteral(Substitution currentSubstitution, ComparisonBuiltInLiteral domainComparison, ComparisonBuiltInLiteral rangeComparison) {
         ComparisonOperator domainOperator = domainComparison.getOperator();
         ComparisonOperator rangeOperator = rangeComparison.getOperator();
         if (domainOperator.isSymmetric(rangeOperator)) {
             List<Term> reversedRangeTerms = List.of(rangeComparison.getRightTerm(), rangeComparison.getLeftTerm());
-            return computeHomomorphismForTerms(currentSubstitution, domainComparison.getTerms(), reversedRangeTerms);
+            return computeHomomorphismExtensionForTerms(currentSubstitution, domainComparison.getTerms(), reversedRangeTerms);
         } else return Optional.empty();
     }
 
@@ -155,7 +180,7 @@ public class HomomorphismFinder {
      * @param rangeTerms          not null
      * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
      */
-    private Optional<Substitution> computeHomomorphismForTerms(Substitution currentSubstitution, List<Term> domainTerms, List<Term> rangeTerms) {
+    private Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, List<Term> domainTerms, List<Term> rangeTerms) {
         try {
             Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
             Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);
@@ -171,9 +196,9 @@ public class HomomorphismFinder {
      * @param rangeLiteral        is not null
      * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
-    private Optional<Substitution> computeHomomorphismForOrdinaryLiteral(Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
+    private Optional<Substitution> computeHomomorphismExtensionForOrdinaryLiteral(Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
         if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
-        return computeHomomorphismForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
+        return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
 
     }
 
@@ -183,11 +208,11 @@ public class HomomorphismFinder {
      * @param rangeAtom           is not null
      * @return an extension of the currentSubstitution that makes domainAtom to be equal to rangeAtom, if exists
      */
-    private Optional<Substitution> computeHomomorphismForAtom(Substitution currentSubstitution, Atom domainAtom, Atom rangeAtom) {
+    private Optional<Substitution> computeHomomorphismExtensionForAtom(Substitution currentSubstitution, Atom domainAtom, Atom rangeAtom) {
         if (!domainAtom.getPredicateName().equals(rangeAtom.getPredicateName())) {
             return Optional.empty();
         }
 
-        return computeHomomorphismForTerms(currentSubstitution, domainAtom.getTerms(), rangeAtom.getTerms());
+        return computeHomomorphismExtensionForTerms(currentSubstitution, domainAtom.getTerms(), rangeAtom.getTerms());
     }
 }
