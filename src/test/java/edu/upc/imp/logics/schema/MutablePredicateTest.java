@@ -29,7 +29,7 @@ public class MutablePredicateTest {
 
     @Test
     public void should_createMutablePredicate_WithEmptyDefinitionRules() {
-        MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of());
+        MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         assertThat(mutablePredicate.getDerivationRules()).isEmpty();
     }
 
@@ -58,7 +58,7 @@ public class MutablePredicateTest {
 
     @Test
     public void should_ReturnDerivationRule_WithThisPredicateInHead_WhenAddDefinitionRule() {
-        MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of());
+        MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         mutablePredicate.addDerivationRule(definitionRule);
         assertThat(mutablePredicate.getDerivationRules()).allSatisfy(dr -> assertThat(dr.getHead().getPredicate()).isSameAs(mutablePredicate));
@@ -103,7 +103,7 @@ public class MutablePredicateTest {
 
     @Test
     public void should_NotBeDerived_WhenMutablePredicateHaveNotDerivationRules() {
-        MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of());
+        MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         assertThat(mutablePredicate.isDerived()).isFalse();
     }
 

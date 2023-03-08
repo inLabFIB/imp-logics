@@ -58,4 +58,8 @@ public class Atom implements Visitable {
     public boolean isDerived() {
         return predicate.isDerived();
     }
+
+    public boolean isBase() {
+        return predicate.isBase();
+    }
 }

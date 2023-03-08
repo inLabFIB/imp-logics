@@ -56,4 +56,8 @@ public class OrdinaryLiteral extends Literal {
     public boolean isDerived() {
         return atom.isDerived();
     }
+
+    public boolean isBase() {
+        return atom.isBase();
+    }
 }

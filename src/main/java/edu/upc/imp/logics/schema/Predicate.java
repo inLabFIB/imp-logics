@@ -25,7 +25,7 @@ public class Predicate {
      * - the list of derivationRules is not null
      * - the list of derivationRules it not empty
      * - derivationRules head terms size matches with arity
-     * - derivationRules are immutable
+     * - derivationRules are immutable when retrieved
      */
 
     protected final List<DerivationRule> derivationRules;
@@ -79,6 +79,10 @@ public class Predicate {
     }
 
     public boolean isDerived() {
-        return !derivationRules.isEmpty();
+        return !isBase();
+    }
+
+    public boolean isBase() {
+        return derivationRules.isEmpty();
     }
 }
