@@ -40,6 +40,16 @@ public class HomomorphismFinder {
      * As expected, we say that a substitution s1 is an extension of a substitution s2 if all the mappings of s2 are contained in s1.
      */
 
+    private final Optional<DerivedOrdinaryLiteralHomomorphismCriteria> derivedOrdinaryLiteralHomomorphismCriteria;
+
+    public HomomorphismFinder() {
+        derivedOrdinaryLiteralHomomorphismCriteria = Optional.empty();
+    }
+
+    protected HomomorphismFinder(DerivedOrdinaryLiteralHomomorphismCriteria derivedOrdinaryLiteralHomomorphismCriteria) {
+        this.derivedOrdinaryLiteralHomomorphismCriteria = Optional.ofNullable(derivedOrdinaryLiteralHomomorphismCriteria);
+    }
+
     /**
      * Return a homomorphism from the domainRule terms to the rangeRule terms, if exists
      *
@@ -50,8 +60,8 @@ public class HomomorphismFinder {
     public Optional<Substitution> findHomomorphism(DerivationRule domainRule, DerivationRule rangeRule) {
         if (Objects.isNull(domainRule)) throw new IllegalArgumentException("DomainRule cannot be null");
         if (Objects.isNull(rangeRule)) throw new IllegalArgumentException("RangeRule cannot be null");
-        checkIfExistOrdinaryLiteralWithDerivationRule(domainRule.getBody());
-        checkIfExistOrdinaryLiteralWithDerivationRule(rangeRule.getBody());
+        checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainRule.getBody());
+        checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeRule.getBody());
 
         Optional<Substitution> homomorphism = findHomomorphismForHead(domainRule.getHead(), rangeRule.getHead());
         if (homomorphism.isEmpty()) return Optional.empty();
@@ -80,8 +90,8 @@ public class HomomorphismFinder {
     public Optional<Substitution> findHomomorphismForLiteralsList(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (Objects.isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
         if (Objects.isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
-        checkIfExistOrdinaryLiteralWithDerivationRule(domainLiterals);
-        checkIfExistOrdinaryLiteralWithDerivationRule(rangeLiterals);
+        checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainLiterals);
+        checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeLiterals);
 
         return computeHomomorphismExtensionForLiteralsList(new Substitution(), domainLiterals, rangeLiterals);
     }
@@ -90,7 +100,8 @@ public class HomomorphismFinder {
         return computeHomomorphismExtensionForAtom(new Substitution(), domainHead, rangeHead);
     }
 
-    private static void checkIfExistOrdinaryLiteralWithDerivationRule(List<Literal> literals) {
+    private void checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(List<Literal> literals) {
+        if (this.derivedOrdinaryLiteralHomomorphismCriteria.isPresent()) return;
         if (literals.stream()
                 .filter(l -> l instanceof OrdinaryLiteral)
                 .map(l -> (OrdinaryLiteral) l)
@@ -195,8 +206,14 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
     protected Optional<Substitution> computeHomomorphismExtensionForOrdinaryLiteral(Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
-        if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
-        return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
+        if (domainLiteral.isBase() && rangeLiteral.isBase()) {
+            if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
+            return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
+        } else {
+            return derivedOrdinaryLiteralHomomorphismCriteria
+                    .orElseThrow(DerivedLiteralInHomomorphismCheck::new)
+                    .computeHomomorphismExtensionForDerivedOrdinaryLiteral(this, currentSubstitution, domainLiteral, rangeLiteral);
+        }
     }
 
     /**
