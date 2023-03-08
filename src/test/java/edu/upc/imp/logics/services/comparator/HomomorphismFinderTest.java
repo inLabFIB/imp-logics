@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class HomomorphismFinderTest {
 
     @Nested
-    class LiteralsListTest {
+    class ImmutableLiteralsListTest {
         @Nested
         class ParameterCorrectness {
             @Test

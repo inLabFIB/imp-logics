@@ -25,7 +25,10 @@ public abstract class NormalClause implements Visitable {
         this.body = Collections.unmodifiableList(body);
     }
 
-    public List<Literal> getBody() {
-        return body;
+    /**
+     * @return an immutable list of literals that forms the body of this normal clause
+     */
+    public ImmutableLiteralsList getBody() {
+        return new ImmutableLiteralsList(body);
     }
 }

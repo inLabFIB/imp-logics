@@ -96,7 +96,7 @@ public class PredicateTest {
     public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
-        assertThat(predicate.getDerivationRules().get(0).getBody()).isSameAs(definitionRule.getBody());
+        assertThat(predicate.getDerivationRules().get(0).getBody()).containsExactlyElementsOf(definitionRule.getBody());
     }
 
     @Test
