@@ -16,10 +16,13 @@ We expect this project to grow with new services to be written in the `logics.se
 Terms are Value Objects, so, they can be reused among several constructions. E.g, a variable term "x" can
 be reused in several atoms, or built-in literals, even from different schemas.
 
-Predicates can be reused to create several atoms inside the schema they belong to, but should not be used in different
+Predicates are not Value Objects (since they are identified by their name).
+They can be reused to create several atoms inside the schema they belong to, but should not be used in different
 schemas.
 
 Atoms, and Literals should not be reused in several NormalClauses, neither twice in the same NormalClause.
+This is because they are not value objects, but entities. Indeed, they cannot be value objects since they contain
+predicates, which are entities.
 
 ## Testing code
 
