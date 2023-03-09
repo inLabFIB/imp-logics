@@ -8,8 +8,8 @@ public class SubstitutionBuilder {
 
     private final Substitution substitution = new Substitution();
 
-    public SubstitutionBuilder addMapping(String domainTermName, String rangeTermName) {
-        Variable domainVariable = new Variable(domainTermName);
+    public SubstitutionBuilder addMapping(String domainVariableName, String rangeTermName) {
+        Variable domainVariable = new Variable(domainVariableName);
         Term rangeTerm = TermMother.createTerm(rangeTermName);
         substitution.addMapping(domainVariable, rangeTerm);
         return this;

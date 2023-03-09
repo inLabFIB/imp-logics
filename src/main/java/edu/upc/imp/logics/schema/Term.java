@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.services.comparator.Substitution;
+
 import java.util.Objects;
 
 /**
@@ -39,4 +41,6 @@ public abstract class Term {
     public int hashCode() {
         return Objects.hash(name);
     }
+
+    public abstract Term applySubstitution(Substitution substitution);
 }

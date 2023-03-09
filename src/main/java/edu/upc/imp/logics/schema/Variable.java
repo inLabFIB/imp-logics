@@ -1,11 +1,21 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.services.comparator.Substitution;
+
+import java.util.Optional;
+
 /**
  * Implementation of a logic variable. E.g.: x, y, z, ...
  */
 public class Variable extends Term {
     public Variable(String name) {
         super(name);
+    }
+
+    @Override
+    public Term applySubstitution(Substitution substitution) {
+        Optional<Term> substitutedTerm = substitution.getTerm(this);
+        return substitutedTerm.orElse(this);
     }
 
     @Override
