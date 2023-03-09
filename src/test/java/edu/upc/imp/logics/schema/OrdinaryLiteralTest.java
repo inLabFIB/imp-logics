@@ -1,7 +1,14 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.assertions.LiteralAssert;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.utils.AtomMother;
+import edu.upc.imp.logics.schema.utils.LiteralMother;
+import edu.upc.imp.logics.services.comparator.SubstitutionBuilder;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
@@ -10,33 +17,41 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class OrdinaryLiteralTest {
 
-    @Test
-    public void should_ThrowException_WhenCreatingOrdinaryLiteral_WithNullAtom() {
-        assertThatThrownBy(() -> new OrdinaryLiteral(null, true)).isInstanceOf(IllegalArgumentException.class);
+    @Nested
+    class CreationTests {
+        @Test
+        public void should_ThrowException_WhenCreatingOrdinaryLiteral_WithNullAtom() {
+            assertThatThrownBy(() -> new OrdinaryLiteral(null, true)).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_CreatePositiveOrdinaryLiteral_WhenCreatingOrdinaryLiteral_WithNoSign() {
+            OrdinaryLiteral oLiteral = new OrdinaryLiteral(AtomMother.createAtomWithVariableNames("P", List.of("x")));
+            assertThat(oLiteral.isPositive()).isTrue();
+        }
     }
 
-    @Test
-    public void should_CreatePositiveOrdinaryLiteral_WhenCreatingOrdinaryLiteral_WithNoSign() {
-        OrdinaryLiteral oLiteral = new OrdinaryLiteral(AtomMother.createAtomWithVariableNames("P", List.of("x")));
-        assertThat(oLiteral.isPositive()).isTrue();
+    @ParameterizedTest(name = "[{index}] Substitution for OrdinaryLiteral with isPositive = {0} case")
+    @ValueSource(booleans = {true, false})
+    public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(boolean isPositiveParam) {
+        OrdinaryLiteral oLiteral = LiteralMother.createOrdinaryLiteral(isPositiveParam, "P", "x", "y");
+        Substitution substitution = new SubstitutionBuilder()
+                .addMapping("x", "1")
+                .addMapping("y", "b")
+                .build();
+
+        OrdinaryLiteral newLiteral = oLiteral.applySubstitution(substitution);
+
+        assertThat(newLiteral).isNotSameAs(oLiteral);
+        LiteralAssert.assertThat(newLiteral)
+                .isNotSameAs(oLiteral)
+                .isPositive(isPositiveParam)
+                .hasPredicate("P", 2)
+                .hasConstant(0, "1")
+                .hasVariable(1, "b");
     }
-//
-//    @Test
-//    public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(){
-//        OrdinaryLiteral oLiteral = new OrdinaryLiteral(AtomMother.createAtomWithVariableNames("P", List.of("x", "y")));
-//        Substitution substitution = new SubstitutionBuilder()
-//                .addMapping("x", "1")
-//                .addMapping("y", "b")
-//                .build();
-//
-//        OrdinaryLiteral newLiteral = oLiteral.applySubstitution(substitution);
-//        assertThat(newLiteral).isNotSameAs(oLiteral);
-//        LiteralAssert.assertThat(newLiteral)
-//                .hasPredicate("P", 2)
-//                .hasConstant(0, "1")
-//                .hasVariable(1, "b");
-//    }
-//
+
+
 //    @Nested
 //    class UnfoldingTests {
 //        @Test
@@ -47,10 +62,10 @@ public class OrdinaryLiteralTest {
 //
 //            assertThat(actualUnfoldingList).hasSize(1);
 //            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-//            ImmutableLiteralsList expectedUnfolding = new ImmutableLiteralsList(ordinaryLiteral);
 //            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
-//                    .isLogicallyEquivalentTo(expectedUnfolding)
-//                    .hasSameSizeAs(expectedUnfolding);
+//                    .hasSize(1)
+//                    .containsOrdinaryLiteral("P", "x");
+//
 //        }
 //
 //        @Test

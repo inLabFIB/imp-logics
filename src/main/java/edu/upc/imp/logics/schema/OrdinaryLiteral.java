@@ -1,8 +1,8 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -48,11 +48,10 @@ public class OrdinaryLiteral extends Literal {
         return atom.getTerms();
     }
 
-//    @Override
-//    public OrdinaryLiteral applySubstitution(Substitution substitution) {
-//        new OrdinaryLiteral(new Atom(this.getAtom().getPredicate(), applySubstitutionToTerms(substitution)));
-//        return null;
-//    }
+    @Override
+    public OrdinaryLiteral applySubstitution(Substitution substitution) {
+        return new OrdinaryLiteral(atom.applySubstitution(substitution), isPositive);
+    }
 
 
     @Override
@@ -68,9 +67,9 @@ public class OrdinaryLiteral extends Literal {
         return atom.isBase();
     }
 
-    public List<ImmutableLiteralsList> unfold() {
-        if (this.isBase()) return List.of(new ImmutableLiteralsList(this));
-        if (!this.isPositive) return List.of(new ImmutableLiteralsList(this));
-        return null;
-    }
+//    public List<ImmutableLiteralsList> unfold() {
+//        if (this.isBase()) return List.of(new ImmutableLiteralsList(this));
+//        if (!this.isPositive) return List.of(new ImmutableLiteralsList(this));
+//        return null;
+//    }
 }

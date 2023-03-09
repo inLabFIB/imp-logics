@@ -3,6 +3,7 @@ package edu.upc.imp.logics.schema;
 import edu.upc.imp.logics.schema.operations.Substitution;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * An immutable list of terms
@@ -156,5 +157,12 @@ public class ImmutableTermList implements List<Term> {
                 .map(term -> term.applySubstitution(substitution))
                 .toList();
         return new ImmutableTermList(substitutedTerms);
+    }
+
+    public Set<Variable> getUsedVariables() {
+        return termsList.stream()
+                .filter(Term::isVariable)
+                .map(t -> new Variable(t.getName()))
+                .collect(Collectors.toSet());
     }
 }

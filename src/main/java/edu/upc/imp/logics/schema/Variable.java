@@ -22,4 +22,9 @@ public class Variable extends Term {
     public String toString() {
         return "Var{'" + this.getName() + "'}";
     }
+
+    @Override
+    public boolean isVariable() {
+        return true;
+    }
 }

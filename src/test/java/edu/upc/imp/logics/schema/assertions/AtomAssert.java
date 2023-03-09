@@ -20,4 +20,13 @@ public class AtomAssert extends AbstractAssert<AtomAssert, Atom> {
     }
 
 
+    public AtomAssert containsConstant(int index, String constantName) {
+        ImmutableTermListAssert.assertThat(actual.getTerms()).containsConstant(index, constantName);
+        return this;
+    }
+
+    public AtomAssert hasVariable(int index, String variableName) {
+        ImmutableTermListAssert.assertThat(actual.getTerms()).containsVariable(index, variableName);
+        return this;
+    }
 }

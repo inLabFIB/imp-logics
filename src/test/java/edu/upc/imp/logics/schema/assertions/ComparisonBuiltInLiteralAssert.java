@@ -28,4 +28,14 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         Assertions.assertThat(actual.getOperator().getSymbol()).isEqualTo(comparisonOperator);
         return this;
     }
+
+    public ComparisonBuiltInLiteralAssert hasLeftVariable(String variableName) {
+        TermAssert.assertThat(actual.getLeftTerm()).isVariable(variableName);
+        return this;
+    }
+
+    public ComparisonBuiltInLiteralAssert hasRightVariable(String variableName) {
+        TermAssert.assertThat(actual.getRightTerm()).isVariable(variableName);
+        return this;
+    }
 }

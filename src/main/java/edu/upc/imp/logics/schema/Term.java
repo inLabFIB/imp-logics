@@ -43,4 +43,8 @@ public abstract class Term {
     }
 
     public abstract Term applySubstitution(Substitution substitution);
+
+    public boolean isVariable() {
+        return false;
+    }
 }

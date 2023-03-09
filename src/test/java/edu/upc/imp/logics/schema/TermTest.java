@@ -8,30 +8,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class TermTest {
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    void should_throwException_whenNameIsNullOrEmpty(String nullOrEmpty) {
-        assertThatThrownBy(() -> new Term(nullOrEmpty) {
-            @Override
-            public Term applySubstitution(Substitution substitution) {
-                return null;
-            }
-        }).isInstanceOf(IllegalArgumentException.class);
-    }
+    @Nested
+    class CreationTests {
+        @ParameterizedTest
+        @NullAndEmptySource
+        void should_throwException_whenNameIsNullOrEmpty(String nullOrEmpty) {
+            assertThatThrownBy(() -> new Term(nullOrEmpty) {
+                @Override
+                public Term applySubstitution(Substitution substitution) {
+                    return null;
+                }
 
-    @Test
-    void should_createTerm_whenNameIsNotNullNorEmpty() {
-        assertThatCode(() -> new Term("x") {
-            @Override
-            public Term applySubstitution(Substitution substitution) {
-                return null;
-            }
-        }).doesNotThrowAnyException();
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void should_createTerm_whenNameIsNotNullNorEmpty() {
+            assertThatCode(() -> new Term("x") {
+                @Override
+                public Term applySubstitution(Substitution substitution) {
+                    return null;
+                }
+
+            }).doesNotThrowAnyException();
+        }
     }
 
     @Nested
@@ -68,6 +72,20 @@ class TermTest {
 
             TermAssert.assertThat(actual).isConstant("X");
         }
+    }
 
+    @Nested
+    class IsVariableTests {
+        @Test
+        public void should_returnTrue_whenItIsVariable() {
+            Term term = new Variable("v");
+            assertThat(term.isVariable()).isTrue();
+        }
+
+        @Test
+        public void should_returnFalse_whenIsConstant() {
+            Term term = new Constant("X");
+            assertThat(term.isVariable()).isFalse();
+        }
     }
 }

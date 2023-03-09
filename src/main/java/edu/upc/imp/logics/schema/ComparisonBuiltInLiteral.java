@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
 import java.util.Objects;
@@ -45,6 +46,14 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     @Override
     public ImmutableTermList getTerms() {
         return new ImmutableTermList(leftTerm, rightTerm);
+    }
+
+    @Override
+    public ComparisonBuiltInLiteral applySubstitution(Substitution substitution) {
+        return new ComparisonBuiltInLiteral(leftTerm.applySubstitution(substitution),
+                rightTerm.applySubstitution(substitution),
+                operator
+        );
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -242,5 +243,15 @@ class SubstitutionTest {
     public void should_returnMappedTerm_whenGettingTerm_withMappedVariable() {
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "a").build();
         assertThat(substitution.getTerm(new Variable("x"))).isPresent().contains(new Variable("a"));
+    }
+
+    @Test
+    public void should_returnUsedVariables() {
+        Substitution substitution = new SubstitutionBuilder().addMapping("x", "y").build();
+
+        Set<Variable> usedVariables = substitution.getUsedVariables();
+
+        assertThat(usedVariables).hasSize(2)
+                .contains(new Variable("x"), new Variable("y"));
     }
 }

@@ -19,7 +19,15 @@ public class LiteralMother {
         return createOrdinaryLiteral(true, predicateName, terms);
     }
 
+    public static OrdinaryLiteral createOrdinaryLiteral(String predicateName, String... termNames) {
+        return createOrdinaryLiteral(true, predicateName, termNames);
+    }
+
     public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, List<Term> terms) {
+        return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
+    }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, String... terms) {
         return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
     }
 

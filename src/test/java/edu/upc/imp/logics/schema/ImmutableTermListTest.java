@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -78,6 +79,17 @@ public class ImmutableTermListTest {
                     .containsConstant(0, "2")
                     .containsConstant(1, "1");
         }
+    }
+
+    @Test
+    public void should_ReturnUsedVariables() {
+        ImmutableTermList immutableTermList = TermMother.createTerms("x", "1", "y");
+
+        Set<Variable> usedVariables = immutableTermList.getUsedVariables();
+
+        assertThat(usedVariables)
+                .hasSize(2)
+                .contains(new Variable("x"), new Variable("y"));
     }
 
 }

@@ -52,4 +52,20 @@ public class ImmutableLiteralsListAssert extends AbstractAssert<ImmutableLiteral
         Assertions.assertThat(actual).isEmpty();
         return this;
     }
+
+    public ImmutableLiteralsListAssert hasSize(int expectedSize) {
+        Assertions.assertThat(actual).hasSize(expectedSize);
+        return this;
+    }
+
+    public ImmutableLiteralsListAssert containsComparisonBuiltInLiteral(String leftVariableName, String comparisonOperator, String rightVariableName) {
+        Assertions.assertThat(actual).anySatisfy(
+                lit -> LiteralAssert.assertThat(lit)
+                        .isComparisonBuiltInLiteral()
+                        .hasBuiltInComparisonOperation(comparisonOperator)
+                        .containsVariables(leftVariableName, rightVariableName)
+        );
+        return this;
+
+    }
 }

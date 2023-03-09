@@ -1,11 +1,11 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.visitor.Visitable;
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Implementation of a logic Atom.
@@ -45,6 +45,48 @@ public class Atom implements Visitable {
         if (arity != terms.size()) throw new ArityMismatch(arity, terms.size());
     }
 
+    public List<ImmutableLiteralsList> unfold() {
+        if (this.isBase()) {
+            return List.of(new ImmutableLiteralsList(new OrdinaryLiteral(new Atom(this.predicate, this.terms))));
+        } else {
+            List<ImmutableLiteralsList> result = new LinkedList<>();
+            for (DerivationRule derivationRule : this.getPredicate().getDerivationRules()) {
+                ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), this.terms);
+                Substitution substitutionOfHeadTerms = new Substitution(derivationRule.getHead().terms, this.terms);
+                result.add(bodyLiteralsAvoidingClashWithThisTerms.applySubstitution(substitutionOfHeadTerms));
+            }
+            return result;
+        }
+    }
+
+    private ImmutableLiteralsList computeListThatAvoidsClash(ImmutableLiteralsList literalsList, ImmutableTermList potentiallyClashingTerms) {
+        Substitution substitutionForClashingTerms = new Substitution();
+        Set<Variable> currentlyUsedVariables = computeCurrentlyUsedVariables(literalsList, potentiallyClashingTerms);
+        for (Term potentiallyClashingTerm : potentiallyClashingTerms) {
+            if (potentiallyClashingTerm.isVariable()) {
+                Variable newFreshVariable = computeNewFreshVariable(potentiallyClashingTerm.getName(), currentlyUsedVariables);
+                substitutionForClashingTerms.addMapping(new Variable(potentiallyClashingTerm.getName()), newFreshVariable);
+                currentlyUsedVariables.add(newFreshVariable);
+            }
+        }
+        return literalsList.applySubstitution(substitutionForClashingTerms);
+    }
+
+    private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList literalsList, ImmutableTermList potentiallyClashingTerms) {
+        Set<Variable> usedVariables = new HashSet<>();
+        usedVariables.addAll(literalsList.getUsedVariables());
+        usedVariables.addAll(potentiallyClashingTerms.getUsedVariables());
+        return usedVariables;
+    }
+
+    private Variable computeNewFreshVariable(String variableNamePrefix, Set<Variable> usedVariables) {
+        String proposedNewVariableName = variableNamePrefix;
+        while (usedVariables.contains(new Variable(proposedNewVariableName))) {
+            proposedNewVariableName = proposedNewVariableName + "'";
+        }
+        return new Variable(proposedNewVariableName);
+    }
+
     @Override
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitAtom(this, context);
@@ -60,5 +102,9 @@ public class Atom implements Visitable {
 
     public boolean isBase() {
         return predicate.isBase();
+    }
+
+    public Atom applySubstitution(Substitution substitution) {
+        return new Atom(this.predicate, this.terms.applySubstitution(substitution));
     }
 }

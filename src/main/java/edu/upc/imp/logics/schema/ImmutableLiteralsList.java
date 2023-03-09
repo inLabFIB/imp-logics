@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.operations.Substitution;
+
 import java.util.*;
 
 /**
@@ -147,5 +149,22 @@ public class ImmutableLiteralsList implements List<Literal> {
     @Override
     public ImmutableLiteralsList subList(int fromIndex, int toIndex) {
         return new ImmutableLiteralsList(literalList.subList(fromIndex, toIndex));
+    }
+
+    public ImmutableLiteralsList applySubstitution(Substitution substitution) {
+        return new ImmutableLiteralsList(
+                this.literalList.stream()
+                        .map(l -> l.applySubstitution(substitution))
+                        .toList());
+    }
+
+    public Set<Variable> getUsedVariables() {
+        return this.literalList.stream()
+                .map(Literal::getUsedVariables)
+                .reduce(new HashSet<>(),
+                        (subtotal, element) -> {
+                            subtotal.addAll(element);
+                            return subtotal;
+                        });
     }
 }

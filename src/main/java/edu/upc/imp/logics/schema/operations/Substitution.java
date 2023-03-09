@@ -5,6 +5,7 @@ import edu.upc.imp.logics.schema.Variable;
 import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a substitution of variables to terms.
@@ -120,5 +121,17 @@ public class Substitution {
 
     public boolean isEmpty() {
         return this.termsMap.isEmpty();
+    }
+
+    public Set<Variable> getUsedVariables() {
+        Set<Variable> variablesInDomain = this.termsMap.keySet();
+        Set<Variable> variablesInRange = this.termsMap.values().stream()
+                .filter(Term::isVariable)
+                .map(t -> new Variable(t.getName()))
+                .collect(Collectors.toSet());
+
+        Set<Variable> result = new HashSet<>(variablesInDomain);
+        result.addAll(variablesInRange);
+        return result;
     }
 }

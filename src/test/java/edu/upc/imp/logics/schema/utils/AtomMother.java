@@ -16,4 +16,15 @@ public class AtomMother {
         Predicate predicate = new MutablePredicate(predicateName, terms.size());
         return new Atom(predicate, terms);
     }
+
+    public static Atom createAtom(String predicateName, String... termNames) {
+        Predicate predicate = new MutablePredicate(predicateName, termNames.length);
+        return new Atom(predicate, TermMother.createTerms(termNames));
+    }
+
+    public static Atom createAtom(LogicSchema logicSchema, String predicateName, String... termNames) {
+        Predicate predicateFromSchema = logicSchema.getPredicateByName(predicateName);
+        return new Atom(predicateFromSchema, TermMother.createTerms(termNames));
+    }
+
 }
