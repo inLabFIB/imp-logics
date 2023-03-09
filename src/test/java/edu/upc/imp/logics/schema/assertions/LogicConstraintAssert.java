@@ -37,4 +37,9 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
         return this;
     }
 
+//    public LogicConstraintAssert isLogicallyEquivalence(LogicConstraint other) {
+//        Assertions.assertThat(actual.isLogicEquivalence()).isTrue();
+//        return this;
+//    }
+
 }

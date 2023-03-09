@@ -3,6 +3,7 @@ package edu.upc.imp.logics.services.comparator;
 import edu.upc.imp.logics.schema.ConstraintID;
 import edu.upc.imp.logics.schema.Literal;
 import edu.upc.imp.logics.schema.LogicSchema;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.imp.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Test;

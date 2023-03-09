@@ -79,4 +79,12 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         }
         return this;
     }
+
+    public LiteralAssert isPositive(boolean expected) {
+        Assertions.assertThat(actual).isInstanceOf(OrdinaryLiteral.class);
+        Assertions.assertThat(
+                        ((OrdinaryLiteral) actual).isPositive())
+                .isEqualTo(expected);
+        return this;
+    }
 }

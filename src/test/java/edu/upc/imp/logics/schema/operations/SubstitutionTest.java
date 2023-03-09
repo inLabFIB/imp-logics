@@ -1,9 +1,10 @@
-package edu.upc.imp.logics.services.comparator;
+package edu.upc.imp.logics.schema.operations;
 
 import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
 import edu.upc.imp.logics.schema.utils.TermMother;
+import edu.upc.imp.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 import org.junit.jupiter.api.Test;

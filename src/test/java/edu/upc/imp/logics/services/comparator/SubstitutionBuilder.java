@@ -2,6 +2,7 @@ package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.utils.TermMother;
 
 public class SubstitutionBuilder {

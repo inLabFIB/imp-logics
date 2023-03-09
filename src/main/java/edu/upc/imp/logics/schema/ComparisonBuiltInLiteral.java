@@ -2,7 +2,6 @@ package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,8 +43,8 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     }
 
     @Override
-    public List<Term> getTerms() {
-        return List.of(leftTerm, rightTerm);
+    public ImmutableTermList getTerms() {
+        return new ImmutableTermList(leftTerm, rightTerm);
     }
 
     @Override

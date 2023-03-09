@@ -5,7 +5,7 @@ import edu.upc.imp.logics.schema.Constant;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;
 import edu.upc.imp.logics.schema.assertions.TermAssert;
-import edu.upc.imp.logics.services.comparator.Substitution;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 

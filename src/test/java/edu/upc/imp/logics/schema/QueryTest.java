@@ -46,10 +46,15 @@ public class QueryTest {
     }
 
     @Test
-    public void should_MakeBodyImmutable_WhenCreatingQuery() {
-        List<Literal> body = new LinkedList<>();
-        body.add(LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x")));
+    public void should_MakeBodyImmutable_WhenCreatingQuery_WithMutableListInput() {
+        List<Literal> body = createMutableListOfLiterals();
         Query q = new Query(List.of(), body);
         assertThat(q.getBody()).isUnmodifiable();
+    }
+
+    private static List<Literal> createMutableListOfLiterals() {
+        List<Literal> body = new LinkedList<>();
+        body.add(LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x")));
+        return body;
     }
 }

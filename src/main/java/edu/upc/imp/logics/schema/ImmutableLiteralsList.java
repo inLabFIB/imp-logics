@@ -6,11 +6,22 @@ import java.util.*;
  * An immutable list of literals
  */
 public class ImmutableLiteralsList implements List<Literal> {
+    /**
+     * Invariants:
+     * - literalsList is not null
+     * - literalsList has no nulls
+     */
     private final List<Literal> literalList;
 
     public ImmutableLiteralsList(List<Literal> literalList) {
-        if (Objects.isNull(literalList)) throw new IllegalArgumentException("literalList cannot be null");
+        if (Objects.isNull(literalList)) throw new IllegalArgumentException("LiteralList cannot be null");
+        if (literalList.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("LiteralList cannot contain null elements");
         this.literalList = Collections.unmodifiableList(literalList);
+    }
+
+    public ImmutableLiteralsList(Literal... literal) {
+        this(Arrays.stream(literal).toList());
     }
 
     @Override
@@ -134,7 +145,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
     @Override
-    public List<Literal> subList(int fromIndex, int toIndex) {
-        return literalList.subList(fromIndex, toIndex);
+    public ImmutableLiteralsList subList(int fromIndex, int toIndex) {
+        return new ImmutableLiteralsList(literalList.subList(fromIndex, toIndex));
     }
 }

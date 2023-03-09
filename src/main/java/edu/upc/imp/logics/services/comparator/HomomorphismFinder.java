@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.*;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
 import edu.upc.imp.logics.services.comparator.exceptions.SubstitutionException;
 
@@ -93,7 +94,7 @@ public class HomomorphismFinder {
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainLiterals);
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeLiterals);
 
-        return computeHomomorphismExtensionForLiteralsList(new Substitution(), domainLiterals, rangeLiterals);
+        return computeHomomorphismExtensionForLiteralsList(new Substitution(), new ImmutableLiteralsList(domainLiterals), new ImmutableLiteralsList(rangeLiterals));
     }
 
     private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
@@ -115,13 +116,13 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    protected Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+    protected Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, ImmutableLiteralsList domainLiterals, ImmutableLiteralsList rangeLiterals) {
         if (domainLiterals.isEmpty()) return Optional.of(currentSubstitution);
         else {
             Literal domainLiteral = domainLiterals.get(0);
             List<Substitution> possibleSubstitutionsForDomainLiteral = computeAllPossibleHomomorphismsExtensions(currentSubstitution, domainLiteral, rangeLiterals);
             for (Substitution possibleSubstitutionForDomainLiteral : possibleSubstitutionsForDomainLiteral) {
-                List<Literal> restOfDomainLiterals = domainLiterals.subList(1, domainLiterals.size());
+                ImmutableLiteralsList restOfDomainLiterals = new ImmutableLiteralsList(domainLiterals.subList(1, domainLiterals.size()));
                 Optional<Substitution> homomorphism = computeHomomorphismExtensionForLiteralsList(possibleSubstitutionForDomainLiteral, restOfDomainLiterals, rangeLiterals);
                 if (homomorphism.isPresent()) return homomorphism;
             }
@@ -135,7 +136,7 @@ public class HomomorphismFinder {
      * @param rangeLiterals       is not null
      * @return a list of extensions of the currentSubstitution that makes domainLiteral to be included in rangeLiterals
      */
-    private List<Substitution> computeAllPossibleHomomorphismsExtensions(Substitution currentSubstitution, Literal domainLiteral, List<Literal> rangeLiterals) {
+    private List<Substitution> computeAllPossibleHomomorphismsExtensions(Substitution currentSubstitution, Literal domainLiteral, ImmutableLiteralsList rangeLiterals) {
         List<Substitution> allPossibleHomomorphisms = new LinkedList<>();
         for (Literal rangeLiteral : rangeLiterals) {
             Optional<Substitution> homomorphism = computeHomomorphismExtensionForLiteral(currentSubstitution, domainLiteral, rangeLiteral);
@@ -194,7 +195,7 @@ public class HomomorphismFinder {
         ComparisonOperator domainOperator = domainComparison.getOperator();
         ComparisonOperator rangeOperator = rangeComparison.getOperator();
         if (domainOperator.isSymmetric(rangeOperator)) {
-            List<Term> reversedRangeTerms = List.of(rangeComparison.getRightTerm(), rangeComparison.getLeftTerm());
+            ImmutableTermList reversedRangeTerms = new ImmutableTermList(rangeComparison.getRightTerm(), rangeComparison.getLeftTerm());
             return computeHomomorphismExtensionForTerms(currentSubstitution, domainComparison.getTerms(), reversedRangeTerms);
         } else return Optional.empty();
     }
@@ -236,7 +237,7 @@ public class HomomorphismFinder {
      * @param rangeTerms          not null
      * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
      */
-    protected Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, List<Term> domainTerms, List<Term> rangeTerms) {
+    protected Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, ImmutableTermList domainTerms, ImmutableTermList rangeTerms) {
         try {
             Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
             Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);

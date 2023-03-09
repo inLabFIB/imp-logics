@@ -27,13 +27,18 @@ public class NormalClauseTest {
     }
 
     @Test
-    public void should_MakeBodyImmutable_WhenCreatingNormalClause() {
+    public void should_MakeBodyImmutable_WhenCreatingNormalClause_WithMutableListInput() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
         Literal literal = LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x"));
-        List<Literal> body = new LinkedList<>();
-        body.add(literal);
+        List<Literal> body = createMutableList(literal);
         LogicConstraint logicConstraint = new LogicConstraint(constraintID, body);
 
         assertThat(logicConstraint.getBody()).isUnmodifiable();
+    }
+
+    private static List<Literal> createMutableList(Literal literal) {
+        List<Literal> body = new LinkedList<>();
+        body.add(literal);
+        return body;
     }
 }

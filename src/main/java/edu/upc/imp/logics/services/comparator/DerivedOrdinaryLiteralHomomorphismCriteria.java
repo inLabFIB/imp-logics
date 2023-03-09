@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.OrdinaryLiteral;
+import edu.upc.imp.logics.schema.operations.Substitution;
 
 import java.util.Optional;
 

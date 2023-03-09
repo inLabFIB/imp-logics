@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.assertions.TermAssert;
-import edu.upc.imp.logics.services.comparator.Substitution;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.services.comparator.SubstitutionBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

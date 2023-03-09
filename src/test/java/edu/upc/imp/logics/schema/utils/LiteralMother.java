@@ -1,20 +1,30 @@
 package edu.upc.imp.logics.schema.utils;
 
-import edu.upc.imp.logics.schema.Literal;
-import edu.upc.imp.logics.schema.OrdinaryLiteral;
-import edu.upc.imp.logics.schema.Term;
-import edu.upc.imp.logics.schema.Variable;
+import edu.upc.imp.logics.schema.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class LiteralMother {
-    public static Literal createOrdinaryLiteralWithVariableNames(String predicateName, List<String> variableNames) {
-        List<Term> terms = variableNames.stream().map(Variable::new).collect(Collectors.toList());
-        return createOrdinaryLiteral(predicateName, terms);
+    public static OrdinaryLiteral createOrdinaryLiteralWithVariableNames(String predicateName, List<String> variableNames) {
+        return createOrdinaryLiteralWithVariableNames(true, predicateName, variableNames);
     }
 
-    public static Literal createOrdinaryLiteral(String predicateName, List<Term> terms) {
-        return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms));
+    public static OrdinaryLiteral createOrdinaryLiteralWithVariableNames(boolean isPositive, String predicateName, List<String> variableNames) {
+        List<Term> terms = variableNames.stream().map(Variable::new).collect(Collectors.toList());
+        return createOrdinaryLiteral(isPositive, predicateName, terms);
+    }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(String predicateName, List<Term> terms) {
+        return createOrdinaryLiteral(true, predicateName, terms);
+    }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, List<Term> terms) {
+        return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
+    }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, boolean isPositive, String predicateName, String... termNames) {
+        Predicate predicateFromSchema = schema.getPredicateByName(predicateName);
+        return new OrdinaryLiteral(new Atom(predicateFromSchema, TermMother.createTerms(termNames)), isPositive);
     }
 }

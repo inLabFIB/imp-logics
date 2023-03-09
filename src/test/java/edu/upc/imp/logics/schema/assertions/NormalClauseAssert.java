@@ -30,12 +30,7 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
     }
 
     public NormalClauseAssert<T> containsOrdinaryLiteral(String predicateName, String... variableNames) {
-        Assertions.assertThat(actual.getBody()).anySatisfy(
-                lit -> LiteralAssert.assertThat(lit)
-                        .isOrdinaryLiteral()
-                        .hasPredicate(predicateName, variableNames.length)
-                        .containsVariables(variableNames)
-        );
+        ImmutableLiteralsListAssert.assertThat(actual.getBody()).containsOrdinaryLiteral(predicateName, variableNames);
         return this;
     }
 

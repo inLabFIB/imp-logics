@@ -44,9 +44,16 @@ public class OrdinaryLiteral extends Literal {
     }
 
     @Override
-    public List<Term> getTerms() {
+    public ImmutableTermList getTerms() {
         return atom.getTerms();
     }
+
+//    @Override
+//    public OrdinaryLiteral applySubstitution(Substitution substitution) {
+//        new OrdinaryLiteral(new Atom(this.getAtom().getPredicate(), applySubstitutionToTerms(substitution)));
+//        return null;
+//    }
+
 
     @Override
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
@@ -59,5 +66,11 @@ public class OrdinaryLiteral extends Literal {
 
     public boolean isBase() {
         return atom.isBase();
+    }
+
+    public List<ImmutableLiteralsList> unfold() {
+        if (this.isBase()) return List.of(new ImmutableLiteralsList(this));
+        if (!this.isPositive) return List.of(new ImmutableLiteralsList(this));
+        return null;
     }
 }

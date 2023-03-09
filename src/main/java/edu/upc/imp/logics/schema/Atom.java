@@ -4,7 +4,6 @@ import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
 import edu.upc.imp.logics.schema.visitor.Visitable;
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,7 +22,7 @@ public class Atom implements Visitable {
      * - Terms list is immutable
      */
     private final Predicate predicate;
-    private final List<Term> terms;
+    private final ImmutableTermList terms;
 
     public Atom(Predicate predicate, List<Term> terms) {
         if (Objects.isNull(predicate)) throw new IllegalArgumentException("Predicate cannot be null");
@@ -31,14 +30,14 @@ public class Atom implements Visitable {
         checkArityMatches(predicate.getArity(), terms);
 
         this.predicate = predicate;
-        this.terms = Collections.unmodifiableList(terms);
+        this.terms = new ImmutableTermList(terms);
     }
 
     public Predicate getPredicate() {
         return predicate;
     }
 
-    public List<Term> getTerms() {
+    public ImmutableTermList getTerms() {
         return terms;
     }
 

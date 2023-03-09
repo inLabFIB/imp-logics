@@ -73,8 +73,8 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
     }
 
     private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
-        List<Term> headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
-        List<Literal> body = buildBody(bodySpec);
+        ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
+        ImmutableLiteralsList body = buildBody(bodySpec);
         return new Query(headTerms, body);
     }
 
@@ -89,11 +89,11 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     private void addLogicConstraint(ConstraintID constraintID, LogicConstraintSpec lcs) {
         if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintID(constraintID);
-        List<Literal> body = buildBody(lcs.getBody());
+        ImmutableLiteralsList body = buildBody(lcs.getBody());
         logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
     }
 
-    private List<Literal> buildBody(List<LiteralSpec> bodySpec) {
+    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
         addPredicatesFromBody(bodySpec);
         return new BodyBuilder(predicatesByName).addLiterals(bodySpec).build();
     }

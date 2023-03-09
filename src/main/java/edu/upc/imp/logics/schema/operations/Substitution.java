@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.services.comparator;
+package edu.upc.imp.logics.schema.operations;
 
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.schema.Variable;

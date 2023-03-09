@@ -2,7 +2,6 @@ package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.visitor.Visitable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,18 +16,18 @@ public abstract class NormalClause implements Visitable {
      * - body must not be empty
      * - body must be immutable
      */
-    private final List<Literal> body;
+    private final ImmutableLiteralsList body;
 
     public NormalClause(List<Literal> body) {
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
         if (body.isEmpty()) throw new IllegalArgumentException("Body cannot be empty");
-        this.body = Collections.unmodifiableList(body);
+        this.body = new ImmutableLiteralsList(body);
     }
 
     /**
      * @return an immutable list of literals that forms the body of this normal clause
      */
     public ImmutableLiteralsList getBody() {
-        return new ImmutableLiteralsList(body);
+        return body;
     }
 }

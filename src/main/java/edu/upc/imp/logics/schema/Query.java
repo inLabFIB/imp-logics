@@ -1,6 +1,5 @@
 package edu.upc.imp.logics.schema;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,22 +21,22 @@ public class Query {
      * - body is immutable
      */
 
-    private final List<Term> headTerms;
-    private final List<Literal> body;
+    private final ImmutableTermList headTerms;
+    private final ImmutableLiteralsList body;
 
     public Query(List<Term> headTerms, List<Literal> body) {
         if (Objects.isNull(headTerms)) throw new IllegalArgumentException("Head terms cannot be null");
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
         if (body.isEmpty()) throw new IllegalArgumentException("Body cannot be empty");
-        this.headTerms = Collections.unmodifiableList(headTerms);
-        this.body = Collections.unmodifiableList(body);
+        this.headTerms = new ImmutableTermList(headTerms);
+        this.body = new ImmutableLiteralsList(body);
     }
 
-    public List<Term> getHeadTerms() {
+    public ImmutableTermList getHeadTerms() {
         return headTerms;
     }
 
-    public List<Literal> getBody() {
+    public ImmutableLiteralsList getBody() {
         return body;
     }
 }

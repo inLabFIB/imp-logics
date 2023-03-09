@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.services.comparator;
 
 import edu.upc.imp.logics.schema.*;
+import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.imp.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;

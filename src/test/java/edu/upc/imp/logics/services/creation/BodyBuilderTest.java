@@ -1,6 +1,6 @@
 package edu.upc.imp.logics.services.creation;
 
-import edu.upc.imp.logics.schema.Literal;
+import edu.upc.imp.logics.schema.ImmutableLiteralsList;
 import edu.upc.imp.logics.schema.Predicate;
 import edu.upc.imp.logics.schema.assertions.LiteralAssert;
 import edu.upc.imp.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
@@ -26,7 +26,7 @@ public class BodyBuilderTest {
         OrdinaryLiteralSpec literalSpec = new OrdinaryLiteralSpec("P", termFactory.createTermSpecs("x", "y"), true);
 
         BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new Predicate("P", 2)));
-        List<Literal> body = bodyBuilder
+        ImmutableLiteralsList body = bodyBuilder
                 .addLiteral(literalSpec)
                 .build();
 
@@ -38,13 +38,13 @@ public class BodyBuilderTest {
 
     @Test
     public void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithComparisonOperator() {
-        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
-        bodyBuilder.addLiteral(builtInLiteralSpec);
 
-        List<Literal> body = bodyBuilder.build();
+        ImmutableLiteralsList body = new BodyBuilder(Collections.emptyMap())
+                .addLiteral(builtInLiteralSpec)
+                .build();
 
         assertThat(body).hasSize(1);
         assertThat(body).first().satisfies(
@@ -54,10 +54,11 @@ public class BodyBuilderTest {
 
     @Test
     public void should_ThrowException_whenAddingBuiltInLiteralSpec_WithComparisonOperator_AndWrongNumberOfTerms() {
-        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y", "z");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
+
+        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
         assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
                 WrongNumberOfTermsInBuiltInLiteral.class
         );
@@ -65,11 +66,11 @@ public class BodyBuilderTest {
 
     @Test
     public void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithUnrecognizedOperator() {
-        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("ANYEQ", termSpecList);
 
+        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
         assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
                 UnrecognizedBuiltInOperator.class
         );

@@ -56,7 +56,7 @@ class BodyBuilder {
         return this;
     }
 
-    public List<Literal> build() {
-        return body;
+    public ImmutableLiteralsList build() {
+        return new ImmutableLiteralsList(body);
     }
 }
