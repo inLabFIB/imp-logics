@@ -14,4 +14,11 @@ public class ImmutableLiteralsListMother {
         LogicSchema domainSchema = parser.parse("@1 :- " + listOfLiterals);
         return domainSchema.getLogicConstraintByID(new ConstraintID("1")).getBody();
     }
+
+    public static ImmutableLiteralsList create(String literalsList, String derivationRules) {
+        String logicSchemaString = derivationRules + "\n"
+                + "@1 :- " + literalsList;
+        LogicSchema domainSchema = parser.parse(logicSchemaString);
+        return domainSchema.getLogicConstraintByID(new ConstraintID("1")).getBody();
+    }
 }

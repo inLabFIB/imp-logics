@@ -145,5 +145,18 @@ public class AtomTest {
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("R", "a", "b");
         }
+
+        @Test
+        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms_evenInTheHead() {
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(b, a) :- R(b, a)");
+            Atom atom = AtomMother.createAtom(logicSchema, "P", "a", "b");
+
+            List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+            assertThat(unfoldedAtom).hasSize(1);
+            ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                    .hasSize(1)
+                    .containsOrdinaryLiteral("R", "a", "b");
+        }
     }
 }

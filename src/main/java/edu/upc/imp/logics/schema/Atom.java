@@ -2,10 +2,12 @@ package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.utils.NewFreshVariable;
 import edu.upc.imp.logics.schema.visitor.Visitable;
 import edu.upc.imp.logics.schema.visitor.Visitor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of a logic Atom.
@@ -45,13 +47,28 @@ public class Atom implements Visitable {
         if (arity != terms.size()) throw new ArityMismatch(arity, terms.size());
     }
 
+    /**
+     * <p>Unfolding an atom returns a list of literals' list, one for each derivation rule of (the predicate of) this atom.
+     * In particular, for each derivation rule, it returns a literals' list replacing the variables of the derivation rule's head
+     * for the terms appearing in this atom. </p>
+     *
+     * <p>For instance, if we have the atom "P(1)", with derivation rules "P(x) :- R(x), S(x)" and "P(y) :- T(y), U(y)",
+     * unfolding "P(1)" will return two literals' list: "R(1), S(1)" and "T(1), U(1)". </p>
+     *
+     * <p>This unfolding avoids clashing the variables inside the derivation rule's body with the variables appearing in this atom.
+     * For instance, if we have the ordinary literal "P(a, b)" with a derivation rule "P(x, y) :- R(x, y, a, b)" it will return
+     * "R(a, b, a', b')" </p>
+     *
+     * @return a list of ImmutableLiteralsList representing the result of unfolding this atom
+     */
     public List<ImmutableLiteralsList> unfold() {
         if (this.isBase()) {
-            return List.of(new ImmutableLiteralsList(new OrdinaryLiteral(new Atom(this.predicate, this.terms))));
+            return List.of(new ImmutableLiteralsList(new OrdinaryLiteral(this)));
         } else {
             List<ImmutableLiteralsList> result = new LinkedList<>();
             for (DerivationRule derivationRule : this.getPredicate().getDerivationRules()) {
-                ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), this.terms);
+                Set<Variable> potentiallyClashingVariables = computePotentiallyClashingVariables(derivationRule);
+                ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), potentiallyClashingVariables);
                 Substitution substitutionOfHeadTerms = new Substitution(derivationRule.getHead().terms, this.terms);
                 result.add(bodyLiteralsAvoidingClashWithThisTerms.applySubstitution(substitutionOfHeadTerms));
             }
@@ -59,33 +76,45 @@ public class Atom implements Visitable {
         }
     }
 
-    private ImmutableLiteralsList computeListThatAvoidsClash(ImmutableLiteralsList literalsList, ImmutableTermList potentiallyClashingTerms) {
+    private Set<Variable> computePotentiallyClashingVariables(DerivationRule derivationRule) {
+        /*
+         * There might be a clash with the terms that are currently in this atom's terms such that
+         * are not contained in the head of the derivation rule. Indeed, all those variables appearing
+         * in the head of the derivation rule will be replaced during the unfolding, and thus, cannot
+         * cause a clash.
+         *
+         * For instance, assume that we are unfolding "P(a, b, c)"
+         * and we have the derivation rule "P(x, y, a) :- R(x, y, a, b, c)"
+         *
+         * The variables that can clash during the unfolding are: 'b' and 'c'.
+         * Indeed, 'a' cannot cause a clash, because any apparison of 'a' in the derivation rule will disappear.
+         *
+         */
+        Set<Variable> potentiallyClashingVariables = this.terms.getUsedVariables();
+        potentiallyClashingVariables.removeAll(derivationRule.getHead().getTerms().getUsedVariables());
+        return potentiallyClashingVariables;
+    }
+
+
+    private ImmutableLiteralsList computeListThatAvoidsClash(ImmutableLiteralsList literalsList, Set<Variable> potentiallyClashingTerms) {
         Substitution substitutionForClashingTerms = new Substitution();
         Set<Variable> currentlyUsedVariables = computeCurrentlyUsedVariables(literalsList, potentiallyClashingTerms);
         for (Term potentiallyClashingTerm : potentiallyClashingTerms) {
-            if (potentiallyClashingTerm.isVariable()) {
-                Variable newFreshVariable = computeNewFreshVariable(potentiallyClashingTerm.getName(), currentlyUsedVariables);
-                substitutionForClashingTerms.addMapping(new Variable(potentiallyClashingTerm.getName()), newFreshVariable);
-                currentlyUsedVariables.add(newFreshVariable);
-            }
+            Variable newFreshVariable = NewFreshVariable.computeNewFreshVariable(potentiallyClashingTerm.getName(), currentlyUsedVariables);
+            substitutionForClashingTerms.addMapping(new Variable(potentiallyClashingTerm.getName()), newFreshVariable);
+            currentlyUsedVariables.add(newFreshVariable);
         }
         return literalsList.applySubstitution(substitutionForClashingTerms);
     }
 
-    private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList literalsList, ImmutableTermList potentiallyClashingTerms) {
+    private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList literalsList, Set<Variable> potentiallyClashingTerms) {
         Set<Variable> usedVariables = new HashSet<>();
         usedVariables.addAll(literalsList.getUsedVariables());
-        usedVariables.addAll(potentiallyClashingTerms.getUsedVariables());
+        usedVariables.addAll(potentiallyClashingTerms);
         return usedVariables;
     }
 
-    private Variable computeNewFreshVariable(String variableNamePrefix, Set<Variable> usedVariables) {
-        String proposedNewVariableName = variableNamePrefix;
-        while (usedVariables.contains(new Variable(proposedNewVariableName))) {
-            proposedNewVariableName = proposedNewVariableName + "'";
-        }
-        return new Variable(proposedNewVariableName);
-    }
+
 
     @Override
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
@@ -106,5 +135,11 @@ public class Atom implements Visitable {
 
     public Atom applySubstitution(Substitution substitution) {
         return new Atom(this.predicate, this.terms.applySubstitution(substitution));
+    }
+
+    @Override
+    public String toString() {
+        String termsAsString = terms.stream().map(Term::getName).collect(Collectors.joining(", "));
+        return this.getPredicateName() + "(" + termsAsString + ")";
     }
 }

@@ -35,4 +35,8 @@ public class LiteralMother {
         Predicate predicateFromSchema = schema.getPredicateByName(predicateName);
         return new OrdinaryLiteral(new Atom(predicateFromSchema, TermMother.createTerms(termNames)), isPositive);
     }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, String predicateName, String... termNames) {
+        return createOrdinaryLiteral(schema, true, predicateName, termNames);
+    }
 }

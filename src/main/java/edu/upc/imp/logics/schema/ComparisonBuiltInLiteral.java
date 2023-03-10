@@ -65,4 +65,9 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     public String getOperationName() {
         return operator.getSymbol();
     }
+
+    @Override
+    public String toString() {
+        return leftTerm.getName() + " " + operator.getSymbol() + " " + rightTerm.getName();
+    }
 }

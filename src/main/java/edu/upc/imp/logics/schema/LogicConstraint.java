@@ -35,4 +35,9 @@ public class LogicConstraint extends NormalClause implements Visitable {
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitLogicConstraint(this, context);
     }
+
+    @Override
+    public String toString() {
+        return "@ " + getID() + " :- " + this.getBody();
+    }
 }

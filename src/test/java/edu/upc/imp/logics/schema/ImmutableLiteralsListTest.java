@@ -70,6 +70,129 @@ public class ImmutableLiteralsListTest {
         assertThat(usedVariables)
                 .hasSize(2)
                 .contains(new Variable("x"), new Variable("y"));
+    }
 
+    @Nested
+    class UnfoldingTests {
+        @Test
+        public void should_returnLiteralsList_whenUnfoldedLiteralIsBase() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x), R(x)");
+
+            List<ImmutableLiteralsList> actualUnfoldingList = immutableLiteralsList.unfold(0);
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(2)
+                    .containsOrdinaryLiteral("P", "x")
+                    .containsOrdinaryLiteral("R", "x");
+
+        }
+
+        @Test
+        public void should_returnLiteralsList_whenUnfoldedLiteralIsBuiltIn() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x), R(x, y), x <= y");
+
+            List<ImmutableLiteralsList> actualUnfoldingList = immutableLiteralsList.unfold(2);
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(3)
+                    .containsOrdinaryLiteral("P", "x")
+                    .containsOrdinaryLiteral("R", "x", "y")
+                    .containsComparisonBuiltInLiteral("x", "<=", "y");
+
+        }
+
+        @Test
+        public void should_returnSameLiteralList_whenLiteralIsDerived_butNegated() {
+            ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                    "R(a, b), not(P(a, b))",
+                    "P(x, y) :- S(x, y)"
+            );
+
+            List<ImmutableLiteralsList> actualUnfoldingList = literalsList.unfold(1);
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(2)
+                    .containsOrdinaryLiteral(false, "P", "a", "b")
+                    .containsOrdinaryLiteral("R", "a", "b");
+        }
+
+        @Test
+        public void should_returnListWithDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
+            ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                    "R(a, b), P(a, b)",
+                    "P(x, y) :- S(x, y)"
+            );
+
+            List<ImmutableLiteralsList> actualUnfoldingList = literalsList.unfold(1);
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(2)
+                    .containsOrdinaryLiteral("R", "a", "b")
+                    .containsOrdinaryLiteral("S", "a", "b");
+        }
+
+        @Test
+        public void should_returnSeveralLists_whenLiteralHasSeveralDefinitionRules() {
+            ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                    "R(a, b), P(a, b)",
+                    """
+                            P(x, y) :- S(x, y)
+                            P(x, y) :- T(x, y)
+                            """
+            );
+            List<ImmutableLiteralsList> unfoldedLiteral = literalsList.unfold(1);
+
+            assertThat(unfoldedLiteral).hasSize(2);
+            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(0))
+                    .hasSize(2)
+                    .containsOrdinaryLiteral("R", "a", "b")
+                    .containsOrdinaryLiteral("S", "a", "b");
+            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(1))
+                    .hasSize(2)
+                    .containsOrdinaryLiteral("R", "a", "b")
+                    .containsOrdinaryLiteral("T", "a", "b");
+        }
+
+        @Test
+        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
+            ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                    "R(a, b), P(a, b), U(b, z)",
+                    "P(x, y) :- S(x, y), T(y, z), V(a, b)"
+            );
+
+            List<ImmutableLiteralsList> unfoldedAtom = literalsList.unfold(1);
+
+            ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("R(a, b), S(a, b), T(b, z'), V(a',b'), U(b,z)");
+            assertThat(unfoldedAtom).hasSize(1);
+            ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                    .hasSize(5)
+                    .isLogicallyEquivalentTo(expectedLiteralsList)
+                    .containsOrdinaryLiteral("S", "a", "b");
+        }
+
+        @Test
+        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_evenWithTermsInDerivationHead() {
+            ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                    "P(a, b), Q(z)",
+                    "P(x, y) :- S(x,y), R(x, y, a, b, z)"
+            );
+
+            List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(0);
+
+            ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("S(a, b), R(a, b, a', b', z'), Q(z)");
+            assertThat(unfoldedLiteralsList).hasSize(1);
+            ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                    .hasSize(3)
+                    .isLogicallyEquivalentTo(expectedLiteralsList)
+                    .containsOrdinaryLiteral("S", "a", "b");
+        }
     }
 }

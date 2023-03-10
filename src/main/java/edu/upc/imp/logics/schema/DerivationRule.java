@@ -37,4 +37,9 @@ public class DerivationRule extends NormalClause implements Visitable {
     public <T, R> T accept(Visitor<T, R> visitor, R context) {
         return visitor.visitDerivationRule(this, context);
     }
+
+    @Override
+    public String toString() {
+        return head.toString() + " :- " + this.getBody();
+    }
 }

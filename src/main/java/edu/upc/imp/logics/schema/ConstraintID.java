@@ -8,5 +8,10 @@ public record ConstraintID(String id) {
             throw new IllegalArgumentException("ConstraintID cannot be null");
         }
     }
+
+    @Override
+    public String toString() {
+        return id;
+    }
 }
 

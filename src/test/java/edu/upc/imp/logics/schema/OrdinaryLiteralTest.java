@@ -1,10 +1,13 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.assertions.ImmutableLiteralsListAssert;
 import edu.upc.imp.logics.schema.assertions.LiteralAssert;
 import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.utils.AtomMother;
+import edu.upc.imp.logics.schema.utils.ImmutableLiteralsListMother;
 import edu.upc.imp.logics.schema.utils.LiteralMother;
 import edu.upc.imp.logics.services.comparator.SubstitutionBuilder;
+import edu.upc.imp.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,62 +55,88 @@ public class OrdinaryLiteralTest {
     }
 
 
-//    @Nested
-//    class UnfoldingTests {
-//        @Test
-//        public void should_returnSameLiteral_whenLiteralIsBase(){
-//            OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x"));
-//
-//            List<ImmutableLiteralsList> actualUnfoldingList = ordinaryLiteral.unfold();
-//
-//            assertThat(actualUnfoldingList).hasSize(1);
-//            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-//            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
-//                    .hasSize(1)
-//                    .containsOrdinaryLiteral("P", "x");
-//
-//        }
-//
-//        @Test
-//        public void should_returnSameLiteral_whenLiteralIsDerived_butNegated(){
-//            LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), not(S(x))");
-//            OrdinaryLiteral negatedOrdinaryLiteral = LiteralMother.createOrdinaryLiteral(schema, false, "P", "a", "b");
-//
-//            List<ImmutableLiteralsList> actualUnfoldingList = negatedOrdinaryLiteral.unfold();
-//
-//            assertThat(actualUnfoldingList).hasSize(1);
-//            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-//            ImmutableLiteralsList expectedUnfolding = new ImmutableLiteralsList(negatedOrdinaryLiteral);
-//            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
-//                    .isLogicallyEquivalentTo(expectedUnfolding)
-//                    .hasSameSizeAs(expectedUnfolding);
-//        }
-//
-//        @Test
-//        public void should_returnDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms(){
-//            LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), not(S(x))");
-//            OrdinaryLiteral derivedLiteral = LiteralMother.createOrdinaryLiteral(schema, true, "P", "a", "b");
-//
-//            List<ImmutableLiteralsList> actualUnfoldingList = derivedLiteral.unfold();
-//
-//            assertThat(actualUnfoldingList).hasSize(1);
-//            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-//            ImmutableLiteralsList expectedUnfolding = ImmutableLiteralsListMother.create("R(a, b), not(S(b))");
-//            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
-//                    .isLogicallyEquivalentTo(expectedUnfolding)
-//                    .hasSameSizeAs(expectedUnfolding)
-//                    .containsOrdinaryLiteral("R", "a", "b")
-//                    .containsOrdinaryLiteral(false, "S", "a");
-//        }
-//
-//        @Test
-//        public void should_returnSeveralDefinitionRules_whenLiteralHasSeveralDefinitionRules(){
-//
-//        }
-//
-//        @Test
-//        public void should_avoidCollisionOfTerms_whenLiteralHasTerms_usedInTheDefinitionRules(){
-//
-//        }
-//    }
+    @Nested
+    class UnfoldingTests {
+        @Test
+        public void should_returnSameLiteral_whenLiteralIsBase() {
+            OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x"));
+
+            List<ImmutableLiteralsList> actualUnfoldingList = ordinaryLiteral.unfold();
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(1)
+                    .containsOrdinaryLiteral("P", "x");
+
+        }
+
+        @Test
+        public void should_returnSameLiteral_whenLiteralIsDerived_butNegated() {
+            LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), not(S(x))");
+            OrdinaryLiteral negatedOrdinaryLiteral = LiteralMother.createOrdinaryLiteral(schema, false, "P", "a", "b");
+
+            List<ImmutableLiteralsList> actualUnfoldingList = negatedOrdinaryLiteral.unfold();
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .hasSize(1)
+                    .containsOrdinaryLiteral(false, "P", "a", "b");
+        }
+
+        @Test
+        public void should_returnDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
+            LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, z)");
+            OrdinaryLiteral derivedLiteral = LiteralMother.createOrdinaryLiteral(schema, true, "P", "a", "b");
+
+            List<ImmutableLiteralsList> actualUnfoldingList = derivedLiteral.unfold();
+
+            assertThat(actualUnfoldingList).hasSize(1);
+            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
+            ImmutableLiteralsList expectedUnfolding = ImmutableLiteralsListMother.create("R(a, b), S(b, z)");
+            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+                    .isLogicallyEquivalentTo(expectedUnfolding)
+                    .hasSameSizeAs(expectedUnfolding)
+                    .containsOrdinaryLiteral("R", "a", "b");
+        }
+
+        @Test
+        public void should_returnSeveralDefinitionRules_whenLiteralHasSeveralDefinitionRules() {
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
+                        P(x, y) :- R(x, y), S(y, z)
+                        P(x, y) :- R(x, y), T(y, z)
+                    """);
+            OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteral(logicSchema, true, "P", "a", "b");
+
+            List<ImmutableLiteralsList> unfoldedLiteral = ordinaryLiteral.unfold();
+
+            assertThat(unfoldedLiteral).hasSize(2);
+            ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create("R(a, b), S(b, z)");
+            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(0))
+                    .hasSize(2)
+                    .isLogicallyEquivalentTo(expectedLiteralsList1)
+                    .containsOrdinaryLiteral("R", "a", "b");
+            ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create("R(a, b), T(b, z)");
+            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(1))
+                    .hasSize(2)
+                    .isLogicallyEquivalentTo(expectedLiteralsList2)
+                    .containsOrdinaryLiteral("R", "a", "b");
+        }
+
+        @Test
+        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, a, b)");
+            OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteral(logicSchema, "P", "a", "b");
+
+            List<ImmutableLiteralsList> unfoldedAtom = ordinaryLiteral.unfold();
+
+            ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("R(a, b), S(b, z, w)");
+            assertThat(unfoldedAtom).hasSize(1);
+            ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                    .hasSize(2)
+                    .isLogicallyEquivalentTo(expectedLiteralsList)
+                    .containsOrdinaryLiteral("R", "a", "b");
+        }
+    }
 }
