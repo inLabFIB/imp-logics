@@ -85,5 +85,14 @@ public class LogicSchema {
         return new HashSet<>(constraintsByID.values());
     }
 
-
+    public Set<DerivationRule> getAllDerivationRules() {
+        return this.getAllPredicates().stream()
+                .map(Predicate::getDerivationRules)
+                .map(HashSet::new)
+                .reduce(new HashSet<>(), (subtotal, element) ->
+                {
+                    subtotal.addAll(element);
+                    return subtotal;
+                });
+    }
 }
