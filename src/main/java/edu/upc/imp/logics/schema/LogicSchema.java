@@ -1,9 +1,11 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.exceptions.*;
+import edu.upc.imp.logics.schema.utils.Level;
 import edu.upc.imp.logics.schema.utils.LevelHierarchy;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the representation of a logic schema.
@@ -98,6 +100,46 @@ public class LogicSchema {
     }
 
     public LevelHierarchy computeLevelHierarchy() {
-        return null;
+        Map<Predicate, Integer> predicateToLevelMap = new HashMap<>();
+        for (Predicate predicate : this.getAllPredicates()) {
+            fillPredicateIntoALevel(predicate, predicateToLevelMap);
+        }
+
+        List<Level> levels = createLevels(predicateToLevelMap);
+        return new LevelHierarchy(levels);
+
+    }
+
+    private void fillPredicateIntoALevel(Predicate predicate, Map<Predicate, Integer> predicateToLevelMap) {
+        if (predicateToLevelMap.containsKey(predicate)) return;
+        if (predicate.isBase()) {
+            predicateToLevelMap.put(predicate, 0);
+        } else {
+            int maxLevelOfUsedPredicate = 0;
+            for (DerivationRule rule : predicate.getDerivationRules()) {
+                for (Literal literal : rule.getBody()) {
+                    if (literal instanceof OrdinaryLiteral ordinaryLiteral) {
+                        Predicate usedPredicate = ordinaryLiteral.getAtom().getPredicate();
+                        fillPredicateIntoALevel(usedPredicate, predicateToLevelMap);
+                        int levelOfUsedPredicate = predicateToLevelMap.get(usedPredicate);
+                        maxLevelOfUsedPredicate = Math.max(maxLevelOfUsedPredicate, levelOfUsedPredicate);
+                    }
+                }
+            }
+            predicateToLevelMap.put(predicate, maxLevelOfUsedPredicate + 1);
+        }
+    }
+
+    private List<Level> createLevels(Map<Predicate, Integer> predicateToLevelMap) {
+        List<Level> levels = new LinkedList<>();
+        for (int index = 0; predicateToLevelMap.containsValue(index); ++index) {
+            int finalIndex = index;
+            Set<Predicate> predicates = predicateToLevelMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(finalIndex))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            levels.add(new Level(predicates));
+        }
+        return levels;
     }
 }

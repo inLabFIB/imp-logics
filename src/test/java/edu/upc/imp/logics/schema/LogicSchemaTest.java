@@ -1,10 +1,8 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.assertions.LevelHierarchyAssert;
 import edu.upc.imp.logics.schema.exceptions.*;
-import edu.upc.imp.logics.schema.utils.ConstraintIDMother;
-import edu.upc.imp.logics.schema.utils.DerivedPredicateMother;
-import edu.upc.imp.logics.schema.utils.LogicConstraintMother;
-import edu.upc.imp.logics.schema.utils.QueryMother;
+import edu.upc.imp.logics.schema.utils.*;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -138,6 +136,40 @@ public class LogicSchemaTest {
             LogicSchema logicSchema = new LogicSchema(Set.of(basePredicate), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName(basePredicateName))
                     .isInstanceOf(PredicateIsNotDerived.class);
+        }
+    }
+
+    @Nested
+    class ComputeLevelHierarchy {
+        @Test
+        public void should_computeLevels() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- R2(x)
+                    P(x) :- Q1(x)
+                    R2(x) :- S1(x)
+                    """);
+
+            LevelHierarchy hierarchy = schema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(hierarchy).hasLevels(3)
+                    .containsExactlyPredicateNamesInLevel(0, "S1", "Q1")
+                    .containsExactlyPredicateNamesInLevel(1, "R2")
+                    .containsExactlyPredicateNamesInLevel(2, "P");
+        }
+
+        @Test
+        public void should_computeLevels_whenDerivedRuleDoesNotUsePredicates() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- R2(x), S1(x)
+                    R2(x) :- 3 > x
+                    """);
+
+            LevelHierarchy hierarchy = schema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(hierarchy).hasLevels(3)
+                    .containsExactlyPredicateNamesInLevel(0, "S1")
+                    .containsExactlyPredicateNamesInLevel(1, "R2")
+                    .containsExactlyPredicateNamesInLevel(2, "P");
         }
     }
 
