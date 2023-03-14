@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.exceptions.*;
+import edu.upc.imp.logics.schema.utils.LevelHierarchy;
 
 import java.util.*;
 
@@ -94,5 +95,9 @@ public class LogicSchema {
                     subtotal.addAll(element);
                     return subtotal;
                 });
+    }
+
+    public LevelHierarchy computeLevelHierarchy() {
+        return null;
     }
 }
