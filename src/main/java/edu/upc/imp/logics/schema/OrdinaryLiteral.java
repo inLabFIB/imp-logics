@@ -40,6 +40,10 @@ public class OrdinaryLiteral extends Literal {
         return isPositive;
     }
 
+    public boolean isNegative() {
+        return !isPositive;
+    }
+
     public Atom getAtom() {
         return atom;
     }

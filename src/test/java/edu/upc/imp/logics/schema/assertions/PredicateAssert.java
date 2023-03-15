@@ -34,9 +34,15 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     public PredicateAssert isLogicallyEquivalentTo(Predicate expectedPredicate) {
-        Assertions.assertThat(actual.getName()).isEqualTo(expectedPredicate.getName());
-        Assertions.assertThat(actual.getArity()).isEqualTo(expectedPredicate.getArity());
-        Assertions.assertThat(actual.isBase()).isEqualTo(expectedPredicate.isBase());
+        Assertions.assertThat(actual.getName())
+                .describedAs("Name of predicate")
+                .isEqualTo(expectedPredicate.getName());
+        Assertions.assertThat(actual.getArity())
+                .describedAs("Arity of predicate " + actual.getName())
+                .isEqualTo(expectedPredicate.getArity());
+        Assertions.assertThat(actual.isBase())
+                .describedAs("IsBase value of predicate " + actual.getName())
+                .isEqualTo(expectedPredicate.isBase());
         assertThatAllActualDerivationRulesAreExpected(expectedPredicate.getDerivationRules());
         assertThatAllExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules());
         return this;

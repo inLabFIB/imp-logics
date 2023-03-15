@@ -21,6 +21,11 @@ public class IncrementalConstraintIDGenerator implements ConstraintIDGenerator<L
 
     @Override
     public ConstraintID newConstraintID(LogicConstraintWithoutIDSpec lcs) {
+        return newConstraintID();
+    }
+
+    public ConstraintID newConstraintID() {
         return new ConstraintID(Integer.toString(nextID++));
     }
+
 }

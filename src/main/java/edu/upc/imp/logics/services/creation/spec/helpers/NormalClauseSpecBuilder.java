@@ -24,6 +24,11 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
         this.stringToTermSpecFactory = new StringToTermSpecFactory(termTypeCriteria);
     }
 
+    public T addAllLiteralSpecs(List<LiteralSpec> literals) {
+        bodySpec.addAll(literals);
+        return self();
+    }
+
     public T addOrdinaryLiteral(String predicateName, String... terms) {
         return addOrdinaryLiteral(predicateName, true, terms);
     }
@@ -46,4 +51,5 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
     private T self() {
         return (T) this;
     }
+
 }

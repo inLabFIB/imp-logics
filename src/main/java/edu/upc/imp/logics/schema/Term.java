@@ -47,4 +47,9 @@ public abstract class Term {
     public boolean isVariable() {
         return false;
     }
+
+    public boolean isConstant() {
+        return false;
+    }
+
 }

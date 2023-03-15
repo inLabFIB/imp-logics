@@ -89,14 +89,10 @@ public class LogicSchema {
     }
 
     public Set<DerivationRule> getAllDerivationRules() {
-        return this.getAllPredicates().stream()
-                .map(Predicate::getDerivationRules)
-                .map(HashSet::new)
-                .reduce(new HashSet<>(), (subtotal, element) ->
-                {
-                    subtotal.addAll(element);
-                    return subtotal;
-                });
+        return predicatesByName.values().stream()
+                .filter(Predicate::isDerived)
+                .flatMap(p -> p.getDerivationRules().stream())
+                .collect(Collectors.toSet());
     }
 
     /**

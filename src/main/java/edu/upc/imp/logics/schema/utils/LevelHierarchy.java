@@ -8,6 +8,7 @@ import edu.upc.imp.logics.schema.exceptions.LevelHierarchyException;
 import edu.upc.imp.logics.schema.exceptions.PredicateNotInLevel;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * <p> This class implements the definition of hierarchical database as defined in "Basis for Deductive Database Systems"
@@ -17,7 +18,7 @@ import java.util.*;
  * levels so that the definitions of level 0 predicates consist solely of base predicates
  * and the bodies of the derived predicates of level j contain only level i predicates, where i < j. </p>
  */
-public class LevelHierarchy {
+public class LevelHierarchy implements Iterable<Level> {
     private final List<Level> levels;
     /*
      * Invariants:
@@ -117,11 +118,25 @@ public class LevelHierarchy {
      * May throw exception if predicate is not contained in the hierarchy
      *
      * @param predicate a non-null predicate
-     * @return the level of the predicate predicate
+     * @return the level of the predicate
      */
     public Level getLevelOfPredicate(Predicate predicate) {
         int index = this.getLevelIndexOfPredicate(predicate);
         return this.getLevel(index);
     }
 
+    @Override
+    public Iterator<Level> iterator() {
+        return levels.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super Level> action) {
+        Iterable.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<Level> spliterator() {
+        return Iterable.super.spliterator();
+    }
 }
