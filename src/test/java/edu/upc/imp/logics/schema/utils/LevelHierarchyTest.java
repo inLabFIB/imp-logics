@@ -150,4 +150,30 @@ class LevelHierarchyTest {
 
         }
     }
+
+    @Test
+    void should_returnBaseLevel() {
+        Predicate predicateP = new Predicate("P", 0);
+        Set<Predicate> level0 = Set.of(predicateP);
+        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
+        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+
+        Level level = levelHierarchy.getBasePredicatesLevel();
+
+        LevelAssert.assertThat(level).containsExactlyPredicateNames("P");
+    }
+
+    @Test
+    void should_returnIterableDerivedLevels() {
+        Predicate predicateP = new Predicate("P", 0);
+        Set<Predicate> level0 = Set.of(predicateP);
+        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
+        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+
+        List<Level> derivedLevels = levelHierarchy.getDerivedLevels();
+
+        assertThat(derivedLevels).hasSize(1);
+        Level derivedLevel = derivedLevels.get(0);
+        LevelAssert.assertThat(derivedLevel).containsExactlyPredicateNames("Q");
+    }
 }

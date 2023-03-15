@@ -125,6 +125,20 @@ public class LevelHierarchy implements Iterable<Level> {
         return this.getLevel(index);
     }
 
+    /**
+     * @return the 0-th level of the hierarchy, which contains the base predicates
+     */
+    public Level getBasePredicatesLevel() {
+        return this.getLevel(0);
+    }
+
+    /**
+     * @return a list with the levels representing derived predicates (i.e., i-th levels with i > 0)
+     */
+    public List<Level> getDerivedLevels() {
+        return this.levels.subList(1, levels.size());
+    }
+
     @Override
     public Iterator<Level> iterator() {
         return levels.iterator();

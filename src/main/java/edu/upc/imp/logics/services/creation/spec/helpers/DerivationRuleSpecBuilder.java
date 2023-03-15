@@ -30,6 +30,12 @@ public class DerivationRuleSpecBuilder extends NormalClauseSpecBuilder<Derivatio
         return this;
     }
 
+    public DerivationRuleSpecBuilder addHead(String predicateName, TermSpec... terms) {
+        this.predicateName = predicateName;
+        this.terms = List.of(terms);
+        return this;
+    }
+
     public DerivationRuleSpec build() {
         return new DerivationRuleSpec(predicateName, terms, bodySpec);
     }
