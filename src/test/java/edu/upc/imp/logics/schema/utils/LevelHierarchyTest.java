@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class LevelHierarchyTest {
@@ -25,9 +26,9 @@ class LevelHierarchyTest {
         }
 
         @Test
-        void should_ThrowException_WhenLevelsIsEmpty() {
-            assertThatThrownBy(() -> new LevelHierarchy(List.of()))
-                    .isInstanceOf(IllegalArgumentException.class);
+        void should_notThrowException_WhenLevelsIsEmpty() {
+            assertThatCode(() -> new LevelHierarchy(List.of()))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -80,6 +81,14 @@ class LevelHierarchyTest {
     @Nested
     class ReturnLevelIndexTests {
         @Test
+        public void should_throwException_whenPredicateIsNull() {
+            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
+
+            assertThatThrownBy(() -> levelHierarchy.getLevelIndexOfPredicate(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
         public void should_returnLevelIndexOfPredicate() {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
@@ -108,6 +117,14 @@ class LevelHierarchyTest {
 
     @Nested
     class ReturnLevelTests {
+        @Test
+        public void should_throwException_whenPredicateIsNull() {
+            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
+
+            assertThatThrownBy(() -> levelHierarchy.getLevelOfPredicate(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
         @Test
         public void should_returnLevelOfPredicate() {
             Predicate predicateP = new Predicate("P", 0);

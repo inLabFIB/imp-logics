@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Set of predicates of a level in some hierarchichal database
+ * Set of predicates of a level in some hierarchical database
  */
 public class Level {
     private final Set<Predicate> predicates;

@@ -22,14 +22,14 @@ public class LevelHierarchy {
     /*
      * Invariants:
      *  - levels cannot be null
-     *  - levels cannot be empty
      *  - levels cannot contain nulls
      *  - derived predicates cannot be defined in terms of higher predicates
+     *
+     * levels can be empty since a LogicSchema can be empty too
      */
 
     public LevelHierarchy(List<Level> levels) {
         if (Objects.isNull(levels)) throw new IllegalArgumentException("Levels cannot be null");
-        if (levels.isEmpty()) throw new IllegalArgumentException("Levels cannot be empty");
         if (levels.stream().anyMatch(Objects::isNull)) throw new IllegalArgumentException("Levels cannot contain null");
         checkLevelsCorrectness(levels);
         checkNoBasePredicateAppearsInHighLevel(levels);
@@ -97,29 +97,30 @@ public class LevelHierarchy {
     }
 
     /**
-     * May throw exception if p is not contained in the hierarchy
+     * May throw exception if predicate is not contained in the hierarchy
      *
-     * @param p a predicate
-     * @return the index of the predicate p
+     * @param predicate a non-null predicate
+     * @return the index of the predicate predicate
      */
-    public int getLevelIndexOfPredicate(Predicate p) {
+    public int getLevelIndexOfPredicate(Predicate predicate) {
+        if (Objects.isNull(predicate)) throw new IllegalArgumentException("Predicate cannot be null");
         for (int index = 0; index < this.getNumberOfLevels(); ++index) {
             Level level = getLevel(index);
-            if (level.getAllPredicates().contains(p)) {
+            if (level.getAllPredicates().contains(predicate)) {
                 return index;
             }
         }
-        throw new PredicateNotInLevel(p.getName());
+        throw new PredicateNotInLevel(predicate.getName());
     }
 
     /**
-     * May throw exception if p is not contained in the hierarchy
+     * May throw exception if predicate is not contained in the hierarchy
      *
-     * @param p a predicate
-     * @return the level of the predicate p
+     * @param predicate a non-null predicate
+     * @return the level of the predicate predicate
      */
-    public Level getLevelOfPredicate(Predicate p) {
-        int index = this.getLevelIndexOfPredicate(p);
+    public Level getLevelOfPredicate(Predicate predicate) {
+        int index = this.getLevelIndexOfPredicate(predicate);
         return this.getLevel(index);
     }
 

@@ -142,7 +142,43 @@ public class LogicSchemaTest {
     @Nested
     class ComputeLevelHierarchy {
         @Test
-        public void should_computeLevels() {
+        public void should_returnNoLevel_whenThereIsNoPredicate() {
+            LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
+
+            LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(levelHierarchy).hasLevels(0);
+        }
+
+        @Test
+        public void should_computeLevels_whenThereIsNoDerivationRule() {
+            LogicSchema logicSchema = new LogicSchema(Set.of(new Predicate("P", 0),
+                    new Predicate("Q", 0)),
+                    Set.of());
+
+            LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(levelHierarchy).hasLevels(1);
+            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(0, "P", "Q");
+        }
+
+        @Test
+        public void should_computeLevels_whenEachPredicateHasOnlyOneDerivationRule() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- R2(x), S1(x)
+                    R2(x) :- Q1(x)
+                    """);
+
+            LevelHierarchy hierarchy = schema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(hierarchy).hasLevels(3)
+                    .containsExactlyPredicateNamesInLevel(0, "S1", "Q1")
+                    .containsExactlyPredicateNamesInLevel(1, "R2")
+                    .containsExactlyPredicateNamesInLevel(2, "P");
+        }
+
+        @Test
+        public void should_computeLevels_whenPredicatesHaveSeveralDerivationRules() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                     P(x) :- R2(x)
                     P(x) :- Q1(x)
