@@ -20,6 +20,15 @@ class SchemaUnfolderTest {
     @Nested
     class UnfoldingTests {
         @Test
+        public void should_returnEmptySchema_whenSchemaIsEmpty() {
+            LogicSchema emptySchema = LogicSchemaMother.createEmptySchema();
+
+            LogicSchema unfoldedEmptySchema = new SchemaUnfolder().unfold(emptySchema);
+
+            LogicSchemaAssert.assertThat(unfoldedEmptySchema).isEmpty();
+        }
+
+        @Test
         public void should_unfoldDerivationRule_whenDerivationRuleHasDerivedLiterals() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """

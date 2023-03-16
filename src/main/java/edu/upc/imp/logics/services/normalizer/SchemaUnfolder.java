@@ -10,6 +10,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * <p>This class is responsible for recursively unfolding the positive derived literals of a logic schema.
+ * For instance, if the logic schema contains:</p>
+ * :- Der1(x), Base1(x) <br>
+ * Der1(x) :- Base2(x) <br>
+ * Der1(x) :- Der2(x) <br>
+ * Der2(x) :- Base3(x) <br>
+ * <br>
+ * This class returns: <br>
+ * :- Base2(x), Base1(x) <br>
+ * :- Base3(x), Base1(x) <br>
+ * Der1(x) :- Base2(x) <br>
+ * Der1(x) :- Base3(x) <br>
+ * Der2(x) :- Base3(x) <br>
+ */
 public class SchemaUnfolder {
     /**
      * @param schema not null

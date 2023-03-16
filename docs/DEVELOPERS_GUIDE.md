@@ -27,6 +27,11 @@ Atoms, and Literals should not be reused in several NormalClauses, neither twice
 This is because they are not value objects, but entities. Indeed, they cannot be value objects since they contain
 predicates, which are entities.
 
+## Guidance for creating equals & hashcode
+
+When automatically generating the functions equals & hashcode, we prefer using the Java proposals rather than
+the IDE based equals & hashcode.
+
 ## Testing code
 
 ### To test or not to test
@@ -40,3 +45,4 @@ predicates, which are entities.
 Taking inspiration from https://dzone.com/articles/7-popular-unit-test-naming we use the following convention:
 
 **should_featureTested_whenStateUnderTest**
+
