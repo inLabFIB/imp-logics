@@ -39,7 +39,7 @@ public class LogicEquivalenceAnalyzer {
     }
 
     private boolean existHomomorphism(List<Literal> first, List<Literal> second) {
-        return extendedHomomorphismFinder.findHomomorphismForLiteralsList(first, second).isPresent();
+        return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
     public boolean areEquivalent(LogicConstraint first, LogicConstraint second) {

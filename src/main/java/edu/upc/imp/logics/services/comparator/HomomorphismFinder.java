@@ -79,7 +79,7 @@ public class HomomorphismFinder {
     public Optional<Substitution> findHomomorphism(LogicConstraint domainLogicConstraint, LogicConstraint rangeLogicConstraint) {
         if (Objects.isNull(domainLogicConstraint)) throw new IllegalArgumentException("DomainLiterals cannot be null");
         if (Objects.isNull(rangeLogicConstraint)) throw new IllegalArgumentException("RangeLiterals cannot be null");
-        return findHomomorphismForLiteralsList(domainLogicConstraint.getBody(), rangeLogicConstraint.getBody());
+        return findHomomorphism(domainLogicConstraint.getBody(), rangeLogicConstraint.getBody());
     }
 
     /**
@@ -88,7 +88,7 @@ public class HomomorphismFinder {
      * @return a substitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    public Optional<Substitution> findHomomorphismForLiteralsList(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+    public Optional<Substitution> findHomomorphism(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
         if (Objects.isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
         if (Objects.isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainLiterals);

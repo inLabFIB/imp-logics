@@ -1,13 +1,14 @@
 package edu.upc.imp.logics.services.comparator;
 
-import edu.upc.imp.logics.schema.*;
+import edu.upc.imp.logics.schema.DerivationRule;
+import edu.upc.imp.logics.schema.ImmutableLiteralsList;
+import edu.upc.imp.logics.schema.LogicConstraint;
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.utils.DerivationRuleMother;
+import edu.upc.imp.logics.schema.utils.ImmutableLiteralsListMother;
+import edu.upc.imp.logics.schema.utils.LogicConstraintMother;
 import edu.upc.imp.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.imp.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
-import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
-import edu.upc.imp.logics.services.parser.LogicSchemaParser;
-import edu.upc.imp.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -26,42 +27,34 @@ class HomomorphismFinderTest {
             @Test
             public void should_throwException_whenDomainLiteralsList_isNull() {
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(null, List.of()))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(null, List.of()))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
             public void should_throwException_whenRangeLiteralsList_isNull() {
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(List.of(), null))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), null))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
-                        """
-                                    P() :- R(x, y), S(x)
-                                    R(x, y) :- T(x, y)
-                                """);
-                List<Literal> domainLiteralList = domainSchema.getDerivationRulesByPredicateName("P").get(0).getBody();
+            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
+                ImmutableLiteralsList domainLiteralList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
+                        "R(x, y) :- T(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(domainLiteralList, List.of()))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiteralList, List.of()))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
 
             @Test
-            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
-                        """
-                                    P() :- R(x, y), S(x)
-                                    R(x, y) :- T(x, y)
-                                """);
-                List<Literal> rangeLiteralsList = rangeSchema.getDerivationRulesByPredicateName("P").get(0).getBody();
+            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
+                ImmutableLiteralsList rangeLiteralsList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
+                        "R(x, y) :- T(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphismForLiteralsList(List.of(), rangeLiteralsList))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), rangeLiteralsList))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
         }
@@ -70,91 +63,70 @@ class HomomorphismFinderTest {
         class FindHomomorphism {
             @Test
             public void should_notFindHomomorphism_whenLiteralsListIsNotSameUpToRenaming() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(a, b) :- R(a, b), not(S(b))");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), not(S(x))");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create(" R(a, b), not(S(b))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isNotPresent();
             }
 
             @Test
             public void should_findHomomorphism_whenLiteralsListIsSubsumedUpToRenaming() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(a, b) :- R(a, b), not(S(a)), T(a)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x, y) :- R(x, y), not(S(x))");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(a, b) :- R(a, b), not(S(a)), T(a)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "a");
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("y", "b");
+                SubstitutionAssert.assertThat(substitution)
+                        .mapsToVariable("x", "a")
+                        .mapsToVariable("y", "b");
             }
 
             @Test
             public void should_notFindHomomorphism_whenLiteralsListIsTheSameUpToRenaming_butLiteralsSignDoNotCoincide() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), S(x)");
-                LogicSchema rangeSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), S(x)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(a, b) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isNotPresent();
             }
 
 
             @Test
             public void should_findHomomorphism_whenLiteralsListRangeHasRepeatedLiterals() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P() :- R(x, y), S(x)");
-                LogicSchema rangeSchema = parser.parse("P() :- R(a, b), R(c, d), S(c)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), S(x)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), R(c, d), S(c)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "c");
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("y", "d");
+                SubstitutionAssert.assertThat(substitution)
+                        .mapsToVariable("x", "c")
+                        .mapsToVariable("y", "d");
             }
 
             @Test
             public void should_notFindHomomorphism_whenDomainLiteralsListUsesConstants() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parserEverythingIsConstant = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria());
-                LogicSchema domainSchema = parserEverythingIsConstant.parse("P() :- R(1, 2), S(1)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), R(c, d), S(c)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(1, 2), S(1)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), R(c, d), S(c)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isNotPresent();
             }
 
             @Test
             public void should_findHomomorphism_whenLiteralsListRangeUsesConstants() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), S(a)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(1, 2), S(1)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(a, b), S(a)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(1, 2), S(1)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
                 SubstitutionAssert.assertThat(substitution).mapsToConstant("a", "1");
@@ -163,14 +135,11 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_findHomomorphism_whenLiteralsListRangeRepeatsVariables() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), S(a)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, x), S(x)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(a, b), S(a)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(x, x), S(x)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
                 SubstitutionAssert.assertThat(substitution).mapsToVariable("a", "x");
@@ -179,27 +148,21 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_notFindHomomorphism_whenDomainLiteralsListRepeatsVariables() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, a)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y)");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create(" R(a, a)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isNotPresent();
             }
 
             @Test
             public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), x > y");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), a > b");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), a > b");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
                 SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
@@ -208,27 +171,21 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_notFindHomomorphism_whenDomainLiteralsListHasBuiltIn_notInRange() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), x > y");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), a >= b");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), a >= b");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isNotPresent();
             }
 
             @Test
             public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheOperationAndTerms() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), x > y");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(a, b), b < a");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), b < a");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
                 SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
@@ -244,10 +201,7 @@ class HomomorphismFinderTest {
         class ParameterCorrectness {
             @Test
             public void should_throwException_whenDomainRule_isNull() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema schema = parser.parse("@1 :- R(x, y), not(S(x))");
-
-                LogicConstraint baseLogicConstraint = schema.getLogicConstraintByID(new ConstraintID("1"));
+                LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithoutID(":- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(null, baseLogicConstraint))
@@ -256,10 +210,7 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_throwException_whenRangeRule_isNull() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema schema = parser.parse("@1 :- R(x, y), not(S(x))");
-
-                LogicConstraint baseLogicConstraint = schema.getLogicConstraintByID(new ConstraintID("1"));
+                LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithoutID(":- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(baseLogicConstraint, null))
@@ -268,33 +219,29 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
-                        """
-                                  @1 :- R(x, y), S(x)
-                                  R(x, y) :- T(x, y)
-                                """);
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("@2 :- R(x, y)");
-                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
-                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+                LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
+                          :- R(x, y), S(x)
+                          R(x, y) :- T(x, y)
+                        """);
+                LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID(":- R(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
 
             @Test
             public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("@1 :- R(x, y)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
-                        """
-                                  @2 :- R(x, y), S(x)
-                                  R(x, y) :- T(x, y)
-                                """);
-                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
-                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+                LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
+                        :- R(x, y)
+                        """);
+                LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID("""
+                        :- R(x, y), S(x)
+                        R(x, y) :- T(x, y)
+                        """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
         }
@@ -303,32 +250,33 @@ class HomomorphismFinderTest {
         class FindHomomorphism {
             @Test
             public void should_findHomomorphism_whenLogicConstraintsAreTheSame_evenWithDifferentConstraintID() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("@1 :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("@2 :- R(x, y), not(S(x))");
-
-                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
-                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+                LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
+                        @1 :- R(x, y), not(S(x))
+                        """);
+                LogicConstraint rangeConstraint = LogicConstraintMother.createWithID("""
+                        @2 :- R(x, y), not(S(x))
+                        """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "x");
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("y", "y");
+                SubstitutionAssert.assertThat(homomorphism)
+                        .mapsToVariable("x", "x")
+                        .mapsToVariable("y", "y");
             }
 
             @Test
             public void should_findHomomorphism_whenLogicConstraintsAreTheSameUpToRenamingVariables_evenWithDifferentConstraintID() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("@1 :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("@2 :- R(a, b), not(S(a))");
-
-                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
-                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+                LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
+                        @1 :- R(x, y), not(S(x))
+                        """);
+                LogicConstraint rangeConstraint = LogicConstraintMother.createWithID("""
+                        @2 :- R(a, b), not(S(a))
+                        """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
                 SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
@@ -337,15 +285,15 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_notFindHomomorphism_whenLogicConstraintsAreNotTheSameUpToRenamingVariables() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("@1 :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("@2 :- T(x)");
-
-                LogicConstraint domainLogicConstraint = domainSchema.getLogicConstraintByID(new ConstraintID("1"));
-                LogicConstraint rangeLogicConstraint = rangeSchema.getLogicConstraintByID(new ConstraintID("2"));
+                LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
+                        :- R(x, y), not(S(x))
+                        """);
+                LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID("""
+                        :- T(x)
+                        """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainLogicConstraint, rangeLogicConstraint);
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
                 assertThat(homomorphismOpt).isNotPresent();
             }
         }
@@ -358,10 +306,7 @@ class HomomorphismFinderTest {
         class ParameterCorrectness {
             @Test
             public void should_throwException_whenDomainRule_isNull() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema schema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-
-                DerivationRule rangeRule = schema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule rangeRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(null, rangeRule))
@@ -370,10 +315,7 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_throwException_whenRangeRule_isNull() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema schema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-
-                DerivationRule domainRule = schema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, null))
@@ -383,14 +325,11 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse(
-                        """
-                                    P() :- R(x, y), S(x)
-                                    R(x, y) :- T(x, y)
-                                """);
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), S(x)");
-                DerivationRule domainDerivationRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeDerivationRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule domainDerivationRule = DerivationRuleMother.create("""
+                        P() :- R(x, y), S(x)
+                        R(x, y) :- T(x, y)
+                        """, "P");
+                DerivationRule rangeDerivationRule = DerivationRuleMother.create("P() :- R(x, y), S(x)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
@@ -399,17 +338,16 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
-                LogicSchema domainSchema = new LogicSchemaWithIDsParser().parse("P() :- R(x, y), S(x)");
-                LogicSchema rangeSchema = new LogicSchemaWithIDsParser().parse(
+                DerivationRule domainRule = DerivationRuleMother.create("P() :- R(x, y), S(x)");
+                DerivationRule rangeRule = DerivationRuleMother.create(
                         """
                                     P() :- R(x, y), S(x)
                                     R(x, y) :- T(x, y)
-                                """);
-                DerivationRule domainDerivationRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeDerivationRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                                """,
+                        "P");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, rangeRule))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
         }
@@ -418,46 +356,37 @@ class HomomorphismFinderTest {
         class FindHomomorphism {
             @Test
             public void should_findHomomorphism_whenDerivationRulesAreTheSame() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
+                DerivationRule rangeRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "x");
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("y", "y");
+                SubstitutionAssert.assertThat(substitution)
+                        .mapsToVariable("x", "x")
+                        .mapsToVariable("y", "y");
             }
 
             @Test
             public void should_findHomomorphism_whenDerivationRulesAreTheSameUpToRenaming() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(a, b) :- R(a, b), not(S(a))");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
+                DerivationRule rangeRule = DerivationRuleMother.create("P(a, b) :- R(a, b), not(S(a))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "a");
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("y", "b");
+                SubstitutionAssert.assertThat(substitution)
+                        .mapsToVariable("x", "a")
+                        .mapsToVariable("y", "b");
             }
 
             @Test
             public void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadSizeDoNotCoincide() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(x) :- R(x, y), not(S(x))");
+                DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
+                DerivationRule rangeRule = DerivationRuleMother.create("P(x) :- R(x, y), not(S(x))");
 
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
@@ -466,12 +395,8 @@ class HomomorphismFinderTest {
 
             @Test
             public void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadTermsDoNotCoincide() {
-                LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
-                LogicSchema domainSchema = parser.parse("P(x, y) :- R(x, y), not(S(x))");
-                LogicSchema rangeSchema = parser.parse("P(y, x) :- R(x, y), not(S(x))");
-
-                DerivationRule domainRule = domainSchema.getDerivationRulesByPredicateName("P").get(0);
-                DerivationRule rangeRule = rangeSchema.getDerivationRulesByPredicateName("P").get(0);
+                DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
+                DerivationRule rangeRule = DerivationRuleMother.create("P(y, x) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);

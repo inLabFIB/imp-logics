@@ -85,7 +85,7 @@ public class LogicEquivalenceAnalyzerTest {
         class ParameterCorrectness {
             @Test
             public void should_throwException_whenFirstLogicConstraint_isNull() {
-                LogicConstraint baseLogicConstraint = LogicConstraintMother.create("@1 :- R(x, y), not(S(x))");
+                LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithID("@1 :- R(x, y), not(S(x))");
 
                 LogicEquivalenceAnalyzer logicAnalyzer = new LogicEquivalenceAnalyzer();
                 assertThatThrownBy(() -> logicAnalyzer.areEquivalent(null, baseLogicConstraint))
@@ -94,7 +94,7 @@ public class LogicEquivalenceAnalyzerTest {
 
             @Test
             public void should_throwException_whenSecondLogicConstraint_isNull() {
-                LogicConstraint baseLogicConstraint = LogicConstraintMother.create("@1 :- R(x, y), not(S(x))");
+                LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithID("@1 :- R(x, y), not(S(x))");
 
                 LogicEquivalenceAnalyzer logicAnalyzer = new LogicEquivalenceAnalyzer();
                 assertThatThrownBy(() -> logicAnalyzer.areEquivalent(baseLogicConstraint, null))
@@ -106,8 +106,8 @@ public class LogicEquivalenceAnalyzerTest {
         class EquivalenceAnalysis {
             @Test
             public void should_findEquivalence_whenLogicConstraintsAreTheSameUpToRenaming() {
-                LogicConstraint first = LogicConstraintMother.create("@1 :- R(x, y), not(S(x))");
-                LogicConstraint second = LogicConstraintMother.create("@2 :- R(a, b), not(S(a))");
+                LogicConstraint first = LogicConstraintMother.createWithID("@1 :- R(x, y), not(S(x))");
+                LogicConstraint second = LogicConstraintMother.createWithID("@2 :- R(a, b), not(S(a))");
 
                 boolean equivalence = new LogicEquivalenceAnalyzer()
                         .areEquivalent(first, second);
@@ -118,9 +118,9 @@ public class LogicEquivalenceAnalyzerTest {
             @Test
             public void should_notFindEquivalence_whenFirstLiteralsHaveHomomorphismToSecondLiterals_butNotViceversa() {
                 LogicConstraint firstRule = LogicConstraintMother
-                        .create("@1 :- R(x, y), not(S(x))");
+                        .createWithID("@1 :- R(x, y), not(S(x))");
                 LogicConstraint secondRule = LogicConstraintMother
-                        .create("@2 :- R(a, b), not(S(a)), R(b,b)");
+                        .createWithID("@2 :- R(a, b), not(S(a)), R(b,b)");
 
                 boolean equivalence = new LogicEquivalenceAnalyzer()
                         .areEquivalent(firstRule, secondRule);
@@ -131,12 +131,12 @@ public class LogicEquivalenceAnalyzerTest {
             @Test
             public void should_findEquivalence_whenThereAreHomomorphicDerivedLiterals() {
                 LogicConstraint firstRule = LogicConstraintMother
-                        .create("""
+                        .createWithID("""
                                 @1 :- R(x, y), not(S(x))
                                 R(a, b) :- T(a, b)
                                 """);
                 LogicConstraint secondRule = LogicConstraintMother
-                        .create("""
+                        .createWithID("""
                                     @2 :- R(x, y), not(S(x))
                                     R(a, b) :- T(a, b)
                                 """);
