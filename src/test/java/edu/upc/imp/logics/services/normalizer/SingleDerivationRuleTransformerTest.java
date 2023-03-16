@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.services;
+package edu.upc.imp.logics.services.normalizer;
 
 import edu.upc.imp.logics.schema.*;
 import edu.upc.imp.logics.schema.assertions.ImmutableLiteralsListAssert;
@@ -7,12 +7,45 @@ import edu.upc.imp.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SingleDerivationRuleTransformerTest {
+
+    @Nested
+    class InputValidation {
+        @Test
+        void should_throwException_whenLogicSchemaIsNull() {
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            assertThatThrownBy(() -> singleDerivationRuleTransformer.transform(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("LogicSchema cannot be null");
+        }
+
+        @Test
+        void should_returnEmptySchema_whenInputLogicSchemaIsEmpty() {
+            String schemaString = "";
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+            LogicSchemaAssert.assertThat(logicSchemaTransformed).isEmpty();
+        }
+
+        @Test
+        void should_transformLogicSchema_whenInputLogicSchemaContainsOnlyBasePredicates() {
+            LogicSchema logicSchema = new LogicSchema(Set.of(new Predicate("P", 0)), Collections.emptySet());
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+            LogicSchemaAssert.assertThat(logicSchemaTransformed).containsExactlyThesePredicateNames("P");
+        }
+    }
 
     @Nested
     class ByProperties {

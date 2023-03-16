@@ -3,6 +3,7 @@ package edu.upc.imp.logics.services.creation.spec.helpers;
 import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
 import edu.upc.imp.logics.services.creation.spec.TermSpec;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public class DerivationRuleSpecBuilder extends NormalClauseSpecBuilder<DerivationRuleSpecBuilder> {
     private String predicateName;
-    private List<TermSpec> terms;
+    private List<TermSpec> headTerms;
 
     /**
      * Creates a new DerivationRuleSpecBuilder using a DefaultStringToTermSpecFactory to distinguish
@@ -26,17 +27,17 @@ public class DerivationRuleSpecBuilder extends NormalClauseSpecBuilder<Derivatio
 
     public DerivationRuleSpecBuilder addHead(String predicateName, String... terms) {
         this.predicateName = predicateName;
-        this.terms = stringToTermSpecFactory.createTermSpecs(terms);
+        this.headTerms = stringToTermSpecFactory.createTermSpecs(terms);
         return this;
     }
 
-    public DerivationRuleSpecBuilder addHead(String predicateName, TermSpec... terms) {
+    public DerivationRuleSpecBuilder addHead(String predicateName, List<TermSpec> terms) {
         this.predicateName = predicateName;
-        this.terms = List.of(terms);
+        this.headTerms = new LinkedList<>(terms);
         return this;
     }
 
     public DerivationRuleSpec build() {
-        return new DerivationRuleSpec(predicateName, terms, bodySpec);
+        return new DerivationRuleSpec(predicateName, headTerms, bodySpec);
     }
 }

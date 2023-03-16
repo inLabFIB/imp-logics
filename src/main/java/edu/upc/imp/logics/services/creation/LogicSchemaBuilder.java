@@ -114,4 +114,19 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
         Set<LogicConstraint> constraints = new HashSet<>(logicConstraintById.values());
         return new LogicSchema(predicates, constraints);
     }
+
+    public LogicSchemaBuilder<T> addAllDerivationRules(List<DerivationRuleSpec> newRules) {
+        newRules.forEach(this::addDerivationRule);
+        return this;
+    }
+
+    public LogicSchemaBuilder<T> addAllLogicConstraints(List<T> newConstraints) {
+        newConstraints.forEach(this::addLogicConstraint);
+        return this;
+    }
+
+    public LogicSchemaBuilder<T> addAllPredicates(List<PredicateSpec> allPredicates) {
+        allPredicates.forEach(this::addPredicate);
+        return this;
+    }
 }

@@ -39,6 +39,10 @@ public class LogicSchema {
         checkDerivedPredicatesUsesPredicatesFromSchema();
     }
 
+    public boolean isEmpty() {
+        return predicatesByName.isEmpty();
+    }
+
     private void checkDerivedPredicatesUsesPredicatesFromSchema() {
         for (Predicate p : predicatesByName.values()) {
             if (p.isDerived()) {

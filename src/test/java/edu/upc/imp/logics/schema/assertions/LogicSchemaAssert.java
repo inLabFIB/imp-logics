@@ -61,7 +61,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return this;
     }
 
-    private void assertAllLogicConstraintsAreEquivalent(LogicSchema expectedSchema) {
+    public LogicSchemaAssert assertAllLogicConstraintsAreEquivalent(LogicSchema expectedSchema) {
         for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
             boolean actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints());
             if (!actualIsExpected) {
@@ -75,6 +75,8 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
                 Assertions.fail("Expected constraint \"" + expectedConstraint + "\" is missing");
             }
         }
+
+        return this;
     }
 
     private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
@@ -87,7 +89,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return false;
     }
 
-    private void assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
+    public LogicSchemaAssert assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
         for (Predicate actualPredicate : actual.getAllPredicates()) {
             try {
                 Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
@@ -104,5 +106,14 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
                 Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
             }
         }
+
+        return this;
+    }
+
+    public LogicSchemaAssert isEmpty() {
+        Assertions.assertThat(actual.isEmpty())
+                .describedAs("Actual logic schema is not empty")
+                .isTrue();
+        return this;
     }
 }
