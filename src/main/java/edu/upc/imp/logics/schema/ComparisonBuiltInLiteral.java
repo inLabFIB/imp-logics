@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
-import edu.upc.imp.logics.schema.visitor.Visitor;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.Objects;
 
@@ -57,8 +57,8 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     }
 
     @Override
-    public <T, R> T accept(Visitor<T, R> visitor, R context) {
-        return visitor.visitBuiltInLiteral(this, context);
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

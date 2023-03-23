@@ -1,7 +1,5 @@
 package edu.upc.imp.logics.schema;
 
-import edu.upc.imp.logics.schema.visitor.Visitable;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +7,7 @@ import java.util.Objects;
  * Implementation of a logic normal clause. Normal clauses might be LogicConstraints, or DerivationRules
  * A NormalClause should be used, at most, in one LogicSchema.
  */
-public abstract class NormalClause implements Visitable {
+public abstract class NormalClause {
     /**
      * Invariants:
      * - body must not be null

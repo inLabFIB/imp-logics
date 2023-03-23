@@ -3,6 +3,7 @@ package edu.upc.imp.logics.schema;
 import edu.upc.imp.logics.schema.exceptions.*;
 import edu.upc.imp.logics.schema.utils.Level;
 import edu.upc.imp.logics.schema.utils.LevelHierarchy;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,11 +86,11 @@ public class LogicSchema {
     }
 
     public Set<Predicate> getAllPredicates() {
-        return new HashSet<>(predicatesByName.values());
+        return new LinkedHashSet<>(predicatesByName.values());
     }
 
     public Set<LogicConstraint> getAllLogicConstraints() {
-        return new HashSet<>(constraintsByID.values());
+        return new LinkedHashSet<>(constraintsByID.values());
     }
 
     public Set<DerivationRule> getAllDerivationRules() {
@@ -148,5 +149,9 @@ public class LogicSchema {
             levels.add(new Level(predicates));
         }
         return levels;
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

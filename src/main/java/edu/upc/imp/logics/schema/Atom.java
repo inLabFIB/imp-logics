@@ -3,8 +3,7 @@ package edu.upc.imp.logics.schema;
 import edu.upc.imp.logics.schema.exceptions.ArityMismatch;
 import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.utils.NewFreshVariable;
-import edu.upc.imp.logics.schema.visitor.Visitable;
-import edu.upc.imp.logics.schema.visitor.Visitor;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
  * An atom should belong, at most, to one NormalClause, or one literal. That is,
  * atoms should not be reused several times.
  */
-public class Atom implements Visitable {
+public class Atom {
     /**
      * Invariants:
      * - Predicate must not be null
@@ -115,12 +114,6 @@ public class Atom implements Visitable {
     }
 
 
-
-    @Override
-    public <T, R> T accept(Visitor<T, R> visitor, R context) {
-        return visitor.visitAtom(this, context);
-    }
-
     public String getPredicateName() {
         return predicate.getName();
     }
@@ -141,5 +134,9 @@ public class Atom implements Visitable {
     public String toString() {
         String termsAsString = terms.stream().map(Term::getName).collect(Collectors.joining(", "));
         return this.getPredicateName() + "(" + termsAsString + ")";
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

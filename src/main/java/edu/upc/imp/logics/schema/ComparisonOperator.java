@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,5 +48,9 @@ public enum ComparisonOperator {
             case GREATER_OR_EQUALS -> rangeOperator.equals(LESS_OR_EQUALS);
             case NOT_EQUALS -> rangeOperator.equals(NOT_EQUALS);
         };
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

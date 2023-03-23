@@ -2,6 +2,7 @@ package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
 import edu.upc.imp.logics.schema.utils.NewFreshVariable;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -249,5 +250,9 @@ public class ImmutableLiteralsList implements List<Literal> {
         return this.literalList.stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

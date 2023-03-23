@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -164,5 +165,9 @@ public class ImmutableTermList implements List<Term> {
                 .filter(Term::isVariable)
                 .map(t -> new Variable(t.getName()))
                 .collect(Collectors.toSet());
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

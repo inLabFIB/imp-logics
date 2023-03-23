@@ -2,6 +2,7 @@ package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.assertions.TermAssert;
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 import edu.upc.imp.logics.services.comparator.SubstitutionBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,11 @@ class TermTest {
                     return null;
                 }
 
+                @Override
+                public <T> T accept(LogicSchemaVisitor<T> visitor) {
+                    return null;
+                }
+
             }).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -31,6 +37,11 @@ class TermTest {
             assertThatCode(() -> new Term("x") {
                 @Override
                 public Term applySubstitution(Substitution substitution) {
+                    return null;
+                }
+
+                @Override
+                public <T> T accept(LogicSchemaVisitor<T> visitor) {
                     return null;
                 }
 

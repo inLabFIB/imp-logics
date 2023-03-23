@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,5 +86,9 @@ public class Predicate {
 
     public boolean isBase() {
         return derivationRules.isEmpty();
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

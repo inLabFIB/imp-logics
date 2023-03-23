@@ -1,5 +1,7 @@
 package edu.upc.imp.logics.schema;
 
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
+
 import java.util.Objects;
 
 public record ConstraintID(String id) {
@@ -12,6 +14,10 @@ public record ConstraintID(String id) {
     @Override
     public String toString() {
         return id;
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }
 

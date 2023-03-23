@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.Optional;
 
@@ -27,4 +28,10 @@ public class Variable extends Term {
     public boolean isVariable() {
         return true;
     }
+
+    @Override
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
 }

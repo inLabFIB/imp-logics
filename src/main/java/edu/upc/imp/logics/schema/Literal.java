@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
-import edu.upc.imp.logics.schema.visitor.Visitable;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.Set;
 
@@ -10,7 +10,7 @@ import java.util.Set;
  * A literal should appear, at most, inside the body of one NormalClause.
  * That is, literals should not be reused among several NormalClauses.
  */
-public abstract class Literal implements Visitable {
+public abstract class Literal {
     public abstract ImmutableTermList getTerms();
 
     public abstract Literal applySubstitution(Substitution substitution);
@@ -18,4 +18,6 @@ public abstract class Literal implements Visitable {
     public Set<Variable> getUsedVariables() {
         return getTerms().getUsedVariables();
     }
+
+    public abstract <T> T accept(LogicSchemaVisitor<T> visitor);
 }

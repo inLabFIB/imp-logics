@@ -1,7 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
-import edu.upc.imp.logics.schema.visitor.Visitor;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,10 +58,9 @@ public class OrdinaryLiteral extends Literal {
         return new OrdinaryLiteral(atom.applySubstitution(substitution), isPositive);
     }
 
-
     @Override
-    public <T, R> T accept(Visitor<T, R> visitor, R context) {
-        return visitor.visitOrdinaryLiteral(this, context);
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     public boolean isDerived() {

@@ -1,7 +1,6 @@
 package edu.upc.imp.logics.schema;
 
-import edu.upc.imp.logics.schema.visitor.Visitable;
-import edu.upc.imp.logics.schema.visitor.Visitor;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +12,7 @@ import java.util.Objects;
  * - There are no 2 LogicConstraints with the same ConstraintID in the same schema
  * - A LogicConstraint cannot appear in two schemas
  */
-public class LogicConstraint extends NormalClause implements Visitable {
+public class LogicConstraint extends NormalClause {
     /**
      * Invariants:
      * - constraintID must not be null
@@ -32,12 +31,11 @@ public class LogicConstraint extends NormalClause implements Visitable {
     }
 
     @Override
-    public <T, R> T accept(Visitor<T, R> visitor, R context) {
-        return visitor.visitLogicConstraint(this, context);
-    }
-
-    @Override
     public String toString() {
         return "@ " + getID() + " :- " + this.getBody();
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

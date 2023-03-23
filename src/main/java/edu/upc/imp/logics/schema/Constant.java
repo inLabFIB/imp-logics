@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 /**
  * Implementation of a logic constant. E.g.: `Socrates`, 4, etc.
@@ -18,6 +19,11 @@ public class Constant extends Term {
     @Override
     public String toString() {
         return "Const{'" + this.getName() + "'}";
+    }
+
+    @Override
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
 }

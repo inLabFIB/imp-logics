@@ -1,6 +1,7 @@
 package edu.upc.imp.logics.schema;
 
 import edu.upc.imp.logics.schema.operations.Substitution;
+import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.Objects;
 
@@ -52,4 +53,5 @@ public abstract class Term {
         return false;
     }
 
+    public abstract <T> T accept(LogicSchemaVisitor<T> visitor);
 }
