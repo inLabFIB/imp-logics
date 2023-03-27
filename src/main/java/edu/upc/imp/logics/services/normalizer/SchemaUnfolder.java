@@ -3,11 +3,9 @@ package edu.upc.imp.logics.services.normalizer;
 import edu.upc.imp.logics.schema.*;
 import edu.upc.imp.logics.services.creation.LogicSchemaFactory;
 import edu.upc.imp.logics.services.creation.spec.*;
+import edu.upc.imp.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -73,7 +71,8 @@ public class SchemaUnfolder {
 
     private List<DerivationRuleSpec> computeUnfoldedDerivationRuleSpecs(Atom head, ImmutableLiteralsList body) {
         String predicateName = head.getPredicateName();
-        List<TermSpec> termSpecs = buildSpec(head.getTerms());
+        ImmutableTermList terms = head.getTerms();
+        List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpec(terms);
         List<BodySpec> unfoldedBodySpecs = computeUnfoldedBodySpec(body);
 
         return unfoldedBodySpecs.stream()
@@ -91,7 +90,7 @@ public class SchemaUnfolder {
                 result.addAll(computeUnfoldedBodySpec(bodyWithUnfoldedLiteral));
             }
             return result;
-        } else return List.of(buildSpec(body));
+        } else return List.of(LogicSchemaToSpecHelper.buildBodySpec(body));
     }
 
     private Optional<Integer> getIndexOfUnfoldableLiteral(ImmutableLiteralsList body) {
@@ -108,35 +107,10 @@ public class SchemaUnfolder {
     }
 
     private PredicateSpec[] computePredicateSpecs(LogicSchema schema) {
-        List<PredicateSpec> predicateSpecs = schema.getAllPredicates().stream()
-                .map(predicate -> new PredicateSpec(predicate.getName(), predicate.getArity()))
-                .toList();
+        Set<Predicate> allPredicates = schema.getAllPredicates();
+        List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicates(allPredicates);
         return predicateSpecs.toArray(predicateSpecs.toArray(new PredicateSpec[0]));
     }
 
-    private List<TermSpec> buildSpec(ImmutableTermList terms) {
-        return terms.stream().map(t -> {
-            if (t instanceof Constant) {
-                return new ConstantSpec(t.getName());
-            } else if (t instanceof Variable) {
-                return new VariableSpec(t.getName());
-            } else throw new RuntimeException("Unknown term type: " + t.getClass().getName());
-        }).collect(Collectors.toList());
-    }
 
-    private BodySpec buildSpec(ImmutableLiteralsList body) {
-        return new BodySpec(body.stream()
-                .map(l -> {
-                    if (l instanceof OrdinaryLiteral ordinaryLiteral) {
-                        List<TermSpec> termSpecs = buildSpec(ordinaryLiteral.getTerms());
-                        return new OrdinaryLiteralSpec(ordinaryLiteral.getAtom().getPredicateName(),
-                                termSpecs,
-                                ordinaryLiteral.isPositive());
-                    } else if (l instanceof ComparisonBuiltInLiteral comparisonBuiltInLiteral) {
-                        List<TermSpec> termSpecs = buildSpec(comparisonBuiltInLiteral.getTerms());
-                        return new BuiltInLiteralSpec(comparisonBuiltInLiteral.getOperationName(), termSpecs);
-                    } else throw new RuntimeException("Unknown literal type: " + l.getClass().getName());
-                })
-                .collect(Collectors.toList()));
-    }
 }

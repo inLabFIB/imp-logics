@@ -63,6 +63,11 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
         return this;
     }
 
+    public LogicSchemaBuilder<T> addDerivationRule(Collection<DerivationRuleSpec> derivationRules) {
+        derivationRules.forEach(this::addDerivationRule);
+        return this;
+    }
+
     private void addDerivationRule(DerivationRuleSpec drs) {
         predicatesByName.putIfAbsent(
                 drs.getPredicateName(),
@@ -80,7 +85,11 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     @SafeVarargs
     public final LogicSchemaBuilder<T> addLogicConstraint(T... logicConstraintSpecs) {
-        Arrays.stream(logicConstraintSpecs).forEach(lcs -> {
+        return addLogicConstraint(Arrays.stream(logicConstraintSpecs).toList());
+    }
+
+    public final LogicSchemaBuilder<T> addLogicConstraint(Collection<T> logicConstraintSpecs) {
+        logicConstraintSpecs.forEach(lcs -> {
             ConstraintID constraintID = constraintIDGenerator.newConstraintID(lcs);
             addLogicConstraint(constraintID, lcs);
         });
