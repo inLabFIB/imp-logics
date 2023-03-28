@@ -9,6 +9,7 @@ import edu.upc.imp.logics.services.creation.spec.*;
 import edu.upc.imp.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -22,6 +23,9 @@ public class BodySorter {
      * @return a logicSchema with the bodies of the normal clauses sorted
      */
     public LogicSchema sort(LogicSchema logicSchema) {
+        if (Objects.isNull(logicSchema)) {
+            throw new IllegalArgumentException("LogicSchema cannot be null");
+        }
         List<LogicConstraintWithIDSpec> logicConstraintsSpecs = sortBodyInLogicConstraints(logicSchema.getAllLogicConstraints());
         List<DerivationRuleSpec> derivationRulesSpecs = sortBodyInDerivationRules(logicSchema.getAllDerivationRules());
 

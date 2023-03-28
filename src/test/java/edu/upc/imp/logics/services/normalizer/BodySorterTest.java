@@ -17,7 +17,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 public class BodySorterTest {
+
+    @Test
+    public void should_throwException_whenSortingNullSchema() {
+        assertThatThrownBy(() -> new BodySorter().sort(null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 
     public static Stream<Arguments> provideLogicSchemasAndExpectedSortedBodies() {
         return Stream.of(
