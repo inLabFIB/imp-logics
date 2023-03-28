@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.services.visitor;
+package edu.upc.imp.logics.services.printer;
 
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.schema.utils.LogicSchemaMother;

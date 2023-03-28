@@ -1,4 +1,4 @@
-package edu.upc.imp.logics.services.visitor;
+package edu.upc.imp.logics.services.printer;
 
 import edu.upc.imp.logics.schema.*;
 import edu.upc.imp.logics.schema.visitor.LogicSchemaVisitor;
@@ -9,6 +9,7 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     private static final String CONSTRAINT_ID_PREFIX = "@";
     public static final String NORMAL_CLAUSE_SEPARATOR = ":-";
     public static final String COMMA_SEPARATOR = ",";
+    public static final String NOT = "not";
 
     public String print(LogicSchema logicSchema) {
         return this.visit(logicSchema);
@@ -76,7 +77,7 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
         StringBuilder stringBuilder = new StringBuilder();
         if (ordinaryLiteral.isNegative()) {
             stringBuilder
-                    .append("not")
+                    .append(NOT)
                     .append("(")
                     .append(atomString)
                     .append(")");
