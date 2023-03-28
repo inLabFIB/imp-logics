@@ -10,11 +10,21 @@ import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintWithIDSp
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class LogicConstraintCleanerTest {
 
     @Test
-    public void should_cleanPredicatesNotUsed() {
+    public void should_throwException_when_logicSchemaIsNull() {
+        LogicConstraintCleaner logicConstraintCleaner = new LogicConstraintCleaner();
+
+        assertThatThrownBy(() -> logicConstraintCleaner.clean(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("LogicSchema cannot be null");
+    }
+
+    @Test
+    public void should_cleanLogicSchema_when_ItsContainsPredicatesNotUsed() {
         PredicateSpec unusedPredicateSpec = new PredicateSpec("Z", 2);
 
         LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
@@ -36,7 +46,7 @@ public class LogicConstraintCleanerTest {
     }
 
     @Test
-    public void should_cleanDerivationRulesNotUsed() {
+    public void should_cleanLogicSchema_when_ItsContainsDerivationRulesNotUsed() {
         String schemaString = """
                 @1 :- A(x), B(x), C(x)
                 D(x) :- A(x), B(x), C(x)

@@ -13,8 +13,13 @@ import java.util.Set;
 
 public class LogicConstraintCleaner {
     public LogicSchema clean(LogicSchema logicSchema) {
+        checkLogicSchema(logicSchema);
         List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(logicSchema);
         return buildLogicSchema(logicSchema.getAllLogicConstraints(), usedDerivationRules);
+    }
+
+    private static void checkLogicSchema(LogicSchema logicSchema) {
+        if (logicSchema == null) throw new IllegalArgumentException("LogicSchema cannot be null");
     }
 
     private static List<DerivationRule> filterUsedDerivationRules(LogicSchema logicSchema) {
