@@ -1,11 +1,10 @@
-package edu.upc.imp.logics.services;
+package edu.upc.imp.logics.services.normalizer;
 
 import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.utils.LogicSchemaMother;
 import edu.upc.imp.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.imp.logics.services.creation.spec.PredicateSpec;
-import edu.upc.imp.logics.services.normalizer.PredicateCleaner;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

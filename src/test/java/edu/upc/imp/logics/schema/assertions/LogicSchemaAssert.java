@@ -55,6 +55,13 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
 
+    /**
+     * Asserts whether the actual logicSchema is equivalent to the expectedSchema.
+     * This comparison is NOT agnostic with the name of the derived predicates.
+     *
+     * @param expectedSchema not-null
+     * @return this assert
+     */
     public LogicSchemaAssert isLogicallyEquivalentTo(LogicSchema expectedSchema) {
         assertAllPredicatesAreEquivalent(expectedSchema);
         assertAllLogicConstraintsAreEquivalent(expectedSchema);
