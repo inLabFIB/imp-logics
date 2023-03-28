@@ -1,11 +1,19 @@
 package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.ImmutableLiteralsList;
+import edu.upc.imp.logics.schema.Literal;
+import edu.upc.imp.logics.schema.OrdinaryLiteral;
+import edu.upc.imp.logics.schema.utils.LiteralParser;
 import edu.upc.imp.logics.services.comparator.LogicEquivalenceAnalyzer;
-import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 
-public class ImmutableLiteralsListAssert extends AbstractAssert<ImmutableLiteralsListAssert, ImmutableLiteralsList> {
+import java.util.List;
+
+import static org.assertj.core.util.Lists.newArrayList;
+
+public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLiteralsListAssert, ImmutableLiteralsList, Literal, LiteralAssert> {
     private final LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new LogicEquivalenceAnalyzer();
 
     protected ImmutableLiteralsListAssert(ImmutableLiteralsList actual) {
@@ -48,14 +56,14 @@ public class ImmutableLiteralsListAssert extends AbstractAssert<ImmutableLiteral
         return this;
     }
 
-    public ImmutableLiteralsListAssert isEmpty() {
-        Assertions.assertThat(actual).isEmpty();
-        return this;
+    @Override
+    protected LiteralAssert toAssert(Literal value, String description) {
+        return LiteralAssert.assertThat(value).as(description);
     }
 
-    public ImmutableLiteralsListAssert hasSize(int expectedSize) {
-        Assertions.assertThat(actual).hasSize(expectedSize);
-        return this;
+    @Override
+    protected ImmutableLiteralsListAssert newAbstractIterableAssert(Iterable<? extends Literal> iterable) {
+        return assertThat(new ImmutableLiteralsList(newArrayList(iterable)));
     }
 
     public ImmutableLiteralsListAssert containsComparisonBuiltInLiteral(String leftVariableName, String comparisonOperator, String rightVariableName) {
@@ -68,4 +76,31 @@ public class ImmutableLiteralsListAssert extends AbstractAssert<ImmutableLiteral
         return this;
 
     }
+
+    public ImmutableLiteralsListAssert hasLiteral(int index, String expectedLiteralString) {
+        Assertions.assertThat(actual.size())
+                .withFailMessage("Expecting to have some element at index %d", index)
+                .isGreaterThan(index);
+
+        Literal expectedLiteral = LiteralParser.parseLiteral(expectedLiteralString);
+        Literal actualLiteral = actual.get(index);
+
+        if (expectedLiteral instanceof OrdinaryLiteral expectedOL) {
+            Assertions.assertThat(actualLiteral)
+                    .asInstanceOf(InstanceOfAssertFactories.type(OrdinaryLiteral.class))
+                    .satisfies(
+                            ol -> OrdinaryLiteralAssert.assertThat(ol)
+                                    .hasPredicateName(expectedOL.getAtom().getPredicateName())
+                                    .hasTerms(expectedOL.getAtom().getTerms())
+                    );
+        }
+        return this;
+    }
+
+    public void containsExactlyLiteralsOf(List<String> sortedLiterals) {
+        for (int i = 0; i < sortedLiterals.size(); i++) {
+            hasLiteral(i, sortedLiterals.get(i));
+        }
+    }
+
 }

@@ -4,9 +4,7 @@ import edu.upc.imp.logics.schema.LogicSchema;
 import edu.upc.imp.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.imp.logics.schema.utils.LogicSchemaMother;
 import edu.upc.imp.logics.services.creation.LogicSchemaBuilder;
-import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.PredicateSpec;
-import edu.upc.imp.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 import edu.upc.imp.logics.services.normalizer.PredicateCleaner;
 import org.junit.jupiter.api.Test;
 
@@ -28,22 +26,14 @@ public class PredicateCleanerTest {
     public void should_cleanLogicSchema_when_ItContainsPredicatesNotUsed() {
         PredicateSpec unusedPredicateSpec = new PredicateSpec("Z", 2);
 
-        LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
-                .addConstraintId("1")
-                .addOrdinaryLiteral("P", "x", "y")
-                .addOrdinaryLiteral("Q", "x", "y")
-                .build();
-
         LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
-                .addLogicConstraint(logicConstraintSpec)
                 .addPredicate(unusedPredicateSpec)
                 .build();
 
         PredicateCleaner predicateCleaner = new PredicateCleaner();
         LogicSchema logicSchemaResult = predicateCleaner.clean(logicSchema);
 
-        LogicSchemaAssert.assertThat(logicSchemaResult).containsExactlyTheseConstraintIDs("1");
-        LogicSchemaAssert.assertThat(logicSchemaResult).containsExactlyThesePredicateNames("P", "Q");
+        LogicSchemaAssert.assertThat(logicSchemaResult).isEmpty();
     }
 
     @Test

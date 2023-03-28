@@ -72,7 +72,7 @@ public class SchemaUnfolder {
     private List<DerivationRuleSpec> computeUnfoldedDerivationRuleSpecs(Atom head, ImmutableLiteralsList body) {
         String predicateName = head.getPredicateName();
         ImmutableTermList terms = head.getTerms();
-        List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpec(terms);
+        List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpecs(terms);
         List<BodySpec> unfoldedBodySpecs = computeUnfoldedBodySpec(body);
 
         return unfoldedBodySpecs.stream()
@@ -108,7 +108,7 @@ public class SchemaUnfolder {
 
     private PredicateSpec[] computePredicateSpecs(LogicSchema schema) {
         Set<Predicate> allPredicates = schema.getAllPredicates();
-        List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicates(allPredicates);
+        List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicatesSpecs(allPredicates);
         return predicateSpecs.toArray(predicateSpecs.toArray(new PredicateSpec[0]));
     }
 

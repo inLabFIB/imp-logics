@@ -1,54 +1,36 @@
 package edu.upc.imp.logics.services.creation;
 
-import edu.upc.imp.logics.schema.*;
-import edu.upc.imp.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
-import edu.upc.imp.logics.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
+import edu.upc.imp.logics.schema.ImmutableLiteralsList;
+import edu.upc.imp.logics.schema.Literal;
+import edu.upc.imp.logics.schema.Predicate;
 import edu.upc.imp.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.LiteralSpec;
 import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class in charge of instantiating the body of some normal clause given the predicates of the schema
  */
 class BodyBuilder {
-    private final Map<String, Predicate> predicatesByName;
+    private final LiteralFactory literalFactory;
     private final List<Literal> body;
 
+    //TODO: Change parameter predicatesByName Map by LiteralFactory
     public BodyBuilder(Map<String, ? extends Predicate> predicatesByName) {
-        this.predicatesByName = Collections.unmodifiableMap(predicatesByName);
         body = new LinkedList<>();
+        literalFactory = new LiteralFactory(predicatesByName);
     }
 
     public BodyBuilder addLiteral(LiteralSpec literalSpec) {
         if (literalSpec instanceof OrdinaryLiteralSpec olSpec) {
-            body.add(buildOrdinaryLiteral(olSpec));
+            body.add(literalFactory.buildOrdinaryLiteral(olSpec));
         } else if (literalSpec instanceof BuiltInLiteralSpec biSpec) {
-            body.add(buildBuiltInLiteral(biSpec));
+            body.add(literalFactory.buildBuiltInLiteral(biSpec));
         } else throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
         return this;
-    }
-
-    private Literal buildOrdinaryLiteral(OrdinaryLiteralSpec olSpec) {
-        List<Term> terms = TermSpecToTermFactory.buildTerms(olSpec.getTermSpecList());
-        Predicate predicate = predicatesByName.get(olSpec.getPredicateName());
-        return new OrdinaryLiteral(new Atom(predicate, terms), olSpec.isPositive());
-    }
-
-    private Literal buildBuiltInLiteral(BuiltInLiteralSpec bilSpec) {
-        ComparisonOperator comparisonOperator = ComparisonOperator.fromSymbol(bilSpec.getOperator());
-        if (Objects.nonNull(comparisonOperator)) {
-            checkNumberOfTerms(bilSpec);
-            Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecs().get(0));
-            Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecs().get(1));
-            return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperator);
-        } else throw new UnrecognizedBuiltInOperator(bilSpec.getOperator());
-    }
-
-    private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec) {
-        if (bilSpec.getTermSpecs().size() != 2)
-            throw new WrongNumberOfTermsInBuiltInLiteral(2, bilSpec.getTermSpecs().size());
     }
 
     public BodyBuilder addLiterals(List<LiteralSpec> bodySpec) {

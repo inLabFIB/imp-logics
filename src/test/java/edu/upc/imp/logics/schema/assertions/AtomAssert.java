@@ -19,6 +19,10 @@ public class AtomAssert extends AbstractAssert<AtomAssert, Atom> {
         return this;
     }
 
+    public AtomAssert hasPredicateName(String predicateName) {
+        PredicateAssert.assertThat(actual.getPredicate()).hasName(predicateName);
+        return this;
+    }
 
     public AtomAssert containsConstant(int index, String constantName) {
         ImmutableTermListAssert.assertThat(actual.getTerms()).containsConstant(index, constantName);

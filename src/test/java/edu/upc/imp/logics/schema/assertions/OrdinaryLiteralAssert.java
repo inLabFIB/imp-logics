@@ -1,5 +1,6 @@
 package edu.upc.imp.logics.schema.assertions;
 
+import edu.upc.imp.logics.schema.ImmutableTermList;
 import edu.upc.imp.logics.schema.OrdinaryLiteral;
 import edu.upc.imp.logics.schema.Term;
 import edu.upc.imp.logics.services.creation.spec.OrdinaryLiteralSpec;
@@ -36,6 +37,17 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
 
     public OrdinaryLiteralAssert hasPredicate(String predicateName, int arity) {
         AtomAssert.assertThat(actual.getAtom()).hasPredicate(predicateName, arity);
+        return this;
+    }
+
+    public OrdinaryLiteralAssert hasPredicateName(String predicateName) {
+        AtomAssert.assertThat(actual.getAtom()).hasPredicateName(predicateName);
+        return this;
+    }
+
+    public OrdinaryLiteralAssert hasTerms(ImmutableTermList terms) {
+        ImmutableTermListAssert.assertThat(actual.getTerms())
+                .containsExactlyElementsOf(terms);
         return this;
     }
 }

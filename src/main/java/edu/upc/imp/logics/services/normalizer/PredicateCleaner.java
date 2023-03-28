@@ -2,7 +2,6 @@ package edu.upc.imp.logics.services.normalizer;
 
 import edu.upc.imp.logics.schema.*;
 import edu.upc.imp.logics.services.creation.LogicSchemaBuilder;
-import edu.upc.imp.logics.services.creation.spec.BodySpec;
 import edu.upc.imp.logics.services.creation.spec.DerivationRuleSpec;
 import edu.upc.imp.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.imp.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
@@ -17,7 +16,8 @@ public class PredicateCleaner {
     public LogicSchema clean(LogicSchema logicSchema) {
         checkLogicSchema(logicSchema);
         List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(logicSchema);
-        return buildLogicSchema(logicSchema.getAllLogicConstraints(), usedDerivationRules);
+        Set<LogicConstraint> logicConstraints = logicSchema.getAllLogicConstraints();
+        return buildLogicSchema(usedDerivationRules, logicConstraints);
     }
 
     private static void checkLogicSchema(LogicSchema logicSchema) {
@@ -66,23 +66,14 @@ public class PredicateCleaner {
         return predicateNames;
     }
 
-    private static LogicSchema buildLogicSchema(Set<LogicConstraint> logicConstraints, List<DerivationRule> usedDerivationRules) {
-        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = buildLogicConstraints(logicConstraints);
+    private static LogicSchema buildLogicSchema(List<DerivationRule> usedDerivationRules, Set<LogicConstraint> logicConstraints) {
+        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = LogicSchemaToSpecHelper.buildLogicConstraintSpecs(logicConstraints);
         List<DerivationRuleSpec> derivationRulesSpecs = LogicSchemaToSpecHelper.buildDerivationRuleSpecs(usedDerivationRules);
 
         return LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addLogicConstraint(logicConstraintsSpecs)
                 .addDerivationRule(derivationRulesSpecs)
                 .build();
-    }
-
-    private static List<LogicConstraintWithIDSpec> buildLogicConstraints(Set<LogicConstraint> logicConstraints) {
-        return logicConstraints.stream()
-                .map(lc -> {
-                    BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(lc.getBody());
-                    return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
-                })
-                .toList();
     }
 
 }

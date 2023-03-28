@@ -1,26 +1,19 @@
 package edu.upc.imp.logics.schema.assertions;
 
 import edu.upc.imp.logics.schema.ImmutableTermList;
-import org.assertj.core.api.AbstractAssert;
+import edu.upc.imp.logics.schema.Term;
+import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
 
-public class ImmutableTermListAssert extends AbstractAssert<ImmutableTermListAssert, ImmutableTermList> {
+import static org.assertj.core.util.Lists.newArrayList;
+
+public class ImmutableTermListAssert extends AbstractListAssert<ImmutableTermListAssert, ImmutableTermList, Term, TermAssert> {
     protected ImmutableTermListAssert(ImmutableTermList terms) {
         super(terms, ImmutableTermListAssert.class);
     }
 
     public static ImmutableTermListAssert assertThat(ImmutableTermList actual) {
         return new ImmutableTermListAssert(actual);
-    }
-
-    public ImmutableTermListAssert isEmpty() {
-        Assertions.assertThat(actual).isEmpty();
-        return this;
-    }
-
-    public ImmutableTermListAssert isNotEmpty() {
-        Assertions.assertThat(actual).isNotEmpty();
-        return this;
     }
 
     public ImmutableTermListAssert containsVariable(int index, String variableName) {
@@ -38,5 +31,15 @@ public class ImmutableTermListAssert extends AbstractAssert<ImmutableTermListAss
     public ImmutableTermListAssert hasSize(int size) {
         Assertions.assertThat(actual).hasSize(size);
         return this;
+    }
+
+    @Override
+    protected TermAssert toAssert(Term value, String description) {
+        return TermAssert.assertThat(value).as(description);
+    }
+
+    @Override
+    protected ImmutableTermListAssert newAbstractIterableAssert(Iterable<? extends Term> iterable) {
+        return assertThat(new ImmutableTermList(newArrayList(iterable)));
     }
 }
