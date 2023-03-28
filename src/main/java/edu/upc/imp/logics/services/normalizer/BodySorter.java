@@ -11,7 +11,16 @@ import edu.upc.imp.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Service that returns a copy of the logicSchema where every normal clause (logic constraint, or derivation rule) has
+ * its body sorted according to the following order: 1) positive literals, 2) negated literals, 3) built-in literals
+ */
 public class BodySorter {
+
+    /**
+     * @param logicSchema not-null
+     * @return a logicSchema with the bodies of the normal clauses sorted
+     */
     public LogicSchema sort(LogicSchema logicSchema) {
         List<LogicConstraintWithIDSpec> logicConstraintsSpecs = sortBodyInLogicConstraints(logicSchema.getAllLogicConstraints());
         List<DerivationRuleSpec> derivationRulesSpecs = sortBodyInDerivationRules(logicSchema.getAllDerivationRules());
