@@ -2,8 +2,6 @@ package edu.upc.fib.inlab.imp.kse.logics.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
-import edu.upc.imp.parser.LogicSchemaGrammarBaseVisitor;
-import edu.upc.imp.parser.LogicSchemaGrammarParser;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -7,8 +7,6 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
-import edu.upc.imp.parser.LogicSchemaGrammarLexer;
-import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

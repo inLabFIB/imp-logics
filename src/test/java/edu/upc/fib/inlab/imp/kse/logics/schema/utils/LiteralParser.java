@@ -7,9 +7,9 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpe
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicElementSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaGrammarLexer;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaGrammarParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsGrammarToSpecVisitor;
-import edu.upc.imp.parser.LogicSchemaGrammarLexer;
-import edu.upc.imp.parser.LogicSchemaGrammarParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

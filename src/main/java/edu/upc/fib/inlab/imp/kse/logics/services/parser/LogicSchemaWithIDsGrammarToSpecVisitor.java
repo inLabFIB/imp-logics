@@ -4,7 +4,6 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.exceptions.ExpectingConstraintID;
-import edu.upc.imp.parser.LogicSchemaGrammarParser;
 
 public class LogicSchemaWithIDsGrammarToSpecVisitor extends LogicSchemaGrammarToSpecVisitor<LogicConstraintWithIDSpec> {
 
