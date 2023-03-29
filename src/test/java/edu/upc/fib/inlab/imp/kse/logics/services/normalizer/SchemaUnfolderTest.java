@@ -1,11 +1,12 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
+import static edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
@@ -25,7 +26,7 @@ class SchemaUnfolderTest {
 
             LogicSchema unfoldedEmptySchema = new SchemaUnfolder().unfold(emptySchema);
 
-            LogicSchemaAssert.assertThat(unfoldedEmptySchema).isEmpty();
+            assertThat(unfoldedEmptySchema).isEmpty();
         }
 
         @Test
@@ -45,7 +46,7 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
 
         @Test
@@ -65,7 +66,7 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
 
         @Test
@@ -85,7 +86,7 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
 
         @Test
@@ -107,7 +108,7 @@ class SchemaUnfolderTest {
                                 T(c, d) :- U(c, d, z)
                             """
             );
-            LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
 
         @Test
@@ -136,8 +137,44 @@ class SchemaUnfolderTest {
                                 S(y) :- S2(y)
                             """
             );
-            LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
+    }
+
+    @Nested
+    class TraceabilityMap {
+
+        @Test
+        public void should_returnOriginalConstraintID_when_unfoldingCreatesSeveralConstraints() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                R(a, b) :- T(a, b)
+                                R(a, b) :- U(a, b)
+                            """
+            );
+
+            SchemaTransformation schemaTransformation = new SchemaUnfolder().unfoldTransformation(schema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1_1")
+                    .constraintIDComesFrom("1", "1_2");
+        }
+
+        @Test
+        public void should_returnOriginalConstraintID_when_unfoldingCreatesOneConstraint() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                            """
+            );
+
+            SchemaTransformation schemaTransformation = new SchemaUnfolder().unfoldTransformation(schema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1");
+        }
+
     }
 
 }

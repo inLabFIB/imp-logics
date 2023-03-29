@@ -6,18 +6,25 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.DerivationRuleSpe
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PredicateCleaner {
+
+    public SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
+        checkLogicSchema(originalSchema);
+
+        List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(originalSchema);
+        Set<LogicConstraint> logicConstraints = originalSchema.getAllLogicConstraints();
+
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
+
+        return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
+    }
+
     public LogicSchema clean(LogicSchema logicSchema) {
-        checkLogicSchema(logicSchema);
-        List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(logicSchema);
-        Set<LogicConstraint> logicConstraints = logicSchema.getAllLogicConstraints();
-        return buildLogicSchema(usedDerivationRules, logicConstraints);
+        return cleanTransformation(logicSchema).transformed();
     }
 
     private static void checkLogicSchema(LogicSchema logicSchema) {
@@ -66,14 +73,24 @@ public class PredicateCleaner {
         return predicateNames;
     }
 
-    private static LogicSchema buildLogicSchema(List<DerivationRule> usedDerivationRules, Set<LogicConstraint> logicConstraints) {
-        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = LogicSchemaToSpecHelper.buildLogicConstraintSpecs(logicConstraints);
+    private static LogicSchema buildLogicSchema(List<DerivationRule> usedDerivationRules, Set<LogicConstraint> logicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
+        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = buildLogicConstraintSpecs(logicConstraints, schemaTraceabilityMap);
         List<DerivationRuleSpec> derivationRulesSpecs = LogicSchemaToSpecHelper.buildDerivationRuleSpecs(usedDerivationRules);
 
         return LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addLogicConstraint(logicConstraintsSpecs)
                 .addDerivationRule(derivationRulesSpecs)
                 .build();
+    }
+
+    private static List<LogicConstraintWithIDSpec> buildLogicConstraintSpecs(Set<LogicConstraint> logicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
+        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = new LinkedList<>();
+        for (LogicConstraint lc : logicConstraints) {
+            LogicConstraintWithIDSpec logicSchemaSpec = LogicSchemaToSpecHelper.buildLogicConstraintSpec(lc);
+            schemaTraceabilityMap.addConstraintIDOrigin(new ConstraintID(logicSchemaSpec.getId()), lc.getID());
+            logicConstraintsSpecs.add(logicSchemaSpec);
+        }
+        return logicConstraintsSpecs;
     }
 
 }

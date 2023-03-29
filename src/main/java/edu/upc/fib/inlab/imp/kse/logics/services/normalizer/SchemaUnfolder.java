@@ -24,41 +24,72 @@ import java.util.stream.Collectors;
  * Der2(x) :- Base3(x) <br>
  */
 public class SchemaUnfolder {
+
+    private final MultipleConstraintIDGenerator multipleConstraintIDGenerator;
+
+    public SchemaUnfolder() {
+        this(new SuffixMultipleConstraintIDGenerator());
+    }
+
+    public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator) {
+        this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
+    }
+
+    /**
+     * @param schema not null
+     * @return a schema transformation where the final schema has the same (based & derived) predicates as the one given but unfolding
+     * all the positive derived literals
+     */
+    public SchemaTransformation unfoldTransformation(LogicSchema schema) {
+        if (Objects.isNull(schema)) throw new IllegalArgumentException("Schema cannot be null");
+
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec = computeUnfoldedLogicSchemaSpec(schema, schemaTraceabilityMap);
+
+        LogicSchema unfoldedSchema = LogicSchemaFactory.defaultLogicSchemaWithIDsFactory().createLogicSchema(logicSchemaSpec);
+        return new SchemaTransformation(schema, unfoldedSchema, schemaTraceabilityMap);
+    }
+
     /**
      * @param schema not null
      * @return a new schema with the same (based & derived) predicates as the one given but unfolding
      * all the positive derived literals
      */
     public LogicSchema unfold(LogicSchema schema) {
-        if (Objects.isNull(schema)) throw new IllegalArgumentException("Schema cannot be null");
-
-        LogicSchemaSpec<LogicConstraintWithoutIDSpec> logicSchemaSpec = computeUnfoldedLogicSchemaSpec(schema);
-
-        return LogicSchemaFactory.defaultLogicSchemaWithoutIDsFactory().createLogicSchema(logicSchemaSpec);
+        return unfoldTransformation(schema).transformed();
     }
 
-    private LogicSchemaSpec<LogicConstraintWithoutIDSpec> computeUnfoldedLogicSchemaSpec(LogicSchema schema) {
-        LogicSchemaSpec<LogicConstraintWithoutIDSpec> logicSchemaSpec = new LogicSchemaSpec<>();
+    private LogicSchemaSpec<LogicConstraintWithIDSpec> computeUnfoldedLogicSchemaSpec(LogicSchema schema, SchemaTraceabilityMap schemaTraceabilityMap) {
+        LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec = new LogicSchemaSpec<>();
         logicSchemaSpec.addPredicateSpecs(computePredicateSpecs(schema));
         logicSchemaSpec.addDerivationRuleSpecs(computeUnfoldedDerivationRuleSpecs(schema));
-        logicSchemaSpec.addLogicConstraintSpecs(computeUnfoldedLogicConstraintSpecs(schema));
+        logicSchemaSpec.addLogicConstraintSpecs(computeUnfoldedLogicConstraintSpecs(schema, schemaTraceabilityMap));
         return logicSchemaSpec;
     }
 
-    private LogicConstraintWithoutIDSpec[] computeUnfoldedLogicConstraintSpecs(LogicSchema schema) {
-        List<LogicConstraintWithoutIDSpec> result = new LinkedList<>();
+    private LogicConstraintWithIDSpec[] computeUnfoldedLogicConstraintSpecs(LogicSchema schema, SchemaTraceabilityMap schemaTraceabilityMap) {
+        List<LogicConstraintWithIDSpec> result = new LinkedList<>();
         for (LogicConstraint logicConstraint : schema.getAllLogicConstraints()) {
-            result.addAll(computeUnfoldedLogicConstraintSpecs(logicConstraint.getBody()));
+            result.addAll(computeUnfoldedLogicConstraintSpecs(logicConstraint, schemaTraceabilityMap));
         }
-        return result.toArray(new LogicConstraintWithoutIDSpec[0]);
+        return result.toArray(new LogicConstraintWithIDSpec[0]);
     }
 
-    private List<LogicConstraintWithoutIDSpec> computeUnfoldedLogicConstraintSpecs(ImmutableLiteralsList body) {
-        List<BodySpec> unfoldedBodySpecs = computeUnfoldedBodySpec(body);
+    private List<LogicConstraintWithIDSpec> computeUnfoldedLogicConstraintSpecs(LogicConstraint originalConstraint, SchemaTraceabilityMap schemaTraceabilityMap) {
+        List<BodySpec> unfoldedBodySpecs = computeUnfoldedBodySpec(originalConstraint.getBody());
 
-        return unfoldedBodySpecs.stream()
-                .map(LogicConstraintWithoutIDSpec::new)
-                .collect(Collectors.toList());
+        List<ConstraintID> constraintIDsToUse = multipleConstraintIDGenerator.generateNewConstraintsIDs(originalConstraint.getID(),
+                unfoldedBodySpecs.size());
+
+        List<LogicConstraintWithIDSpec> result = new LinkedList<>();
+        for (int i = 0; i < unfoldedBodySpecs.size(); ++i) {
+            ConstraintID newConstraintID = constraintIDsToUse.get(i);
+            BodySpec newBodySpec = unfoldedBodySpecs.get(i);
+            schemaTraceabilityMap.addConstraintIDOrigin(newConstraintID, originalConstraint.getID());
+            result.add(new LogicConstraintWithIDSpec(newConstraintID.id(), newBodySpec));
+        }
+
+        return result;
     }
 
     private DerivationRuleSpec[] computeUnfoldedDerivationRuleSpecs(LogicSchema schema) {

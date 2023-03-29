@@ -1,8 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
+import static edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +34,7 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
 
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).isEmpty();
+            assertThat(logicSchemaTransformed).isEmpty();
         }
 
         @Test
@@ -43,7 +44,7 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
 
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).containsExactlyThesePredicateNames("P");
+            assertThat(logicSchemaTransformed).containsExactlyThesePredicateNames("P");
         }
     }
 
@@ -61,7 +62,7 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            LogicSchemaAssert.assertThat(logicSchemaTransformed)
+            assertThat(logicSchemaTransformed)
                     .hasConstraintsSize(2);
         }
 
@@ -78,9 +79,9 @@ class SingleDerivationRuleTransformerTest {
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
             // Constraint literal size - 1 + N derivation rules
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).hasConstraintsSize(1);
+            assertThat(logicSchemaTransformed).hasConstraintsSize(1);
             ImmutableLiteralsList constraintLiterals = logicSchemaTransformed.getAllLogicConstraints().iterator().next().getBody();
-            ImmutableLiteralsListAssert.assertThat(constraintLiterals).hasSize(3);
+            assertThat(constraintLiterals).hasSize(3);
         }
 
         @Test
@@ -119,7 +120,7 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
         }
 
         @Test
@@ -142,7 +143,7 @@ class SingleDerivationRuleTransformerTest {
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
 
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
         }
 
         @Test
@@ -166,7 +167,7 @@ class SingleDerivationRuleTransformerTest {
 
             LogicConstraint actualLogicConstraint = logicSchemaTransformed.getAllLogicConstraints().iterator().next();
             LogicConstraint expectedLogicConstraint = expectedLogicSchema.getLogicConstraintByID(new ConstraintID("1"));
-            ImmutableLiteralsListAssert.assertThat(actualLogicConstraint.getBody())
+            assertThat(actualLogicConstraint.getBody())
                     .isLogicallyEquivalentTo(expectedLogicConstraint.getBody());
         }
 
@@ -196,7 +197,7 @@ class SingleDerivationRuleTransformerTest {
                     P_3(x) :- B(x, y)
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
         }
 
         @Test
@@ -222,8 +223,41 @@ class SingleDerivationRuleTransformerTest {
                     A_2(x, y) :- D(x, y)
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
-            LogicSchemaAssert.assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
         }
 
+    }
+
+    @Nested
+    class Traceability {
+
+        @Test
+        public void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
+            LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                         @1 :- T(x, y), P(x)
+                         P(x) :- R(x, y)
+                         P(x) :- S(x, y)
+                    """);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.transformTransformation(originalSchema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1_1")
+                    .constraintIDComesFrom("1", "1_2");
+        }
+
+        @Test
+        public void should_maintainTraceabilityMap_when_transformLogicSchemaDoesNotCreateSeveralConstraints() {
+            LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                         @1 :- T(x, y), P(x)
+                    """);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.transformTransformation(originalSchema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1");
+        }
     }
 }

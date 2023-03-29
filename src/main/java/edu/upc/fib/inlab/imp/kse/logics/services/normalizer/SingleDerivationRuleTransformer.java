@@ -7,7 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LevelHierarchy;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithoutIDSpecBuilder;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,6 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SingleDerivationRuleTransformer {
 
+    private final MultipleConstraintIDGenerator generatorId;
+
     private static final class PredicateNameToNewPredicateNamesMap extends HashMap<String, List<String>> {
     }
 
@@ -44,33 +46,54 @@ public class SingleDerivationRuleTransformer {
 
     private static final String SUFFIX_SEPARATOR = "_";
 
+    public SingleDerivationRuleTransformer(MultipleConstraintIDGenerator generatorId) {
+        this.generatorId = generatorId;
+    }
+
+    public SingleDerivationRuleTransformer() {
+        this(new SuffixMultipleConstraintIDGenerator());
+    }
+
     /**
      * @param logicSchema a not null logic schema
      * @return a new equivalent logic schema where every derived predicate is defined through only one derivation rule
      */
     public LogicSchema transform(LogicSchema logicSchema) {
-        if (Objects.isNull(logicSchema)) throw new IllegalArgumentException("LogicSchema cannot be null");
-        if (logicSchema.isEmpty()) return new LogicSchema(Set.of(), Set.of());
+        return transformTransformation(logicSchema).transformed();
+    }
 
+    /**
+     * @param logicSchema not-null
+     * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived predicate is defined through only one derivation rule
+     */
+    public SchemaTransformation transformTransformation(LogicSchema logicSchema) {
+        if (Objects.isNull(logicSchema)) throw new IllegalArgumentException("LogicSchema cannot be null");
+        if (logicSchema.isEmpty()) {
+            LogicSchema transformedSchema = new LogicSchema(Set.of(), Set.of());
+            return new SchemaTransformation(logicSchema, transformedSchema, new SchemaTraceabilityMap());
+        }
+
+        //TODO: ????
         PredicateNameToNewPredicateNamesMap predicateTransformMap = new PredicateNameToNewPredicateNamesMap();
+        SchemaTraceabilityMap constraintTransformMap = new SchemaTraceabilityMap();
 
         LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
-
         List<PredicateSpec> newPredicates = buildNewPredicates(levelHierarchy, predicateTransformMap);
         List<DerivationRuleSpec> newRules = buildNewDerivationRules(levelHierarchy, predicateTransformMap);
-        List<LogicConstraintWithoutIDSpec> newConstraints = buildNewLogicConstraints(logicSchema, predicateTransformMap);
+        List<LogicConstraintWithIDSpec> newConstraints = buildNewLogicConstraints(logicSchema, predicateTransformMap, constraintTransformMap);
 
-        return LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
+        LogicSchema transformedSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addAllPredicates(newPredicates)
                 .addAllDerivationRules(newRules)
                 .addAllLogicConstraints(newConstraints)
                 .build();
+        return new SchemaTransformation(logicSchema, transformedSchema, constraintTransformMap);
     }
 
-    private List<LogicConstraintWithoutIDSpec> buildNewLogicConstraints(LogicSchema logicSchema, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
-        List<LogicConstraintWithoutIDSpec> allConstraints = new LinkedList<>();
+    private List<LogicConstraintWithIDSpec> buildNewLogicConstraints(LogicSchema logicSchema, PredicateNameToNewPredicateNamesMap predicateTransformMap, SchemaTraceabilityMap constraintTransformMap) {
+        List<LogicConstraintWithIDSpec> allConstraints = new LinkedList<>();
         for (LogicConstraint logicConstraint : logicSchema.getAllLogicConstraints()) {
-            List<LogicConstraintWithoutIDSpec> newConstraints = buildLogicConstraintSpecsByConstraint(logicConstraint, predicateTransformMap);
+            List<LogicConstraintWithIDSpec> newConstraints = buildLogicConstraintSpecsByConstraint(logicConstraint, predicateTransformMap, constraintTransformMap);
             allConstraints.addAll(newConstraints);
         }
         return allConstraints;
@@ -166,6 +189,7 @@ public class SingleDerivationRuleTransformer {
         AtomicInteger i = new AtomicInteger(numberOfGeneratedRules + 1);
         return listOfDerivationRuleBodies.stream()
                 .map(listOfLiteralSpecs -> {
+                    //TODO - Generate a new name for the predicate
                     String newPredicateName = rule.getHead().getPredicateName() + SUFFIX_SEPARATOR + i.getAndIncrement();
                     return new DerivationRuleSpecBuilder()
                             .addHead(newPredicateName, buildTermSpecs(rule.getHead().getTerms()))
@@ -225,14 +249,25 @@ public class SingleDerivationRuleTransformer {
         }
     }
 
-    private List<LogicConstraintWithoutIDSpec> buildLogicConstraintSpecsByConstraint(LogicConstraint logicConstraint,
-                                                                                     PredicateNameToNewPredicateNamesMap predicateTransformMap) {
+    private List<LogicConstraintWithIDSpec> buildLogicConstraintSpecsByConstraint(
+            LogicConstraint logicConstraint,
+            PredicateNameToNewPredicateNamesMap predicateTransformMap,
+            SchemaTraceabilityMap constraintTransformMap
+    ) {
         List<BodySpecFragment> listOfBodyFragments = buildBodySpecFragmentsByLiteralsList(logicConstraint.getBody(), predicateTransformMap);
+        List<ConstraintID> newConstraintIDS = generatorId.generateNewConstraintsIDs(logicConstraint.getID(), listOfBodyFragments.size());
 
+        AtomicInteger index = new AtomicInteger(0);
         return listOfBodyFragments.stream()
-                .map(bodyFragment -> new LogicConstraintWithoutIDSpecBuilder()
-                        .addAllLiteralSpecs(bodyFragment)
-                        .build())
+                .map(bodyFragment -> {
+                            ConstraintID newConstraintId = newConstraintIDS.get(index.getAndIncrement());
+                            constraintTransformMap.addConstraintIDOrigin(newConstraintId, logicConstraint.getID());
+                            return new LogicConstraintWithIDSpecBuilder()
+                                    .addConstraintId(newConstraintId.id())
+                                    .addAllLiteralSpecs(bodyFragment)
+                                    .build();
+                        }
+                )
                 .toList();
     }
 

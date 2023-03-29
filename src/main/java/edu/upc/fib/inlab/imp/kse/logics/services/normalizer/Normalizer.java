@@ -27,16 +27,34 @@ public class Normalizer {
     }
 
     /**
+     * @param schema not null
+     * @return a transformation of the given schema where the resulting schema has been normalized
+     */
+    public SchemaTransformation normalizeTransformation(LogicSchema schema) {
+        if (Objects.isNull(schema)) {
+            throw new IllegalArgumentException("LogicSchema cannot be null");
+        }
+        SchemaTransformation unfoldedSchema = schemaUnfolder.unfoldTransformation(schema);
+        SchemaTransformation singleDerivationRulesSchema = singleDerivationRuleTransformer.transformTransformation(unfoldedSchema.transformed());
+        SchemaTransformation sortedSchema = bodySorter.sortTransformation(singleDerivationRulesSchema.transformed());
+        SchemaTransformation cleanTransformation = predicateCleaner.cleanTransformation(sortedSchema.transformed());
+
+        SchemaTraceabilityMap schemaTraceabilityMap = SchemaTraceabilityMap.collapseMaps(
+                unfoldedSchema.schemaTraceabilityMap(),
+                singleDerivationRulesSchema.schemaTraceabilityMap(),
+                sortedSchema.schemaTraceabilityMap(),
+                cleanTransformation.schemaTraceabilityMap()
+        );
+        return new SchemaTransformation(schema, cleanTransformation.transformed(), schemaTraceabilityMap);
+    }
+
+    /**
      * @param logicSchema a non-null schema
      * @return a normalized schema
      */
     public LogicSchema normalize(LogicSchema logicSchema) {
-        if (Objects.isNull(logicSchema)) {
-            throw new IllegalArgumentException("LogicSchema cannot be null");
-        }
-        LogicSchema unfoldedSchema = schemaUnfolder.unfold(logicSchema);
-        LogicSchema singleDerivationRulesSchema = singleDerivationRuleTransformer.transform(unfoldedSchema);
-        LogicSchema sortedSchema = bodySorter.sort(singleDerivationRulesSchema);
-        return predicateCleaner.clean(sortedSchema);
+        return normalizeTransformation(logicSchema).transformed();
     }
+
+
 }

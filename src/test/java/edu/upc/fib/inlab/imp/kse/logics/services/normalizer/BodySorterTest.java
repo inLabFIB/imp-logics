@@ -4,11 +4,10 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
+import edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BodySorterTest {
@@ -67,7 +67,7 @@ public class BodySorterTest {
         LogicSchema sortedSchema = new BodySorter().sort(logicSchema);
 
         LogicConstraint logicConstraint = sortedSchema.getLogicConstraintByID(new ConstraintID(constraintId));
-        ImmutableLiteralsListAssert.assertThat(logicConstraint.getBody())
+        assertThat(logicConstraint.getBody())
                 .describedAs(caseName)
                 .containsExactlyLiteralsOf(sortedLiterals);
     }
@@ -81,7 +81,7 @@ public class BodySorterTest {
         LogicSchema sortedSchema = new BodySorter().sort(logicSchema);
 
         DerivationRule rule = sortedSchema.getDerivationRulesByPredicateName("q").get(0);
-        ImmutableLiteralsListAssert.assertThat(rule.getBody())
+        assertThat(rule.getBody())
                 .describedAs(caseName)
                 .containsExactlyLiteralsOf(sortedLiterals);
     }
@@ -96,6 +96,22 @@ public class BodySorterTest {
 
         LogicSchema sortedSchema = new BodySorter().sort(logicSchema);
 
-        LogicSchemaAssert.assertThat(sortedSchema).containsExactlyThesePredicateNames("Z");
+        assertThat(sortedSchema).containsExactlyThesePredicateNames("Z");
+    }
+
+    @Test
+    public void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
+        LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                @1 :- P(x)
+                @2 :- Q(x)
+                @3 :- R(x)
+                """);
+
+        SchemaTransformation schemaTransformation = new BodySorter().sortTransformation(originalSchema);
+
+        SchemaTransformationAssert.assertThat(schemaTransformation)
+                .constraintIDComesFrom("1", "1")
+                .constraintIDComesFrom("2", "2")
+                .constraintIDComesFrom("3", "3");
     }
 }

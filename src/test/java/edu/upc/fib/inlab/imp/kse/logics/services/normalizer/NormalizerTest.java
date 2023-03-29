@@ -1,14 +1,16 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 import java.util.Set;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -62,13 +64,49 @@ public class NormalizerTest {
                 """);
 
         LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                @1 :- P(x), S(x), not(U_1(x)), not(U_2(x))
-                @2 :- P(x), T(x), not(U_1(x)), not(U_2(x))
+                @1_1 :- P(x), S(x), not(U_1(x)), not(U_2(x))
+                @1_2 :- P(x), T(x), not(U_1(x)), not(U_2(x))
                 U_1(x) :- V(x)
                 U_2(x) :- W(x)
                 """);
 
         LogicSchema normalizedSchema = new Normalizer().normalize(inputSchema);
-        LogicSchemaAssert.assertThat(normalizedSchema).assertAllLogicConstraintsAreEquivalent(expectedSchema);
+        assertThat(normalizedSchema).assertAllLogicConstraintsAreEquivalent(expectedSchema);
+    }
+
+    @Nested
+    class TraceabilityMap {
+
+        @Test
+        public void should_returnOriginalConstraintID_when_normalizingCreatesSeveralConstraints() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                R(a, b) :- T(a, b)
+                                R(a, b) :- U(a, b)
+                            """
+            );
+
+            SchemaTransformation schemaTransformation = new Normalizer().normalizeTransformation(schema);
+
+            SchemaTransformationAssert.assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1_1")
+                    .constraintIDComesFrom("1", "1_2");
+        }
+
+        @Test
+        public void should_returnOriginalConstraintID_when_normalizingCreatesOneConstraint() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                            """
+            );
+
+            SchemaTransformation schemaTransformation = new Normalizer().normalizeTransformation(schema);
+
+            SchemaTransformationAssert.assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1");
+        }
+
     }
 }

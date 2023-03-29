@@ -20,29 +20,41 @@ public class BodySorter {
 
     /**
      * @param logicSchema not-null
-     * @return a logicSchema with the bodies of the normal clauses sorted
+     * @return a transformation where the final logicSchema has sorted the bodies of its normal clauses
      */
-    public LogicSchema sort(LogicSchema logicSchema) {
+    public SchemaTransformation sortTransformation(LogicSchema logicSchema) {
         if (Objects.isNull(logicSchema)) {
             throw new IllegalArgumentException("LogicSchema cannot be null");
         }
-        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = sortBodyInLogicConstraints(logicSchema.getAllLogicConstraints());
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        List<LogicConstraintWithIDSpec> logicConstraintsSpecs = sortBodyInLogicConstraints(logicSchema.getAllLogicConstraints(), schemaTraceabilityMap);
         List<DerivationRuleSpec> derivationRulesSpecs = sortBodyInDerivationRules(logicSchema.getAllDerivationRules());
 
         List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicatesSpecs(logicSchema.getAllPredicates());
-        return LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+        LogicSchema outputLogicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addLogicConstraint(logicConstraintsSpecs)
                 .addDerivationRule(derivationRulesSpecs)
                 .addAllPredicates(predicateSpecs)
                 .build();
+
+        return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
     }
 
-    private static List<LogicConstraintWithIDSpec> sortBodyInLogicConstraints(Set<LogicConstraint> allLogicConstraints) {
+    /**
+     * @param logicSchema not-null
+     * @return a logicSchema with the bodies of the normal clauses sorted
+     */
+    public LogicSchema sort(LogicSchema logicSchema) {
+        return this.sortTransformation(logicSchema).transformed();
+    }
+
+    private static List<LogicConstraintWithIDSpec> sortBodyInLogicConstraints(Set<LogicConstraint> allLogicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
         return allLogicConstraints.stream()
                 .map(
                         lc -> {
                             ImmutableLiteralsList sortedBody = lc.getBody().getSorted();
                             BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(sortedBody);
+                            schemaTraceabilityMap.addConstraintIDOrigin(lc.getID(), lc.getID());
                             return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
                         }
                 )

@@ -10,26 +10,36 @@ import java.util.stream.Collectors;
 public class LogicSchemaToSpecHelper {
 
     public static List<DerivationRuleSpec> buildDerivationRuleSpecs(List<DerivationRule> usedDerivationRules) {
-        return usedDerivationRules.stream().map(dr -> {
-            BodySpec bodySpec = buildBodySpec(dr.getBody());
-            List<TermSpec> termSpecs = buildTermsSpecs(dr.getHead().getTerms());
-            return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
-        }).toList();
+        return usedDerivationRules.stream()
+                .map(LogicSchemaToSpecHelper::buildDerivationRuleSpec)
+                .toList();
+    }
+
+    private static DerivationRuleSpec buildDerivationRuleSpec(DerivationRule dr) {
+        BodySpec bodySpec = buildBodySpec(dr.getBody());
+        List<TermSpec> termSpecs = buildTermsSpecs(dr.getHead().getTerms());
+        return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
     }
 
     public static List<LogicConstraintWithIDSpec> buildLogicConstraintSpecs(Set<LogicConstraint> logicConstraints) {
         return logicConstraints.stream()
-                .map(lc -> {
-                    BodySpec bodySpec = buildBodySpec(lc.getBody());
-                    return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
-                })
+                .map(LogicSchemaToSpecHelper::buildLogicConstraintSpec)
                 .toList();
+    }
+
+    public static LogicConstraintWithIDSpec buildLogicConstraintSpec(LogicConstraint lc) {
+        BodySpec bodySpec = buildBodySpec(lc.getBody());
+        return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
     }
 
     public static List<PredicateSpec> buildPredicatesSpecs(Set<Predicate> allPredicates) {
         return allPredicates.stream()
-                .map(predicate -> new PredicateSpec(predicate.getName(), predicate.getArity()))
+                .map(LogicSchemaToSpecHelper::buildPredicateSpec)
                 .toList();
+    }
+
+    private static PredicateSpec buildPredicateSpec(Predicate predicate) {
+        return new PredicateSpec(predicate.getName(), predicate.getArity());
     }
 
     public static List<TermSpec> buildTermsSpecs(ImmutableTermList terms) {
@@ -59,5 +69,4 @@ public class LogicSchemaToSpecHelper {
                 })
                 .collect(Collectors.toList()));
     }
-
 }
