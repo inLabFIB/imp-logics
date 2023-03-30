@@ -10,6 +10,9 @@ variables:
   MAVEN_CLI_OPTS: "-s ci_settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 stages:
   - test
   - deploy
@@ -29,10 +32,5 @@ deploy:release:
     - mvn deploy -DskipTests $MAVEN_CLI_OPTS
   artifacts:
     paths:
-      - target/imp-logics-*.jar
+      - target/*.jar
     expire_in: 1 week
-
-sast:
-  stage: test
-include:
-  - template: Security/SAST.gitlab-ci.yml
