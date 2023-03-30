@@ -1,8 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;

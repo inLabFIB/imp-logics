@@ -3,7 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.operations;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Constant;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.TermMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.SubstitutionException;

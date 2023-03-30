@@ -5,6 +5,9 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LevelAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.LevelHierarchyException;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotInLevel;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivedPredicateMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LevelHierarchyMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

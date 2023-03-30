@@ -2,8 +2,8 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.TermMother;
 
 public class SubstitutionBuilder {
 

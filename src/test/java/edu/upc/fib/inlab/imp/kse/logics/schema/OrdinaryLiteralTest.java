@@ -2,10 +2,10 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.AtomMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.AtomMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.ImmutableLiteralsListMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;

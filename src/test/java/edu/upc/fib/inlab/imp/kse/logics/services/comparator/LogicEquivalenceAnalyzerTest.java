@@ -2,8 +2,8 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.DerivationRuleMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicConstraintMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

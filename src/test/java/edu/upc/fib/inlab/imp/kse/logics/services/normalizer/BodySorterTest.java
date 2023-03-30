@@ -4,7 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert;

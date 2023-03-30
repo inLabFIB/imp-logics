@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.printer;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

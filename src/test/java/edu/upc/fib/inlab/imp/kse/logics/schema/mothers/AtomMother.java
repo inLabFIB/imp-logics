@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.schema.utils;
+package edu.upc.fib.inlab.imp.kse.logics.schema.mothers;
 
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;

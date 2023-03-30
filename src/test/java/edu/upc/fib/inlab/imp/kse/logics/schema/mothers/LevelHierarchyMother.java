@@ -1,6 +1,8 @@
-package edu.upc.fib.inlab.imp.kse.logics.schema.utils;
+package edu.upc.fib.inlab.imp.kse.logics.schema.mothers;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.Level;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LevelHierarchy;
 
 import java.util.Arrays;
 import java.util.LinkedList;

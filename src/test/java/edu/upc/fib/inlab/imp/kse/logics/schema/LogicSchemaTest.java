@@ -2,7 +2,8 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LevelHierarchyAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.*;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LevelHierarchy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

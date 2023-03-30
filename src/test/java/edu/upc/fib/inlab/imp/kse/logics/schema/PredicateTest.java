@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.ArityMismatch;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.QueryMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.QueryMother;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

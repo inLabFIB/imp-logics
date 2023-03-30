@@ -1,8 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
