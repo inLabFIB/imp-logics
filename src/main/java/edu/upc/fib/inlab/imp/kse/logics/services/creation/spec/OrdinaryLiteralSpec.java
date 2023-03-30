@@ -25,6 +25,7 @@ public class OrdinaryLiteralSpec extends LiteralSpec implements LogicElementSpec
         return predicateName;
     }
 
+    @Override
     public List<TermSpec> getTermSpecList() {
         return termsList;
     }

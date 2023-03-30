@@ -22,7 +22,8 @@ public class BuiltInLiteralSpec extends LiteralSpec implements LogicElementSpec 
         return operator;
     }
 
-    public List<TermSpec> getTermSpecs() {
+    @Override
+    public List<TermSpec> getTermSpecList() {
         return termSpecs;
     }
 }

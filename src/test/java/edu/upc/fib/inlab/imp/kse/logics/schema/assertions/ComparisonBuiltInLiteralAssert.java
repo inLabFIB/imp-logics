@@ -16,12 +16,12 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
 
     @SuppressWarnings("UnusedReturnValue")
     public ComparisonBuiltInLiteralAssert correspondsSpec(BuiltInLiteralSpec spec) {
-        if (spec.getTermSpecs().size() != 2) {
+        if (spec.getTermSpecList().size() != 2) {
             throw new IllegalArgumentException("Built-in literal spec must have 2 terms to be compared with ComparisonBuiltInLiteral");
         }
         Assertions.assertThat(actual.getOperator().getSymbol()).isEqualTo(spec.getOperator());
-        TermAssert.assertThat(actual.getLeftTerm()).correspondsSpec(spec.getTermSpecs().get(0));
-        TermAssert.assertThat(actual.getRightTerm()).correspondsSpec(spec.getTermSpecs().get(1));
+        TermAssert.assertThat(actual.getLeftTerm()).correspondsSpec(spec.getTermSpecList().get(0));
+        TermAssert.assertThat(actual.getRightTerm()).correspondsSpec(spec.getTermSpecList().get(1));
         return this;
     }
 

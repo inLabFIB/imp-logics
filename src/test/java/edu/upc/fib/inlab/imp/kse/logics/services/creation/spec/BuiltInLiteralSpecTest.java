@@ -13,7 +13,7 @@ public class BuiltInLiteralSpecTest {
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", List.of(new ConstantSpec("a")));
 
         assertThat(builtInLiteralSpec.getOperator()).isEqualTo("=");
-        assertThat(builtInLiteralSpec.getTermSpecs()).containsExactly(new ConstantSpec("a"));
+        assertThat(builtInLiteralSpec.getTermSpecList()).containsExactly(new ConstantSpec("a"));
     }
 
     @Test

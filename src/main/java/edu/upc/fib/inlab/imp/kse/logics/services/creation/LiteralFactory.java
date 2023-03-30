@@ -29,15 +29,15 @@ public class LiteralFactory {
         ComparisonOperator comparisonOperator = ComparisonOperator.fromSymbol(bilSpec.getOperator());
         if (Objects.nonNull(comparisonOperator)) {
             checkNumberOfTerms(bilSpec);
-            Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecs().get(0));
-            Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecs().get(1));
+            Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(0));
+            Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(1));
             return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperator);
         } else throw new UnrecognizedBuiltInOperator(bilSpec.getOperator());
     }
 
     private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec) {
-        if (bilSpec.getTermSpecs().size() != 2)
-            throw new WrongNumberOfTermsInBuiltInLiteral(2, bilSpec.getTermSpecs().size());
+        if (bilSpec.getTermSpecList().size() != 2)
+            throw new WrongNumberOfTermsInBuiltInLiteral(2, bilSpec.getTermSpecList().size());
     }
 
 }
