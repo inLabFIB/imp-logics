@@ -9,8 +9,16 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSche
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service that removes all those predicates (base or derived) that are not used in any LogicConstraint (neither
+ * directly, neither transitively)
+ */
 public class PredicateCleaner {
 
+    /**
+     * @param originalSchema not null
+     * @return a transformation where the resulting logicSchema does not have any unused predicate
+     */
     public SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
         checkLogicSchema(originalSchema);
 
@@ -23,6 +31,10 @@ public class PredicateCleaner {
         return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
     }
 
+    /**
+     * @param logicSchema not null
+     * @return a copy of the logic schema where the unused predicates have been removed
+     */
     public LogicSchema clean(LogicSchema logicSchema) {
         return cleanTransformation(logicSchema).transformed();
     }

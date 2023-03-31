@@ -14,7 +14,11 @@ import java.util.Set;
 
 /**
  * Service that returns a copy of the logicSchema where every normal clause (logic constraint, or derivation rule) has
- * its body sorted according to the following order: 1) positive literals, 2) negated literals, 3) built-in literals
+ * its body sorted according to the following order: 1) positive literals, 2) negated literals, 3) built-in literals.
+ * <p>
+ * Sorting the body literals in this way is useful, for instance, for evaluating the body. Indeed, we cannot
+ * evaluate a built-in literal or negated literal until we know which values can take its variables, and such values
+ * can be obtained by first evaluating the positive literals.
  */
 public class BodySorter {
 
