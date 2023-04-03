@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
-import static edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert.assertThat;
+import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
@@ -142,7 +142,7 @@ class SchemaUnfolderTest {
     }
 
     @Nested
-    class TraceabilityMap {
+    class TraceabilityMapTest {
 
         @Test
         public void should_returnOriginalConstraintID_when_unfoldingCreatesSeveralConstraints() {

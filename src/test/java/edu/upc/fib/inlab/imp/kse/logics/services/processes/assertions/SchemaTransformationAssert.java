@@ -1,7 +1,7 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.services.normalizer.SchemaTransformation;
+import edu.upc.fib.inlab.imp.kse.logics.services.processes.SchemaTransformation;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 

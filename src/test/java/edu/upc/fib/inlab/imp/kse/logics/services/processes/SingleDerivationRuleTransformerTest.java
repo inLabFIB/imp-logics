@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
-import static edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert.assertThat;
+import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

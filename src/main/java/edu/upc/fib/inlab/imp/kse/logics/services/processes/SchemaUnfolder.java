@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaFactory;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * Der1(x) :- Base3(x) <br>
  * Der2(x) :- Base3(x) <br>
  */
-public class SchemaUnfolder {
+public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator multipleConstraintIDGenerator;
 
@@ -33,6 +33,25 @@ public class SchemaUnfolder {
 
     public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator) {
         this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
+    }
+
+    @Override
+    public LogicSchema execute(LogicSchema logicSchema) {
+        return unfold(logicSchema);
+    }
+
+    @Override
+    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
+        return unfoldTransformation(logicSchema);
+    }
+
+    /**
+     * @param schema not null
+     * @return a new schema with the same (based & derived) predicates as the one given but unfolding
+     * all the positive derived literals
+     */
+    public LogicSchema unfold(LogicSchema schema) {
+        return unfoldTransformation(schema).transformed();
     }
 
     /**
@@ -48,15 +67,6 @@ public class SchemaUnfolder {
 
         LogicSchema unfoldedSchema = LogicSchemaFactory.defaultLogicSchemaWithIDsFactory().createLogicSchema(logicSchemaSpec);
         return new SchemaTransformation(schema, unfoldedSchema, schemaTraceabilityMap);
-    }
-
-    /**
-     * @param schema not null
-     * @return a new schema with the same (based & derived) predicates as the one given but unfolding
-     * all the positive derived literals
-     */
-    public LogicSchema unfold(LogicSchema schema) {
-        return unfoldTransformation(schema).transformed();
     }
 
     private LogicSchemaSpec<LogicConstraintWithIDSpec> computeUnfoldedLogicSchemaSpec(LogicSchema schema, SchemaTraceabilityMap schemaTraceabilityMap) {
@@ -142,6 +152,5 @@ public class SchemaUnfolder {
         List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicatesSpecs(allPredicates);
         return predicateSpecs.toArray(predicateSpecs.toArray(new PredicateSpec[0]));
     }
-
 
 }

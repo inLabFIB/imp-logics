@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
@@ -20,7 +20,25 @@ import java.util.Set;
  * evaluate a built-in literal or negated literal until we know which values can take its variables, and such values
  * can be obtained by first evaluating the positive literals.
  */
-public class BodySorter {
+public class BodySorter implements LogicProcess, SchemaTransformationProcess {
+
+    @Override
+    public LogicSchema execute(LogicSchema logicSchema) {
+        return sort(logicSchema);
+    }
+
+    @Override
+    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
+        return sortTransformation(logicSchema);
+    }
+
+    /**
+     * @param logicSchema not-null
+     * @return a logicSchema with the bodies of the normal clauses sorted
+     */
+    public LogicSchema sort(LogicSchema logicSchema) {
+        return this.sortTransformation(logicSchema).transformed();
+    }
 
     /**
      * @param logicSchema not-null
@@ -42,14 +60,6 @@ public class BodySorter {
                 .build();
 
         return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
-    }
-
-    /**
-     * @param logicSchema not-null
-     * @return a logicSchema with the bodies of the normal clauses sorted
-     */
-    public LogicSchema sort(LogicSchema logicSchema) {
-        return this.sortTransformation(logicSchema).transformed();
     }
 
     private static List<LogicConstraintWithIDSpec> sortBodyInLogicConstraints(Set<LogicConstraint> allLogicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {

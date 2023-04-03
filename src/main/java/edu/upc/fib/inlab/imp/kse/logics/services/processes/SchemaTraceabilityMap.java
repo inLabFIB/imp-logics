@@ -1,27 +1,27 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class SchemaTraceabilityMap {
     private final Map<ConstraintID, ConstraintID> constraintToOrigConstraintIDMap = new HashMap<>();
 
-    public static SchemaTraceabilityMap collapseMaps(SchemaTraceabilityMap... maps) {
+    public static SchemaTraceabilityMap collapseMaps(List<SchemaTraceabilityMap> maps) {
 
-        SchemaTraceabilityMap resultMap = new SchemaTraceabilityMap();
+        List<SchemaTraceabilityMap> reverseList = new LinkedList<>(maps);
+        Collections.reverse(reverseList);
 
-        SchemaTraceabilityMap lastMap = maps[maps.length - 1];
-        lastMap.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
-            for (int i = maps.length - 1; i >= 0; --i) {
-                originalId = maps[i].getOriginalConstraintID(originalId);
-            }
-            resultMap.addConstraintIDOrigin(finalId, originalId);
+        return reverseList.stream().reduce(new SchemaTraceabilityMap(), SchemaTraceabilityMap::joinMap);
+    }
+
+    private static SchemaTraceabilityMap joinMap(SchemaTraceabilityMap previous, SchemaTraceabilityMap current) {
+        if (previous.constraintToOrigConstraintIDMap.isEmpty()) return current;
+        previous.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
+            ConstraintID newOriginalId = current.getOriginalConstraintID(originalId);
+            previous.addConstraintIDOrigin(finalId, newOriginalId);
         });
-
-        return resultMap;
+        return previous;
     }
 
     public void addConstraintIDOrigin(ConstraintID constraintID, ConstraintID originalID) {

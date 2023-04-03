@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
@@ -7,7 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
 import org.junit.jupiter.api.Test;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
-import static edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert.assertThat;
+import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

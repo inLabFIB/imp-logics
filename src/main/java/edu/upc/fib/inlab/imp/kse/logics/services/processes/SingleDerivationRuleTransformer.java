@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
@@ -34,24 +34,36 @@ import java.util.concurrent.atomic.AtomicInteger;
  * :- P_2, R <br>
  * :- S, not(P_1), not(P_2) <br>
  */
-public class SingleDerivationRuleTransformer {
+public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator generatorId;
 
     private static final class PredicateNameToNewPredicateNamesMap extends HashMap<String, List<String>> {
+
     }
 
     private static final class BodySpecFragment extends LinkedList<LiteralSpec> {
+
     }
 
     private static final String SUFFIX_SEPARATOR = "_";
+
+    public SingleDerivationRuleTransformer() {
+        this(new SuffixMultipleConstraintIDGenerator());
+    }
 
     public SingleDerivationRuleTransformer(MultipleConstraintIDGenerator generatorId) {
         this.generatorId = generatorId;
     }
 
-    public SingleDerivationRuleTransformer() {
-        this(new SuffixMultipleConstraintIDGenerator());
+    @Override
+    public LogicSchema execute(LogicSchema logicSchema) {
+        return transform(logicSchema);
+    }
+
+    @Override
+    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
+        return transformTransformation(logicSchema);
     }
 
     /**

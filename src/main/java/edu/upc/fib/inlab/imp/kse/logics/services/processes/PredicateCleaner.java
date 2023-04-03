@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
@@ -13,7 +13,25 @@ import java.util.stream.Collectors;
  * Service that removes all those predicates (base or derived) that are not used in any LogicConstraint (neither
  * directly, neither transitively)
  */
-public class PredicateCleaner {
+public class PredicateCleaner implements LogicProcess, SchemaTransformationProcess {
+
+    @Override
+    public LogicSchema execute(LogicSchema logicSchema) {
+        return clean(logicSchema);
+    }
+
+    @Override
+    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
+        return cleanTransformation(logicSchema);
+    }
+
+    /**
+     * @param logicSchema not null
+     * @return a copy of the logic schema where the unused predicates have been removed
+     */
+    public LogicSchema clean(LogicSchema logicSchema) {
+        return cleanTransformation(logicSchema).transformed();
+    }
 
     /**
      * @param originalSchema not null
@@ -29,14 +47,6 @@ public class PredicateCleaner {
         LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
 
         return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
-    }
-
-    /**
-     * @param logicSchema not null
-     * @return a copy of the logic schema where the unused predicates have been removed
-     */
-    public LogicSchema clean(LogicSchema logicSchema) {
-        return cleanTransformation(logicSchema).transformed();
     }
 
     private static void checkLogicSchema(LogicSchema logicSchema) {
@@ -104,5 +114,4 @@ public class PredicateCleaner {
         }
         return logicConstraintsSpecs;
     }
-
 }

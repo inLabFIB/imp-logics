@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.normalizer;
+package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
@@ -7,7 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
-import edu.upc.fib.inlab.imp.kse.logics.services.normalizer.assertions.SchemaTransformationAssert;
+import edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
