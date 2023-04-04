@@ -29,7 +29,7 @@ test:unit:
 deploy:release:
   stage: deploy
   script:
-    - mvn deploy -DskipTests $MAVEN_CLI_OPTS
+    - mvn deploy -DskipTests -U $MAVEN_CLI_OPTS
   artifacts:
     paths:
       - target/*.jar
