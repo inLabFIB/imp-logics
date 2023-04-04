@@ -3,8 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LogicSchemaToSpecHelper {
@@ -76,5 +75,33 @@ public class LogicSchemaToSpecHelper {
         ImmutableTermList terms = builtInLiteral.getTerms();
         List<TermSpec> termSpecs = buildTermsSpecs(terms);
         return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
+    }
+
+
+    public static final class BodySpecFragment extends LinkedList<LiteralSpec> {
+
+        public BodySpecFragment() {
+        }
+
+        public BodySpecFragment(LiteralSpec... literals) {
+            super(List.of(literals));
+        }
+
+        public BodySpecFragment(Collection<? extends LiteralSpec> c) {
+            super(c);
+        }
+    }
+
+    public static List<BodySpecFragment> cartesianProduct(List<BodySpecFragment> firstListOfFragments, List<BodySpecFragment> secondListOfFragments) {
+        List<BodySpecFragment> result = new ArrayList<>();
+        for (BodySpecFragment firstFragment : firstListOfFragments) {
+            for (BodySpecFragment secondFragment : secondListOfFragments) {
+                BodySpecFragment newFragment = new BodySpecFragment();
+                newFragment.addAll(firstFragment);
+                newFragment.addAll(secondFragment);
+                result.add(newFragment);
+            }
+        }
+        return result;
     }
 }

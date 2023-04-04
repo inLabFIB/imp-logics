@@ -8,6 +8,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper.BodySpecFragment;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,10 +41,6 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
     private final MultipleConstraintIDGenerator generatorId;
 
     private static final class PredicateNameToNewPredicateNamesMap extends HashMap<String, List<String>> {
-
-    }
-
-    private static final class BodySpecFragment extends LinkedList<LiteralSpec> {
 
     }
 
@@ -159,7 +157,7 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
 
         if (predicateGeneratesSingleRule) {
             DerivationRule dr = predicate.getDerivationRules().get(0);
-            List<BodySpecFragment> lists = buildBodySpecFragmentsByLiteralsList(dr.getBody(), predicateTransformMap);
+            List<LogicSchemaToSpecHelper.BodySpecFragment> lists = buildBodySpecFragmentsByLiteralsList(dr.getBody(), predicateTransformMap);
             List<LiteralSpec> literalSpecs = lists.get(0);
             DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
                     .addHead(predicate.getName(), buildTermSpecs(dr.getHead().getTerms()))
@@ -225,7 +223,7 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
         List<BodySpecFragment> result = List.of(new BodySpecFragment());
         for (Literal literal : literalsList) {
             List<BodySpecFragment> listOfLiteralSpecs = buildBodySpecFragmentsByLiteral(literal, predicateTransformMap);
-            result = cartesianProduct(result, listOfLiteralSpecs);
+            result = LogicSchemaToSpecHelper.cartesianProduct(result, listOfLiteralSpecs);
         }
         return result;
     }
@@ -281,19 +279,6 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
                         }
                 )
                 .toList();
-    }
-
-    private List<BodySpecFragment> cartesianProduct(List<BodySpecFragment> firstListOfFragments, List<BodySpecFragment> secondListOfFragments) {
-        List<BodySpecFragment> result = new ArrayList<>();
-        for (BodySpecFragment firstFragment : firstListOfFragments) {
-            for (BodySpecFragment secondFragment : secondListOfFragments) {
-                BodySpecFragment newFragment = new BodySpecFragment();
-                newFragment.addAll(firstFragment);
-                newFragment.addAll(secondFragment);
-                result.add(newFragment);
-            }
-        }
-        return result;
     }
 
     private List<TermSpec> buildTermSpecs(ImmutableTermList terms) {
