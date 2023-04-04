@@ -72,7 +72,7 @@ public class LogicSchemaToSpecHelper {
                 ordinaryLiteral.isPositive());
     }
 
-    private static BuiltInLiteralSpec buildBuiltInLiteralSpec(BuiltInLiteral builtInLiteral) {
+    public static BuiltInLiteralSpec buildBuiltInLiteralSpec(BuiltInLiteral builtInLiteral) {
         ImmutableTermList terms = builtInLiteral.getTerms();
         List<TermSpec> termSpecs = buildTermsSpecs(terms);
         return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
