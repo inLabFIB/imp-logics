@@ -56,17 +56,25 @@ public class LogicSchemaToSpecHelper {
         return new BodySpec(body.stream()
                 .map(l -> {
                     if (l instanceof OrdinaryLiteral ordinaryLiteral) {
-                        ImmutableTermList terms = ordinaryLiteral.getTerms();
-                        List<TermSpec> termSpecs = buildTermsSpecs(terms);
-                        return new OrdinaryLiteralSpec(ordinaryLiteral.getAtom().getPredicateName(),
-                                termSpecs,
-                                ordinaryLiteral.isPositive());
-                    } else if (l instanceof ComparisonBuiltInLiteral comparisonBuiltInLiteral) {
-                        ImmutableTermList terms = comparisonBuiltInLiteral.getTerms();
-                        List<TermSpec> termSpecs = buildTermsSpecs(terms);
-                        return new BuiltInLiteralSpec(comparisonBuiltInLiteral.getOperationName(), termSpecs);
+                        return buildOrdinaryLiteralSpec(ordinaryLiteral);
+                    } else if (l instanceof BuiltInLiteral comparisonBuiltInLiteral) {
+                        return buildBuiltInLiteralSpec(comparisonBuiltInLiteral);
                     } else throw new RuntimeException("Unknown literal type: " + l.getClass().getName());
                 })
                 .collect(Collectors.toList()));
+    }
+
+    public static OrdinaryLiteralSpec buildOrdinaryLiteralSpec(OrdinaryLiteral ordinaryLiteral) {
+        ImmutableTermList terms = ordinaryLiteral.getTerms();
+        List<TermSpec> termSpecs = buildTermsSpecs(terms);
+        return new OrdinaryLiteralSpec(ordinaryLiteral.getAtom().getPredicateName(),
+                termSpecs,
+                ordinaryLiteral.isPositive());
+    }
+
+    private static BuiltInLiteralSpec buildBuiltInLiteralSpec(BuiltInLiteral builtInLiteral) {
+        ImmutableTermList terms = builtInLiteral.getTerms();
+        List<TermSpec> termSpecs = buildTermsSpecs(terms);
+        return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
     }
 }
