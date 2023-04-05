@@ -29,6 +29,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         return this;
     }
 
+    @SuppressWarnings("unused")
     public PredicateAssert isDerived(boolean expected) {
         Assertions.assertThat(actual.isDerived()).isEqualTo(expected);
         return this;
@@ -69,12 +70,45 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules) {
+        return isDerivationRuleContained(derivationRule, listOfRules, new LogicEquivalenceAnalyzer());
+    }
+
+    private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule aRuleOfTheList : listOfRules) {
-            LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new LogicEquivalenceAnalyzer();
-            if (logicEquivalenceAnalyzer.areEquivalent(derivationRule, aRuleOfTheList)) {
+            if (analyzer.areEquivalent(derivationRule, aRuleOfTheList)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering
+     * that two derived ordinary literals are equivalent according to the given strategy.
+     *
+     * @param expectedRule not null
+     * @return this assert
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public PredicateAssert containsEquivalentDerivationRule(DerivationRule expectedRule, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
+        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer())) {
+            Assertions.fail("Missing derivation rule " + expectedRule);
+        }
+        return this;
+    }
+
+    /**
+     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering
+     * that two derived ordinary literals are equivalent iff their definition rules are equivalent
+     *
+     * @param expectedRule not null
+     * @return this assert
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public PredicateAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
+        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules())) {
+            Assertions.fail("Missing derivation rule " + expectedRule);
+        }
+        return this;
     }
 }

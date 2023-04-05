@@ -15,9 +15,9 @@ import java.util.Objects;
  * have a mutual homomorphism. That is, there is an homomorphism from A to B, and another from B to A. Such test
  * is sound, but incomplete. </p>
  *
- * <p> This class ignores the names of the derived predicate names. That is, two derived ordinary literals are considered
+ * <p> This class, by default, ignores the names of the derived predicate names. That is, two derived ordinary literals are considered
  * to be homomorphic if there is an homomorphism for their terms, and their derivation rules are homomorphic, but they
- * might have different predicate names.</p>
+ * might have different predicate names. Such behavior can be overriden by injecting a different HomomorphismFinder</p>
  *
  * <p> This class also ignores the schemas where the predicate belong to. That is, two base ordinary literals are considered
  * to be homomorphic if their predicate names coincide, and there is an homomorphism for their terms, but both literals belongs
@@ -26,10 +26,14 @@ import java.util.Objects;
  */
 public class LogicEquivalenceAnalyzer {
 
-    private final ExtendedHomomorphismFinder extendedHomomorphismFinder;
+    private final HomomorphismFinder homomorphismFinder;
 
     public LogicEquivalenceAnalyzer() {
-        extendedHomomorphismFinder = new ExtendedHomomorphismFinder();
+        this(new ExtendedHomomorphismFinder());
+    }
+
+    public LogicEquivalenceAnalyzer(HomomorphismFinder homomorphismFinder) {
+        this.homomorphismFinder = homomorphismFinder;
     }
 
     /**
@@ -44,7 +48,7 @@ public class LogicEquivalenceAnalyzer {
     }
 
     private boolean existHomomorphism(List<Literal> first, List<Literal> second) {
-        return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
+        return homomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
     /**
@@ -60,7 +64,7 @@ public class LogicEquivalenceAnalyzer {
     }
 
     private boolean existHomomorphism(LogicConstraint first, LogicConstraint second) {
-        return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
+        return homomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
     /**
@@ -75,7 +79,7 @@ public class LogicEquivalenceAnalyzer {
     }
 
     private boolean existHomomorphism(DerivationRule first, DerivationRule second) {
-        return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
+        return homomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
 }

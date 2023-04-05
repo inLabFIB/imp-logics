@@ -1,11 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.*;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
@@ -117,9 +114,12 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
     private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
-        LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new LogicEquivalenceAnalyzer();
+        return logicConstraintIsContainedInList(constraint, constraintSet, new LogicEquivalenceAnalyzer());
+    }
+
+    private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
         for (LogicConstraint aConstraintFromSet : constraintSet) {
-            if (logicEquivalenceAnalyzer.areEquivalent(constraint, aConstraintFromSet)) {
+            if (analyzer.areEquivalent(constraint, aConstraintFromSet)) {
                 return true;
             }
         }
@@ -156,6 +156,83 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
             }
         }
 
+        return this;
+    }
+
+
+    public enum DerivedLiteralStrategy {
+        HOMOMORPHIC_RULES(new HomomorphicRulesHomomorphismCriteria()),
+        SAME_NAME(new SamePredicateNameCriteria());
+
+        private final DerivedOrdinaryLiteralHomomorphismCriteria criteria;
+
+        DerivedLiteralStrategy(DerivedOrdinaryLiteralHomomorphismCriteria criteria) {
+            this.criteria = criteria;
+        }
+
+        public LogicEquivalenceAnalyzer getAnalyzer() {
+            return new LogicEquivalenceAnalyzer(new HomomorphismFinder(this.criteria));
+        }
+
+    }
+
+    /**
+     * Checks whether the actual schema contains a constraint equivalent to expectedConstraint considering
+     * that two derived ordinary literals are equivalent if their derivation rules are equivalent
+     *
+     * @param expectedConstraint not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentConstraint(LogicConstraint expectedConstraint) {
+        if (!this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints())) {
+            Assertions.fail("Missing expected constraint " + expectedConstraint);
+        }
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a constraint equivalent to expectedConstraint considering
+     * that two derived ordinary literals are equivalent according to the given strategy.
+     *
+     * @param expectedConstraint      not null
+     * @param derivedLiteralsStrategy not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentConstraint(LogicConstraint expectedConstraint, DerivedLiteralStrategy derivedLiteralsStrategy) {
+        if (!this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), derivedLiteralsStrategy.getAnalyzer())) {
+            Assertions.fail("Missing expected constraint " + expectedConstraint);
+        }
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
+     * that two derived ordinary literals are equivalent according to the given strategy.
+     *
+     * @param expectedRule            not null
+     * @param derivedLiteralsStrategy not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule, DerivedLiteralStrategy derivedLiteralsStrategy) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
+        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule, derivedLiteralsStrategy);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
+     * that two derived ordinary literals are equivalent according to the given strategy.
+     *
+     * @param expectedRule not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
+        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule);
         return this;
     }
 

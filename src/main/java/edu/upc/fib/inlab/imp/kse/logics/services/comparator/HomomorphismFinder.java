@@ -47,7 +47,7 @@ public class HomomorphismFinder {
         derivedOrdinaryLiteralHomomorphismCriteria = Optional.empty();
     }
 
-    protected HomomorphismFinder(DerivedOrdinaryLiteralHomomorphismCriteria derivedOrdinaryLiteralHomomorphismCriteria) {
+    public HomomorphismFinder(DerivedOrdinaryLiteralHomomorphismCriteria derivedOrdinaryLiteralHomomorphismCriteria) {
         this.derivedOrdinaryLiteralHomomorphismCriteria = Optional.ofNullable(derivedOrdinaryLiteralHomomorphismCriteria);
     }
 
@@ -223,7 +223,7 @@ public class HomomorphismFinder {
      * @param rangeAtom           is not null
      * @return an extension of the currentSubstitution that makes domainAtom to be equal to rangeAtom, if exists
      */
-    private Optional<Substitution> computeHomomorphismExtensionForAtom(Substitution currentSubstitution, Atom domainAtom, Atom rangeAtom) {
+    protected Optional<Substitution> computeHomomorphismExtensionForAtom(Substitution currentSubstitution, Atom domainAtom, Atom rangeAtom) {
         if (!domainAtom.getPredicateName().equals(rangeAtom.getPredicateName())) {
             return Optional.empty();
         }

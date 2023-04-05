@@ -7,7 +7,11 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import java.util.List;
 import java.util.Optional;
 
-public class DefaultDerivedLiteralHomomorphismCriteria implements DerivedOrdinaryLiteralHomomorphismCriteria {
+/**
+ * Under this criteria, two derived ordinary literals are considered homomorphic, even if they have different predicate names,
+ * if their derivation rules are homomorphic
+ */
+public class HomomorphicRulesHomomorphismCriteria implements DerivedOrdinaryLiteralHomomorphismCriteria {
 
     @Override
     public Optional<Substitution> computeHomomorphismExtensionForDerivedOrdinaryLiteral(HomomorphismFinder homomorphismFinder, Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
