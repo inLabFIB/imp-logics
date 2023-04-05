@@ -58,11 +58,23 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
 
+    public LogicSchemaAssert isEmpty() {
+        Assertions.assertThat(actual.isEmpty())
+                .describedAs("Actual logic schema is not empty")
+                .isTrue();
+        return this;
+    }
+
     /**
      * Asserts whether the actual logicSchema is equivalent to the expectedSchema.
-     * This comparison is NOT agnostic with the name of the derived predicates.
+     * That is, whether they have equivalent predicates (base, and derived), and equivalent constraints.
+     * Do note that this comparison is NOT agnostic with the name of the derived predicates.
+     * <p>
+     * Since this check is not decidable, this method applies a sound (but not complete) strategy.
+     * In particular, for each normal clause of one schema, it tries to find an homomorphic normal clause of the other
+     * schema, and viceversa.
      *
-     * @param expectedSchema not-null
+     * @param expectedSchema not null
      * @return this assert
      */
     @SuppressWarnings("UnusedReturnValue")
@@ -72,6 +84,19 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return this;
     }
 
+    /**
+     * Asserts whether the actual logicSchema constraints are equivalent to the expectedSchema constraints.
+     * Do note that this comparison IS agnostic with the name of the derived predicates.
+     * <p>
+     * Since this check is not decidable, this method applies a sound (but not complete) strategy.
+     * In particular, for each logicConstraint of one schema, it tries to find an homomorphic logicConstraint of the other
+     * schema, and viceversa. In such case, two derived ordinary literals are considered to be homomorphic if they have
+     * homomorphic definition rules. In practice, this means that two logic constraints are equivalent if they are
+     * the same up-to renaming of variables and derived predicate names.
+     *
+     * @param expectedSchema not null
+     * @return this assert
+     */
     @SuppressWarnings("UnusedReturnValue")
     public LogicSchemaAssert assertAllLogicConstraintsAreEquivalent(LogicSchema expectedSchema) {
         for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
@@ -101,6 +126,17 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return false;
     }
 
+    /**
+     * Asserts whether the actual logicSchema predicates (base or derived) are equivalent to the expectedSchema.
+     * Do note that this comparison is NOT agnostic with the name of the derived predicates.
+     * <p>
+     * Since this check is not decidable, this method applies a sound (but not complete) strategy.
+     * In particular, for each derivation rule of one schema, it tries to find an homomorphic derivation rule of the other
+     * schema, and viceversa.
+     *
+     * @param expectedSchema not null
+     * @return this assert
+     */
     @SuppressWarnings("UnusedReturnValue")
     public LogicSchemaAssert assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
         for (Predicate actualPredicate : actual.getAllPredicates()) {
@@ -123,10 +159,4 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return this;
     }
 
-    public LogicSchemaAssert isEmpty() {
-        Assertions.assertThat(actual.isEmpty())
-                .describedAs("Actual logic schema is not empty")
-                .isTrue();
-        return this;
-    }
 }

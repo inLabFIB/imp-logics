@@ -32,6 +32,11 @@ public class LogicEquivalenceAnalyzer {
         extendedHomomorphismFinder = new ExtendedHomomorphismFinder();
     }
 
+    /**
+     * @param first  not null
+     * @param second not null
+     * @return whether both literalslist are equivalent
+     */
     public boolean areEquivalent(List<Literal> first, List<Literal> second) {
         if (Objects.isNull(first)) throw new IllegalArgumentException("First list of literals cannot be null");
         if (Objects.isNull(second)) throw new IllegalArgumentException("Second list of literals cannot be null");
@@ -42,6 +47,11 @@ public class LogicEquivalenceAnalyzer {
         return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
+    /**
+     * @param first  not null
+     * @param second not null
+     * @return whether both logicConstraints are equivalent
+     */
     public boolean areEquivalent(LogicConstraint first, LogicConstraint second) {
         if (Objects.isNull(first)) throw new IllegalArgumentException("First logic constraint cannot be null");
         if (Objects.isNull(second)) throw new IllegalArgumentException("Second logic constraint cannot be null");
@@ -53,6 +63,11 @@ public class LogicEquivalenceAnalyzer {
         return extendedHomomorphismFinder.findHomomorphism(first, second).isPresent();
     }
 
+    /**
+     * @param first  not null
+     * @param second not null
+     * @return whether both derivation rules are equivalent
+     */
     public boolean areEquivalent(DerivationRule first, DerivationRule second) {
         if (Objects.isNull(first)) throw new IllegalArgumentException("First derivation rule cannot be null");
         if (Objects.isNull(second)) throw new IllegalArgumentException("Second derivation rule cannot be null");

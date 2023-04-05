@@ -24,6 +24,13 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         return new ImmutableLiteralsListAssert(actual);
     }
 
+    /**
+     * Checks whether the actual literals are the same as the expected literals up-to renaming
+     * variables, and derived predicate names.
+     *
+     * @param expected not null
+     * @return this assert
+     */
     public ImmutableLiteralsListAssert isLogicallyEquivalentTo(ImmutableLiteralsList expected) {
         boolean equivalence = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
         Assertions.assertThat(equivalence).isTrue();
