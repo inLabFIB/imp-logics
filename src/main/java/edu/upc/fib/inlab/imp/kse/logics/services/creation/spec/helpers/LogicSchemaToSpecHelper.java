@@ -14,12 +14,13 @@ public class LogicSchemaToSpecHelper {
                 .toList();
     }
 
-    private static DerivationRuleSpec buildDerivationRuleSpec(DerivationRule dr) {
+    public static DerivationRuleSpec buildDerivationRuleSpec(DerivationRule dr) {
         BodySpec bodySpec = buildBodySpec(dr.getBody());
         List<TermSpec> termSpecs = buildTermsSpecs(dr.getHead().getTerms());
         return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
     }
 
+    @SuppressWarnings("unused")
     public static List<LogicConstraintWithIDSpec> buildLogicConstraintSpecs(Set<LogicConstraint> logicConstraints) {
         return logicConstraints.stream()
                 .map(LogicSchemaToSpecHelper::buildLogicConstraintSpec)
@@ -83,10 +84,12 @@ public class LogicSchemaToSpecHelper {
         public BodySpecFragment() {
         }
 
+        @SuppressWarnings("unused")
         public BodySpecFragment(LiteralSpec... literals) {
             super(List.of(literals));
         }
 
+        @SuppressWarnings("unused")
         public BodySpecFragment(Collection<? extends LiteralSpec> c) {
             super(c);
         }
