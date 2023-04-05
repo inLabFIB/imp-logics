@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,13 +14,39 @@ import java.util.stream.IntStream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class LogicProcessPipelineTest {
 
+    @Nested
+    class InputValidationTests {
+
+        @Test
+        public void should_ThrowException_when_processPipelineIsNull() {
+            assertThatThrownBy(() -> new LogicProcessPipeline(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_ThrowException_when_processPipelineConstainsNull() {
+            List<LogicProcess> processes = new LinkedList<>();
+            processes.add(null);
+            assertThatThrownBy(() -> new LogicProcessPipeline(processes))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_ThrowException_when_inputSchemaIsNull() {
+            LogicProcessPipeline pipeline = new LogicProcessPipeline(List.of());
+            assertThatThrownBy(() -> pipeline.execute(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
     @Test
     public void should_returnInputLogicSchema_when_processPipelineIsEmpty() {
-        List<LogicProcess> logicProcesses = new LinkedList<>();
+        List<LogicProcess> logicProcesses = List.of();
 
         LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
 
@@ -28,6 +55,7 @@ class LogicProcessPipelineTest {
 
         assertThat(logicSchemaOutput).isEqualTo(inputSchema);
     }
+
 
     @Test
     public void should_returnLogicSchemaExpected_when_processPipelineContainsOneProcess() {

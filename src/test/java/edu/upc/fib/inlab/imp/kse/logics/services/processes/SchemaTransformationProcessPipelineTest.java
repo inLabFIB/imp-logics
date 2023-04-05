@@ -2,9 +2,11 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,11 +14,30 @@ import static org.mockito.Mockito.*;
 
 public class SchemaTransformationProcessPipelineTest {
 
-    @Test
-    public void should_throwException_when_inputLogicSchemaIsNull() {
-        assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(List.of()).executeTransformation(null))
-                .isInstanceOf(IllegalArgumentException.class);
+    @Nested
+    class InputValidationTests {
+        @Test
+        public void should_throwException_when_SchemaTransformationProcessListIsNull() {
+            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_throwException_when_SchemaTransformationProcessContainsNull() {
+            List<SchemaTransformationProcess> processList = new LinkedList<>();
+            processList.add(null);
+            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(processList))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_throwException_when_inputLogicSchemaIsNull() {
+            SchemaTransformationProcessPipeline pipeline = new SchemaTransformationProcessPipeline(List.of());
+            assertThatThrownBy(() -> pipeline.executeTransformation(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
+
 
     @Test
     public void should_invokeTheServiceInInputOrder() {

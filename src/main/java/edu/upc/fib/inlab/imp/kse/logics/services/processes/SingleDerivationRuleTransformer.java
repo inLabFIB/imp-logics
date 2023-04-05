@@ -46,11 +46,22 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
 
     private static final String SUFFIX_SEPARATOR = "_";
 
+    /**
+     * Creates an SingleDerivationRuleTransformer that will use the SuffixMultipleConstraintIDGenerator as a strategy
+     * for creating new constraintIDs, if necessary.
+     */
     public SingleDerivationRuleTransformer() {
         this(new SuffixMultipleConstraintIDGenerator());
     }
 
+    /**
+     * Creates an SingleDerivationRuleTransformer that will use the given generatorId strategy
+     * for creating new constraintIDs, if necessary.
+     *
+     * @param generatorId not null
+     */
     public SingleDerivationRuleTransformer(MultipleConstraintIDGenerator generatorId) {
+        if (Objects.isNull(generatorId)) throw new IllegalArgumentException("GeneratorID cannot be null");
         this.generatorId = generatorId;
     }
 

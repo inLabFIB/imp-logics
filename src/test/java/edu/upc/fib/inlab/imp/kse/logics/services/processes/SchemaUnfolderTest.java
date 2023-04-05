@@ -12,10 +12,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SchemaUnfolderTest {
 
-    @Test
-    public void should_throwException_whenSchemaIsNull() {
-        assertThatThrownBy(() -> new SchemaUnfolder().unfold(null))
-                .isInstanceOf(IllegalArgumentException.class);
+    @Nested
+    class InputValidationTests {
+        @Test
+        public void should_throwException_whenMultipleStrategyIsNull() {
+            assertThatThrownBy(() -> new SchemaUnfolder(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_throwException_whenSchemaIsNull() {
+            SchemaUnfolder unfolder = new SchemaUnfolder();
+            assertThatThrownBy(() -> unfolder.unfold(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested

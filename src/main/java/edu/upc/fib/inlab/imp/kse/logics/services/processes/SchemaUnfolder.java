@@ -27,11 +27,24 @@ public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess
 
     private final MultipleConstraintIDGenerator multipleConstraintIDGenerator;
 
+    /**
+     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
+     * for creating new constraintIDs, if necessary.
+     */
     public SchemaUnfolder() {
         this(new SuffixMultipleConstraintIDGenerator());
     }
 
+    /**
+     * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy
+     * for creating new constraintIDs, if necessary.
+     *
+     * @param multipleConstraintIDGenerator not null
+     */
     public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator) {
+        if (Objects.isNull(multipleConstraintIDGenerator))
+            throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
+
         this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
     }
 

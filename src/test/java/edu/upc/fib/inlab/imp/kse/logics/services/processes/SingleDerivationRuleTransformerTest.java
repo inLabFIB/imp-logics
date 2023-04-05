@@ -20,6 +20,12 @@ class SingleDerivationRuleTransformerTest {
     @Nested
     class InputValidation {
         @Test
+        void should_throwException_when_generatorIdIsNull() {
+            assertThatThrownBy(() -> new SingleDerivationRuleTransformer(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
         void should_throwException_whenLogicSchemaIsNull() {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             assertThatThrownBy(() -> singleDerivationRuleTransformer.transform(null))

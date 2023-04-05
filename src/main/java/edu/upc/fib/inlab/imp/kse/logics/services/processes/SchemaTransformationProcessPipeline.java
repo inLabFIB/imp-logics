@@ -6,14 +6,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A pipeline of SchemaTransformationProcessPipeline.
+ * This class is useful for chaining several transformations over a logic schema.
+ */
 public class SchemaTransformationProcessPipeline {
 
     private final List<SchemaTransformationProcess> transformationProcesses;
 
+    /**
+     * @param transformationProcesses not null, neither contains nulls
+     */
     public SchemaTransformationProcessPipeline(List<SchemaTransformationProcess> transformationProcesses) {
+        if (Objects.isNull(transformationProcesses))
+            throw new IllegalArgumentException("TransformationProcesses cannot be null");
+        checkDoesNotContainNull(transformationProcesses);
+
         this.transformationProcesses = transformationProcesses;
     }
 
+    private void checkDoesNotContainNull(List<SchemaTransformationProcess> transformationProcesses) {
+        if (transformationProcesses.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("TransformationProcesses cannot contain null");
+    }
+
+    /**
+     * @param inputLogicSchema not null
+     * @return the result of applying the pipeline into the inputLogicSchema
+     */
     public SchemaTransformation executeTransformation(LogicSchema inputLogicSchema) {
         checkLogicSchema(inputLogicSchema);
         List<SchemaTransformation> transformations = new LinkedList<>();

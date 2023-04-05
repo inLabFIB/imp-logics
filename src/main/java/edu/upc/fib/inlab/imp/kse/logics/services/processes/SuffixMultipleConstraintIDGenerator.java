@@ -5,6 +5,10 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Strategy for creating new constraintID from a given constraintID based on applying a suffix "_number".
+ * E.g. "_1", "_2", ...
+ */
 public class SuffixMultipleConstraintIDGenerator implements MultipleConstraintIDGenerator {
 
     public static final String CONSTRAINT_ID_PATTERN = "%s_%d";
