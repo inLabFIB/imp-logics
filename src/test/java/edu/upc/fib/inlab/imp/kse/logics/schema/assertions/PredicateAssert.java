@@ -37,6 +37,10 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
 
     @SuppressWarnings("UnusedReturnValue")
     public PredicateAssert isLogicallyEquivalentTo(Predicate expectedPredicate) {
+        return isLogicallyEquivalentTo(expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy.HOMOMORPHIC_RULES);
+    }
+
+    public PredicateAssert isLogicallyEquivalentTo(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
         Assertions.assertThat(actual.getName())
                 .describedAs("Name of predicate")
                 .isEqualTo(expectedPredicate.getName());
@@ -46,32 +50,29 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         Assertions.assertThat(actual.isBase())
                 .describedAs("IsBase value of predicate " + actual.getName())
                 .isEqualTo(expectedPredicate.isBase());
-        assertThatAllActualDerivationRulesAreExpected(expectedPredicate.getDerivationRules());
-        assertThatAllExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules());
+        assertThatAllActualDerivationRulesAreExpected(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
+        assertThatAllExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
         return this;
     }
 
-    private void assertThatAllExpectedDerivationRulesAreContained(List<DerivationRule> expectedDerivationRules) {
+    private void assertThatAllExpectedDerivationRulesAreContained(List<DerivationRule> expectedDerivationRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule expectedDerivationRule : expectedDerivationRules) {
-            boolean expectedFoundInActual = isDerivationRuleContained(expectedDerivationRule, actual.getDerivationRules());
+            boolean expectedFoundInActual = isDerivationRuleContained(expectedDerivationRule, actual.getDerivationRules(), analyzer);
             if (!expectedFoundInActual) {
                 Assertions.fail("Derivation rule \"" + expectedDerivationRule + "\" expected, but missing in actual");
             }
         }
     }
 
-    private void assertThatAllActualDerivationRulesAreExpected(List<DerivationRule> expectedDerivationRules) {
+    private void assertThatAllActualDerivationRulesAreExpected(List<DerivationRule> expectedDerivationRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule actualDerivationRule : actual.getDerivationRules()) {
-            boolean isExpected = isDerivationRuleContained(actualDerivationRule, expectedDerivationRules);
+            boolean isExpected = isDerivationRuleContained(actualDerivationRule, expectedDerivationRules, analyzer);
             if (!isExpected) {
                 Assertions.fail("Derivation rule \"" + actualDerivationRule + "\" is not expected");
             }
         }
     }
 
-    private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules) {
-        return isDerivationRuleContained(derivationRule, listOfRules, new LogicEquivalenceAnalyzer());
-    }
 
     private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule aRuleOfTheList : listOfRules) {
@@ -106,7 +107,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
      */
     @SuppressWarnings("UnusedReturnValue")
     public PredicateAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
-        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules())) {
+        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules(), new LogicEquivalenceAnalyzer())) {
             Assertions.fail("Missing derivation rule " + expectedRule);
         }
         return this;

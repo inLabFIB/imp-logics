@@ -224,7 +224,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
 
     /**
      * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent according to the given strategy.
+     * that two derived ordinary literals are equivalent iff their definition rules are equivalent
      *
      * @param expectedRule not null
      * @return this assert
@@ -233,6 +233,37 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     public LogicSchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
         Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
         PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
+     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
+     * according to the derivedLiteralStrategy given
+     *
+     * @param expectedPredicate       not null
+     * @param derivedLiteralsStrategy not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentPredicate(Predicate expectedPredicate, DerivedLiteralStrategy derivedLiteralsStrategy) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
+        PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate, derivedLiteralsStrategy);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
+     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
+     * iff their definition rules are equivalent
+     *
+     * @param expectedPredicate not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public LogicSchemaAssert containsEquivalentPredicate(Predicate expectedPredicate) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
+        PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
         return this;
     }
 
