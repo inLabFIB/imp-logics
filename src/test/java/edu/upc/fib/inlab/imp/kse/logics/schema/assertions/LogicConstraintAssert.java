@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
@@ -38,9 +39,22 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
         return this;
     }
 
-//    public LogicConstraintAssert isLogicallyEquivalence(LogicConstraint other) {
-//        Assertions.assertThat(actual.isLogicEquivalence()).isTrue();
-//        return this;
-//    }
+    /**
+     * Checks whether the actual constraint is the same as the expected logic constraint up-to renaming
+     * variables, and derived predicate names.
+     *
+     * @param expected not-null
+     * @return this assertion
+     */
+    @SuppressWarnings("unused")
+    public LogicConstraintAssert isLogicallyEquivalent(LogicConstraint expected) {
+        Assertions.assertThat(new LogicEquivalenceAnalyzer().areEquivalent(actual, expected))
+                .overridingErrorMessage("Actual constraint: " + actual.toString() + "\n" +
+                        "   is not equivalent to \n" +
+                        "Expected constraint: " + expected.toString()
+                )
+                .isTrue();
+        return this;
+    }
 
 }
