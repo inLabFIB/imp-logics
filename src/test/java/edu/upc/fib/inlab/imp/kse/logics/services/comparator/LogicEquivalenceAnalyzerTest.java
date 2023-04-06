@@ -48,17 +48,6 @@ public class LogicEquivalenceAnalyzerTest {
             }
 
             @Test
-            public void should_findEquivalence_whenLiteralsList_includesConstants_andBuiltInLiterals() {
-                ImmutableLiteralsList firstRule = ImmutableLiteralsListMother.create("1 = y, T(x, b)");
-                ImmutableLiteralsList secondRule = ImmutableLiteralsListMother.create("T(x, b), y = 1");
-
-                boolean equivalence = new LogicEquivalenceAnalyzer()
-                        .areEquivalent(firstRule, secondRule);
-
-                assertThat(equivalence).isTrue();
-            }
-
-            @Test
             public void should_notFindEquivalence_whenFirstLiteralsHaveHomomorphismToSecondLiterals_butNotViceversa() {
                 ImmutableLiteralsList firstRule = ImmutableLiteralsListMother
                         .create("R(x, y), not(S(x))");

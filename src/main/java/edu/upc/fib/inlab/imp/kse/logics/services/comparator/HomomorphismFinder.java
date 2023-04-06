@@ -139,28 +139,34 @@ public class HomomorphismFinder {
     private List<Substitution> computeAllPossibleHomomorphismsExtensions(Substitution currentSubstitution, Literal domainLiteral, ImmutableLiteralsList rangeLiterals) {
         List<Substitution> allPossibleHomomorphisms = new LinkedList<>();
         for (Literal rangeLiteral : rangeLiterals) {
-            Optional<Substitution> homomorphism = computeHomomorphismExtensionForLiteral(currentSubstitution, domainLiteral, rangeLiteral);
-            homomorphism.ifPresent(allPossibleHomomorphisms::add);
+            List<Substitution> homomorphisms = computeHomomorphismExtensionForLiteral(currentSubstitution, domainLiteral, rangeLiteral);
+            allPossibleHomomorphisms.addAll(homomorphisms);
         }
         return allPossibleHomomorphisms;
     }
 
     /**
+     * It is a list because built-in literals might generate several homomorphism. E.g. "a = b" and "x = y" generates
+     * the homomorphisms "{a->x, b->y}" and "{a->y, b->x}".
+     *
      * @param currentSubstitution is not null
      * @param domainLiteral       is not null
      * @param rangeLiteral        is not null
-     * @return an extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
+     * @return a list of extension of the currentSubstitution that makes domainLiteral to be equal to rangeLiteral, if exists
      */
-    private Optional<Substitution> computeHomomorphismExtensionForLiteral(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
+    private List<Substitution> computeHomomorphismExtensionForLiteral(Substitution currentSubstitution, Literal domainLiteral, Literal rangeLiteral) {
+        List<Substitution> result = new LinkedList<>();
         if (domainLiteral instanceof OrdinaryLiteral domainOrdinaryLiteral) {
             if (rangeLiteral instanceof OrdinaryLiteral rangeOrdinaryLiteral) {
-                return computeHomomorphismExtensionForOrdinaryLiteral(currentSubstitution, domainOrdinaryLiteral, rangeOrdinaryLiteral);
-            } else return Optional.empty();
+                Optional<Substitution> substitution = computeHomomorphismExtensionForOrdinaryLiteral(currentSubstitution, domainOrdinaryLiteral, rangeOrdinaryLiteral);
+                substitution.ifPresent(result::add);
+            }
         } else if (domainLiteral instanceof BuiltInLiteral domainBuiltInLiteral) {
             if (rangeLiteral instanceof BuiltInLiteral rangeBuiltInLiteral) {
-                return computeHomomorphismExtensionForBuiltInLiteral(currentSubstitution, domainBuiltInLiteral, rangeBuiltInLiteral);
-            } else return Optional.empty();
+                result.addAll(computeHomomorphismExtensionForBuiltInLiteral(currentSubstitution, domainBuiltInLiteral, rangeBuiltInLiteral));
+            }
         } else throw new RuntimeException("Unrecognized literal " + domainLiteral.getClass().getName());
+        return result;
     }
 
     /**
@@ -170,22 +176,18 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution that makes domainBuiltInLiteral to be equal to rangeBuiltInLiteral,
      * or its symmetric, if exists
      */
-    private Optional<Substitution> computeHomomorphismExtensionForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
+    private List<Substitution> computeHomomorphismExtensionForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
+        List<Substitution> result = new LinkedList<>();
         if (domainBuiltInLiteral.getOperationName().equals(rangeBuiltInLiteral.getOperationName())) {
             Optional<Substitution> substitution = computeHomomorphismExtensionForTerms(currentSubstitution, domainBuiltInLiteral.getTerms(), rangeBuiltInLiteral.getTerms());
-            if (substitution.isPresent()) {
-                return substitution;
-            } else if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
-                    rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
-                return computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
-            } else return Optional.empty();
-
-        } else {
-            if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
-                    rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
-                return computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
-            } else return Optional.empty();
+            substitution.ifPresent(result::add);
         }
+        if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
+                rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
+            Optional<Substitution> substitution = computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
+            substitution.ifPresent(result::add);
+        }
+        return result;
     }
 
     /**

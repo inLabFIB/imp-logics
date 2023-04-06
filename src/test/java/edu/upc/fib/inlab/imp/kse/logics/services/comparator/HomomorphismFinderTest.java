@@ -191,6 +191,26 @@ class HomomorphismFinderTest {
                 SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
                 SubstitutionAssert.assertThat(homomorphism).mapsToVariable("y", "b");
             }
+
+            @Test
+            public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheTermsOfEqualities() {
+                ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create("1 = y, T(x, b)");
+                ImmutableLiteralsList rangeLiterals = ImmutableLiteralsListMother.create("T(x, b), y = 1");
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
+                assertThat(homomorphismOpt).isPresent();
+            }
+
+            @Test
+            public void should_findHomomorphism_whenLiteralsListIncludesEqualities_ThatCreatesSeveralPossibleHomomorphism() {
+                ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("z = x, T(x, y)");
+                ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("T(x, y), x = z");
+
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
+                assertThat(homomorphismOpt).isPresent();
+            }
         }
     }
 
