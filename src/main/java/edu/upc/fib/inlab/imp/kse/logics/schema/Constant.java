@@ -26,4 +26,8 @@ public class Constant extends Term {
         return visitor.visit(this);
     }
 
+    @Override
+    public boolean isConstant() {
+        return true;
+    }
 }
