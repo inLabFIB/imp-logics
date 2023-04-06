@@ -1,8 +1,10 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
+import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,43 +38,36 @@ public class LogicEquivalenceAnalyzerTest {
         class EquivalenceAnalysis {
             @Test
             public void should_findEquivalence_whenLiteralsListAreTheSameUpToRenaming() {
-                DerivationRule firstRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
-                DerivationRule secondRule = DerivationRuleMother.create("P(a, b) :- R(a, b), not(S(a))");
+                ImmutableLiteralsList firstRule = ImmutableLiteralsListMother.create("R(x, y), not(S(x))");
+                ImmutableLiteralsList secondRule = ImmutableLiteralsListMother.create("R(a, b), not(S(a))");
 
                 boolean equivalence = new LogicEquivalenceAnalyzer()
-                        .areEquivalent(firstRule.getBody(), secondRule.getBody());
+                        .areEquivalent(firstRule, secondRule);
 
                 assertThat(equivalence).isTrue();
             }
 
             @Test
             public void should_notFindEquivalence_whenFirstLiteralsHaveHomomorphismToSecondLiterals_butNotViceversa() {
-                DerivationRule firstRule = DerivationRuleMother
-                        .create("P(x, y) :- R(x, y), not(S(x))");
-                DerivationRule secondRule = DerivationRuleMother
-                        .create("P(a, b) :- R(a, b), not(S(a)), R(b,b)");
+                ImmutableLiteralsList firstRule = ImmutableLiteralsListMother
+                        .create("R(x, y), not(S(x))");
+                ImmutableLiteralsList secondRule = ImmutableLiteralsListMother
+                        .create("R(a, b), not(S(a)), R(b,b)");
 
-                boolean equivalence = new LogicEquivalenceAnalyzer()
-                        .areEquivalent(firstRule.getBody(), secondRule.getBody());
+                boolean equivalence = new LogicEquivalenceAnalyzer().areEquivalent(firstRule, secondRule);
 
                 assertThat(equivalence).isFalse();
             }
 
             @Test
             public void should_findEquivalence_whenThereAreHomomorphicDerivedLiterals() {
-                DerivationRule firstRule = DerivationRuleMother
-                        .create("""
-                                P(x, y) :- R(x, y), not(S(x))
-                                R(a, b) :- T(a, b)
-                                """, "P");
-                DerivationRule secondRule = DerivationRuleMother
-                        .create("""
-                                    P(x, y) :- R(x, y), not(S(x))
-                                    R(a, b) :- T(a, b)
-                                """, "P");
+                ImmutableLiteralsList firstRule = ImmutableLiteralsListMother
+                        .create("R(x, y), not(S(x))", "R(a, b) :- T(a, b)");
+                ImmutableLiteralsList secondRule = ImmutableLiteralsListMother
+                        .create("R(x, y), not(S(x))", "R(a, b) :- T(a, b)");
 
                 boolean equivalence = new LogicEquivalenceAnalyzer()
-                        .areEquivalent(firstRule.getBody(), secondRule.getBody());
+                        .areEquivalent(firstRule, secondRule);
 
                 assertThat(equivalence).isTrue();
             }
