@@ -149,7 +149,97 @@ class SchemaUnfolderTest {
             );
             assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
+
+        @Nested
+        class UnfoldingWithConstantsInHeadTests {
+            @Test
+            public void should_obtainOneDerivationRule_whenThereIsOneDerivationRule() {
+                LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- R(x, y), S(y)
+                                    R(a, 1) :- T(a, b)
+                                """
+                );
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(schema);
+
+                LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- T(x, b), S(y), y=1
+                                    R(a, 1) :- T(a, b)
+                                """
+                );
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            }
+
+            @Test
+            public void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules() {
+                LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- R(x, y), S(y)
+                                    R(a, 1) :- T(a, b)
+                                    R(a, 2) :- TT(a, b)
+                                """
+                );
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(schema);
+
+                LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- T(x, b), S(y), y=1
+                                    P(x, y) :- TT(x, b), S(y), y=2
+                                    R(a, 1) :- T(a, b)
+                                    R(a, 2) :- TT(a, b)
+                                """
+                );
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            }
+
+            @Test
+            public void should_obtainOneDerivationRuleWithContradiction_whenThereIsOneDerivationRule_NotMatchingConstants() {
+                LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- R(x, 2), S(y)
+                                    R(a, 1) :- T(a, b)
+                                """
+                );
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(schema);
+
+                LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- T(x, b), 1=2, S(y)
+                                    R(a, 1) :- T(a, b)
+                                """
+                );
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            }
+
+            @Test
+            public void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules_WithOnlyOneConstantsMatch() {
+                LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- R(x, 1), S(y)
+                                    R(a, 1) :- T(a, b)
+                                    R(a, 2) :- TT(a, b)
+                                """
+                );
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(schema);
+
+                LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    P(x, y) :- T(x, b), 1=1, S(y)
+                                    P(x, y) :- TT(x, b), 1=2, S(y)
+                                    R(a, 1) :- T(a, b)
+                                    R(a, 2) :- TT(a, b)
+                                """
+                );
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            }
+        }
     }
+
 
     @Nested
     class TraceabilityMapTest {

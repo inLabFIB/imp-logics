@@ -58,6 +58,9 @@ public class Atom {
      * For instance, if we have the ordinary literal "P(a, b)" with a derivation rule "P(x, y) :- R(x, y, a, b)" it will return
      * "R(a, b, a', b')" </p>
      *
+     * <p>If the the derivation rules of such atom contains constants in the head, they are treated as new
+     * built-in literals. E.g. if we have the rule "R(a, 1) :- S(a)", and we unfold "R(x, y)", we obtain "R(x, y), y = 1"</p>
+     *
      * @return a list of ImmutableLiteralsList representing the result of unfolding this atom
      */
     public List<ImmutableLiteralsList> unfold() {
@@ -68,11 +71,34 @@ public class Atom {
             for (DerivationRule derivationRule : this.getPredicate().getDerivationRules()) {
                 Set<Variable> potentiallyClashingVariables = computePotentiallyClashingVariables(derivationRule);
                 ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), potentiallyClashingVariables);
-                Substitution substitutionOfHeadTerms = new Substitution(derivationRule.getHead().terms, this.terms);
-                result.add(bodyLiteralsAvoidingClashWithThisTerms.applySubstitution(substitutionOfHeadTerms));
+                ImmutableLiteralsList bodyLiteralsApplyingSubstitution = computeLiteralsWhenUnifyingTheHead(derivationRule.getHead().terms, bodyLiteralsAvoidingClashWithThisTerms);
+                result.add(bodyLiteralsApplyingSubstitution);
             }
             return result;
         }
+    }
+
+    private ImmutableLiteralsList computeLiteralsWhenUnifyingTheHead(List<Term> headTerms, ImmutableLiteralsList bodyLiterals) {
+        SubstitutionAndBuiltInLiterals substitutionAndBuiltInLiterals = computeSubstitutionForHeadAndAdditionalBuiltInLiterals(headTerms);
+        ImmutableLiteralsList bodyLiteralsAfterSubstitution = bodyLiterals.applySubstitution(substitutionAndBuiltInLiterals.substitution());
+        List<Literal> allLiterals = new LinkedList<>(substitutionAndBuiltInLiterals.builtInLiterals);
+        allLiterals.addAll(bodyLiteralsAfterSubstitution);
+        return new ImmutableLiteralsList(allLiterals);
+    }
+
+    private SubstitutionAndBuiltInLiterals computeSubstitutionForHeadAndAdditionalBuiltInLiterals(List<Term> headTerms) {
+        Substitution substitution = new Substitution();
+        List<BuiltInLiteral> builtInLiterals = new LinkedList<>();
+        for (int i = 0; i < headTerms.size(); ++i) {
+            Term headTerm = headTerms.get(i);
+            Term actualTerm = this.terms.get(i);
+            if (headTerm.isConstant()) {
+                builtInLiterals.add(new ComparisonBuiltInLiteral(headTerm, actualTerm, ComparisonOperator.EQUALS));
+            } else if (headTerm.isVariable()) {
+                substitution.addMapping((Variable) headTerm, actualTerm);
+            } else throw new RuntimeException("Unrecognized term subclass " + headTerm.getClass().getName());
+        }
+        return new SubstitutionAndBuiltInLiterals(substitution, builtInLiterals);
     }
 
     private Set<Variable> computePotentiallyClashingVariables(DerivationRule derivationRule) {
@@ -138,5 +164,8 @@ public class Atom {
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {
     }
 }

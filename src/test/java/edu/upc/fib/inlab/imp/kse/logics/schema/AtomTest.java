@@ -6,6 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.ArityMismatch;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.AtomMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismFinder;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,5 +160,92 @@ public class AtomTest {
                     .hasSize(1)
                     .containsOrdinaryLiteral("R", "a", "b");
         }
+
+        @Nested
+        class UnfoldingWithConstantsInHeadTests {
+            @Test
+            public void should_obtainOneRule_whenThereIsOneDerivationRule() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, 1) :- T(a, b)");
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
+
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("T(x, b), y=1");
+                assertThat(unfoldedAtom).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                        .hasSize(2)
+                        .isLogicallyEquivalentTo(expectedLiteralsList)
+                        .containsOrdinaryLiteral("T", "x", "b");
+            }
+
+            @Test
+            public void should_obtainTwoRules_whenThereAreTwoRules_EachOneWithDifferentConstants() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
+                                        R(a, 1) :- T(a, b)
+                                        R(a, 2) :- TT(a, b)
+                        """);
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
+
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create("T(x, y), y=1");
+                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create("TT(x, y), y=2");
+                assertThat(unfoldedAtom).hasSize(2)
+                        .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList1, "x", "y"))
+                        .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList2, "x", "y"));
+            }
+
+            @Test
+            public void should_obtainTwoRules_whenThereAreTwoRules_WithOnlyOneWithConstants() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
+                                        R(a, 1) :- T(a, b)
+                                        R(a, b) :- TT(a, b)
+                        """);
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
+
+
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create("T(x, y), y=1");
+                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create("TT(x, y)");
+
+                assertThat(unfoldedAtom).hasSize(2)
+                        .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList1, "x", "y"))
+                        .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList2, "x", "y"));
+            }
+
+            @Test
+            public void should_obtainOneRuleWithContradictoryBuiltIn_whenThereIsOneRule_NotMatchingConstants() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
+                                        R(a, 1) :- T(a, b)
+                        """);
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "2");
+
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create("T(x, y), 2=1");
+
+                assertThat(unfoldedAtom).hasSize(1)
+                        .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList1, "x"));
+            }
+
+
+        }
+    }
+
+    private static boolean isEquivalentWithSameVariables(ImmutableLiteralsList expectedLiteralsList1, ImmutableLiteralsList expectedLiteralsList2, String... varNames) {
+        Optional<Substitution> homomorphism = new HomomorphismFinder().findHomomorphism(expectedLiteralsList1, expectedLiteralsList2);
+        Optional<Substitution> homomorphismRespectingVariables = homomorphism.filter(substitution -> {
+            for (String varName : varNames) {
+                Optional<Term> subsituttedTerm = substitution.getTerm(new Variable(varName));
+                Optional<Term> termSubstitutedToDifferentVariable = subsituttedTerm.filter(replacedTerm ->
+                        !(replacedTerm.isVariable() && replacedTerm.getName().equals(varName))
+                );
+                if (termSubstitutedToDifferentVariable.isPresent()) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        return homomorphismRespectingVariables.isPresent();
     }
 }
