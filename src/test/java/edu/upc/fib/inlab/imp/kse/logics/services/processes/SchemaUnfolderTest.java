@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
+import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -237,6 +238,30 @@ class SchemaUnfolderTest {
                 );
                 assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
             }
+        }
+
+        @Nested
+        class UnfoldingWithRepeatedVariablesInHeadTests {
+            @Test
+            public void should_unfold_whenFindingRepeatedVariablesInHead() {
+                LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    @1 :- R(x, y, z), S(x,z)
+                                    R(a, b, a) :- T(a, b)
+                                """);
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(logicSchema);
+
+                LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                @1 :- T(x, y), x=z, S(x,z)
+                                R(a, b, a) :- T(a, b)
+                                    """
+                );
+
+                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+            }
+
         }
     }
 

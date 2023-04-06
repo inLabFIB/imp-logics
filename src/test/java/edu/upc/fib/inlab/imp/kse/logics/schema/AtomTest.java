@@ -227,8 +227,39 @@ public class AtomTest {
                 assertThat(unfoldedAtom).hasSize(1)
                         .anyMatch(literals -> isEquivalentWithSameVariables(literals, expectedLiteralsList1, "x"));
             }
+        }
 
+        @Nested
+        class UnfoldingWithRepeatedVariablesInHeadTests {
+            @Test
+            public void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, b, a) :- T(a, b)");
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y", "z");
 
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("T(x, y), x=z");
+                assertThat(unfoldedAtom).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                        .hasSize(2)
+                        .isLogicallyEquivalentTo(expectedLiteralsList)
+                        .containsOrdinaryLiteral("T", "x", "y");
+            }
+
+            @Test
+            public void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead_andAtomHasRepeatedVariables() {
+                LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, a, b) :- T(a, b)");
+                Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y", "y");
+
+                List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("T(x, y), x=y");
+                assertThat(unfoldedAtom).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+                        .hasSize(2)
+                        .isLogicallyEquivalentTo(expectedLiteralsList)
+                        .containsOrdinaryLiteral("T", "x", "y");
+            }
         }
     }
 

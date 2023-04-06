@@ -58,8 +58,9 @@ public class Atom {
      * For instance, if we have the ordinary literal "P(a, b)" with a derivation rule "P(x, y) :- R(x, y, a, b)" it will return
      * "R(a, b, a', b')" </p>
      *
-     * <p>If the the derivation rules of such atom contains constants in the head, they are treated as new
-     * built-in literals. E.g. if we have the rule "R(a, 1) :- S(a)", and we unfold "R(x, y)", we obtain "R(x, y), y = 1"</p>
+     * <p>If the the derivation rules of such atom contains constants, or repeated variables in the head, they are treated as new
+     * built-in literals. E.g. if we have the rule "R(a, 1) :- S(a)", and we unfold "R(x, y)", we obtain "R(x, y), y = 1";
+     * similarly, if we have the rule "R(a,a) :- S(a)", and we unfold "R(x,y)" we obtain "R(x,y), x=y"</p>
      *
      * @return a list of ImmutableLiteralsList representing the result of unfolding this atom
      */
@@ -89,13 +90,22 @@ public class Atom {
     private SubstitutionAndBuiltInLiterals computeSubstitutionForHeadAndAdditionalBuiltInLiterals(List<Term> headTerms) {
         Substitution substitution = new Substitution();
         List<BuiltInLiteral> builtInLiterals = new LinkedList<>();
+        Map<Variable, Integer> visitedVariablesToIndex = new HashMap<>(); //Useful for detecting repeated variables
         for (int i = 0; i < headTerms.size(); ++i) {
             Term headTerm = headTerms.get(i);
             Term actualTerm = this.terms.get(i);
             if (headTerm.isConstant()) {
                 builtInLiterals.add(new ComparisonBuiltInLiteral(headTerm, actualTerm, ComparisonOperator.EQUALS));
             } else if (headTerm.isVariable()) {
-                substitution.addMapping((Variable) headTerm, actualTerm);
+                Variable headVariable = (Variable) headTerm;
+                if (visitedVariablesToIndex.containsKey(headVariable)) {
+                    //Repeated variable
+                    int previousIndex = visitedVariablesToIndex.get(headVariable);
+                    builtInLiterals.add(new ComparisonBuiltInLiteral(this.terms.get(i), this.terms.get(previousIndex), ComparisonOperator.EQUALS));
+                } else {
+                    substitution.addMapping((Variable) headTerm, actualTerm);
+                    visitedVariablesToIndex.put(headVariable, i);
+                }
             } else throw new RuntimeException("Unrecognized term subclass " + headTerm.getClass().getName());
         }
         return new SubstitutionAndBuiltInLiterals(substitution, builtInLiterals);
