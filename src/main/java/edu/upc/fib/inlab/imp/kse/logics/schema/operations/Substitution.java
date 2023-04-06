@@ -134,4 +134,15 @@ public class Substitution {
         result.addAll(variablesInRange);
         return result;
     }
+
+    /**
+     * @return whether the substitution replaces each variable for itself
+     */
+    public boolean isIdentity() {
+        return this.termsMap.entrySet()
+                .stream()
+                .allMatch(entry ->
+                        entry.getValue().isVariable() &&
+                                entry.getValue().getName().equals(entry.getKey().getName()));
+    }
 }

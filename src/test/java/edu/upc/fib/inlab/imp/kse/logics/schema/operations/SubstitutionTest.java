@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.SubstitutionException;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -253,5 +254,37 @@ class SubstitutionTest {
 
         assertThat(usedVariables).hasSize(2)
                 .contains(new Variable("x"), new Variable("y"));
+    }
+
+    @Nested
+    class IsIdentityTests {
+        @Test
+        public void should_returnTrue_whenSubstitutionIsEmpty() {
+            Substitution originalSubstitution = new Substitution();
+
+            assertThat(originalSubstitution.isIdentity()).isTrue();
+        }
+
+        @Test
+        public void should_returnTrue_whenSubstitutionIsNonEmptyIdentity() {
+            Substitution originalSubstitution = new Substitution();
+            Variable b = new Variable("b");
+            Variable anotherB = new Variable("b");
+            originalSubstitution.addMapping(b, anotherB);
+
+            assertThat(originalSubstitution.isIdentity()).isTrue();
+        }
+
+        @Test
+        public void should_returnFalse_whenSubstitutionIsNotIdentity() {
+            Substitution originalSubstitution = new Substitution();
+            Variable b = new Variable("b");
+            Variable anotherB = new Variable("b");
+            Variable a = new Variable("a");
+            originalSubstitution.addMapping(b, anotherB);
+            originalSubstitution.addMapping(a, anotherB);
+
+            assertThat(originalSubstitution.isIdentity()).isFalse();
+        }
     }
 }
