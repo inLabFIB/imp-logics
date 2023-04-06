@@ -33,7 +33,11 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
      */
     public ImmutableLiteralsListAssert isLogicallyEquivalentTo(ImmutableLiteralsList expected) {
         boolean equivalence = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
-        Assertions.assertThat(equivalence).isTrue();
+        Assertions.assertThat(equivalence)
+                .describedAs("Actual literals list: " + actual.toString() + "\n" +
+                        "   is not equivalent to\n" +
+                        "Expected literals list: " + expected.toString() + "\n")
+                .isTrue();
         return this;
     }
 

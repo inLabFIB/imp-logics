@@ -171,15 +171,21 @@ public class HomomorphismFinder {
      * or its symmetric, if exists
      */
     private Optional<Substitution> computeHomomorphismExtensionForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
-        if (!domainBuiltInLiteral.getOperationName().equals(rangeBuiltInLiteral.getOperationName())) {
+        if (domainBuiltInLiteral.getOperationName().equals(rangeBuiltInLiteral.getOperationName())) {
+            Optional<Substitution> substitution = computeHomomorphismExtensionForTerms(currentSubstitution, domainBuiltInLiteral.getTerms(), rangeBuiltInLiteral.getTerms());
+            if (substitution.isPresent()) {
+                return substitution;
+            } else if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
+                    rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
+                return computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
+            } else return Optional.empty();
+
+        } else {
             if (domainBuiltInLiteral instanceof ComparisonBuiltInLiteral domainComparison &&
                     rangeBuiltInLiteral instanceof ComparisonBuiltInLiteral rangeComparison) {
                 return computeHomomorphismExtensionForSymmetricBuiltInLiteral(currentSubstitution, domainComparison, rangeComparison);
             } else return Optional.empty();
         }
-
-        return computeHomomorphismExtensionForTerms(currentSubstitution, domainBuiltInLiteral.getTerms(), rangeBuiltInLiteral.getTerms());
-
     }
 
     /**
