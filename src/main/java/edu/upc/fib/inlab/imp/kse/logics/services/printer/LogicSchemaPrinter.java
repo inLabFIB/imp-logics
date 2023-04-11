@@ -95,6 +95,13 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     }
 
     @Override
+    public String visit(CustomBuiltInLiteral customBuiltInLiteral) {
+        String operationName = customBuiltInLiteral.getOperationName();
+        ImmutableTermList terms = customBuiltInLiteral.getTerms();
+        return operationName + "(" + terms.accept(this) + ")";
+    }
+
+    @Override
     public String visit(ComparisonOperator comparisonOperator) {
         return comparisonOperator.getSymbol();
     }

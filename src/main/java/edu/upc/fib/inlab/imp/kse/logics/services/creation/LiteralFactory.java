@@ -1,7 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
@@ -39,9 +38,9 @@ public class LiteralFactory {
         if (booleanValue.isPresent()) {
             checkEmptyTerms(bilSpec);
             return new BooleanBuiltInLiteral(booleanValue.get());
+        } else {
+            return new CustomBuiltInLiteral(bilSpec.getOperator(), TermSpecToTermFactory.buildTerms(bilSpec.getTermSpecList()));
         }
-
-        throw new UnrecognizedBuiltInOperator(operator);
     }
 
     private static void checkEmptyTerms(BuiltInLiteralSpec bilSpec) {

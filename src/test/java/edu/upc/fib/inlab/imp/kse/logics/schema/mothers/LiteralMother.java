@@ -39,4 +39,8 @@ public class LiteralMother {
     public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, String predicateName, String... termNames) {
         return createOrdinaryLiteral(schema, true, predicateName, termNames);
     }
+
+    public static CustomBuiltInLiteral createCustomBuiltInLiteral(String customBuiltIn, String... termNames) {
+        return new CustomBuiltInLiteral(customBuiltIn, TermMother.createTerms(termNames));
+    }
 }

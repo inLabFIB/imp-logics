@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.printer;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaWithCustomBuiltInMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -104,10 +105,10 @@ public class LogicSchemaPrinterTest {
         @Test
         public void should_printLogicSchema_whenContainsDiferentBuiltInLiterals() {
             String schemaString = """
-                    @1 :- 1<2, TRUE(), FALSE(), 1<>2
+                    @1 :- 1<2, TRUE(), FALSE(), 1<>2, customBuiltIn(x)
                     """;
 
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+            LogicSchema logicSchema = LogicSchemaWithCustomBuiltInMother.buildLogicSchema(schemaString, "customBuiltIn");
 
             LogicSchemaPrinter printer = new LogicSchemaPrinter();
             String actualLogicSchema = printer.print(logicSchema);

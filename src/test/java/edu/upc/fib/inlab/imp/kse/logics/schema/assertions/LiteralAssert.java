@@ -1,8 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.ComparisonBuiltInLiteral;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
@@ -28,6 +26,12 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         } else if (actual instanceof ComparisonBuiltInLiteral actualComparison) {
             Assertions.assertThat(spec).isInstanceOf(BuiltInLiteralSpec.class);
             ComparisonBuiltInLiteralAssert.assertThat(actualComparison).correspondsSpec((BuiltInLiteralSpec) spec);
+        } else if (actual instanceof CustomBuiltInLiteral actualCustomBIL) {
+            Assertions.assertThat(spec).isInstanceOf(BuiltInLiteralSpec.class);
+            BuiltInLiteralAssert.assertThat(actualCustomBIL).correspondsSpec((BuiltInLiteralSpec) spec);
+        } else if (actual instanceof BooleanBuiltInLiteral actualBoolBIL) {
+            Assertions.assertThat(spec).isInstanceOf(BuiltInLiteralSpec.class);
+            BuiltInLiteralAssert.assertThat(actualBoolBIL).correspondsSpec((BuiltInLiteralSpec) spec);
         } else {
             throw new RuntimeException("Unrecognized literal " + actual.getClass().getName());
         }
@@ -53,6 +57,12 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
     public LiteralAssert hasBuiltInComparisonOperation(String comparisonOperator) {
         Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
         ComparisonBuiltInLiteralAssert.assertThat((ComparisonBuiltInLiteral) actual).hasComparisonOperation(comparisonOperator);
+        return this;
+    }
+
+    public LiteralAssert hasBuiltInCustomOperation(String comparisonOperator) {
+        Assertions.assertThat(actual).isInstanceOf(CustomBuiltInLiteral.class);
+        BuiltInLiteralAssert.assertThat((CustomBuiltInLiteral) actual).hasOperationName(comparisonOperator);
         return this;
     }
 

@@ -9,13 +9,11 @@ import java.util.List;
 public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintSpec> extends LogicSchemaGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
-    private final BuiltInPredicateNameChecker builtInPredicateNameChecker;
 
     protected LogicSchemaSpec<T> logicSchemaSpec;
 
-    public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+    public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
-        this.builtInPredicateNameChecker = builtInPredicateNameChecker;
     }
 
     @Override
@@ -60,14 +58,22 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
     }
 
     @Override
+    public LogicElementSpec visitBooleanBuiltInLiteral(LogicSchemaGrammarParser.BooleanBuiltInLiteralContext ctx) {
+        return new BuiltInLiteralSpec(ctx.BOOLEAN().getText(), List.of());
+    }
+
+    @Override
+    public LogicElementSpec visitCustomBuiltInLiteral(LogicSchemaGrammarParser.CustomBuiltInLiteralContext ctx) {
+        String operatorName = ctx.BUILTIN_PREDICATE().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.termsList());
+        return new BuiltInLiteralSpec(operatorName, termSpecList);
+    }
+
+    @Override
     public LiteralSpec visitAtom(LogicSchemaGrammarParser.AtomContext ctx) {
         String predicateName = ctx.predicate().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.termsList());
-        if (builtInPredicateNameChecker.isBuiltInPredicateName(predicateName)) {
-            return new BuiltInLiteralSpec(predicateName, termSpecList);
-        } else {
-            return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
-        }
+        return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
     }
 
     @Override

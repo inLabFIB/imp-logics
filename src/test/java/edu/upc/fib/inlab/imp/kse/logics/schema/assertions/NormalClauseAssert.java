@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.BooleanBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.CustomBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.NormalClause;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
 import org.assertj.core.api.AbstractAssert;
@@ -55,6 +56,19 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                         .satisfies(l ->
                                 BuiltInLiteralAssert.assertThat(l)
                                         .hasOperationName(BooleanBuiltInLiteral.fromValue(booleanValue))
+                        )
+
+        );
+        return this;
+    }
+
+    public NormalClauseAssert<T> containsCustomBuiltInLiteral(String operationName) {
+        Assertions.assertThat(actual.getBody()).anySatisfy(
+                lit -> LiteralAssert.assertThat(lit)
+                        .asInstanceOf(InstanceOfAssertFactories.type(CustomBuiltInLiteral.class))
+                        .satisfies(l ->
+                                BuiltInLiteralAssert.assertThat(l)
+                                        .hasOperationName(operationName)
                         )
 
         );

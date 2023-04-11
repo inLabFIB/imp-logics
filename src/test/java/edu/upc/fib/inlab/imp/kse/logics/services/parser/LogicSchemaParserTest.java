@@ -4,18 +4,15 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
@@ -189,27 +186,33 @@ public class LogicSchemaParserTest {
     class CustomBuiltInLiteralTest {
 
         @Test
-        public void should_containCustomBuiltInLiteral_whenXXXXXXX() {
+        public void should_containCustomBuiltInLiteral_whenConfiguringCustomBuiltInPredicates() {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
-            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria(),
+                    new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
+            ).parse(schemaString);
 
             assertThat(logicSchema).containsConstraintID("1");
             LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
 
-//            assertThat(logicConstraint)
-//                    .containsCustomBuiltInLiteral("myCustomBuiltInPredicate");
+            assertThat(logicConstraint)
+                    .containsCustomBuiltInLiteral("myCustomBuiltInPredicate");
         }
 
-
         @Test
-        public void test() {
-            CharStream input = CharStreams.fromString("myCustomBuiltInPredicate()");
-            HashSet<String> myCustomBuiltInPredicate = new HashSet<>(Arrays.asList("myCustomBuiltInPredicate"));
-            LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, myCustomBuiltInPredicate);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
-            LogicSchemaGrammarParser.ProgContext tree = parser.prog();
+        public void should_notContainCustomBuiltInLiteral_whenNotConfiguringCustomBuiltInPredicates() {
+            String schemaString = "@1 :- myCustomBuiltInPredicate()";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria(),
+                    new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
+            ).parse(schemaString);
+
+            assertThat(logicSchema).containsConstraintID("1");
+            LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
+
+            assertThat(logicConstraint)
+                    .containsOrdinaryLiteral("myCustomBuiltInPredicate", 0);
         }
     }
 }

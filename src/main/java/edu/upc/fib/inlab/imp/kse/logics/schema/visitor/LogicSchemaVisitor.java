@@ -20,6 +20,8 @@ public interface LogicSchemaVisitor<T> {
 
     T visit(BooleanBuiltInLiteral comparisonBuiltInLiteral);
 
+    T visit(CustomBuiltInLiteral customBuiltInLiteral);
+
     T visit(Atom atom);
 
     T visit(ComparisonOperator comparisonOperator);

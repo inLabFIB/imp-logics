@@ -1,10 +1,10 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.BooleanBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.CustomBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.exceptions.UnrecognizedBuiltInOperator;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
@@ -77,9 +77,12 @@ public class BodyBuilderTest {
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("ANYEQ", termSpecList);
 
         BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
-        assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
-                UnrecognizedBuiltInOperator.class
-        );
+        bodyBuilder.addLiteral(builtInLiteralSpec);
+        ImmutableLiteralsList body = bodyBuilder.build();
+
+        assertThat(body).hasSize(1);
+        assertThat(body).first().satisfies(
+                l -> LiteralAssert.assertThat(l).correspondsSpec(builtInLiteralSpec));
     }
 
     @Nested
@@ -115,6 +118,32 @@ public class BodyBuilderTest {
                             booleanBuiltInLiteral -> assertThat(booleanBuiltInLiteral)
                                     .hasOperationName(booleanOperator)
                                     .hasNoTerms()
+                    );
+        }
+
+    }
+
+    @Nested
+    class CustomBuiltInLiteralCreation {
+
+        @Test
+        public void should_createCustomBuiltInLiteral_whenOperationNameIsNotTrueNorFalse() {
+            StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
+            List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
+            BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("customBuiltInLiteral", termSpecList);
+
+            ImmutableLiteralsList body = new BodyBuilder(Collections.emptyMap())
+                    .addLiteral(builtInLiteralSpec)
+                    .build();
+
+            assertThat(body).hasSize(1);
+            assertThat(body).first()
+                    .asInstanceOf(InstanceOfAssertFactories.type(CustomBuiltInLiteral.class))
+                    .satisfies(
+                            customBuiltInLiteral -> assertThat(customBuiltInLiteral)
+                                    .hasOperationName("customBuiltInLiteral")
+                                    .hasVariable(0, "x")
+                                    .hasVariable(1, "y")
                     );
         }
 

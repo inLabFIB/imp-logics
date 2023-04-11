@@ -1,11 +1,11 @@
 grammar LogicSchemaGrammar;
 
 @lexer::members {
-  private java.util.Set<String> special = new java.util.HashSet<>();
+  private CustomBuiltInPredicateNameChecker builtInPredicateNameChecker = new CustomBuiltInPredicateNameChecker(java.util.Set.of());
 
-  public LogicSchemaGrammarLexer(CharStream input, java.util.Set<String> special) {
+  public LogicSchemaGrammarLexer(CharStream input, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker) {
     this(input);
-    this.special = special;
+    this.builtInPredicateNameChecker = builtInPredicateNameChecker;
   }
 }
 
@@ -13,11 +13,10 @@ tokens {
   BUILTIN_PREDICATE
 }
 
-
 NOT: 'not';
 BOOLEAN: 'TRUE' | 'FALSE';
 OPERATOR: '='|'<>'|'<'|'>'|'<='|'>=';
-ID: ([A-Za-z0-9_'?])+ {if(special.contains(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
+ID: ([A-Za-z0-9_'?])+ {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
 CONSTRAINTIDSTART: '@';
 NEWLINE:'\r'? '\n';
 WS : [ \t]+ -> skip ; // toss out whitespace
@@ -43,3 +42,8 @@ atom: predicate OPENPAR termsList CLOSEPAR;
 termsList: | term (COMMA term)*;
 predicate: ID;
 term: ID;
+
+// 22
+// 2.345
+// 'Hola'
+// 'Qualquier cosa. Como \n por ejemplo esto ¿?!"·$$!!!{} incluso con escape \' '
