@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
+
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.AtomMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -34,24 +35,28 @@ public class OrdinaryLiteralTest {
         }
     }
 
-    @ParameterizedTest(name = "[{index}] Substitution for OrdinaryLiteral with isPositive = {0} case")
-    @ValueSource(booleans = {true, false})
-    public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(boolean isPositiveParam) {
-        OrdinaryLiteral oLiteral = LiteralMother.createOrdinaryLiteral(isPositiveParam, "P", "x", "y");
-        Substitution substitution = new SubstitutionBuilder()
-                .addMapping("x", "1")
-                .addMapping("y", "b")
-                .build();
+    @Nested
+    class ApplySubstitution {
 
-        OrdinaryLiteral newLiteral = oLiteral.applySubstitution(substitution);
+        @ParameterizedTest(name = "[{index}] Substitution for OrdinaryLiteral with isPositive = {0} case")
+        @ValueSource(booleans = {true, false})
+        public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(boolean isPositiveParam) {
+            OrdinaryLiteral oLiteral = LiteralMother.createOrdinaryLiteral(isPositiveParam, "P", "x", "y");
+            Substitution substitution = new SubstitutionBuilder()
+                    .addMapping("x", "1")
+                    .addMapping("y", "b")
+                    .build();
 
-        assertThat(newLiteral).isNotSameAs(oLiteral);
-        LiteralAssert.assertThat(newLiteral)
-                .isNotSameAs(oLiteral)
-                .isPositive(isPositiveParam)
-                .hasPredicate("P", 2)
-                .hasConstant(0, "1")
-                .hasVariable(1, "b");
+            OrdinaryLiteral newLiteral = oLiteral.applySubstitution(substitution);
+
+            assertThat(newLiteral).isNotSameAs(oLiteral);
+            LiteralAssert.assertThat(newLiteral)
+                    .isNotSameAs(oLiteral)
+                    .isPositive(isPositiveParam)
+                    .hasPredicate("P", 2)
+                    .hasConstant(0, "1")
+                    .hasVariable(1, "b");
+        }
     }
 
 
@@ -65,7 +70,7 @@ public class OrdinaryLiteralTest {
 
             assertThat(actualUnfoldingList).hasSize(1);
             ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfolding)
                     .hasSize(1)
                     .containsOrdinaryLiteral("P", "x");
 
@@ -80,7 +85,7 @@ public class OrdinaryLiteralTest {
 
             assertThat(actualUnfoldingList).hasSize(1);
             ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfolding)
                     .hasSize(1)
                     .containsOrdinaryLiteral(false, "P", "a", "b");
         }
@@ -95,7 +100,7 @@ public class OrdinaryLiteralTest {
             assertThat(actualUnfoldingList).hasSize(1);
             ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
             ImmutableLiteralsList expectedUnfolding = ImmutableLiteralsListMother.create("R(a, b), S(b, z)");
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfolding)
                     .isLogicallyEquivalentTo(expectedUnfolding)
                     .hasSameSizeAs(expectedUnfolding)
                     .containsOrdinaryLiteral("R", "a", "b");
@@ -113,12 +118,12 @@ public class OrdinaryLiteralTest {
 
             assertThat(unfoldedLiteral).hasSize(2);
             ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create("R(a, b), S(b, z)");
-            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(0))
+            assertThat(unfoldedLiteral.get(0))
                     .hasSize(2)
                     .isLogicallyEquivalentTo(expectedLiteralsList1)
                     .containsOrdinaryLiteral("R", "a", "b");
             ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create("R(a, b), T(b, z)");
-            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(1))
+            assertThat(unfoldedLiteral.get(1))
                     .hasSize(2)
                     .isLogicallyEquivalentTo(expectedLiteralsList2)
                     .containsOrdinaryLiteral("R", "a", "b");
@@ -133,7 +138,7 @@ public class OrdinaryLiteralTest {
 
             ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("R(a, b), S(b, z, w)");
             assertThat(unfoldedAtom).hasSize(1);
-            ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+            assertThat(unfoldedAtom.get(0))
                     .hasSize(2)
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("R", "a", "b");

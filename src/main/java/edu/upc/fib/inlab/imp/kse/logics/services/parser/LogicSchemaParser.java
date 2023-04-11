@@ -11,25 +11,31 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
 
     private final LogicSchemaGrammarToSpecVisitor<T> visitor;
+    private final Set<String> specialSymbols;
 
     public LogicSchemaParser() {
-        this(new DefaultTermTypeCriteria());
+        this(new DefaultTermTypeCriteria(), new BooleanBuiltInPredicateNameChecker());
     }
 
-    public LogicSchemaParser(TermTypeCriteria termTypeCriteria) {
-        visitor = createVisitor(new StringToTermSpecFactory(termTypeCriteria));
+    public LogicSchemaParser(TermTypeCriteria termTypeCriteria, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+        visitor = createVisitor(new StringToTermSpecFactory(termTypeCriteria), builtInPredicateNameChecker);
+        specialSymbols = new HashSet<>();
+        specialSymbols.add("myCustomBuiltInPredicate");
     }
 
-    protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);
+    protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker);
 
     protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
 
     public LogicSchema parse(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
-        LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input);
+        LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, specialSymbols);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();

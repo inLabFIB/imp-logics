@@ -97,4 +97,25 @@ public class LogicSchemaPrinterTest {
 
         assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
     }
+
+    @Nested
+    class BuiltInLiteralPrintingTests {
+
+        @Test
+        public void should_printLogicSchema_whenContainsDiferentBuiltInLiterals() {
+            String schemaString = """
+                    @1 :- 1<2, TRUE(), FALSE(), 1<>2
+                    """;
+
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+            LogicSchemaPrinter printer = new LogicSchemaPrinter();
+            String actualLogicSchema = printer.print(logicSchema);
+
+            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
+            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+
+            assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
+        }
+    }
 }

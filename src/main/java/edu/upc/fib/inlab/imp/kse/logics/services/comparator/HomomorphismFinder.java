@@ -174,7 +174,7 @@ public class HomomorphismFinder {
      * @param domainBuiltInLiteral is not null
      * @param rangeBuiltInLiteral  is not null
      * @return an extension of the currentSubstitution that makes domainBuiltInLiteral to be equal to rangeBuiltInLiteral,
-     * or its symmetric, if exists
+     * or its symmetric, if exists (e.g. "a < 1" is not homomorphic to "1 > b", but, it is with the symmetric "b < 1")
      */
     private List<Substitution> computeHomomorphismExtensionForBuiltInLiteral(Substitution currentSubstitution, BuiltInLiteral domainBuiltInLiteral, BuiltInLiteral rangeBuiltInLiteral) {
         List<Substitution> result = new LinkedList<>();

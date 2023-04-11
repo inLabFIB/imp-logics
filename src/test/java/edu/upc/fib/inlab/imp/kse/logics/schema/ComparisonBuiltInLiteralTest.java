@@ -1,11 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ComparisonBuiltInLiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -40,19 +40,22 @@ public class ComparisonBuiltInLiteralTest {
         }
     }
 
-    @Test
-    public void should_ReturnNewComparisonBuiltInLiteral_WithSubstitutedTerms_WhenApplyingSubstitution() {
-        ComparisonBuiltInLiteral builtInLiteral = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("y"), ComparisonOperator.LESS_THAN);
-        Substitution substitution = new SubstitutionBuilder()
-                .addMapping("x", "a")
-                .addMapping("y", "b")
-                .build();
+    @Nested
+    class ApplySubstitution {
+        @Test
+        public void should_ReturnNewComparisonBuiltInLiteral_WithSubstitutedTerms_WhenApplyingSubstitution() {
+            ComparisonBuiltInLiteral builtInLiteral = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("y"), ComparisonOperator.LESS_THAN);
+            Substitution substitution = new SubstitutionBuilder()
+                    .addMapping("x", "a")
+                    .addMapping("y", "b")
+                    .build();
 
-        ComparisonBuiltInLiteral actualBuiltInLiteral = builtInLiteral.applySubstitution(substitution);
-        ComparisonBuiltInLiteralAssert.assertThat(actualBuiltInLiteral)
-                .isNotSameAs(builtInLiteral)
-                .hasComparisonOperation(ComparisonOperator.LESS_THAN.getSymbol())
-                .hasLeftVariable("a")
-                .hasRightVariable("b");
+            ComparisonBuiltInLiteral actualBuiltInLiteral = builtInLiteral.applySubstitution(substitution);
+            assertThat(actualBuiltInLiteral)
+                    .isNotSameAs(builtInLiteral)
+                    .hasComparisonOperation(ComparisonOperator.LESS_THAN.getSymbol())
+                    .hasLeftVariable("a")
+                    .hasRightVariable("b");
+        }
     }
 }

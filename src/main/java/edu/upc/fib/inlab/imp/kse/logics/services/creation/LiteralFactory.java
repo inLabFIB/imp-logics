@@ -9,7 +9,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSp
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 public class LiteralFactory {
 
@@ -26,18 +26,31 @@ public class LiteralFactory {
     }
 
     public BuiltInLiteral buildBuiltInLiteral(BuiltInLiteralSpec bilSpec) {
-        ComparisonOperator comparisonOperator = ComparisonOperator.fromSymbol(bilSpec.getOperator());
-        if (Objects.nonNull(comparisonOperator)) {
-            checkNumberOfTerms(bilSpec);
+        String operator = bilSpec.getOperator();
+        Optional<ComparisonOperator> comparisonOperatorOpt = ComparisonOperator.fromSymbol(operator);
+        if (comparisonOperatorOpt.isPresent()) {
+            checkNumberOfTerms(bilSpec, 2);
             Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(0));
             Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(1));
-            return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperator);
-        } else throw new UnrecognizedBuiltInOperator(bilSpec.getOperator());
+            return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperatorOpt.get());
+        }
+
+        Optional<Boolean> booleanValue = BooleanBuiltInLiteral.fromOperator(operator);
+        if (booleanValue.isPresent()) {
+            checkEmptyTerms(bilSpec);
+            return new BooleanBuiltInLiteral(booleanValue.get());
+        }
+
+        throw new UnrecognizedBuiltInOperator(operator);
     }
 
-    private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec) {
-        if (bilSpec.getTermSpecList().size() != 2)
-            throw new WrongNumberOfTermsInBuiltInLiteral(2, bilSpec.getTermSpecList().size());
+    private static void checkEmptyTerms(BuiltInLiteralSpec bilSpec) {
+        checkNumberOfTerms(bilSpec, 0);
+    }
+
+    private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec, int expectedTerms) {
+        if (bilSpec.getTermSpecList().size() != expectedTerms)
+            throw new WrongNumberOfTermsInBuiltInLiteral(expectedTerms, bilSpec.getTermSpecList().size());
     }
 
 }

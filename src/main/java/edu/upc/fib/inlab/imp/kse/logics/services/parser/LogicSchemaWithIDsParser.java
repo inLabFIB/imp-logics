@@ -10,13 +10,13 @@ public class LogicSchemaWithIDsParser extends LogicSchemaParser<LogicConstraintW
         super();
     }
 
-    public LogicSchemaWithIDsParser(TermTypeCriteria termTypeCriteria) {
-        super(termTypeCriteria);
+    public LogicSchemaWithIDsParser(TermTypeCriteria termTypeCriteria, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+        super(termTypeCriteria, builtInPredicateNameChecker);
     }
 
     @Override
-    protected LogicSchemaGrammarToSpecVisitor<LogicConstraintWithIDSpec> createVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
-        return new LogicSchemaWithIDsGrammarToSpecVisitor(stringToTermSpecFactory);
+    protected LogicSchemaGrammarToSpecVisitor<LogicConstraintWithIDSpec> createVisitor(StringToTermSpecFactory stringToTermSpecFactory, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+        return new LogicSchemaWithIDsGrammarToSpecVisitor(stringToTermSpecFactory, builtInPredicateNameChecker);
     }
 
     @Override

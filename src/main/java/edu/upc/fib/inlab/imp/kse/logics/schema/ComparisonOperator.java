@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Implementation of binary arithmetic comparison operators such as <, or <=.
@@ -35,8 +36,8 @@ public enum ComparisonOperator {
         return symbol;
     }
 
-    public static ComparisonOperator fromSymbol(String symbol) {
-        return LOOKUP.get(symbol);
+    public static Optional<ComparisonOperator> fromSymbol(String symbol) {
+        return Optional.ofNullable(LOOKUP.get(symbol));
     }
 
     public boolean isSymmetric(ComparisonOperator rangeOperator) {

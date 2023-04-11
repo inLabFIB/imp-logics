@@ -16,9 +16,9 @@ public interface LogicSchemaVisitor<T> {
 
     T visit(OrdinaryLiteral ordinaryLiteral);
 
-    T visit(BuiltInLiteral builtInLiteral);
-
     T visit(ComparisonBuiltInLiteral comparisonBuiltInLiteral);
+
+    T visit(BooleanBuiltInLiteral comparisonBuiltInLiteral);
 
     T visit(Atom atom);
 

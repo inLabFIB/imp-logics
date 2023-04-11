@@ -9,10 +9,13 @@ import java.util.List;
 public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintSpec> extends LogicSchemaGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
+    private final BuiltInPredicateNameChecker builtInPredicateNameChecker;
+
     protected LogicSchemaSpec<T> logicSchemaSpec;
 
-    public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
+    public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
+        this.builtInPredicateNameChecker = builtInPredicateNameChecker;
     }
 
     @Override
@@ -42,14 +45,14 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
 
     private List<TermSpec> createTermsList(LogicSchemaGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
-        for (LogicSchemaGrammarParser.TermContext termContext: ctx.term()) {
+        for (LogicSchemaGrammarParser.TermContext termContext : ctx.term()) {
             termSpecList.add(this.createTermSpec(termContext));
         }
         return termSpecList;
     }
 
     @Override
-    public BuiltInLiteralSpec visitBuiltInLiteral(LogicSchemaGrammarParser.BuiltInLiteralContext ctx) {
+    public BuiltInLiteralSpec visitComparisonBuiltInLiteral(LogicSchemaGrammarParser.ComparisonBuiltInLiteralContext ctx) {
         TermSpec leftTermSpec = createTermSpec(ctx.term(0));
         TermSpec rightTermSpec = createTermSpec(ctx.term(1));
         List<TermSpec> termSpecList = List.of(leftTermSpec, rightTermSpec);
@@ -57,11 +60,21 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
     }
 
     @Override
-    public OrdinaryLiteralSpec visitOrdinaryLiteral(LogicSchemaGrammarParser.OrdinaryLiteralContext ctx) {
+    public LiteralSpec visitAtom(LogicSchemaGrammarParser.AtomContext ctx) {
+        String predicateName = ctx.predicate().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.termsList());
+        if (builtInPredicateNameChecker.isBuiltInPredicateName(predicateName)) {
+            return new BuiltInLiteralSpec(predicateName, termSpecList);
+        } else {
+            return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
+        }
+    }
+
+    @Override
+    public OrdinaryLiteralSpec visitNegatedAtom(LogicSchemaGrammarParser.NegatedAtomContext ctx) {
         String predicateName = ctx.atom().predicate().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
-        boolean isPositive = ctx.NOT() == null;
-        return new OrdinaryLiteralSpec(predicateName, termSpecList, isPositive);
+        return new OrdinaryLiteralSpec(predicateName, termSpecList, false);
     }
 
     private TermSpec createTermSpec(LogicSchemaGrammarParser.TermContext ctx) {

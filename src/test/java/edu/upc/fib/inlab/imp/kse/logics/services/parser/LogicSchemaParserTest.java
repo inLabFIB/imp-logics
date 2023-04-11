@@ -4,16 +4,22 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.DerivationRuleAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicConstraintAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
-import org.assertj.core.api.Assertions;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class LogicSchemaParserTest {
 
@@ -23,7 +29,7 @@ public class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        LogicSchemaAssert.assertThat(logicSchema)
+        assertThat(logicSchema)
                 .containsPredicate("p", 0);
     }
 
@@ -33,7 +39,7 @@ public class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        LogicSchemaAssert.assertThat(logicSchema)
+        assertThat(logicSchema)
                 .containsPredicate("p", 2);
     }
 
@@ -43,11 +49,11 @@ public class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        LogicSchemaAssert.assertThat(logicSchema)
+        assertThat(logicSchema)
                 .containsConstraintID("1");
 
         LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
-        LogicConstraintAssert.assertThat(logicConstraint)
+        assertThat(logicConstraint)
                 .hasID("1")
                 .hasBodySize(1)
                 .containsOrdinaryLiteral("p", 0);
@@ -59,11 +65,11 @@ public class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        LogicSchemaAssert.assertThat(logicSchema)
+        assertThat(logicSchema)
                 .containsConstraintID("1");
 
         LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
-        LogicConstraintAssert.assertThat(logicConstraint)
+        assertThat(logicConstraint)
                 .hasID("1")
                 .hasBodySize(1)
                 .containsOrdinaryLiteral("p", "x", "y");
@@ -76,9 +82,9 @@ public class LogicSchemaParserTest {
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
-        Assertions.assertThat(derivationRulesList).hasSize(1);
+        assertThat(derivationRulesList).hasSize(1);
         DerivationRule derivationRule = derivationRulesList.get(0);
-        DerivationRuleAssert.assertThat(derivationRule)
+        assertThat(derivationRule)
                 .hasBodySize(1)
                 .containsOrdinaryLiteral("p", "x", "y");
     }
@@ -90,9 +96,9 @@ public class LogicSchemaParserTest {
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
-        Assertions.assertThat(derivationRulesList).hasSize(1);
+        assertThat(derivationRulesList).hasSize(1);
         DerivationRule derivationRule = derivationRulesList.get(0);
-        DerivationRuleAssert.assertThat(derivationRule)
+        assertThat(derivationRule)
                 .hasBodySize(2)
                 .containsOrdinaryLiteral("p", "x", "y")
                 .containsOrdinaryLiteral("r", "y");
@@ -101,21 +107,21 @@ public class LogicSchemaParserTest {
     @Test
     public void should_containTwoDerivationRules_whenTwoDerivationRuleAreDefined_forTheSamePredicate() {
         String schemaString = """
-                                q(x) :- p(x, y)
-                                q(x) :- r(x)
-                                """;
+                q(x) :- p(x, y)
+                q(x) :- r(x)
+                """;
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
         List<DerivationRule> derivationRulesList = logicSchema.getDerivationRulesByPredicateName("q");
-        Assertions.assertThat(derivationRulesList).hasSize(2);
+        assertThat(derivationRulesList).hasSize(2);
         DerivationRule firstDerivationRule = derivationRulesList.get(0);
-        DerivationRuleAssert.assertThat(firstDerivationRule)
+        assertThat(firstDerivationRule)
                 .hasBodySize(1)
                 .containsOrdinaryLiteral("p", "x", "y");
 
         DerivationRule secondDerivationRule = derivationRulesList.get(1);
-        DerivationRuleAssert.assertThat(secondDerivationRule)
+        assertThat(secondDerivationRule)
                 .hasBodySize(1)
                 .containsOrdinaryLiteral("r", "x");
     }
@@ -133,7 +139,7 @@ public class LogicSchemaParserTest {
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
 
-        LogicSchemaAssert.assertThat(logicSchema)
+        assertThat(logicSchema)
                 .containsExactlyThesePredicateNames(
                         "Dept", "Rich", "WorksIn", "Emp", "Manages", "CrucialDept", "MinOneSpecialEmployee", "Happy")
                 .containsExactlyTheseConstraintIDs("1", "2", "3");
@@ -152,7 +158,58 @@ public class LogicSchemaParserTest {
         //Action
         String schemaString2 = "R(x) :- S(x, y)";
         LogicSchema logicSchema2 = logicSchemaWithIDsParser.parse(schemaString2);
-        LogicSchemaAssert.assertThat(logicSchema2).containsExactlyThesePredicateNames("R", "S");
+        assertThat(logicSchema2).containsExactlyThesePredicateNames("R", "S");
     }
 
+    @Nested
+    class BooleanBuiltInLiteralTest {
+        @ParameterizedTest
+        @MethodSource("booleanValues")
+        public void should_containBooleanBuiltInLiteral_whenBodyContainsBooleanString(String booleanString, boolean booleanValue) {
+            String schemaString = "@1 :- " + booleanString + "()";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema).containsConstraintID("1");
+            LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
+
+            assertThat(logicConstraint)
+                    .containsBooleanBuiltInLiteral(booleanValue);
+        }
+
+        private static Stream<Arguments> booleanValues() {
+            return Stream.of(
+                    Arguments.of("TRUE", true),
+                    Arguments.of("FALSE", false)
+            );
+        }
+    }
+
+    @Nested
+    class CustomBuiltInLiteralTest {
+
+        @Test
+        public void should_containCustomBuiltInLiteral_whenXXXXXXX() {
+            String schemaString = "@1 :- myCustomBuiltInPredicate()";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema).containsConstraintID("1");
+            LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
+
+//            assertThat(logicConstraint)
+//                    .containsCustomBuiltInLiteral("myCustomBuiltInPredicate");
+        }
+
+
+        @Test
+        public void test() {
+            CharStream input = CharStreams.fromString("myCustomBuiltInPredicate()");
+            HashSet<String> myCustomBuiltInPredicate = new HashSet<>(Arrays.asList("myCustomBuiltInPredicate"));
+            LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, myCustomBuiltInPredicate);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
+            LogicSchemaGrammarParser.ProgContext tree = parser.prog();
+        }
+    }
 }

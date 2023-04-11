@@ -61,16 +61,6 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     }
 
     @Override
-    public String visit(ComparisonBuiltInLiteral comparisonBuiltInLiteral) {
-        Term leftTerm = comparisonBuiltInLiteral.getLeftTerm();
-        ComparisonOperator operator = comparisonBuiltInLiteral.getOperator();
-        Term rightTerm = comparisonBuiltInLiteral.getRightTerm();
-        return leftTerm.accept(this) +
-                operator.accept(this) +
-                rightTerm.accept(this);
-    }
-
-    @Override
     public String visit(OrdinaryLiteral ordinaryLiteral) {
         Atom atom = ordinaryLiteral.getAtom();
         String atomString = atom.accept(this);
@@ -88,11 +78,20 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     }
 
     @Override
-    public String visit(BuiltInLiteral builtInLiteral) {
-        String operationName = builtInLiteral.getOperationName();
-        ImmutableTermList terms = builtInLiteral.getTerms();
-        return operationName +
-                terms.accept(this);
+    public String visit(ComparisonBuiltInLiteral comparisonBuiltInLiteral) {
+        Term leftTerm = comparisonBuiltInLiteral.getLeftTerm();
+        ComparisonOperator operator = comparisonBuiltInLiteral.getOperator();
+        Term rightTerm = comparisonBuiltInLiteral.getRightTerm();
+        return leftTerm.accept(this) +
+                operator.accept(this) +
+                rightTerm.accept(this);
+    }
+
+    @Override
+    public String visit(BooleanBuiltInLiteral booleanBuiltInLiteral) {
+        String operationName = booleanBuiltInLiteral.getOperationName();
+        ImmutableTermList terms = booleanBuiltInLiteral.getTerms();
+        return operationName + "(" + terms.accept(this) + ")";
     }
 
     @Override

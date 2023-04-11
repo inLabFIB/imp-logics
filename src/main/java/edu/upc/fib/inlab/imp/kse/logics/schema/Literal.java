@@ -13,6 +13,10 @@ import java.util.Set;
 public abstract class Literal {
     public abstract ImmutableTermList getTerms();
 
+    /**
+     * @param substitution not null
+     * @return a new Literal after applying the given substitution
+     */
     public abstract Literal applySubstitution(Substitution substitution);
 
     public Set<Variable> getUsedVariables() {

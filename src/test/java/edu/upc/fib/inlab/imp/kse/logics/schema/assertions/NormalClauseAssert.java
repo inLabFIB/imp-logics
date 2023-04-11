@@ -1,9 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
+import edu.upc.fib.inlab.imp.kse.logics.schema.BooleanBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.NormalClause;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 
 public abstract class NormalClauseAssert<T extends NormalClause> extends AbstractAssert<NormalClauseAssert<T>, T> {
     public NormalClauseAssert(T actual, Class<?> selfType) {
@@ -42,6 +44,19 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                         .isComparisonBuiltInLiteral()
                         .hasBuiltInComparisonOperation(comparisonOperator)
                         .containsVariables(leftVariable, rightVariable)
+        );
+        return this;
+    }
+
+    public NormalClauseAssert<T> containsBooleanBuiltInLiteral(boolean booleanValue) {
+        Assertions.assertThat(actual.getBody()).anySatisfy(
+                lit -> LiteralAssert.assertThat(lit)
+                        .asInstanceOf(InstanceOfAssertFactories.type(BooleanBuiltInLiteral.class))
+                        .satisfies(l ->
+                                BuiltInLiteralAssert.assertThat(l)
+                                        .hasOperationName(BooleanBuiltInLiteral.fromValue(booleanValue))
+                        )
+
         );
         return this;
     }

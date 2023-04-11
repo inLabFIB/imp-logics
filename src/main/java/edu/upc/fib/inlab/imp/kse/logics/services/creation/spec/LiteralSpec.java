@@ -5,6 +5,6 @@ import java.util.List;
 /**
  * Specification of a Literal.
  */
-public abstract class LiteralSpec {
+public abstract class LiteralSpec implements LogicElementSpec {
     public abstract List<TermSpec> getTermSpecList();
 }

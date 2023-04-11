@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpe
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicElementSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.BooleanBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaGrammarLexer;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaGrammarParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsGrammarToSpecVisitor;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 public class LiteralParser {
     public static Literal parseLiteral(String literalString) {
-        LogicSchemaWithIDsGrammarToSpecVisitor visitor = new LogicSchemaWithIDsGrammarToSpecVisitor(new StringToTermSpecFactory());
+        LogicSchemaWithIDsGrammarToSpecVisitor visitor = new LogicSchemaWithIDsGrammarToSpecVisitor(new StringToTermSpecFactory(), new BooleanBuiltInPredicateNameChecker());
         CharStream input = CharStreams.fromString(literalString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

@@ -50,6 +50,10 @@ public class LogicSchemaAssertions {
         return OrdinaryLiteralAssert.assertThat(actual);
     }
 
+    public static BuiltInLiteralAssert assertThat(BuiltInLiteral actual) {
+        return new BuiltInLiteralAssert(actual);
+    }
+
     public static PredicateAssert assertThat(Predicate actual) {
         return PredicateAssert.assertThat(actual);
     }

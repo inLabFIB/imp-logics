@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Specification of a built-in literal.
  */
-public class BuiltInLiteralSpec extends LiteralSpec implements LogicElementSpec {
+public class BuiltInLiteralSpec extends LiteralSpec {
     private final String operator;
     private final List<TermSpec> termSpecs;
 

@@ -7,8 +7,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.parser.exceptions.NotExpectingC
 
 public class LogicSchemaWithoutIDsGrammarToSpecVisitor extends LogicSchemaGrammarToSpecVisitor<LogicConstraintWithoutIDSpec> {
 
-    public LogicSchemaWithoutIDsGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
-        super(stringToTermSpecFactory);
+    public LogicSchemaWithoutIDsGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory, BooleanBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+        super(stringToTermSpecFactory, builtInPredicateNameChecker);
     }
 
     public LogicConstraintWithoutIDSpec visitConstraint(LogicSchemaGrammarParser.ConstraintContext ctx) {
