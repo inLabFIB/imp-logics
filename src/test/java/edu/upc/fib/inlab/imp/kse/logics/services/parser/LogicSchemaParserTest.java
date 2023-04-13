@@ -2,9 +2,8 @@ package edu.upc.fib.inlab.imp.kse.logics.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.CapitalConstantsCriteria;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
-import org.junit.jupiter.api.Disabled;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -190,7 +189,7 @@ public class LogicSchemaParserTest {
         public void should_containCustomBuiltInLiteral_whenConfiguringCustomBuiltInPredicates() {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
-            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria(),
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
                     new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
             ).parse(schemaString);
 
@@ -205,7 +204,7 @@ public class LogicSchemaParserTest {
         public void should_notContainCustomBuiltInLiteral_whenNotConfiguringCustomBuiltInPredicates() {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
-            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new DefaultTermTypeCriteria(),
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
                     new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
             ).parse(schemaString);
 
@@ -217,12 +216,16 @@ public class LogicSchemaParserTest {
         }
     }
 
-    @Disabled
     @Nested
     class ConstantAndVariableParsingTests {
 
         @ParameterizedTest
-        @ValueSource(strings = {"0", "1", "01", "1.0", "0.0", "1000"})
+        @ValueSource(strings = {
+                "0", "1", "01", "1000",
+                "1.0", "0.0", "1000.0", ".000001",
+                "1.0e-10", "1.0e10", "1.0e+10",
+                "1.0E-10", "1.0E10", "1.0E+10"
+        })
         public void should_parseConstant_whenTermIsNumber(String numberString) {
             String schemaString = "@1 :- P(" + numberString + ")";
 
@@ -235,21 +238,33 @@ public class LogicSchemaParserTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"''", "'1'", "'a'", "'abc'", "'Escape \\' test'", "'Hello \n World'"})
-        public void should_parseConstant_whenTermIsString(String string) {
-            String schemaString = "@1 :- P(" + string + ")";
+        public void should_parseConstant_whenTermIsSingleQuotes(String constantString) {
+            String schemaString = "@1 :- P(" + constantString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser().parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 
-            LiteralAssert.assertThat(ordinaryLiteral).hasConstant(0, string);
+            LiteralAssert.assertThat(ordinaryLiteral).hasConstant(0, constantString);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"\"\"", "\"1\"", "\"a\"", "\"abc\"", "\"Escape \\\" test\"", "\"Hello \n World\""})
+        public void should_parseConstant_whenTermIsDoubleQuotes(String constantString) {
+            String schemaString = "@1 :- P(" + constantString + ")";
+
+            LogicSchema parsedSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+            LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
+            OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
+
+            LiteralAssert.assertThat(ordinaryLiteral).hasConstant(0, constantString);
         }
 
         @Test
         public void should_parseConstant_whenTermIsID_andCriteriaMakesItConstant() {
             String schemaString = "@1 :- P(A)";
 
-            LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsCriteria(),
+            LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
                     new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
@@ -257,16 +272,17 @@ public class LogicSchemaParserTest {
             LiteralAssert.assertThat(ordinaryLiteral).hasConstant(0, "A");
         }
 
-        @Test
-        public void should_parseVariable_whenTermIsID_andCriteriaMakesItVariable() {
-            String schemaString = "@1 :- P(a)";
+        @ParameterizedTest
+        @ValueSource(strings = {"a", "a'", "a123"})
+        public void should_parseVariable_whenTermIsID_andCriteriaMakesItVariable(String variableString) {
+            String schemaString = "@1 :- P(" + variableString + ")";
 
-            LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsCriteria(),
+            LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
                     new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 
-            LiteralAssert.assertThat(ordinaryLiteral).hasVariable(0, "a");
+            LiteralAssert.assertThat(ordinaryLiteral).hasVariable(0, variableString);
         }
     }
 }

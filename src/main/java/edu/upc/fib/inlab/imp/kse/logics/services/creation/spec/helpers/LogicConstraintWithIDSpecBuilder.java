@@ -13,7 +13,7 @@ public class LogicConstraintWithIDSpecBuilder extends NormalClauseSpecBuilder<Lo
      * the kind of Term to instantiate for the given term names.
      */
     public LogicConstraintWithIDSpecBuilder() {
-        this(new DefaultTermTypeCriteria());
+        this(new AllVariableTermTypeCriteria());
     }
 
     public LogicConstraintWithIDSpecBuilder(TermTypeCriteria termTypeCriteria) {

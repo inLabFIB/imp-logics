@@ -4,7 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicSchemaSpec;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
 import org.antlr.v4.runtime.CharStream;
@@ -19,7 +19,7 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     private final CustomBuiltInPredicateNameChecker builtInPredicateNameChecker;
 
     public LogicSchemaParser() {
-        this(new DefaultTermTypeCriteria(), new CustomBuiltInPredicateNameChecker(Set.of()));
+        this(new AllVariableTermTypeCriteria(), new CustomBuiltInPredicateNameChecker(Set.of()));
     }
 
     public LogicSchemaParser(TermTypeCriteria termTypeCriteria, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker) {
@@ -41,4 +41,14 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
         LogicSchemaFactory<T> factory = createLogicSchemaFactory();
         return factory.createLogicSchema(logicSchemaSpec);
     }
+
+
+    // Parser --> Spec --> LogicSchema
+
+    // Parser --> ConstantSpec & OtherTerms ----(TermTypeCriteria OtherTerms) ---> LogicSchema
+
+
+    // ConstantSpec & VariableSpec --> LogicSchema
+
+
 }

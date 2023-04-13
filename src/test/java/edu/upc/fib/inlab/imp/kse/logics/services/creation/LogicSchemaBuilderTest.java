@@ -108,7 +108,7 @@ public class LogicSchemaBuilderTest {
 
     @Test
     public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
-        TermTypeCriteria termTypeCriteria = new DefaultTermTypeCriteria();
+        TermTypeCriteria termTypeCriteria = new AllVariableTermTypeCriteria();
         LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")

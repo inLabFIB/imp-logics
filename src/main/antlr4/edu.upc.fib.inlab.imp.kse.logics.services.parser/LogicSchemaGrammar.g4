@@ -13,22 +13,36 @@ tokens {
   BUILTIN_PREDICATE
 }
 
-NOT: 'not';
-BOOLEAN: 'TRUE' | 'FALSE';
-OPERATOR: '='|'<>'|'<'|'>'|'<='|'>=';
-ID: ([A-Za-z0-9_'?])+ {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
-CONSTRAINTIDSTART: '@';
-NEWLINE:'\r'? '\n';
-WS : [ \t]+ -> skip ; // toss out whitespace
-COMMENT : '%' ~[\r\n]*;
-COMMA: ',';
-OPENPAR: '(';
-CLOSEPAR: ')';
-ARROW: ':-';
+NOT:            'not';
+BOOLEAN:        'TRUE' | 'FALSE';
+OPERATOR:       '='|'<>'|'<'|'>'|'<='|'>=';
+STRING:         SINGLE_QUOTE | DOUBLE_QUOTE;
+NUMBER:         DECIMAL | FLOAT | REAL;
+ALPHANUMERIC_WITH_PRIMA: ALPHANUMERIC [']? {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
+CONSTRAINTID:   '@' ALPHANUMERIC;
+NEWLINE:        '\r'? '\n';
+WS:             [ \t]+ -> skip ; // toss out whitespace
+COMMENT:        '%' ~[\r\n]*;
+COMMA:          ',';
+OPENPAR:        '(';
+CLOSEPAR:       ')';
+ARROW:          ':-';
+
+//No debemos permitir esto: 1.1()
+//Sí debemos pemitir esto: P(1.1)
+
+fragment DEC_DOT_DEC:   (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
+fragment DEC_DIGIT:     [0-9];
+fragment DECIMAL:       DEC_DIGIT+;
+fragment FLOAT:         DEC_DOT_DEC;
+fragment REAL:          (DECIMAL  | DEC_DOT_DEC) (('E'|'e') [+-]? DEC_DIGIT+);
+fragment ALPHANUMERIC:  [a-zA-Z0-9_]+;
+fragment SINGLE_QUOTE:  '\'' (~'\'' | '\\\'')* '\'';
+fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
 prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
 line: (COMMENT | constraint | derivationRule);
-constraint: (CONSTRAINTIDSTART ID)? ARROW body;
+constraint: (CONSTRAINTID)? ARROW body;
 derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;
 literal: builtInLiteral | ordinaryLiteral;
@@ -40,10 +54,5 @@ ordinaryLiteral: atom | negatedAtom;
 negatedAtom: NOT OPENPAR atom CLOSEPAR;
 atom: predicate OPENPAR termsList CLOSEPAR;
 termsList: | term (COMMA term)*;
-predicate: ID;
-term: ID;
-
-// 22
-// 2.345
-// 'Hola'
-// 'Qualquier cosa. Como \n por ejemplo esto ¿?!"·$$!!!{} incluso con escape \' '
+predicate: ALPHANUMERIC_WITH_PRIMA;
+term: STRING | NUMBER | ALPHANUMERIC_WITH_PRIMA;

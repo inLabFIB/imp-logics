@@ -44,33 +44,33 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
     private List<TermSpec> createTermsList(LogicSchemaGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
         for (LogicSchemaGrammarParser.TermContext termContext : ctx.term()) {
-            termSpecList.add(this.createTermSpec(termContext));
+            termSpecList.add(this.visitTerm(termContext));
         }
         return termSpecList;
     }
 
     @Override
     public BuiltInLiteralSpec visitComparisonBuiltInLiteral(LogicSchemaGrammarParser.ComparisonBuiltInLiteralContext ctx) {
-        TermSpec leftTermSpec = createTermSpec(ctx.term(0));
-        TermSpec rightTermSpec = createTermSpec(ctx.term(1));
+        TermSpec leftTermSpec = visitTerm(ctx.term(0));
+        TermSpec rightTermSpec = visitTerm(ctx.term(1));
         List<TermSpec> termSpecList = List.of(leftTermSpec, rightTermSpec);
         return new BuiltInLiteralSpec(ctx.OPERATOR().getText(), termSpecList);
     }
 
     @Override
-    public LogicElementSpec visitBooleanBuiltInLiteral(LogicSchemaGrammarParser.BooleanBuiltInLiteralContext ctx) {
+    public BuiltInLiteralSpec visitBooleanBuiltInLiteral(LogicSchemaGrammarParser.BooleanBuiltInLiteralContext ctx) {
         return new BuiltInLiteralSpec(ctx.BOOLEAN().getText(), List.of());
     }
 
     @Override
-    public LogicElementSpec visitCustomBuiltInLiteral(LogicSchemaGrammarParser.CustomBuiltInLiteralContext ctx) {
+    public BuiltInLiteralSpec visitCustomBuiltInLiteral(LogicSchemaGrammarParser.CustomBuiltInLiteralContext ctx) {
         String operatorName = ctx.BUILTIN_PREDICATE().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.termsList());
         return new BuiltInLiteralSpec(operatorName, termSpecList);
     }
 
     @Override
-    public LiteralSpec visitAtom(LogicSchemaGrammarParser.AtomContext ctx) {
+    public OrdinaryLiteralSpec visitAtom(LogicSchemaGrammarParser.AtomContext ctx) {
         String predicateName = ctx.predicate().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.termsList());
         return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
@@ -83,7 +83,9 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
         return new OrdinaryLiteralSpec(predicateName, termSpecList, false);
     }
 
-    private TermSpec createTermSpec(LogicSchemaGrammarParser.TermContext ctx) {
-        return stringToTermSpecFactory.createTermSpec(ctx.ID().getText());
+
+    @Override
+    public TermSpec visitTerm(LogicSchemaGrammarParser.TermContext ctx) {
+        return stringToTermSpecFactory.createTermSpec(ctx.getText());
     }
 }

@@ -12,17 +12,14 @@ public class LogicSchemaWithIDsGrammarToSpecVisitor extends LogicSchemaGrammarTo
     }
 
     public LogicConstraintWithIDSpec visitConstraint(LogicSchemaGrammarParser.ConstraintContext ctx) {
-
-        if (ctx.ID() != null) {
+        if (ctx.CONSTRAINTID() != null) {
             BodySpec body = createBody(ctx.body());
-            String id = ctx.ID().getText();
+            String id = ctx.CONSTRAINTID().getText().replace("@", "");
             LogicConstraintWithIDSpec constraintSpec = new LogicConstraintWithIDSpec(id, body);
             logicSchemaSpec.addLogicConstraintSpecs(constraintSpec);
             return constraintSpec;
-
         } else {
             throw new ExpectingConstraintID();
         }
-
     }
 }

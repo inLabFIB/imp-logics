@@ -7,7 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.DerivationRuleSpe
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DerivationRuleSpecBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
@@ -27,7 +27,7 @@ public class LogicSchemaFactoryTest {
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
 //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
 //            % Existing but unused predicates: Project(p)
-        TermTypeCriteria termTypeCriteria = new DefaultTermTypeCriteria();
+        TermTypeCriteria termTypeCriteria = new AllVariableTermTypeCriteria();
         LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")

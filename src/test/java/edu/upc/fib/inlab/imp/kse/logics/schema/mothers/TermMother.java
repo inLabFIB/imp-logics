@@ -4,14 +4,14 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Constant;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
-import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.DefaultTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
 
 import java.util.Arrays;
 
 public class TermMother {
 
-    private static final TermTypeCriteria termTypeCriteria = new DefaultTermTypeCriteria();
+    private static final TermTypeCriteria termTypeCriteria = new AllVariableTermTypeCriteria();
 
     public static ImmutableTermList createTerms(String... terms) {
         return new ImmutableTermList(Arrays.stream(terms).map(TermMother::createTerm).toList());

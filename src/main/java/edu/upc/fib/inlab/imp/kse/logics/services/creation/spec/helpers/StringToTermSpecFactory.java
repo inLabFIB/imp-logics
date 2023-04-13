@@ -20,7 +20,7 @@ public class StringToTermSpecFactory {
     }
 
     public StringToTermSpecFactory() {
-        this(new DefaultTermTypeCriteria());
+        this(new AllVariableTermTypeCriteria());
     }
 
     public List<TermSpec> createTermSpecs(String... termNames) {
