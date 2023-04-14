@@ -11,8 +11,8 @@ public class DerivationRuleMother {
 
     private final static LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
 
-    public static DerivationRule create(String schema) {
-        LogicSchema domainSchema = parser.parse(schema);
+    public static DerivationRule create(String derivationRuleString) {
+        LogicSchema domainSchema = parser.parse(derivationRuleString);
         Predicate predicate = domainSchema.getAllPredicates().stream()
                 .filter(Predicate::isDerived)
                 .findFirst().orElseThrow();

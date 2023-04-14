@@ -10,10 +10,11 @@ import java.util.Objects;
 /**
  * <p> This class is responsible for detecting whether two list of literals (or derivation rules, or logic constraints) are
  * logically equivalent, or not. That is, whether they have the same evaluation for all possible databases. </p>
- *
+ * *
  * <p> Since this problem is undecidible, this class relies on checking whether the two logic objects being compared (e.g. A, and B)
- * have a mutual homomorphism. That is, there is an homomorphism from A to B, and another from B to A. Such test
- * is sound, but incomplete. </p>
+ * have a mutual homomorphism. That is, there is an homomorphism from A to B, and another from B to A. When the list of literals
+ * is composed only of positive base ordinary literals, the test is sound and complete. However, if some literal list
+ * contains negated literals, or built-in literals, such test is sound, but incomplete. </p>
  *
  * <p> This class, by default, ignores the names of the derived predicate names. That is, two derived ordinary literals are considered
  * to be homomorphic if there is an homomorphism for their terms, and their derivation rules are homomorphic, but they
