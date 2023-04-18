@@ -171,7 +171,7 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
             List<LogicSchemaToSpecHelper.BodySpecFragment> lists = buildBodySpecFragmentsByLiteralsList(dr.getBody(), predicateTransformMap);
             List<LiteralSpec> literalSpecs = lists.get(0);
             DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
-                    .addHead(predicate.getName(), buildTermSpecs(dr.getHead().getTerms()))
+                    .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHead().getTerms()))
                     .addAllLiteralSpecs(literalSpecs)
                     .build();
             result.add(derivationRuleSpec);
@@ -213,7 +213,7 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
                     //TODO - Generate a new name for the predicate
                     String newPredicateName = rule.getHead().getPredicateName() + SUFFIX_SEPARATOR + i.getAndIncrement();
                     return new DerivationRuleSpecBuilder()
-                            .addHead(newPredicateName, buildTermSpecs(rule.getHead().getTerms()))
+                            .addHead(newPredicateName, LogicSchemaToSpecHelper.buildTermsSpecs(rule.getHead().getTerms()))
                             .addAllLiteralSpecs(listOfLiteralSpecs)
                             .build();
                 }).toList();
@@ -241,12 +241,12 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
 
     private List<BodySpecFragment> buildBodySpecFragmentsByLiteral(Literal literal, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
         if (literal instanceof BuiltInLiteral bil) {
-            LiteralSpec literalSpec = new BuiltInLiteralSpec(bil.getOperationName(), buildTermSpecs(bil.getTerms()));
+            LiteralSpec literalSpec = new BuiltInLiteralSpec(bil.getOperationName(), LogicSchemaToSpecHelper.buildTermsSpecs(bil.getTerms()));
             BodySpecFragment bodyFragment = new BodySpecFragment();
             bodyFragment.add(literalSpec);
             return List.of(bodyFragment);
         } else if (literal instanceof OrdinaryLiteral ol) {
-            List<TermSpec> terms = buildTermSpecs(ol.getTerms());
+            List<TermSpec> terms = LogicSchemaToSpecHelper.buildTermsSpecs(ol.getTerms());
             String predicateName = ol.getAtom().getPredicateName();
             List<String> newPredicateNamesList = predicateTransformMap.get(predicateName);
             if (ol.isPositive()) {
@@ -290,21 +290,6 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
                         }
                 )
                 .toList();
-    }
-
-    private List<TermSpec> buildTermSpecs(ImmutableTermList terms) {
-        return terms.stream().map(this::buildTermSpec).toList();
-    }
-
-
-    private TermSpec buildTermSpec(Term term) {
-        if (term.isVariable()) {
-            return new VariableSpec(term.getName());
-        } else if (term.isConstant()) {
-            return new ConstantSpec(term.getName());
-        } else {
-            throw new RuntimeException("Term type not supported");
-        }
     }
 
 }

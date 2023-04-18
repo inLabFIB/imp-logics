@@ -101,6 +101,10 @@ public class HomomorphismFinder {
         return computeHomomorphismExtensionForAtom(new Substitution(), domainHead, rangeHead);
     }
 
+    public Optional<Substitution> findHomomorphismForTerms(ImmutableTermList domainTerms, ImmutableTermList rangeTerms) {
+        return computeHomomorphismExtensionForTerms(new Substitution(), domainTerms, rangeTerms);
+    }
+
     private void checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(List<Literal> literals) {
         if (this.derivedOrdinaryLiteralHomomorphismCriteria.isPresent()) return;
         if (literals.stream()

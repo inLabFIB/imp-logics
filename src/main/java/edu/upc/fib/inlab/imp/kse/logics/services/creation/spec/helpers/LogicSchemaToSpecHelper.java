@@ -78,6 +78,30 @@ public class LogicSchemaToSpecHelper {
         return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
     }
 
+    public static LiteralSpec buildLiteralSpec(Literal literal) {
+        if (literal instanceof OrdinaryLiteral)
+            return LogicSchemaToSpecHelper.buildOrdinaryLiteralSpec((OrdinaryLiteral) literal);
+        if (literal instanceof BuiltInLiteral)
+            return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec((BuiltInLiteral) literal);
+        throw new IllegalArgumentException("Literal type not supported");
+    }
+
+    public static BuiltInLiteralSpec buildFalseLiteralSpec() {
+        return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(new BooleanBuiltInLiteral(false));
+    }
+
+    public static BuiltInLiteralSpec buildTrueLiteralSpec() {
+        return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(new BooleanBuiltInLiteral(true));
+    }
+
+    //TODO: maybe remove this functions because it has a constant "x"
+    public static List<TermSpec> createVariableSpecs(int arity) {
+        List<TermSpec> result = new LinkedList<>();
+        for (int i = 1; i <= arity; i++) {
+            result.add(new VariableSpec("x" + i));
+        }
+        return result;
+    }
 
     public static final class BodySpecFragment extends LinkedList<LiteralSpec> {
 

@@ -100,6 +100,12 @@ public class LogicSchema {
                 .collect(Collectors.toSet());
     }
 
+    public Set<Predicate> getAllDerivedPredicates() {
+        return predicatesByName.values().stream()
+                .filter(Predicate::isDerived)
+                .collect(Collectors.toSet());
+    }
+
     /**
      * A LevelHierarchy is a partition of the predicates of a schema into several levels,
      * where level 0 contains the base predicates, and each derived predicate from level i

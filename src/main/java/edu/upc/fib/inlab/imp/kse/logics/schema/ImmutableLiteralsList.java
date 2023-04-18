@@ -265,7 +265,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     @Override
     public String toString() {
         return this.literalList.stream()
-                .map(Object::toString)
+                .map(Literal::toString)
                 .collect(Collectors.joining(", "));
     }
 

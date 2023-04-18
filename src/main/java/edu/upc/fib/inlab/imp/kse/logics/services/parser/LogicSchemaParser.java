@@ -32,23 +32,18 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
 
     public LogicSchema parse(String schemaString) {
+        LogicSchemaSpec<T> logicSchemaSpec = parseToSpec(schemaString);
+        LogicSchemaFactory<T> factory = createLogicSchemaFactory();
+        return factory.createLogicSchema(logicSchemaSpec);
+    }
+
+    public LogicSchemaSpec<T> parseToSpec(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, builtInPredicateNameChecker);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
-        LogicSchemaSpec<T> logicSchemaSpec = visitor.visitProg(tree);
-        LogicSchemaFactory<T> factory = createLogicSchemaFactory();
-        return factory.createLogicSchema(logicSchemaSpec);
+        return visitor.visitProg(tree);
     }
-
-
-    // Parser --> Spec --> LogicSchema
-
-    // Parser --> ConstantSpec & OtherTerms ----(TermTypeCriteria OtherTerms) ---> LogicSchema
-
-
-    // ConstantSpec & VariableSpec --> LogicSchema
-
 
 }

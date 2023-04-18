@@ -42,6 +42,14 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
         return new ImmutableTermList();
     }
 
+    public boolean isTrue() {
+        return value;
+    }
+
+    public boolean isFalse() {
+        return !value;
+    }
+
     @Override
     public BooleanBuiltInLiteral applySubstitution(Substitution substitution) {
         return new BooleanBuiltInLiteral(value);
@@ -50,5 +58,10 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
     @Override
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return fromValue(value) + "()";
     }
 }

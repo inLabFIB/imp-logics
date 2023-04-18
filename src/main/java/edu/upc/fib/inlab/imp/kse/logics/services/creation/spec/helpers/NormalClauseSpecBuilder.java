@@ -29,6 +29,11 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
         return self();
     }
 
+    public T addLiteralSpec(LiteralSpec literal) {
+        bodySpec.add(literal);
+        return self();
+    }
+
     public T addOrdinaryLiteral(String predicateName, String... terms) {
         return addOrdinaryLiteral(predicateName, true, terms);
     }

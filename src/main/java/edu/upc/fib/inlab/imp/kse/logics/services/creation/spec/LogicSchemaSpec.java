@@ -32,13 +32,25 @@ public class LogicSchemaSpec<T extends LogicConstraintSpec> implements LogicElem
         this.predicateSpecList.addAll(Arrays.asList(predicateSpecs));
     }
 
+    public void addPredicateSpecs(List<PredicateSpec> predicateSpecs) {
+        this.predicateSpecList.addAll(predicateSpecs);
+    }
+
     public void addDerivationRuleSpecs(DerivationRuleSpec... derivationRuleSpecs) {
         this.derivationRuleSpecList.addAll(Arrays.asList(derivationRuleSpecs));
+    }
+
+    public void addDerivationRuleSpecs(List<DerivationRuleSpec> derivationRuleSpecs) {
+        this.derivationRuleSpecList.addAll(derivationRuleSpecs);
     }
 
     @SafeVarargs
     public final void addLogicConstraintSpecs(T... logicConstraintSpecs) {
         this.logicConstraintSpecList.addAll(Arrays.asList(logicConstraintSpecs));
+    }
+
+    public final void addLogicConstraintSpecs(List<T> logicConstraintSpecs) {
+        this.logicConstraintSpecList.addAll(logicConstraintSpecs);
     }
 
     public List<PredicateSpec> getPredicateSpecList() {

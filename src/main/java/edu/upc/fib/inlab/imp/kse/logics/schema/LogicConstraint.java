@@ -32,7 +32,7 @@ public class LogicConstraint extends NormalClause {
 
     @Override
     public String toString() {
-        return "@ " + getID() + " :- " + this.getBody();
+        return "@" + getID() + " :- " + this.getBody();
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
