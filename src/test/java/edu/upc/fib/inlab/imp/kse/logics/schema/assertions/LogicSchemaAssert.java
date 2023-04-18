@@ -81,6 +81,57 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return this;
     }
 
+
+    public LogicSchemaAssert hasSameStructureAs(LogicSchema expectedSchema) {
+        assertAllPredicatesHaveSameStructure(expectedSchema);
+        assertAllLogicConstraintsHaveSameStructure(expectedSchema);
+        return this;
+    }
+
+    private void assertAllLogicConstraintsHaveSameStructure(LogicSchema expectedSchema) {
+        for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
+            boolean actualIsExpected = logicConstraintIsContainedInListModusStructure(actualConstraint, expectedSchema.getAllLogicConstraints());
+            if (!actualIsExpected) {
+                Assertions.fail("Actual constraint \"" + actualConstraint + "\" is not expected");
+            }
+        }
+
+        for (LogicConstraint expectedConstraint : expectedSchema.getAllLogicConstraints()) {
+            boolean expectedIsFound = logicConstraintIsContainedInListModusStructure(expectedConstraint, actual.getAllLogicConstraints());
+            if (!expectedIsFound) {
+                Assertions.fail("Expected constraint \"" + expectedConstraint + "\" is missing");
+            }
+        }
+    }
+
+    private boolean logicConstraintIsContainedInListModusStructure(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
+        for (LogicConstraint aConstraintFromSet : constraintSet) {
+            if (new LogicStructureComparator().haveSameStructureRecursively(constraint, aConstraintFromSet)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void assertAllPredicatesHaveSameStructure(LogicSchema expectedSchema) {
+        for (Predicate actualPredicate : actual.getAllPredicates()) {
+            try {
+                Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
+                PredicateAssert.assertThat(actualPredicate).hasSameStructureAs(expectedPredicate);
+            } catch (PredicateNotExists e) {
+                Assertions.fail("Actual predicate " + actualPredicate.getName() + " was not expected");
+            }
+        }
+        for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
+            try {
+                actual.getPredicateByName(expectedPredicate.getName());
+            } catch (PredicateNotExists e) {
+                Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
+            }
+        }
+    }
+
+
     /**
      * Asserts whether the actual logicSchema constraints are equivalent to the expectedSchema constraints.
      * Do note that this comparison IS agnostic with the name of the derived predicates.
@@ -96,15 +147,20 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      */
     @SuppressWarnings("UnusedReturnValue")
     public LogicSchemaAssert assertAllLogicConstraintsAreEquivalent(LogicSchema expectedSchema) {
+        assertAllLogicConstraintsAreEquivalentAccordingToAnalyzer(expectedSchema, DerivedLiteralStrategy.HOMOMORPHIC_RULES.getAnalyzer());
+        return this;
+    }
+
+    protected LogicSchemaAssert assertAllLogicConstraintsAreEquivalentAccordingToAnalyzer(LogicSchema expectedSchema, LogicEquivalenceAnalyzer analyzer) {
         for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
-            boolean actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints());
+            boolean actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints(), analyzer);
             if (!actualIsExpected) {
                 Assertions.fail("Actual constraint \"" + actualConstraint + "\" is not expected");
             }
         }
 
         for (LogicConstraint expectedConstraint : expectedSchema.getAllLogicConstraints()) {
-            boolean expectedIsFound = logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints());
+            boolean expectedIsFound = logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), analyzer);
             if (!expectedIsFound) {
                 Assertions.fail("Expected constraint \"" + expectedConstraint + "\" is missing");
             }
@@ -248,7 +304,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     @SuppressWarnings("unused")
     public LogicSchemaAssert containsEquivalentPredicate(Predicate expectedPredicate, DerivedLiteralStrategy derivedLiteralsStrategy) {
         Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
-        PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate, derivedLiteralsStrategy);
+        PredicateAssert.assertThat(actualPredicate).checkDerivationRulesEquivalenceWithStrategy(expectedPredicate, derivedLiteralsStrategy);
         return this;
     }
 
