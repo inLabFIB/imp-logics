@@ -56,6 +56,11 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
     }
 
     @Override
+    public BooleanBuiltInLiteral buildNegatedLiteral() {
+        return new BooleanBuiltInLiteral(!value);
+    }
+
+    @Override
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }

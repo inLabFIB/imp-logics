@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.TermSpec;
@@ -37,9 +38,30 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
         return this;
     }
 
+    public OrdinaryLiteralAssert isPositive() {
+        return this.isPositive(true);
+    }
+
+    public OrdinaryLiteralAssert isNegated() {
+        return this.isPositive(false);
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public OrdinaryLiteralAssert hasPredicate(String predicateName, int arity) {
         AtomAssert.assertThat(actual.getAtom()).hasPredicate(predicateName, arity);
+        return this;
+    }
+
+    /**
+     * Asserts that the actual atom should have the very same predicate (i.e., same object reference)
+     * as the one given by parameter
+     *
+     * @param predicate not null
+     * @return this assert
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public OrdinaryLiteralAssert hasPredicate(Predicate predicate) {
+        AtomAssert.assertThat(actual.getAtom()).hasPredicate(predicate);
         return this;
     }
 

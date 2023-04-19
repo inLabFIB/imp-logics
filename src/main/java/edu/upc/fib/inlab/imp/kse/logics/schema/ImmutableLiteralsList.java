@@ -189,6 +189,27 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
 
+    public enum KindOfUnfolding {
+        STANDARD, //Standard unfolding only valid por positive literals
+        NEGATION_EXTENDED //Standard unfolding extended for dealing with some cases of negated literals
+    }
+
+    public List<ImmutableLiteralsList> unfold(int index, KindOfUnfolding kindOfUnfolding) {
+        Literal literal = this.literalList.get(index);
+        if (literal instanceof OrdinaryLiteral ordinaryLiteral) {
+            ImmutableLiteralsList previousLiterals = this.subList(0, index);
+            List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfold(kindOfUnfolding);
+            ImmutableLiteralsList nextLiterals = this.subList(index + 1, literalList.size());
+
+            List<ImmutableLiteralsList> result = new LinkedList<>();
+            for (ImmutableLiteralsList unfoldedLiterals : unfoldedLiteralsList) {
+                result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal.getUsedVariables()));
+            }
+            return result;
+        } else return List.of(this);
+    }
+
+
     /**
      * <p>Unfolding a literal returns a list of literals' list, one for each derivation rule of this literal.
      * In particular, for each derivation rule, it returns a literals' list replacing the variables of the derivation rule's head
@@ -206,18 +227,21 @@ public class ImmutableLiteralsList implements List<Literal> {
      * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
      */
     public List<ImmutableLiteralsList> unfold(int index) {
-        Literal literal = this.literalList.get(index);
-        if (literal instanceof OrdinaryLiteral ordinaryLiteral) {
-            ImmutableLiteralsList previousLiterals = this.subList(0, index);
-            List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfold();
-            ImmutableLiteralsList nextLiterals = this.subList(index + 1, literalList.size());
+        return unfold(index, KindOfUnfolding.STANDARD);
+    }
 
-            List<ImmutableLiteralsList> result = new LinkedList<>();
-            for (ImmutableLiteralsList unfoldedLiterals : unfoldedLiteralsList) {
-                result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal.getUsedVariables()));
-            }
-            return result;
-        } else return List.of(this);
+    /**
+     * This is an extension of the unfold method that also applies an unfolding for negated literals whose
+     * derivation rules does not contain existential variables.
+     * E.g.: Suppose the literals list "P(x), not(Derived(x))" with derivation rule "Derived(x) :- A(x), not(B(x))"
+     * <p>
+     * Unfolding not(Derived()) in such literals list will return two literals list:
+     * "P(x), not(A(x))" and "P(x), B(x)".
+     *
+     * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
+     */
+    public List<ImmutableLiteralsList> unfoldWithNegationExtension(int index) {
+        return unfold(index, KindOfUnfolding.NEGATION_EXTENDED);
     }
 
     private ImmutableLiteralsList combineLiteralsAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Set<Variable> sharedVariables) {
@@ -272,4 +296,6 @@ public class ImmutableLiteralsList implements List<Literal> {
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+
 }

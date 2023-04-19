@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
+import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
@@ -17,6 +18,18 @@ class SchemaUnfolderTest {
     class InputValidationTests {
         @Test
         public void should_throwException_whenMultipleStrategyIsNull() {
+            assertThatThrownBy(() -> new SchemaUnfolder(null, ImmutableLiteralsList.KindOfUnfolding.STANDARD))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_throwException_whenKindOfUnfoldingIsNull_withTwoParams() {
+            assertThatThrownBy(() -> new SchemaUnfolder(new SuffixMultipleConstraintIDGenerator(), null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void should_throwException_whenKindOfUnfoldingIsNull_withOneParam() {
             assertThatThrownBy(() -> new SchemaUnfolder(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -261,7 +274,30 @@ class SchemaUnfolderTest {
 
                 LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
             }
+        }
 
+        @Nested
+        class UnfoldingNegatedLiterals {
+            @Test
+            public void should_unfoldNegatedLiterals_whenUsingNegationExtendedParameter() {
+                LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    @1 :- R(x, y, z), not(S(x,z))
+                                    S(x,z) :- T(x,z)
+                                """);
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED)
+                        .unfold(logicSchema);
+
+                LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                @1 :- R(x, y, z), not(T(x,z))
+                                S(x,z) :- T(x,z)
+                                    """
+                );
+
+                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+            }
         }
     }
 

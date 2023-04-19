@@ -70,4 +70,9 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     public String toString() {
         return leftTerm.getName() + " " + operator.getSymbol() + " " + rightTerm.getName();
     }
+
+    @Override
+    public ComparisonBuiltInLiteral buildNegatedLiteral() {
+        return new ComparisonBuiltInLiteral(this.getLeftTerm(), this.getRightTerm(), operator.getNegatedOperator());
+    }
 }

@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListA
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -193,6 +194,78 @@ public class ImmutableLiteralsListTest {
                     .hasSize(3)
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("S", "a", "b");
+        }
+
+        @Nested
+        class UnfoldingNegatedLiterals {
+            @Test
+            public void should_returnSameLiteralsList_whenNegatedLiteralCannotBeUnfolded() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(Derived())",
+                        "Derived() :- A(x)"
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfoldWithNegationExtension(1);
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(Derived())",
+                        "Derived() :- A(x)"
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            @Test
+            public void should_returnOneLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoOneRule() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(Derived(x))",
+                        """
+                                Derived(x) :- A(x)
+                                Derived(x) :- B(x)
+                                """
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfoldWithNegationExtension(1);
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(B(x)), not(A(x))",
+                        """
+                                Derived(x) :- A(x)
+                                Derived(x) :- B(x)
+                                """
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            @Test
+            public void should_returnSeveralLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoSeveralRules() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(Derived(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfoldWithNegationExtension(1);
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
+                        "P(x), not(A(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create(
+                        "P(x), not(B(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
+                        .hasSameStructureAs(expectedLiteralsList2);
+            }
         }
     }
 }

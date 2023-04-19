@@ -5,6 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicStructureComparator;
 import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -23,6 +24,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     public static ImmutableLiteralsListAssert assertThat(ImmutableLiteralsList actual) {
         return new ImmutableLiteralsListAssert(actual);
     }
+
 
     /**
      * Checks whether the actual literals are the same as the expected literals up-to renaming
@@ -114,6 +116,23 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         for (int i = 0; i < sortedLiterals.size(); i++) {
             hasLiteral(i, sortedLiterals.get(i));
         }
+    }
+
+    /**
+     * Checks whether the actual literal list has the very same structure (recursively, i.e., checking the derivation
+     * rules of the derived literals), as the expected literals list.
+     *
+     * @param expectedLiteralsList not null
+     * @return this assert
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public ImmutableLiteralsListAssert hasSameStructureAs(ImmutableLiteralsList expectedLiteralsList) {
+        boolean haveSameStructureRecursively = new LogicStructureComparator()
+                .haveSameStructureRecursively(actual, expectedLiteralsList);
+        Assertions.assertThat(haveSameStructureRecursively)
+                .describedAs("Actual literal list: " + actual + " \n" +
+                        "has not the same structure as expected literal list: " + expectedLiteralsList).isTrue();
+        return this;
     }
 
 }

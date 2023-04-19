@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
+import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.NoNegatableLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
@@ -28,4 +29,12 @@ public abstract class Literal {
     }
 
     public abstract <T> T accept(LogicSchemaVisitor<T> visitor);
+
+    /**
+     * @return a new literal that is the negation of this literal, if this is possible
+     * @throws NoNegatableLiteral in case the literal cannot be negated
+     */
+    public Literal buildNegatedLiteral() {
+        throw new NoNegatableLiteral(this);
+    }
 }

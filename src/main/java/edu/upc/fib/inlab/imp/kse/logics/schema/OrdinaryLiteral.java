@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,6 +64,12 @@ public class OrdinaryLiteral extends Literal {
         return visitor.visit(this);
     }
 
+    @Override
+    public OrdinaryLiteral buildNegatedLiteral() {
+        boolean shouldBePositive = !this.isPositive();
+        return new OrdinaryLiteral(new Atom(this.getAtom().getPredicate(), this.getTerms()), shouldBePositive);
+    }
+
     public boolean isDerived() {
         return atom.isDerived();
     }
@@ -88,8 +95,119 @@ public class OrdinaryLiteral extends Literal {
      * @return a list of ImmutableLiteralsList representing the result of unfolding this literal
      */
     public List<ImmutableLiteralsList> unfold() {
-        if (!this.isPositive) return List.of(new ImmutableLiteralsList(this));
+        return unfold(ImmutableLiteralsList.KindOfUnfolding.STANDARD);
+    }
+
+    /**
+     * This is an extension of the unfold method that also applies an unfolding for negated literals whose
+     * derivation rules does not contain existential variables.
+     * E.g.: Suppose the literal "not(Derived(x))" with derivation rule "Derived(x) :- A(x), not(B(x))"
+     * <p>
+     * Unfolding not(Derived()) will return two literals list:
+     * "not(A(x))" and "B(x)".
+     *
+     * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
+     */
+    public List<ImmutableLiteralsList> unfoldWithNegationExtension() {
+        return unfold(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED);
+    }
+
+    public List<ImmutableLiteralsList> unfold(ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
+        if (Objects.isNull(kindOfUnfolding)) throw new IllegalArgumentException("KindOfUnfolding cannot be null");
+        if (isNegative()) {
+            if (kindOfUnfolding.equals(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED) &&
+                    this.hasNoExistentialVariableInDerivationRules()) {
+                return negateAccordingToMorganRules(this.getAtom().unfold());
+            } else {
+                return List.of(new ImmutableLiteralsList(this));
+            }
+        }
         return atom.unfold();
+    }
+
+    /**
+     * The listOfLists is interpreted as an OR of ANDS. This is consistent with the interpretation
+     * of a list of derivation rules of some predicate P, which makes a derived literal of P evaluate
+     * to true if one of the bodies of the derivation rules of P evaluates to true.
+     * <p>
+     * This function applies a NOT over such OR of ANDS, and redistribute the ORs to return
+     * a listOfLists interpreted as an OR of ANDS.
+     * <p>
+     * E.g.: assume that we have the list of literals <br>
+     * A1(), A2(), A3() <br>
+     * B1(), B2()
+     * <p>
+     * Such list of literals is interpreted as
+     * (A1() AND A2() AND A(3))
+     * OR
+     * (B1() AND B2())
+     * <p>
+     * Hence, when negating such expression we obtain:
+     * NOT(
+     * (A1() AND A2() AND A(3))
+     * OR
+     * (B1() AND B2())
+     * )
+     * <p>
+     * which is equivalent to (Morgan rules)
+     * (NOT(A1()) OR NOT(A2()) OR NOT(A(3)))
+     * AND
+     * (NOT(B1()) OR NOT(B2()))
+     * <p>
+     * which is equivalent to (redistributing ORs and ANDs)
+     * (NOT(A1) AND NOT(B1()))
+     * OR
+     * (NOT(A1) AND NOT(B2()))
+     * OR
+     * (NOT(A2) AND NOT(B1()))
+     * OR
+     * (NOT(A2) AND NOT(B2()))
+     * OR
+     * (NOT(A3) AND NOT(B1()))
+     * OR
+     * (NOT(A3) AND NOT(B2()))
+     *
+     * @param listOfLists not null, not empty
+     * @return a new list of ImmutableLiteralsList after applying the morgan rules
+     */
+    private List<ImmutableLiteralsList> negateAccordingToMorganRules(List<ImmutableLiteralsList> listOfLists) {
+        List<Literal> negatedFirstRule = negateLiterals(listOfLists.get(0));
+        if (listOfLists.size() == 1) {
+            return negatedFirstRule.stream()
+                    .map(ImmutableLiteralsList::new)
+                    .toList();
+        }
+        List<ImmutableLiteralsList> result = new LinkedList<>();
+        List<ImmutableLiteralsList> restOfRulesNegated = negateAccordingToMorganRules(listOfLists.subList(1, listOfLists.size()));
+        for (Literal literal : negatedFirstRule) {
+            result.addAll(addLiteralToAllLists(literal, restOfRulesNegated));
+        }
+        return result;
+    }
+
+    private List<ImmutableLiteralsList> addLiteralToAllLists(Literal literal, List<ImmutableLiteralsList> restOfRulesNegated) {
+        List<ImmutableLiteralsList> result = new LinkedList<>();
+        for (ImmutableLiteralsList list : restOfRulesNegated) {
+            List<Literal> mutableList = new LinkedList<>(list);
+            mutableList.add(literal);
+            result.add(new ImmutableLiteralsList(mutableList));
+        }
+        return result;
+    }
+
+    /**
+     * @param literals not null
+     * @return a list of literals where all literals have been negated
+     */
+    private List<Literal> negateLiterals(ImmutableLiteralsList literals) {
+        return literals.stream().map(Literal::buildNegatedLiteral).toList();
+    }
+
+    private boolean hasNoExistentialVariableInDerivationRules() {
+        return this.getAtom().getPredicate().getDerivationRules().stream()
+                .flatMap(dr -> dr.getExistencialVariables().stream())
+                .findAny()
+                .isEmpty();
     }
 
     @Override

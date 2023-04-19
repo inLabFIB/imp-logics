@@ -51,6 +51,17 @@ public enum ComparisonOperator {
         };
     }
 
+    public ComparisonOperator getNegatedOperator() {
+        return switch (this) {
+            case LESS_THAN -> GREATER_OR_EQUALS;
+            case LESS_OR_EQUALS -> GREATER_THAN;
+            case EQUALS -> NOT_EQUALS;
+            case GREATER_THAN -> LESS_OR_EQUALS;
+            case GREATER_OR_EQUALS -> LESS_THAN;
+            case NOT_EQUALS -> EQUALS;
+        };
+    }
+
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }

@@ -1,19 +1,25 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 
+import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.AtomMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.OrdinaryLiteralMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -142,6 +148,231 @@ public class OrdinaryLiteralTest {
                     .hasSize(2)
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("R", "a", "b");
+        }
+
+        @Nested
+        class NegatedUnfoldingTests {
+            @Test
+            public void should_notUnfold_whenDefinitionRuleContainsExistentialVariable() {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived())",
+                        "Derived() :- A(x)");
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(
+                        "not(Derived())",
+                        "Derived() :- A(x)"
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            @Test
+            public void should_unfoldNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleLiteral() {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived(x))",
+                        "Derived(x) :- A(x)"
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(
+                        "not(A(x))",
+                        "Derived() :- A(x)"
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            public static Stream<Arguments> literalsAndItsNegation() {
+                return Stream.of(
+                        Arguments.of("A()", "not(A())"),
+                        Arguments.of("not(A())", "A()"),
+                        Arguments.of("TRUE()", "FALSE()"),
+                        Arguments.of("FALSE()", "TRUE"),
+                        Arguments.of("1 < 2", "1 >= 2"),
+                        Arguments.of("1 <= 2", "1 > 2"),
+                        Arguments.of("1 = 2", "1 <> 2"),
+                        Arguments.of("1 <> 2", "1 = 2"),
+                        Arguments.of("1 >= 2", "1 < 2"),
+                        Arguments.of("1 > 2", "1 <= 2")
+                );
+            }
+
+            @ParameterizedTest
+            @MethodSource("literalsAndItsNegation")
+            public void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleNegatedLiteral(String literal, String negatedLiteral) {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived())",
+                        "Derived() :- " + literal
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(
+                        negatedLiteral,
+                        "Derived() :- " + literal
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            @Test
+            public void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withMultipleLiterals() {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
+                        "not(A(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create(
+                        "not(B(x))",
+                        "Derived(x) :- A(x), B(x)"
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
+                        .hasSameStructureAs(expectedLiteralsList2);
+            }
+
+
+            @Test
+            public void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSingleLiteral() {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived(x))",
+                        """
+                                    Derived(x) :- A(x)
+                                    Derived(x) :- B(x)
+                                """
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
+                        "not(B(x)), not(A(x))",
+                        """
+                                    Derived(x) :- A(x)
+                                    Derived(x) :- B(x)
+                                """
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList1);
+            }
+
+
+            @Test
+            public void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSeveralLiterals() {
+                OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
+                        "not(Derived())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
+
+                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
+                        "not(B1()), not(A1())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create(
+                        "not(B2()), not(A1())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+                ImmutableLiteralsList expectedLiteralsList3 = ImmutableLiteralsListMother.create(
+                        "not(B1()), not(A2())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+                ImmutableLiteralsList expectedLiteralsList4 = ImmutableLiteralsListMother.create(
+                        "not(B2()), not(A2())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+                ImmutableLiteralsList expectedLiteralsList5 = ImmutableLiteralsListMother.create(
+                        "not(B1()), not(A3())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+                ImmutableLiteralsList expectedLiteralsList6 = ImmutableLiteralsListMother.create(
+                        "not(B2()), not(A3())",
+                        """
+                                Derived() :- A1(), A2(), A3()
+                                Derived() :- B1(), B2()
+                                    """
+                );
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(6);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .hasSameStructureAs(expectedLiteralsList1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
+                        .hasSameStructureAs(expectedLiteralsList2);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(2))
+                        .hasSameStructureAs(expectedLiteralsList3);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(3))
+                        .hasSameStructureAs(expectedLiteralsList4);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(4))
+                        .hasSameStructureAs(expectedLiteralsList5);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(5))
+                        .hasSameStructureAs(expectedLiteralsList6);
+            }
+
+        }
+    }
+
+    @Nested
+    class BuildNegatedLiteralTest {
+        @Test
+        public void should_ReturnNewNegatedLiteral_WhenLiteralIsPositive() {
+            OrdinaryLiteral positiveOL = LiteralMother.createOrdinaryLiteral("P", "a", "b");
+
+            OrdinaryLiteral negatedLiteral = positiveOL.buildNegatedLiteral();
+
+            assertThat(negatedLiteral).isNegated()
+                    .hasTerms(positiveOL.getTerms())
+                    .hasPredicate(positiveOL.getAtom().getPredicate());
+            assertThat(negatedLiteral.getAtom()).isNotSameAs(positiveOL.getAtom());
+        }
+
+        @Test
+        public void should_ReturnNewPositiveLiteral_WhenLiteralIsNegative() {
+            OrdinaryLiteral positiveOL = LiteralMother.createOrdinaryLiteral(false, "P", "a", "b");
+
+            OrdinaryLiteral negatedLiteral = positiveOL.buildNegatedLiteral();
+
+            assertThat(negatedLiteral).isPositive()
+                    .hasTerms(positiveOL.getTerms())
+                    .hasPredicate(positiveOL.getAtom().getPredicate());
+            assertThat(negatedLiteral.getAtom()).isNotSameAs(positiveOL.getAtom());
         }
     }
 }

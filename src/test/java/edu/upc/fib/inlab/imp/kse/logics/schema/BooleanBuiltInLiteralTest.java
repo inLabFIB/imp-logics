@@ -51,4 +51,26 @@ public class BooleanBuiltInLiteralTest {
         }
     }
 
+    @Nested
+    class BuildNegatedLiteralTest {
+        @Test
+        public void should_ReturnTrue_WhenIsFalse() {
+            BooleanBuiltInLiteral booleanBuiltInLiteral = new BooleanBuiltInLiteral(false);
+
+            BooleanBuiltInLiteral negatedBol = booleanBuiltInLiteral.buildNegatedLiteral();
+
+            assertThat(negatedBol).hasOperationName("TRUE");
+        }
+
+        @Test
+        public void should_ReturnFalse_WhenIsTrue() {
+            BooleanBuiltInLiteral booleanBuiltInLiteral = new BooleanBuiltInLiteral(true);
+
+            BooleanBuiltInLiteral negatedBol = booleanBuiltInLiteral.buildNegatedLiteral();
+
+            assertThat(negatedBol).hasOperationName("FALSE");
+        }
+
+    }
+
 }
