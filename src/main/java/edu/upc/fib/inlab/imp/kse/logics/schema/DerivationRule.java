@@ -3,7 +3,9 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of a logic derivation rule. That is, a NormalClause with head
@@ -40,4 +42,15 @@ public class DerivationRule extends NormalClause {
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public Set<Variable> getUniversalVariables() {
+        return head.getTerms().getUsedVariables();
+    }
+
+    public Set<Variable> getExistencialVariables() {
+        Set<Variable> existencialVariables = new HashSet<>(getBody().getUsedVariables());
+        existencialVariables.removeAll(getUniversalVariables());
+        return existencialVariables;
+    }
+
 }
