@@ -194,7 +194,7 @@ public class OrdinaryLiteralTest {
                         Arguments.of("A()", "not(A())"),
                         Arguments.of("not(A())", "A()"),
                         Arguments.of("TRUE()", "FALSE()"),
-                        Arguments.of("FALSE()", "TRUE"),
+                        Arguments.of("FALSE()", "TRUE()"),
                         Arguments.of("1 < 2", "1 >= 2"),
                         Arguments.of("1 <= 2", "1 > 2"),
                         Arguments.of("1 = 2", "1 <> 2"),
@@ -233,20 +233,19 @@ public class OrdinaryLiteralTest {
 
                 List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
 
-                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
-                        "not(A(x))",
-                        "Derived(x) :- A(x), B(x)"
-                );
-                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create(
-                        "not(B(x))",
-                        "Derived(x) :- A(x), B(x)"
-                );
+                List<ImmutableLiteralsList> expectedUnfolded = List.of(ImmutableLiteralsListMother.create(
+                                "not(A(x))",
+                                "Derived(x) :- A(x), B(x)"
+                        ),
+                        ImmutableLiteralsListMother.create(
+                                "not(B(x))",
+                                "Derived(x) :- A(x), B(x)"
+                        ));
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList1);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
-                        .hasSameStructureAs(expectedLiteralsList2);
+                expectedUnfolded.forEach(expected ->
+                        Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> assertThat(unfolded)
+                                .hasSameStructureAs(expected)));
             }
 
 
@@ -288,43 +287,15 @@ public class OrdinaryLiteralTest {
 
                 List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
 
-                ImmutableLiteralsList expectedLiteralsList1 = ImmutableLiteralsListMother.create(
-                        "not(B1()), not(A1())",
-                        """
-                                Derived() :- A1(), A2(), A3()
-                                Derived() :- B1(), B2()
-                                    """
-                );
-                ImmutableLiteralsList expectedLiteralsList2 = ImmutableLiteralsListMother.create(
-                        "not(B2()), not(A1())",
-                        """
-                                Derived() :- A1(), A2(), A3()
-                                Derived() :- B1(), B2()
-                                    """
-                );
-                ImmutableLiteralsList expectedLiteralsList3 = ImmutableLiteralsListMother.create(
-                        "not(B1()), not(A2())",
-                        """
-                                Derived() :- A1(), A2(), A3()
-                                Derived() :- B1(), B2()
-                                    """
-                );
-                ImmutableLiteralsList expectedLiteralsList4 = ImmutableLiteralsListMother.create(
-                        "not(B2()), not(A2())",
-                        """
-                                Derived() :- A1(), A2(), A3()
-                                Derived() :- B1(), B2()
-                                    """
-                );
-                ImmutableLiteralsList expectedLiteralsList5 = ImmutableLiteralsListMother.create(
-                        "not(B1()), not(A3())",
-                        """
-                                Derived() :- A1(), A2(), A3()
-                                Derived() :- B1(), B2()
-                                    """
-                );
-                ImmutableLiteralsList expectedLiteralsList6 = ImmutableLiteralsListMother.create(
-                        "not(B2()), not(A3())",
+                List<ImmutableLiteralsList> expectedUnfolded = ImmutableLiteralsListMother.createListOfImmutableLiterals(
+                        List.of(
+                                "not(B1()), not(A1())",
+                                "not(B2()), not(A1())",
+                                "not(B1()), not(A2())",
+                                "not(B2()), not(A2())",
+                                "not(B1()), not(A3())",
+                                "not(B2()), not(A3())"
+                        ),
                         """
                                 Derived() :- A1(), A2(), A3()
                                 Derived() :- B1(), B2()
@@ -332,18 +303,9 @@ public class OrdinaryLiteralTest {
                 );
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(6);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList1);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
-                        .hasSameStructureAs(expectedLiteralsList2);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(2))
-                        .hasSameStructureAs(expectedLiteralsList3);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(3))
-                        .hasSameStructureAs(expectedLiteralsList4);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(4))
-                        .hasSameStructureAs(expectedLiteralsList5);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(5))
-                        .hasSameStructureAs(expectedLiteralsList6);
+                expectedUnfolded.forEach(expected ->
+                        Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> assertThat(unfolded)
+                                .hasSameStructureAs(expected)));
             }
 
         }

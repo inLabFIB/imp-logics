@@ -45,6 +45,19 @@ public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess
     private final ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding;
 
     /**
+     * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy
+     * for creating new constraintIDs, if necessary.
+     *
+     * @param multipleConstraintIDGenerator not null
+     * @param kindOfUnfolding               not null
+     */
+    public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator, ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
+        checkParameters(multipleConstraintIDGenerator, kindOfUnfolding);
+        this.kindOfUnfolding = kindOfUnfolding;
+        this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
+    }
+
+    /**
      * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
      * for creating new constraintIDs, if necessary; and use the standard unfolding
      */
@@ -60,20 +73,11 @@ public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess
         this(new SuffixMultipleConstraintIDGenerator(), kindOfUnfolding);
     }
 
-    /**
-     * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy
-     * for creating new constraintIDs, if necessary.
-     *
-     * @param multipleConstraintIDGenerator not null
-     * @param kindOfUnfolding               not null
-     */
-    public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator, ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
+    private static void checkParameters(MultipleConstraintIDGenerator multipleConstraintIDGenerator, ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
         if (Objects.isNull(multipleConstraintIDGenerator))
             throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
         if (Objects.isNull(kindOfUnfolding))
             throw new IllegalArgumentException("KindOfUnfolding cannot be null");
-        this.kindOfUnfolding = kindOfUnfolding;
-        this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
     }
 
     @Override
@@ -161,7 +165,6 @@ public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess
                 .map(bs -> new DerivationRuleSpec(predicateName, termSpecs, bs))
                 .collect(Collectors.toList());
     }
-
 
     private List<BodySpec> computeUnfoldedBodySpec(ImmutableLiteralsList body) {
         Optional<Integer> indexOfLiteralToUnfold = getIndexOfUnfoldableLiteral(body);

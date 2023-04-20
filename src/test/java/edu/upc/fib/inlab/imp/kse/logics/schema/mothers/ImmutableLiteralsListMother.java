@@ -7,6 +7,9 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWi
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ImmutableLiteralsListMother {
     private final static LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
 
@@ -20,5 +23,13 @@ public class ImmutableLiteralsListMother {
                 + "@1 :- " + literalsList;
         LogicSchema domainSchema = parser.parse(logicSchemaString);
         return domainSchema.getLogicConstraintByID(new ConstraintID("1")).getBody();
+    }
+
+    public static List<ImmutableLiteralsList> createListOfImmutableLiterals(List<String> listOfListOfLiterals, String derivationRules) {
+        List<ImmutableLiteralsList> result = new LinkedList<>();
+        for (String litOfLiterals : listOfListOfLiterals) {
+            result.add(create(litOfLiterals, derivationRules));
+        }
+        return result;
     }
 }
