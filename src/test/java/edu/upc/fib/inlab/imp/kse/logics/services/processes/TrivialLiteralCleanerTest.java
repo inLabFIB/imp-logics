@@ -17,7 +17,7 @@ import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAsse
 import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class BuiltInLiteralCleanerTest {
+public class TrivialLiteralCleanerTest {
 
     @Nested
     class InputValidation {
@@ -209,7 +209,6 @@ public class BuiltInLiteralCleanerTest {
             assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
         }
 
-        //New cases
         public static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads() {
             return Stream.of(
                     Arguments.of(
@@ -356,6 +355,74 @@ public class BuiltInLiteralCleanerTest {
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
             assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
         }
+
+        public static Stream<Arguments> provideLogicSchemasWithNegation() {
+            return Stream.of(
+                    Arguments.of(
+                            """
+                                    @1 :- not(A(x))
+                                    A(x) :- TRUE()
+                                    """,
+                            """
+                                    @1 :- FALSE()
+                                    A(x) :- TRUE()
+                                    """,
+                            List.of()
+                    ),
+                    Arguments.of(
+                            """
+                                    @1 :- not(A(x))
+                                    A(x) :- FALSE()
+                                    """,
+                            """
+                                    @1 :- TRUE()
+                                    A(x) :- FALSE()
+                                    """,
+                            List.of()),
+                    Arguments.of(
+                            """
+                                    A(x) :- not(B(x))
+                                    B(x) :- not(C(x))
+                                    C(x) :- FALSE()
+                                    """,
+                            """
+                                    A(x) :- FALSE()
+                                    B(x) :- TRUE()
+                                    C(x) :- FALSE()
+                                    """,
+                            List.of()
+                    ),
+                    Arguments.of(
+                            """
+                                    A(x) :- not(B(x))
+                                    B(x) :- not(C(x))
+                                    C(x) :- FALSE()
+                                    C(x) :- TRUE()
+                                    """,
+                            """
+                                    A(x) :- TRUE()
+                                    B(x) :- FALSE()
+                                    C(x) :- TRUE()
+                                    """,
+                            List.of()
+                    )
+            );
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemasWithNegation")
+        public void should_clean_when_schemaIncludesNegatedDerivedLiterals(String inputSchema,
+                                                                           String expectedSchema,
+                                                                           List<PredicateSpec> additionalExpectedPredicates) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
+            assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
     }
 
 
