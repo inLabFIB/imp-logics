@@ -14,17 +14,17 @@ public class SchemaTraceabilityMap {
     protected static SchemaTraceabilityMap collapseMaps(List<SchemaTraceabilityMap> maps) {
         List<SchemaTraceabilityMap> reverseList = new LinkedList<>(maps);
         Collections.reverse(reverseList);
-
-        return reverseList.stream().reduce(new SchemaTraceabilityMap(), SchemaTraceabilityMap::joinMap);
+        return reverseList.stream().reduce(new SchemaTraceabilityMap(), (previous, current) -> joinMap(current, previous));
     }
 
-    private static SchemaTraceabilityMap joinMap(SchemaTraceabilityMap previous, SchemaTraceabilityMap current) {
-        if (previous.constraintToOrigConstraintIDMap.isEmpty()) return current;
-        previous.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
-            ConstraintID newOriginalId = current.getOriginalConstraintID(originalId);
-            previous.addConstraintIDOrigin(finalId, newOriginalId);
+    public static SchemaTraceabilityMap joinMap(SchemaTraceabilityMap previous, SchemaTraceabilityMap current) {
+        //TODO: create a new SchemaTraceabilityMap to return
+        if (current.constraintToOrigConstraintIDMap.isEmpty()) return previous;
+        current.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
+            ConstraintID newOriginalId = previous.getOriginalConstraintID(originalId);
+            current.addConstraintIDOrigin(finalId, newOriginalId);
         });
-        return previous;
+        return current;
     }
 
     /**
