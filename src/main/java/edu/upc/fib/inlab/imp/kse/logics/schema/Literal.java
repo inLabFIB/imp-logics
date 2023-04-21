@@ -31,11 +31,31 @@ public abstract class Literal {
     public abstract <T> T accept(LogicSchemaVisitor<T> visitor);
 
     /**
+     * This method buils a new literal that is the negation of this one.
+     * E.g.: given an ordinary literal "P(x)" it will return a new literal "not(P(x))",
+     * or given a built-in literal "x < y" it will return "x >= y"
+     * <p>
+     * Not all built-in literals can be negated. Thus, this function might throw an Exception.
+     *
      * @return a new literal that is the negation of this literal, if this is possible
      * @throws NoNegatableLiteral in case the literal cannot be negated
      */
     public Literal buildNegatedLiteral() {
         throw new NoNegatableLiteral(this);
+    }
+
+
+    /**
+     * @return whether this literal can be negated.
+     * @see Literal#buildNegatedLiteral
+     */
+    public boolean canBeNegated() {
+        try {
+            buildNegatedLiteral();
+            return true;
+        } catch (NoNegatableLiteral ex) {
+            return false;
+        }
     }
 
     /**

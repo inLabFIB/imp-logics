@@ -1,6 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
+import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
@@ -29,6 +31,18 @@ public class LiteralTest {
                 .contains(new Variable("x"), new Variable("y"));
     }
 
+    @Test
+    public void should_returnCanBeNegated_ifBuildNegationIsImplemented() {
+        Literal literal = createLiteralWithBuildNegatedLiteralFunction();
+        assertThat(literal.canBeNegated()).isTrue();
+    }
+
+    @Test
+    public void should_returnCannotBeNegated_ifBuildNegationIsNotImplemented() {
+        Literal literal = createLiteralWithoutBuildNegatedLiteralFunction();
+        assertThat(literal.canBeNegated()).isFalse();
+    }
+
 
     @ParameterizedTest
     @MethodSource("providedTermsAndArity")
@@ -49,6 +63,49 @@ public class LiteralTest {
                 Arguments.of(List.of("x"), 1),
                 Arguments.of(List.of(), 0)
         );
+    }
+
+    private static Literal createLiteralWithoutBuildNegatedLiteralFunction() {
+        return new Literal() {
+            @Override
+            public ImmutableTermList getTerms() {
+                return null;
+            }
+
+            @Override
+            public Literal applySubstitution(Substitution substitution) {
+                return null;
+            }
+
+            @Override
+            public <T> T accept(LogicSchemaVisitor<T> visitor) {
+                return null;
+            }
+        };
+    }
+
+    private static Literal createLiteralWithBuildNegatedLiteralFunction() {
+        return new Literal() {
+            @Override
+            public ImmutableTermList getTerms() {
+                return null;
+            }
+
+            @Override
+            public Literal applySubstitution(Substitution substitution) {
+                return null;
+            }
+
+            @Override
+            public <T> T accept(LogicSchemaVisitor<T> visitor) {
+                return null;
+            }
+
+            @Override
+            public Literal buildNegatedLiteral() {
+                return new BooleanBuiltInLiteral(true);
+            }
+        };
     }
 
     @Nested
