@@ -5,6 +5,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 
 import java.util.List;
@@ -34,5 +36,11 @@ public class LogicSchemaMother {
 
     public static LogicSchema createEmptySchema() {
         return new LogicSchema(Set.of(), Set.of());
+    }
+
+    public static LogicSchema buildLogicSchemaWithIDs(String schema, Set<String> customBuiltInOperators) {
+        return new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
+                new CustomBuiltInPredicateNameChecker(customBuiltInOperators))
+                .parse(schema);
     }
 }

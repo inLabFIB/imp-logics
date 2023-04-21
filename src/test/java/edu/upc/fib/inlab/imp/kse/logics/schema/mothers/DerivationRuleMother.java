@@ -7,6 +7,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWi
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 
+import java.util.Set;
+
 public class DerivationRuleMother {
 
     private final static LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
@@ -22,5 +24,10 @@ public class DerivationRuleMother {
     public static DerivationRule create(String schema, String predicateName) {
         LogicSchema domainSchema = parser.parse(schema);
         return domainSchema.getDerivationRulesByPredicateName(predicateName).get(0);
+    }
+
+    public static DerivationRule create(String schema, String derivedPredicateName, Set<String> customBuiltInOperators) {
+        LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schema, customBuiltInOperators);
+        return logicSchema.getDerivationRulesByPredicateName(derivedPredicateName).get(0);
     }
 }

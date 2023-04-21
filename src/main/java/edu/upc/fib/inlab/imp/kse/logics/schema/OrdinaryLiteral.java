@@ -122,7 +122,9 @@ public class OrdinaryLiteral extends Literal {
         if (Objects.isNull(kindOfUnfolding)) throw new IllegalArgumentException("KindOfUnfolding cannot be null");
         if (isNegative()) {
             if (kindOfUnfolding.equals(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED) &&
-                    this.hasNoExistentialVariableInDerivationRules()) {
+                    this.hasNoExistentialVariableInDerivationRules() &&
+                    this.allLiteralsFromDerivationRuleCanBeNegated()
+            ) {
                 return negateAccordingToMorganRules(this.getAtom().unfold());
             } else {
                 return List.of(new ImmutableLiteralsList(this));
@@ -130,6 +132,7 @@ public class OrdinaryLiteral extends Literal {
         }
         return atom.unfold();
     }
+
 
     /**
      * The listOfLists is interpreted as an OR of ANDS. This is consistent with the interpretation
@@ -214,6 +217,12 @@ public class OrdinaryLiteral extends Literal {
                 .flatMap(dr -> dr.getExistencialVariables().stream())
                 .findAny()
                 .isEmpty();
+    }
+
+    private boolean allLiteralsFromDerivationRuleCanBeNegated() {
+        return this.getAtom().getPredicate().getDerivationRules().stream()
+                .flatMap(dr -> dr.getBody().stream())
+                .allMatch(Literal::canBeNegated);
     }
 
     @Override

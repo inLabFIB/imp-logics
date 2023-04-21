@@ -3,10 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.AtomMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.OrdinaryLiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
@@ -19,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
@@ -168,6 +166,20 @@ public class OrdinaryLiteralTest {
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
                         .hasSameStructureAs(expectedLiteralsList);
+            }
+
+            @Test
+            public void should_notUnfold_whenDefinitionRuleContainsNonNegatableLiteral() {
+                DerivationRule derivationRule = DerivationRuleMother.create("Derived(x) :- NonNegatableLiteral(x)",
+                        "Derived",
+                        Set.of("NonNegatableLiteral"));
+                OrdinaryLiteral negatedDerivedLiteral = new OrdinaryLiteral(new Atom(derivationRule.getHead().getPredicate(), derivationRule.getHead().getTerms()), false);
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = negatedDerivedLiteral.unfoldWithNegationExtension();
+
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
+                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                        .containsOrdinaryLiteral(false, negatedDerivedLiteral.getPredicateName(), "x");
             }
 
             @Test
