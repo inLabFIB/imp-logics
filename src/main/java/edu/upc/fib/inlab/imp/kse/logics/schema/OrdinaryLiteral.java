@@ -9,9 +9,8 @@ import java.util.Objects;
 
 /**
  * Implementation of a logic OrdinaryLiteral.
- * E.g. "not Emp(x)"
+ * E.g. "not(Emp(x))"
  * Ordinary literals should not be reused among several normal clauses
- *
  */
 public class OrdinaryLiteral extends Literal {
     /**
@@ -20,7 +19,6 @@ public class OrdinaryLiteral extends Literal {
      */
     private final Atom atom;
     private final boolean isPositive;
-
 
     public OrdinaryLiteral(Atom atom, boolean isPositive) {
         if(Objects.isNull(atom)) throw new IllegalArgumentException("Atom cannot be null");
@@ -47,6 +45,14 @@ public class OrdinaryLiteral extends Literal {
 
     public Atom getAtom() {
         return atom;
+    }
+
+    public Predicate getPredicate() {
+        return atom.getPredicate();
+    }
+
+    public String getPredicateName() {
+        return atom.getPredicateName();
     }
 
     @Override
