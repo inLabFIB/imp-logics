@@ -2,8 +2,10 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implementation of a logic constraint. That is, a NormalClause  without head.
@@ -38,4 +40,18 @@ public class LogicConstraint extends NormalClause {
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public boolean isSafe() {
+        Set<Variable> variablesInPositiveOrdinaryLiterals = getBody().getVariablesInPositiveOrdinaryLiterals();
+
+        Set<Variable> variablesInNegativeOrdinaryLiterals = getBody().getVariablesInNegativeOrdinaryLiterals();
+        Set<Variable> variablesInBuiltInLiterals = getBody().getVariablesInBuiltInLiterals();
+
+        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiterals = new HashSet<>();
+        variablesInNegativeLiteralsOrBuiltInLiterals.addAll(variablesInNegativeOrdinaryLiterals);
+        variablesInNegativeLiteralsOrBuiltInLiterals.addAll(variablesInBuiltInLiterals);
+        return variablesInPositiveOrdinaryLiterals.containsAll(variablesInNegativeLiteralsOrBuiltInLiterals);
+    }
+
 }

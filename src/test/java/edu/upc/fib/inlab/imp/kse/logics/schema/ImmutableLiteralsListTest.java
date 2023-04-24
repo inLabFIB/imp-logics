@@ -45,32 +45,69 @@ public class ImmutableLiteralsListTest {
         }
     }
 
-    @Test
-    public void should_ReturnNewLiteralsList_WithReplacedTerms_WhenApplyingSubstitution() {
-        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, y), R(y, z), x < y");
-        Substitution substitution = new SubstitutionBuilder()
-                .addMapping("x", "a")
-                .build();
+    @Nested
+    class ApplySubstitution {
+        @Test
+        public void should_ReturnNewLiteralsList_WithReplacedTerms_WhenApplyingSubstitution() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, y), R(y, z), x < y");
+            Substitution substitution = new SubstitutionBuilder()
+                    .addMapping("x", "a")
+                    .build();
 
-        ImmutableLiteralsList actualLiteralsList = immutableLiteralsList.applySubstitution(substitution);
+            ImmutableLiteralsList actualLiteralsList = immutableLiteralsList.applySubstitution(substitution);
 
-        ImmutableLiteralsListAssert.assertThat(actualLiteralsList)
-                .isNotSameAs(immutableLiteralsList)
-                .hasSize(3)
-                .containsOrdinaryLiteral("P", "a", "y")
-                .containsOrdinaryLiteral("R", "y", "z")
-                .containsComparisonBuiltInLiteral("a", "<", "y");
+            ImmutableLiteralsListAssert.assertThat(actualLiteralsList)
+                    .isNotSameAs(immutableLiteralsList)
+                    .hasSize(3)
+                    .containsOrdinaryLiteral("P", "a", "y")
+                    .containsOrdinaryLiteral("R", "y", "z")
+                    .containsComparisonBuiltInLiteral("a", "<", "y");
+        }
     }
 
-    @Test
-    public void should_ReturnUsedVariables() {
-        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), R(y, 2), x < y");
+    @Nested
+    class ReturnVariables {
+        @Test
+        public void should_ReturnUsedVariables() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), R(y, 2), x < y");
 
-        Set<Variable> usedVariables = immutableLiteralsList.getUsedVariables();
+            Set<Variable> usedVariables = immutableLiteralsList.getUsedVariables();
 
-        assertThat(usedVariables)
-                .hasSize(2)
-                .contains(new Variable("x"), new Variable("y"));
+            assertThat(usedVariables)
+                    .hasSize(2)
+                    .contains(new Variable("x"), new Variable("y"));
+        }
+
+        @Test
+        public void should_returnVariables_fromPositiveOrdinaryLiterals() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
+
+            Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInPositiveOrdinaryLiterals();
+
+            Set<Variable> expectedVariables = Set.of(new Variable("x"));
+            assertThat(variablesInPositiveOrdinaryLiterals).containsExactlyInAnyOrderElementsOf(expectedVariables);
+        }
+
+        @Test
+        public void should_returnVariables_fromNegativeOrdinaryLiterals() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
+
+            Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInNegativeOrdinaryLiterals();
+
+            Set<Variable> expectedVariables = Set.of(new Variable("y"));
+            assertThat(variablesInPositiveOrdinaryLiterals).containsExactlyInAnyOrderElementsOf(expectedVariables);
+        }
+
+        @Test
+        public void should_returnVariables_fromFromBuiltInLiterals() {
+            ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
+
+            Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInBuiltInLiterals();
+
+            Set<Variable> expectedVariables = Set.of(new Variable("a"), new Variable("b"));
+            assertThat(variablesInPositiveOrdinaryLiterals).containsExactlyInAnyOrderElementsOf(expectedVariables);
+        }
+
     }
 
     @Nested

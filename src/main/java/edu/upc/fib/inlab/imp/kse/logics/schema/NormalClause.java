@@ -28,4 +28,7 @@ public abstract class NormalClause {
     public ImmutableLiteralsList getBody() {
         return body;
     }
+
+    public abstract boolean isSafe();
+
 }

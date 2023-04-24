@@ -210,4 +210,32 @@ public class LogicSchemaTest {
         }
     }
 
+    @Nested
+    class IsSafe {
+
+        @Test
+        public void should_returnTrue_whenAllNormalClausesAllSafe() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    @1 :- P(x)
+                    @2 :- P(x), not(Q(x))
+                    P(x) :- Q(x)
+                    P(x) :- R(x, y), not(Q(x))
+                    """);
+
+            assertThat(logicSchema.isSafe()).isTrue();
+        }
+
+        @Test
+        public void should_returnFalse_whenAnyNormalClausesIsUnsafe() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    @1 :- P(x)
+                    @2 :- P(x), not(Q(x))
+                    P(x) :- Q(x)
+                    P(x) :- R(x, y), not(Q(x))
+                    P(x) :- x = x
+                    """);
+
+            assertThat(logicSchema.isSafe()).isFalse();
+        }
+    }
 }

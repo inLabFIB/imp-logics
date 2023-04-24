@@ -163,7 +163,7 @@ public class ImmutableTermList implements List<Term> {
     public Set<Variable> getUsedVariables() {
         return termsList.stream()
                 .filter(Term::isVariable)
-                .map(t -> new Variable(t.getName()))
+                .map(Variable.class::cast)
                 .collect(Collectors.toSet());
     }
 

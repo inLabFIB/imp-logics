@@ -157,6 +157,11 @@ public class LogicSchema {
         return levels;
     }
 
+    public boolean isSafe() {
+        return getAllLogicConstraints().stream().allMatch(LogicConstraint::isSafe)
+                && getAllDerivationRules().stream().allMatch(DerivationRule::isSafe);
+    }
+
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }

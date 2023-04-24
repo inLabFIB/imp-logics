@@ -183,6 +183,12 @@ public class Atom {
         return terms.stream().allMatch(Term::isConstant);
     }
 
+    public Set<Variable> getVariables() {
+        return terms.stream().filter(Variable.class::isInstance)
+                .map(Variable.class::cast)
+                .collect(Collectors.toSet());
+    }
+
     private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {
     }
 }

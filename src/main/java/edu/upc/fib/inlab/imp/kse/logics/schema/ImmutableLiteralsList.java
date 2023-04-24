@@ -188,6 +188,28 @@ public class ImmutableLiteralsList implements List<Literal> {
                         });
     }
 
+    public Set<Variable> getVariablesInPositiveOrdinaryLiterals() {
+        return literalList.stream()
+                .filter(OrdinaryLiteral.class::isInstance)
+                .map(OrdinaryLiteral.class::cast)
+                .filter(OrdinaryLiteral::isPositive)
+                .flatMap(ordinaryLiteral -> ordinaryLiteral.getUsedVariables().stream())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Variable> getVariablesInNegativeOrdinaryLiterals() {
+        return literalList.stream()
+                .filter(l -> l instanceof OrdinaryLiteral ol && ol.isNegative())
+                .flatMap(l -> l.getUsedVariables().stream())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Variable> getVariablesInBuiltInLiterals() {
+        return literalList.stream()
+                .filter(BuiltInLiteral.class::isInstance)
+                .flatMap(l -> l.getUsedVariables().stream())
+                .collect(Collectors.toSet());
+    }
 
     public enum KindOfUnfolding {
         STANDARD, //Standard unfolding only valid por positive literals

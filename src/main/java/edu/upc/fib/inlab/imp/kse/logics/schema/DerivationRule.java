@@ -53,4 +53,19 @@ public class DerivationRule extends NormalClause {
         return existencialVariables;
     }
 
+    @Override
+    public boolean isSafe() {
+        Set<Variable> variablesInPositiveOrdinaryLiterals = getBody().getVariablesInPositiveOrdinaryLiterals();
+
+        Set<Variable> variablesInNegativeOrdinaryLiterals = getBody().getVariablesInNegativeOrdinaryLiterals();
+        Set<Variable> variablesInBuiltInLiterals = getBody().getVariablesInBuiltInLiterals();
+        Set<Variable> variablesInHead = getHead().getVariables();
+
+        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiteralsOrHead = new HashSet<>();
+        variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInNegativeOrdinaryLiterals);
+        variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInBuiltInLiterals);
+        variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInHead);
+
+        return variablesInPositiveOrdinaryLiterals.containsAll(variablesInNegativeLiteralsOrBuiltInLiteralsOrHead);
+    }
 }
