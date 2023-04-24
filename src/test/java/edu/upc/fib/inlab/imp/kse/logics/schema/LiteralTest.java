@@ -1,6 +1,10 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
+import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -45,5 +49,48 @@ public class LiteralTest {
                 Arguments.of(List.of("x"), 1),
                 Arguments.of(List.of(), 0)
         );
+    }
+
+    @Nested
+    class GroundTests {
+
+        @Test
+        void should_beGround_whenAllTermsAreConstants() {
+            List<Term> terms = TermMother.createTerms("1.0", "2");
+            Literal literal = new FakeLiteral(terms);
+            assertThat(literal.isGround()).isTrue();
+        }
+
+        @Test
+        void should_notBeGround_whenAnyTermIsNotConstant() {
+            List<Term> terms = TermMother.createTerms("x", "1.0");
+            Literal literal = new FakeLiteral(terms);
+            assertThat(literal.isGround()).isFalse();
+        }
+
+    }
+
+    private static class FakeLiteral extends Literal {
+        private final List<Term> terms;
+
+        public FakeLiteral(List<Term> terms) {
+            super();
+            this.terms = terms;
+        }
+
+        @Override
+        public ImmutableTermList getTerms() {
+            return new ImmutableTermList(terms);
+        }
+
+        @Override
+        public Literal applySubstitution(Substitution substitution) {
+            throw new RuntimeException("Not should be called");
+        }
+
+        @Override
+        public <T> T accept(LogicSchemaVisitor<T> visitor) {
+            throw new RuntimeException("Not should be called");
+        }
     }
 }

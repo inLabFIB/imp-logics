@@ -176,6 +176,13 @@ public class Atom {
         return visitor.visit(this);
     }
 
+    /**
+     * @return true if all the terms of this atom are constants, false otherwise
+     */
+    public boolean isGround() {
+        return terms.stream().allMatch(Term::isConstant);
+    }
+
     private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {
     }
 }

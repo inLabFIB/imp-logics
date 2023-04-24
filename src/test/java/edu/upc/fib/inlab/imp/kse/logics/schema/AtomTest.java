@@ -64,21 +64,43 @@ public class AtomTest {
         }
     }
 
-    @Test
-    public void should_ReturnNewAtomReplacingTerms_WhenApplyingSubstitution() {
-        Atom atom = AtomMother.createAtomWithVariableNames("P", List.of("a", "b"));
-        Substitution substitution = new SubstitutionBuilder()
-                .addMapping("a", "1")
-                .addMapping("b", "c")
-                .build();
+    @Nested
+    class SubstitutionTests {
 
-        Atom replacedAtom = atom.applySubstitution(substitution);
+        @Test
+        public void should_ReturnNewAtomReplacingTerms_WhenApplyingSubstitution() {
+            Atom atom = AtomMother.createAtomWithVariableNames("P", List.of("a", "b"));
+            Substitution substitution = new SubstitutionBuilder()
+                    .addMapping("a", "1")
+                    .addMapping("b", "c")
+                    .build();
 
-        AtomAssert.assertThat(replacedAtom)
-                .isNotSameAs(atom)
-                .hasPredicate("P", 2)
-                .containsConstant(0, "1")
-                .hasVariable(1, "c");
+            Atom replacedAtom = atom.applySubstitution(substitution);
+
+            AtomAssert.assertThat(replacedAtom)
+                    .isNotSameAs(atom)
+                    .hasPredicate("P", 2)
+                    .containsConstant(0, "1")
+                    .hasVariable(1, "c");
+        }
+    }
+
+    @Nested
+    class GroundTests {
+
+        @Test
+        void should_beGround_whenAllTermsAreConstants() {
+            Atom atom = AtomMother.createAtom("P", "1", "2.0");
+
+            assertThat(atom.isGround()).isTrue();
+        }
+
+        @Test
+        void should_notBeGround_whenAnyTermIsNotConstant() {
+            Atom atom = AtomMother.createAtom("P", "a", "b", "1");
+            assertThat(atom.isGround()).isFalse();
+        }
+
     }
 
     @Nested
@@ -263,6 +285,7 @@ public class AtomTest {
         }
     }
 
+    //TODO: Move method to ImmutableLiteralsListAssert
     private static boolean isEquivalentWithSameVariables(ImmutableLiteralsList expectedLiteralsList1, ImmutableLiteralsList expectedLiteralsList2, String... varNames) {
         Optional<Substitution> homomorphism = new HomomorphismFinder().findHomomorphism(expectedLiteralsList1, expectedLiteralsList2);
         Optional<Substitution> homomorphismRespectingVariables = homomorphism.filter(substitution -> {

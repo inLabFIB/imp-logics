@@ -37,4 +37,11 @@ public abstract class Literal {
     public Literal buildNegatedLiteral() {
         throw new NoNegatableLiteral(this);
     }
+
+    /**
+     * @return true if all its terms of literal are constants, false otherwise
+     */
+    public boolean isGround() {
+        return getTerms().stream().allMatch(Term::isConstant);
+    }
 }
