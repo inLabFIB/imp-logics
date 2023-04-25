@@ -246,7 +246,7 @@ class SingleDerivationRuleTransformerTest {
                     """);
 
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
-            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.transformTransformation(originalSchema);
+            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.executeTransformation(originalSchema);
 
             assertThat(schemaTransformation)
                     .constraintIDComesFrom("1_1", "1")
@@ -260,7 +260,7 @@ class SingleDerivationRuleTransformerTest {
                     """);
 
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
-            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.transformTransformation(originalSchema);
+            SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.executeTransformation(originalSchema);
 
             assertThat(schemaTransformation)
                     .constraintIDComesFrom("1", "1");

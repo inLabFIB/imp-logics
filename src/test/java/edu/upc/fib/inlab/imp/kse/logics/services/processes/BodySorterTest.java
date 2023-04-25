@@ -107,7 +107,7 @@ public class BodySorterTest {
                 @3 :- R(x)
                 """);
 
-        SchemaTransformation schemaTransformation = new BodySorter().sortTransformation(originalSchema);
+        SchemaTransformation schemaTransformation = new BodySorter().executeTransformation(originalSchema);
 
         SchemaTransformationAssert.assertThat(schemaTransformation)
                 .constraintIDComesFrom("1", "1")

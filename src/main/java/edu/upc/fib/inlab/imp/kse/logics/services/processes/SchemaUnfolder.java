@@ -78,6 +78,11 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
             throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
     }
 
+    /**
+     * @param logicSchema not null
+     * @return a schema transformation where the final schema has the same (based & derived) predicates as the one given but unfolding
+     * all the positive derived literals
+     */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         return unfoldTransformation(logicSchema);
@@ -92,13 +97,8 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
         return unfoldTransformation(schema).transformed();
     }
 
-    /**
-     * @param schema not null
-     * @return a schema transformation where the final schema has the same (based & derived) predicates as the one given but unfolding
-     * all the positive derived literals
-     */
-    public SchemaTransformation unfoldTransformation(LogicSchema schema) {
-        if (Objects.isNull(schema)) throw new IllegalArgumentException("Schema cannot be null");
+    private SchemaTransformation unfoldTransformation(LogicSchema schema) {
+        checkLogicSchema(schema);
 
         SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
         LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec = computeUnfoldedLogicSchemaSpec(schema, schemaTraceabilityMap);

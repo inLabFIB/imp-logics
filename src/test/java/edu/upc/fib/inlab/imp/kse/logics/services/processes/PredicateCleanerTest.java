@@ -79,7 +79,7 @@ public class PredicateCleanerTest {
                 """);
 
         PredicateCleaner predicateCleaner = new PredicateCleaner();
-        SchemaTransformation schemaTransformation = predicateCleaner.cleanTransformation(originalSchema);
+        SchemaTransformation schemaTransformation = predicateCleaner.executeTransformation(originalSchema);
 
         assertThat(schemaTransformation)
                 .constraintIDComesFrom("1", "1")

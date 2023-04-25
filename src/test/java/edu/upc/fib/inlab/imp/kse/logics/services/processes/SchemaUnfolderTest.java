@@ -302,7 +302,7 @@ class SchemaUnfolderTest {
                             """
             );
 
-            SchemaTransformation schemaTransformation = new SchemaUnfolder().unfoldTransformation(schema);
+            SchemaTransformation schemaTransformation = new SchemaUnfolder().executeTransformation(schema);
 
             assertThat(schemaTransformation)
                     .constraintIDComesFrom("1_1", "1")
@@ -317,7 +317,7 @@ class SchemaUnfolderTest {
                             """
             );
 
-            SchemaTransformation schemaTransformation = new SchemaUnfolder().unfoldTransformation(schema);
+            SchemaTransformation schemaTransformation = new SchemaUnfolder().executeTransformation(schema);
 
             assertThat(schemaTransformation)
                     .constraintIDComesFrom("1", "1");

@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
  */
 public class PredicateCleaner extends LogicSchemaTransformationProcess {
 
+    /**
+     * @param logicSchema not null
+     * @return a transformation where the resulting logicSchema does not have any unused predicate
+     */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         return cleanTransformation(logicSchema);
@@ -28,11 +32,8 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
         return cleanTransformation(logicSchema).transformed();
     }
 
-    /**
-     * @param originalSchema not null
-     * @return a transformation where the resulting logicSchema does not have any unused predicate
-     */
-    public SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
+
+    private SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
         checkLogicSchema(originalSchema);
 
         List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(originalSchema);
@@ -42,10 +43,6 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
         LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
 
         return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
-    }
-
-    private static void checkLogicSchema(LogicSchema logicSchema) {
-        if (logicSchema == null) throw new IllegalArgumentException("LogicSchema cannot be null");
     }
 
     private static List<DerivationRule> filterUsedDerivationRules(LogicSchema logicSchema) {

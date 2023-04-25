@@ -9,7 +9,6 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -22,6 +21,10 @@ import java.util.Set;
  */
 public class BodySorter extends LogicSchemaTransformationProcess {
 
+    /**
+     * @param logicSchema not-null
+     * @return a transformation where the final logicSchema has sorted the bodies of its normal clauses
+     */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         return sortTransformation(logicSchema);
@@ -35,14 +38,9 @@ public class BodySorter extends LogicSchemaTransformationProcess {
         return this.sortTransformation(logicSchema).transformed();
     }
 
-    /**
-     * @param logicSchema not-null
-     * @return a transformation where the final logicSchema has sorted the bodies of its normal clauses
-     */
-    public SchemaTransformation sortTransformation(LogicSchema logicSchema) {
-        if (Objects.isNull(logicSchema)) {
-            throw new IllegalArgumentException("LogicSchema cannot be null");
-        }
+
+    private SchemaTransformation sortTransformation(LogicSchema logicSchema) {
+        checkLogicSchema(logicSchema);
         SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
         List<LogicConstraintWithIDSpec> logicConstraintsSpecs = sortBodyInLogicConstraints(logicSchema.getAllLogicConstraints(), schemaTraceabilityMap);
         List<DerivationRuleSpec> derivationRulesSpecs = sortBodyInDerivationRules(logicSchema.getAllDerivationRules());

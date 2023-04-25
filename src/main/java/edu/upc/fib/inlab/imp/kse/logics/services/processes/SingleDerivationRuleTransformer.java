@@ -65,6 +65,10 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         this.generatorId = generatorId;
     }
 
+    /**
+     * @param logicSchema not-null
+     * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived predicate is defined through only one derivation rule
+     */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         return transformTransformation(logicSchema);
@@ -78,12 +82,9 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         return transformTransformation(logicSchema).transformed();
     }
 
-    /**
-     * @param logicSchema not-null
-     * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived predicate is defined through only one derivation rule
-     */
-    public SchemaTransformation transformTransformation(LogicSchema logicSchema) {
-        if (Objects.isNull(logicSchema)) throw new IllegalArgumentException("LogicSchema cannot be null");
+
+    private SchemaTransformation transformTransformation(LogicSchema logicSchema) {
+        checkLogicSchema(logicSchema);
         if (logicSchema.isEmpty()) {
             LogicSchema transformedSchema = new LogicSchema(Set.of(), Set.of());
             return new SchemaTransformation(logicSchema, transformedSchema, new SchemaTraceabilityMap());

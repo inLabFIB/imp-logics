@@ -11,7 +11,10 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.Derivatio
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,12 +44,8 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
 
     /**
      * @param logicSchema not null
-     * @return a new logicSchema with the trivial literals removed.
+     * @return a transformation where the final logicSchema a new logicSchema with the trivial literals removed.
      */
-    public LogicSchema clean(LogicSchema logicSchema) {
-        return executeTransformation(logicSchema).transformed();
-    }
-
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         checkLogicSchema(logicSchema);
@@ -64,8 +63,12 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
         return new SchemaTransformation(logicSchema, transformedSchema, schemaTraceabilityMap);
     }
 
-    private void checkLogicSchema(LogicSchema logicSchema) {
-        if (Objects.isNull(logicSchema)) throw new IllegalArgumentException("LogicSchema cannot be null");
+    /**
+     * @param logicSchema not null
+     * @return a new logicSchema with the trivial literals removed.
+     */
+    public LogicSchema clean(LogicSchema logicSchema) {
+        return executeTransformation(logicSchema).transformed();
     }
 
     private List<LogicConstraintWithIDSpec> cleanTrivialInLiteralsInLogicConstraints(Set<LogicConstraint> logicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
