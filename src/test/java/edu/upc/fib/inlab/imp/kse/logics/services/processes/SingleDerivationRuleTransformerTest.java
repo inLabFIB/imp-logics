@@ -249,8 +249,8 @@ class SingleDerivationRuleTransformerTest {
             SchemaTransformation schemaTransformation = singleDerivationRuleTransformer.transformTransformation(originalSchema);
 
             assertThat(schemaTransformation)
-                    .constraintIDComesFrom("1", "1_1")
-                    .constraintIDComesFrom("1", "1_2");
+                    .constraintIDComesFrom("1_1", "1")
+                    .constraintIDComesFrom("1_2", "1");
         }
 
         @Test

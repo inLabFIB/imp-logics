@@ -211,16 +211,11 @@ public class ImmutableLiteralsList implements List<Literal> {
                 .collect(Collectors.toSet());
     }
 
-    public enum KindOfUnfolding {
-        STANDARD, //Standard unfolding only valid por positive literals
-        NEGATION_EXTENDED //Standard unfolding extended for dealing with some cases of negated literals
-    }
-
-    public List<ImmutableLiteralsList> unfold(int index, KindOfUnfolding kindOfUnfolding) {
+    public List<ImmutableLiteralsList> unfold(int index, boolean unfoldNegatedLiterals) {
         Literal literal = this.literalList.get(index);
         if (literal instanceof OrdinaryLiteral ordinaryLiteral) {
             ImmutableLiteralsList previousLiterals = this.subList(0, index);
-            List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfold(kindOfUnfolding);
+            List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfold(unfoldNegatedLiterals);
             ImmutableLiteralsList nextLiterals = this.subList(index + 1, literalList.size());
 
             List<ImmutableLiteralsList> result = new LinkedList<>();
@@ -249,7 +244,7 @@ public class ImmutableLiteralsList implements List<Literal> {
      * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
      */
     public List<ImmutableLiteralsList> unfold(int index) {
-        return unfold(index, KindOfUnfolding.STANDARD);
+        return unfold(index, false);
     }
 
     /**
@@ -263,7 +258,7 @@ public class ImmutableLiteralsList implements List<Literal> {
      * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
      */
     public List<ImmutableLiteralsList> unfoldWithNegationExtension(int index) {
-        return unfold(index, KindOfUnfolding.NEGATION_EXTENDED);
+        return unfold(index, true);
     }
 
     private ImmutableLiteralsList combineLiteralsAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Set<Variable> sharedVariables) {

@@ -101,7 +101,7 @@ public class OrdinaryLiteral extends Literal {
      * @return a list of ImmutableLiteralsList representing the result of unfolding this literal
      */
     public List<ImmutableLiteralsList> unfold() {
-        return unfold(ImmutableLiteralsList.KindOfUnfolding.STANDARD);
+        return unfold(false);
     }
 
     /**
@@ -115,13 +115,12 @@ public class OrdinaryLiteral extends Literal {
      * @return a list of ImmutableLiteralsList representing the result of unfolding the index-th literal
      */
     public List<ImmutableLiteralsList> unfoldWithNegationExtension() {
-        return unfold(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED);
+        return unfold(true);
     }
 
-    public List<ImmutableLiteralsList> unfold(ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
-        if (Objects.isNull(kindOfUnfolding)) throw new IllegalArgumentException("KindOfUnfolding cannot be null");
+    public List<ImmutableLiteralsList> unfold(boolean unfoldNegatedLiterals) {
         if (isNegative()) {
-            if (kindOfUnfolding.equals(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED) &&
+            if (unfoldNegatedLiterals &&
                     this.hasNoExistentialVariableInDerivationRules() &&
                     this.allLiteralsFromDerivationRuleCanBeNegated()
             ) {
@@ -158,12 +157,12 @@ public class OrdinaryLiteral extends Literal {
      * (B1() AND B2())
      * )
      * <p>
-     * which is equivalent to (Morgan rules)
+     * which is equivalent to (Morgan rules) <br>
      * (NOT(A1()) OR NOT(A2()) OR NOT(A(3)))
      * AND
      * (NOT(B1()) OR NOT(B2()))
      * <p>
-     * which is equivalent to (redistributing ORs and ANDs)
+     * which is equivalent to (redistributing ORs and ANDs) <br>
      * (NOT(A1) AND NOT(B1()))
      * OR
      * (NOT(A1) AND NOT(B2()))
@@ -175,6 +174,9 @@ public class OrdinaryLiteral extends Literal {
      * (NOT(A3) AND NOT(B1()))
      * OR
      * (NOT(A3) AND NOT(B2()))
+     * <p>
+     * At the end, the method consists in negating all literals from all the literals list, and pick
+     * one of such literals for each list.
      *
      * @param listOfLists not null, not empty
      * @return a new list of ImmutableLiteralsList after applying the morgan rules

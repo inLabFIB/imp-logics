@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * :- P(x), not(A(x))  <br>
  * <p>
  * To apply the positive and also negated literal unfoldings, please, instantiate the class with
- * ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED parameter
+ * unfoldNegatedLiterals set to true.
  * <p>
  * To see the cases in which such unfolding can be performed, please,check OrdinaryLiteral class
  *
@@ -42,19 +42,27 @@ import java.util.stream.Collectors;
 public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator multipleConstraintIDGenerator;
-    private final ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding;
+    private final boolean unfoldNegatedLiterals;
 
     /**
      * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy
      * for creating new constraintIDs, if necessary.
      *
      * @param multipleConstraintIDGenerator not null
-     * @param kindOfUnfolding               not null
+     * @param unfoldNegatedLiterals         , if true, the method tries to unfold negated literals too
      */
-    public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator, ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
-        checkParameters(multipleConstraintIDGenerator, kindOfUnfolding);
-        this.kindOfUnfolding = kindOfUnfolding;
+    public SchemaUnfolder(MultipleConstraintIDGenerator multipleConstraintIDGenerator, boolean unfoldNegatedLiterals) {
+        checkParameters(multipleConstraintIDGenerator);
         this.multipleConstraintIDGenerator = multipleConstraintIDGenerator;
+        this.unfoldNegatedLiterals = unfoldNegatedLiterals;
+    }
+
+    /**
+     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
+     * for creating new constraintIDs, if necessary; and use the unfolding specified by parameter
+     */
+    public SchemaUnfolder(boolean unfoldNegatedLiterals) {
+        this(new SuffixMultipleConstraintIDGenerator(), unfoldNegatedLiterals);
     }
 
     /**
@@ -62,22 +70,12 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
      * for creating new constraintIDs, if necessary; and use the standard unfolding
      */
     public SchemaUnfolder() {
-        this(ImmutableLiteralsList.KindOfUnfolding.STANDARD);
+        this(false);
     }
 
-    /**
-     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
-     * for creating new constraintIDs, if necessary; and use the unfolding specified by parameter
-     */
-    public SchemaUnfolder(ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
-        this(new SuffixMultipleConstraintIDGenerator(), kindOfUnfolding);
-    }
-
-    private static void checkParameters(MultipleConstraintIDGenerator multipleConstraintIDGenerator, ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding) {
+    private static void checkParameters(MultipleConstraintIDGenerator multipleConstraintIDGenerator) {
         if (Objects.isNull(multipleConstraintIDGenerator))
             throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
-        if (Objects.isNull(kindOfUnfolding))
-            throw new IllegalArgumentException("KindOfUnfolding cannot be null");
     }
 
     @Override
@@ -166,7 +164,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
         if (indexOfLiteralToUnfold.isPresent()) {
             int index = indexOfLiteralToUnfold.get();
             List<BodySpec> result = new LinkedList<>();
-            for (ImmutableLiteralsList bodyWithUnfoldedLiteral : body.unfold(index, this.kindOfUnfolding)) {
+            for (ImmutableLiteralsList bodyWithUnfoldedLiteral : body.unfold(index, unfoldNegatedLiterals)) {
                 result.addAll(computeUnfoldedBodySpec(bodyWithUnfoldedLiteral));
             }
             return result;
@@ -178,7 +176,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
         for (Literal literal : body) {
             if (literal instanceof OrdinaryLiteral ordinaryLiteral && ordinaryLiteral.isDerived()) {
                 //We try to unfold the literal, and if we see a different one, it means that it can be unfolded
-                List<ImmutableLiteralsList> unfoldingResult = ordinaryLiteral.unfold(this.kindOfUnfolding);
+                List<ImmutableLiteralsList> unfoldingResult = ordinaryLiteral.unfold(unfoldNegatedLiterals);
                 if (isNotTheSameAs(unfoldingResult, literal)) return Optional.of(index);
             }
             index++;

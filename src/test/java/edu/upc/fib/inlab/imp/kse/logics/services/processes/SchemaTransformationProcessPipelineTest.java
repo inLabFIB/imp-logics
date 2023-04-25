@@ -9,6 +9,7 @@ import org.mockito.InOrder;
 import java.util.LinkedList;
 import java.util.List;
 
+import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -71,6 +72,48 @@ public class SchemaTransformationProcessPipelineTest {
         SchemaTransformation outputTransformation = new SchemaTransformation(inputSchema, outputSchema, new SchemaTraceabilityMap());
         doReturn(outputTransformation).when(mockProcess).executeTransformation(inputSchema);
         return mockProcess;
+    }
+
+    @Nested
+    class TraceabilityTests {
+        @Test
+        public void should_returnOriginalConstraintID_when_pipelineCreatesSeveralConstraints() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                R(a, b) :- T(a, b)
+                                R(a, b) :- U(a, b)
+                            """
+            );
+
+            SchemaTransformationProcessPipeline pipeline = normalizePipeline();
+            SchemaTransformation schemaTransformation = pipeline.executeTransformation(schema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1_1", "1")
+                    .constraintIDComesFrom("1_2", "1");
+        }
+
+        @Test
+        public void should_returnOriginalConstraintID_when_processionCreatesOneConstraint() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                            """
+            );
+
+            SchemaTransformationProcessPipeline pipeline = normalizePipeline();
+            SchemaTransformation schemaTransformation = pipeline.executeTransformation(schema);
+
+            assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1");
+        }
+
+        private static SchemaTransformationProcessPipeline normalizePipeline() {
+            return new SchemaTransformationProcessPipeline(List.of(
+                    new SchemaUnfolder(), new SingleDerivationRuleTransformer(), new BodySorter(), new PredicateCleaner()
+            ));
+        }
     }
 
 }

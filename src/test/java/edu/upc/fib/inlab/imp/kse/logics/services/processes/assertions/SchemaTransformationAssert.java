@@ -15,8 +15,10 @@ public class SchemaTransformationAssert extends AbstractAssert<SchemaTransformat
         return new SchemaTransformationAssert(actual);
     }
 
-    public SchemaTransformationAssert constraintIDComesFrom(String originalID, String finalID) {
-        Assertions.assertThat(actual.getOriginalConstraintID(new ConstraintID(finalID)).id()).isEqualTo(originalID);
+    public SchemaTransformationAssert constraintIDComesFrom(String finalID, String originalID) {
+        Assertions.assertThat(actual.getOriginalConstraintID(new ConstraintID(finalID)))
+                .isNotNull()
+                .satisfies(actualOriginalID -> Assertions.assertThat(actualOriginalID.id()).isEqualTo(originalID));
         return this;
     }
 }

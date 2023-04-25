@@ -1,6 +1,5 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
@@ -18,19 +17,7 @@ class SchemaUnfolderTest {
     class InputValidationTests {
         @Test
         public void should_throwException_whenMultipleStrategyIsNull() {
-            assertThatThrownBy(() -> new SchemaUnfolder(null, ImmutableLiteralsList.KindOfUnfolding.STANDARD))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        public void should_throwException_whenKindOfUnfoldingIsNull_withTwoParams() {
-            assertThatThrownBy(() -> new SchemaUnfolder(new SuffixMultipleConstraintIDGenerator(), null))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        public void should_throwException_whenKindOfUnfoldingIsNull_withOneParam() {
-            assertThatThrownBy(() -> new SchemaUnfolder(null))
+            assertThatThrownBy(() -> new SchemaUnfolder(null, false))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -286,7 +273,7 @@ class SchemaUnfolderTest {
                                     S(x,z) :- T(x,z)
                                 """);
 
-                LogicSchema unfoldedSchema = new SchemaUnfolder(ImmutableLiteralsList.KindOfUnfolding.NEGATION_EXTENDED)
+                LogicSchema unfoldedSchema = new SchemaUnfolder(true)
                         .unfold(logicSchema);
 
                 LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
@@ -318,8 +305,8 @@ class SchemaUnfolderTest {
             SchemaTransformation schemaTransformation = new SchemaUnfolder().unfoldTransformation(schema);
 
             assertThat(schemaTransformation)
-                    .constraintIDComesFrom("1", "1_1")
-                    .constraintIDComesFrom("1", "1_2");
+                    .constraintIDComesFrom("1_1", "1")
+                    .constraintIDComesFrom("1_2", "1");
         }
 
         @Test

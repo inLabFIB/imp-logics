@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +49,12 @@ public class SchemaTransformationProcessPipeline {
         List<SchemaTraceabilityMap> traceabilityMapList = transformations.stream()
                 .map(SchemaTransformation::schemaTraceabilityMap)
                 .toList();
-        SchemaTraceabilityMap schemaTraceabilityMap = SchemaTraceabilityMap.collapseMaps(traceabilityMapList);
+        List<SchemaTraceabilityMap> reversedList = new LinkedList<>(traceabilityMapList);
+        Collections.reverse(reversedList); //reverting list to have the newest maps (the map from the last transformation,
+        //which contains the final constraintIDs) first.
+        //So that, when we collapse them, we obtain a map from the final constraints
+        //to the original ones.
+        SchemaTraceabilityMap schemaTraceabilityMap = SchemaTraceabilityMap.collapseMaps(reversedList);
         return new SchemaTransformation(inputLogicSchema, currentLogicSchema, schemaTraceabilityMap);
     }
 

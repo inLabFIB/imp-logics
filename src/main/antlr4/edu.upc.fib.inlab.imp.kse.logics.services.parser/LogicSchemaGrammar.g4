@@ -28,9 +28,6 @@ OPENPAR:        '(';
 CLOSEPAR:       ')';
 ARROW:          ':-';
 
-//No debemos permitir esto: 1.1()
-//Sí debemos pemitir esto: P(1.1)
-
 fragment DEC_DOT_DEC:   (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
 fragment DEC_DIGIT:     [0-9];
 fragment DECIMAL:       DEC_DIGIT+;
