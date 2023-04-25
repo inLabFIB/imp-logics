@@ -90,7 +90,10 @@ public class DerivationRuleTest {
         @ParameterizedTest
         @ValueSource(strings = {
                 "P(x) :- Q(x)",
-                "P(x) :- R(x, y), not(Q(x))"
+                "P(x) :- R(x, y), not(Q(x))",
+                "P() :- R(), not(Q())",
+                "P(x) :- R(x, y), not(Q(1))",
+                "P(x) :- R(x), x = 1",
         })
         public void should_ReturnTrue_WhenCallingIsSafe_WithSafeDerivationRule(String derivationRuleString) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
@@ -103,6 +106,7 @@ public class DerivationRuleTest {
                 "P(x) :- not(Q(x))",
                 "P(x) :- R(y)",
                 "P(x) :- x = x",
+                "P(1) :- x = x",
         })
         public void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeDerivationRule(String derivationRuleString) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);

@@ -27,7 +27,11 @@ public class LogicConstraintTest {
         @ParameterizedTest
         @ValueSource(strings = {
                 ":- P(x)",
-                ":- P(x), not(Q(x))"
+                ":- P(x), not(Q(x))",
+                ":- P(x), x=1",
+                ":- P(x), not(Q(x, 1))",
+                ":- not(Q(x, 1)), P(x)",
+                ":- P()",
         })
         public void should_ReturnTrue_WhenCallingIsSafe_WithSafeLogicConstraint(String logicConstraintString) {
             LogicConstraint logicConstraint = LogicConstraintMother.createWithoutID(logicConstraintString);
@@ -38,6 +42,8 @@ public class LogicConstraintTest {
         @ValueSource(strings = {
                 ":- P(x), not(Q(x, y))",
                 ":- P(x), x=y",
+                ":- x=y",
+                ":- not(P(x))",
         })
 
         public void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeLogicConstraint(String logicConstraintString) {
