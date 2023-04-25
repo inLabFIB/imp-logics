@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * :- P_2, R <br>
  * :- S, not(P_1), not(P_2) <br>
  */
-public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTransformationProcess {
+public class SingleDerivationRuleTransformer extends LogicSchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator generatorId;
 
@@ -63,11 +63,6 @@ public class SingleDerivationRuleTransformer implements LogicProcess, SchemaTran
     public SingleDerivationRuleTransformer(MultipleConstraintIDGenerator generatorId) {
         if (Objects.isNull(generatorId)) throw new IllegalArgumentException("GeneratorID cannot be null");
         this.generatorId = generatorId;
-    }
-
-    @Override
-    public LogicSchema execute(LogicSchema logicSchema) {
-        return transform(logicSchema);
     }
 
     @Override

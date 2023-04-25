@@ -13,12 +13,7 @@ import java.util.stream.Collectors;
  * Service that removes all those predicates (base or derived) that are not used in any LogicConstraint (neither
  * directly, neither transitively)
  */
-public class PredicateCleaner implements LogicProcess, SchemaTransformationProcess {
-
-    @Override
-    public LogicSchema execute(LogicSchema logicSchema) {
-        return clean(logicSchema);
-    }
+public class PredicateCleaner extends LogicSchemaTransformationProcess {
 
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {

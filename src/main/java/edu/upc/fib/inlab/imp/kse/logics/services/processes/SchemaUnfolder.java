@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @see edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral#unfoldWithNegationExtension
  */
-public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess {
+public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator multipleConstraintIDGenerator;
     private final ImmutableLiteralsList.KindOfUnfolding kindOfUnfolding;
@@ -78,11 +78,6 @@ public class SchemaUnfolder implements LogicProcess, SchemaTransformationProcess
             throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
         if (Objects.isNull(kindOfUnfolding))
             throw new IllegalArgumentException("KindOfUnfolding cannot be null");
-    }
-
-    @Override
-    public LogicSchema execute(LogicSchema logicSchema) {
-        return unfold(logicSchema);
     }
 
     @Override

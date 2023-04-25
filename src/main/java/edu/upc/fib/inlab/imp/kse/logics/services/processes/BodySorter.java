@@ -20,12 +20,7 @@ import java.util.Set;
  * evaluate a built-in literal or negated literal until we know which values can take its variables, and such values
  * can be obtained by first evaluating the positive literals.
  */
-public class BodySorter implements LogicProcess, SchemaTransformationProcess {
-
-    @Override
-    public LogicSchema execute(LogicSchema logicSchema) {
-        return sort(logicSchema);
-    }
+public class BodySorter extends LogicSchemaTransformationProcess {
 
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {

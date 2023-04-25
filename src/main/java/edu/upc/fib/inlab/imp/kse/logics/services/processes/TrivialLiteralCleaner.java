@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * derivation rule which is always false, it will remain as it is.
  * E.g. "P(x) :- FALSE()" will remain as it is.
  */
-public class TrivialLiteralCleaner implements SchemaTransformationProcess, LogicProcess {
+public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
 
     /**
      * @param logicSchema not null
@@ -45,11 +45,6 @@ public class TrivialLiteralCleaner implements SchemaTransformationProcess, Logic
      */
     public LogicSchema clean(LogicSchema logicSchema) {
         return executeTransformation(logicSchema).transformed();
-    }
-
-    @Override
-    public LogicSchema execute(LogicSchema logicSchema) {
-        return clean(logicSchema);
     }
 
     @Override
