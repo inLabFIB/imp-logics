@@ -425,5 +425,196 @@ public class TrivialLiteralCleanerTest {
 
     }
 
+    @Nested
+    class ComparisonBuiltinLiteralsCase {
 
+        public static Stream<Arguments> provideLogicSchemasWithTrueEqualityGroundLiterals() {
+            return Stream.of(
+                    Arguments.of(
+                            "@1 :- A(x), 1=1",
+                            "@1 :- A(x)",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- A(x), 1=1",
+                            "P(x) :- A(x)",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- 1=1",
+                            "@1 :- TRUE()",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- 1=1",
+                            "P(x) :- TRUE()",
+                            List.of()
+                    )
+            );
+        }
+
+        public static Stream<Arguments> provideLogicSchemasWithFalseEqualityGroundLiterals() {
+            return Stream.of(
+
+                    Arguments.of(
+                            "@1 :- A(x), 1=2",
+                            "@1 :- A(x), 1=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- A(x), 1=2",
+                            "P(x) :- A(x), 1=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- 1=2",
+                            "@1 :- 1=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- 1=2",
+                            "P(x) :- 1=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- A(x), 'X'=2",
+                            "@1 :- A(x), 'X'=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- A(x), 'X'=2",
+                            "P(x) :- A(x), 'X'=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- 'X'=2",
+                            "@1 :- 'X'=2",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- 'X'=2",
+                            "P(x) :- 'X'=2",
+                            List.of()
+                    ),
+
+                    Arguments.of(
+                            "@1 :- A(x), 'X'='Y'",
+                            "@1 :- A(x), 'X'='Y'",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- A(x), 'X'='Y'",
+                            "P(x) :- A(x), 'X'='Y'",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- 'X'='Y'",
+                            "@1 :- 'X'='Y'",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- 'X'='Y'",
+                            "P(x) :- 'X'='Y'",
+                            List.of()
+                    )
+            );
+        }
+
+        public static Stream<Arguments> provideLogicSchemasWithEqualityNonGroundLiterals() {
+            return Stream.of(
+
+                    Arguments.of(
+                            "@1 :- A(x), x=2",
+                            "@1 :- A(x), x=2",
+                            List.of()
+                    )
+            );
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemasWithTrueEqualityGroundLiterals")
+        public void should_clean_when_schemaIncludesTrueEqualityGroundLiterals(
+                String inputSchema,
+                String expectedSchema,
+                List<PredicateSpec> additionalExpectedPredicates
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
+            assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemasWithFalseEqualityGroundLiterals")
+        public void should_clean_when_schemaIncludesFalseEqualityGroundLiterals(
+                String inputSchema,
+                String expectedSchema,
+                List<PredicateSpec> additionalExpectedPredicates
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
+            assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemasWithEqualityNonGroundLiterals")
+        public void should_clean_when_schemaIncludesEqualityNonGroundLiterals(
+                String inputSchema,
+                String expectedSchema,
+                List<PredicateSpec> additionalExpectedPredicates
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
+            assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
+    }
+
+    @Nested
+    class IntegrationTest {
+
+        public static Stream<Arguments> provideLogicSchemasWithIntegrationCases() {
+            return Stream.of(
+                    Arguments.of(
+                            """
+                                    P(x) :- not(Q(x)), R(x)
+                                    Q(x) :- 1=1
+                                    """,
+                            """
+                                    P(x) :- FALSE()
+                                    Q(x) :- TRUE()
+                                    """,
+                            List.of(new PredicateSpec("R", 1))
+                    )
+            );
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemasWithIntegrationCases")
+        public void should_clean_when_schemaWithIntegrationCases(
+                String inputSchema,
+                String expectedSchema,
+                List<PredicateSpec> additionalExpectedPredicates
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
+            assertThat(actualLogicSchema).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+    }
 }
