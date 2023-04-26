@@ -2,7 +2,6 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ComparisonBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
-import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.Set;
 class PartitionOfEqualityLiterals {
     private final Set<EqualityLiteralsGroup> equalityLiterals;
 
-    public PartitionOfEqualityLiterals(Set<ComparisonBuiltInLiteral> equalityLiterals) {
+    PartitionOfEqualityLiterals(Set<ComparisonBuiltInLiteral> equalityLiterals) {
         this.equalityLiterals = new LinkedHashSet<>();
         addEqualities(equalityLiterals);
     }
@@ -30,39 +29,33 @@ class PartitionOfEqualityLiterals {
     }
 
     private void addEquality(ComparisonBuiltInLiteral equalityLiteral) {
+        EqualityLiteralsGroup targetEqualityLiteralGroup = computeTargetEqualityLiteralGroupFor(equalityLiteral);
+        targetEqualityLiteralGroup.addEquality(equalityLiteral);
+    }
+
+    private EqualityLiteralsGroup computeTargetEqualityLiteralGroupFor(ComparisonBuiltInLiteral equalityLiteral) {
         Optional<EqualityLiteralsGroup> groupForLeftTermOpt = getEqualityLiteralsContainingTerm(equalityLiteral.getLeftTerm());
         Optional<EqualityLiteralsGroup> groupForRightTermOpt = getEqualityLiteralsContainingTerm(equalityLiteral.getRightTerm());
         if (groupForLeftTermOpt.isPresent() && groupForRightTermOpt.isPresent()) {
-            EqualityLiteralsGroup groupedTermsForLeft = groupForLeftTermOpt.get();
-            EqualityLiteralsGroup groupedTermsForRight = groupForRightTermOpt.get();
-            if (groupedTermsForRight == groupedTermsForLeft) {
-                //If it equals two terms of the same group, add the equality to that group
-                groupedTermsForLeft.addEquality(equalityLiteral);
+            EqualityLiteralsGroup groupedForLeftTerm = groupForLeftTermOpt.get();
+            EqualityLiteralsGroup groupedForRightTerm = groupForRightTermOpt.get();
+            if (groupedForLeftTerm == groupedForRightTerm) {
+                return groupedForLeftTerm;
             } else {
-                //If it equals two terms of different groups, join those groups and add the equality to that group
-                EqualityLiteralsGroup mergedGroup = this.mergeEqualityLiterals(groupedTermsForLeft, groupedTermsForRight);
-                mergedGroup.addEquality(equalityLiteral);
+                return mergeEqualityLiteralGroups(groupedForLeftTerm, groupedForRightTerm);
             }
-        } else if (groupForLeftTermOpt.isPresent()) {
-            //If it equals a term of a group, with a new term, add the new term and the equality to the group
-            groupForLeftTermOpt.get().addTerm(equalityLiteral.getRightTerm());
-            groupForLeftTermOpt.get().addEquality(equalityLiteral);
-        } else if (groupForRightTermOpt.isPresent()) {
-            //If it equals a term of a group, with a new term, add the new term and the equality to the group
-            groupForRightTermOpt.get().addTerm(equalityLiteral.getLeftTerm());
-            groupForRightTermOpt.get().addEquality(equalityLiteral);
         } else {
-            //If it equals two new terms, create a new group with those two terms, and put the equality in the group
-            EqualityLiteralsGroup newGroup = new EqualityLiteralsGroup(equalityLiteral);
-            this.equalityLiterals.add(newGroup);
+            return groupForLeftTermOpt
+                    .or(() -> groupForRightTermOpt)
+                    .orElseGet(this::createNewEqualityLiteralGroup);
         }
     }
 
     private Optional<EqualityLiteralsGroup> getEqualityLiteralsContainingTerm(Term term) {
-        return this.equalityLiterals.stream().filter(g -> g.containsTerm(term)).findFirst();
+        return equalityLiterals.stream().filter(g -> g.containsTerm(term)).findFirst();
     }
 
-    private EqualityLiteralsGroup mergeEqualityLiterals(EqualityLiteralsGroup firstEqualityLiterals, EqualityLiteralsGroup secondEqualityLiterals) {
+    private EqualityLiteralsGroup mergeEqualityLiteralGroups(EqualityLiteralsGroup firstEqualityLiterals, EqualityLiteralsGroup secondEqualityLiterals) {
         equalityLiterals.remove(firstEqualityLiterals);
         equalityLiterals.remove(secondEqualityLiterals);
         EqualityLiteralsGroup mergedGroup = firstEqualityLiterals.union(secondEqualityLiterals);
@@ -70,19 +63,20 @@ class PartitionOfEqualityLiterals {
         return mergedGroup;
     }
 
-    public SubstitutionResult computeSubstitutionResult() {
-        List<SubstitutionResult> substitutionResultSet = equalityLiterals.stream()
+    private EqualityLiteralsGroup createNewEqualityLiteralGroup() {
+        EqualityLiteralsGroup newGroup = new EqualityLiteralsGroup();
+        equalityLiterals.add(newGroup);
+        return newGroup;
+    }
+
+    SubstitutionForEqualities computeSubstitutionResult() {
+        List<SubstitutionForEqualities> substitutionForEqualitiesSet = equalityLiterals.stream()
                 .map(EqualityLiteralsGroup::computeSubstitutionResult)
                 .toList();
 
-        if (substitutionResultSet.isEmpty()) {
-            return new SubstitutionResult(new Substitution(), Set.of());
-        } else if (substitutionResultSet.size() == 1) {
-            return substitutionResultSet.get(0);
-        } else {
-            Optional<SubstitutionResult> reduce = substitutionResultSet.stream()
-                    .reduce(SubstitutionResult::union);
-            return reduce.orElseThrow();
-        }
+        return substitutionForEqualitiesSet.stream()
+                .reduce(SubstitutionForEqualities::union)
+                .orElseGet(SubstitutionForEqualities::empty);
+
     }
 }

@@ -20,6 +20,15 @@ public class LogicSchemaToSpecHelper {
         return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
     }
 
+    public static DerivationRuleSpec buildDerivationRuleSpec(Atom head, ImmutableLiteralsList body) {
+        List<TermSpec> headTerms = LogicSchemaToSpecHelper.buildTermsSpecs(head.getTerms());
+        BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(body);
+        return new DerivationRuleSpecBuilder()
+                .addHead(head.getPredicateName(), headTerms)
+                .addAllLiteralSpecs(bodySpec.literals())
+                .build();
+    }
+
     @SuppressWarnings("unused")
     public static List<LogicConstraintWithIDSpec> buildLogicConstraintSpecs(Set<LogicConstraint> logicConstraints) {
         return logicConstraints.stream()
@@ -30,6 +39,14 @@ public class LogicSchemaToSpecHelper {
     public static LogicConstraintWithIDSpec buildLogicConstraintSpec(LogicConstraint lc) {
         BodySpec bodySpec = buildBodySpec(lc.getBody());
         return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
+    }
+
+    public static LogicConstraintWithIDSpec buildLogicConstraintSpec(ConstraintID id, ImmutableLiteralsList body) {
+        BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(body);
+        return new LogicConstraintWithIDSpecBuilder()
+                .addConstraintId(id.id())
+                .addAllLiteralSpecs(bodySpec.literals())
+                .build();
     }
 
     public static List<PredicateSpec> buildPredicatesSpecs(Set<Predicate> allPredicates) {
@@ -94,11 +111,24 @@ public class LogicSchemaToSpecHelper {
         return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(new BooleanBuiltInLiteral(true));
     }
 
-    //TODO: maybe remove this functions because it has a constant "x"
+    //TODO: maybe remove this functions because it has a constant string "x"
     public static List<TermSpec> createVariableSpecs(int arity) {
         List<TermSpec> result = new LinkedList<>();
         for (int i = 1; i <= arity; i++) {
             result.add(new VariableSpec("x" + i));
+        }
+        return result;
+    }
+
+    public static List<BodySpecFragment> cartesianProduct(List<BodySpecFragment> firstListOfFragments, List<BodySpecFragment> secondListOfFragments) {
+        List<BodySpecFragment> result = new ArrayList<>();
+        for (BodySpecFragment firstFragment : firstListOfFragments) {
+            for (BodySpecFragment secondFragment : secondListOfFragments) {
+                BodySpecFragment newFragment = new BodySpecFragment();
+                newFragment.addAll(firstFragment);
+                newFragment.addAll(secondFragment);
+                result.add(newFragment);
+            }
         }
         return result;
     }
@@ -117,18 +147,5 @@ public class LogicSchemaToSpecHelper {
         public BodySpecFragment(Collection<? extends LiteralSpec> c) {
             super(c);
         }
-    }
-
-    public static List<BodySpecFragment> cartesianProduct(List<BodySpecFragment> firstListOfFragments, List<BodySpecFragment> secondListOfFragments) {
-        List<BodySpecFragment> result = new ArrayList<>();
-        for (BodySpecFragment firstFragment : firstListOfFragments) {
-            for (BodySpecFragment secondFragment : secondListOfFragments) {
-                BodySpecFragment newFragment = new BodySpecFragment();
-                newFragment.addAll(firstFragment);
-                newFragment.addAll(secondFragment);
-                result.add(newFragment);
-            }
-        }
-        return result;
     }
 }
