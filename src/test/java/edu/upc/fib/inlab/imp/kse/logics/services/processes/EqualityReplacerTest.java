@@ -2,6 +2,8 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -114,6 +116,32 @@ public class EqualityReplacerTest {
 
         LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(expectedLogicConstraintString);
         assertThat(schemaTransformation.transformed()).isLogicallyEquivalentTo(expectedLogicSchema);
+    }
+
+
+    @Nested
+    class TraceabilityMapTest {
+
+
+        @Test
+        public void should_maintainConstraintID_when_executeEqualityReplacer() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                @2 :- Q(x, y), Y(y)
+                                @3 :- P(x, y), A(y)
+                                A(x) :- B(x, y), C(y)
+                            """
+            );
+
+            SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
+
+            SchemaTransformationAssert.assertThat(schemaTransformation)
+                    .constraintIDComesFrom("1", "1")
+                    .constraintIDComesFrom("2", "2")
+                    .constraintIDComesFrom("3", "3");
+        }
+
     }
 
 }

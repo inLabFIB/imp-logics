@@ -19,12 +19,10 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
         checkLogicSchema(logicSchema);
 
-        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
-        // TODO: SchemaTraceabilityMap
-
         List<PredicateSpec> predicateSpecs = LogicSchemaToSpecHelper.buildPredicatesSpecs(logicSchema.getAllPredicates());
         List<DerivationRuleSpec> derivationRulesSpecs = replaceEqualitiesInDerivationRules(logicSchema.getAllDerivationRules());
         List<LogicConstraintWithIDSpec> logicConstraintsSpecs = replaceEqualitiesInLogicConstraints(logicSchema.getAllLogicConstraints());
+        SchemaTraceabilityMap schemaTraceabilityMap = buildSchemaTraceabilityMap(logicSchema.getAllLogicConstraints());
 
         LogicSchema outputLogicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addLogicConstraint(logicConstraintsSpecs)
@@ -33,6 +31,14 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
                 .build();
 
         return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
+    }
+
+    private static SchemaTraceabilityMap buildSchemaTraceabilityMap(Set<LogicConstraint> allLogicConstraints) {
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        allLogicConstraints.forEach(
+                logicConstraint -> schemaTraceabilityMap.addConstraintIDOrigin(logicConstraint.getID(), logicConstraint.getID())
+        );
+        return schemaTraceabilityMap;
     }
 
     private List<LogicConstraintWithIDSpec> replaceEqualitiesInLogicConstraints(Set<LogicConstraint> logicConstraints) {
