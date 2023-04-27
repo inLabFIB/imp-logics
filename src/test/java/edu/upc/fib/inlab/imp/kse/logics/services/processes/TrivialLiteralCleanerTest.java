@@ -449,6 +449,26 @@ public class TrivialLiteralCleanerTest {
                             "P(x) :- 1=1",
                             "P(x) :- TRUE()",
                             List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- A(x), 'X'='X'",
+                            "@1 :- A(x)",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- A(x), 'X'='X'",
+                            "P(x) :- A(x)",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "@1 :- 'X'='X'",
+                            "@1 :- TRUE()",
+                            List.of()
+                    ),
+                    Arguments.of(
+                            "P(x) :- 'X'='X'",
+                            "P(x) :- TRUE()",
+                            List.of()
                     )
             );
         }
