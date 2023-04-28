@@ -69,7 +69,7 @@ public class LogicSchemaToSpecHelper {
         }).collect(Collectors.toList());
     }
 
-    public static BodySpec buildBodySpec(ImmutableLiteralsList body) {
+    public static BodySpec buildBodySpec(List<Literal> body) {
         return new BodySpec(body.stream()
                 .map(l -> {
                     if (l instanceof OrdinaryLiteral ordinaryLiteral) {
