@@ -41,7 +41,7 @@ public class LogicSchemaToSpecHelper {
         return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
     }
 
-    public static LogicConstraintWithIDSpec buildLogicConstraintSpec(ConstraintID id, ImmutableLiteralsList body) {
+    public static LogicConstraintWithIDSpec buildLogicConstraintSpec(ConstraintID id, List<Literal> body) {
         BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(body);
         return new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId(id.id())
