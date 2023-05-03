@@ -128,9 +128,9 @@ public class Substitution {
         Set<Variable> variablesInRange = this.termsMap.values().stream()
                 .filter(Term::isVariable)
                 .map(t -> new Variable(t.getName()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        Set<Variable> result = new HashSet<>(variablesInDomain);
+        Set<Variable> result = new LinkedHashSet<>(variablesInDomain);
         result.addAll(variablesInRange);
         return result;
     }

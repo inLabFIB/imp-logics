@@ -143,7 +143,7 @@ public class Atom {
     }
 
     private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList literalsList, Set<Variable> potentiallyClashingTerms) {
-        Set<Variable> usedVariables = new HashSet<>();
+        Set<Variable> usedVariables = new LinkedHashSet<>();
         usedVariables.addAll(literalsList.getUsedVariables());
         usedVariables.addAll(potentiallyClashingTerms);
         return usedVariables;
@@ -186,7 +186,7 @@ public class Atom {
     public Set<Variable> getVariables() {
         return terms.stream().filter(Variable.class::isInstance)
                 .map(Variable.class::cast)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {

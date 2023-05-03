@@ -72,7 +72,7 @@ public class ImmutableTermList implements List<Term> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return new HashSet<>(termsList).containsAll(c);
+        return new LinkedHashSet<>(termsList).containsAll(c);
     }
 
     @Deprecated
@@ -164,7 +164,7 @@ public class ImmutableTermList implements List<Term> {
         return termsList.stream()
                 .filter(Term::isVariable)
                 .map(Variable.class::cast)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {

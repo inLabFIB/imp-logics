@@ -119,8 +119,8 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
     }
 
     public LogicSchema build() {
-        Set<Predicate> predicates = new HashSet<>(predicatesByName.values());
-        Set<LogicConstraint> constraints = new HashSet<>(logicConstraintById.values());
+        Set<Predicate> predicates = new LinkedHashSet<>(predicatesByName.values());
+        Set<LogicConstraint> constraints = new LinkedHashSet<>(logicConstraintById.values());
         return new LogicSchema(predicates, constraints);
     }
 

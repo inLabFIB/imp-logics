@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWi
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
                 .map(ComparisonBuiltInLiteral.class::cast)
                 .filter(comparisonBuiltInLiteral -> ComparisonOperator.EQUALS.equals(comparisonBuiltInLiteral.getOperator()))
                 .filter(comparisonBuiltInLiteral -> comparisonBuiltInLiteral.getTerms().stream().anyMatch(Term::isVariable))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override

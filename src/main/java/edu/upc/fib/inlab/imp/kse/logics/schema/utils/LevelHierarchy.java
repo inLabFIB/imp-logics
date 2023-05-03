@@ -70,7 +70,7 @@ public class LevelHierarchy implements Iterable<Level> {
     }
 
     private Set<Predicate> computePredicatesUsedInDefinition(Predicate predicate) {
-        Set<Predicate> predicatesUsed = new HashSet<>();
+        Set<Predicate> predicatesUsed = new LinkedHashSet<>();
         for (DerivationRule rule : predicate.getDerivationRules()) {
             for (Literal literal : rule.getBody()) {
                 if (literal instanceof OrdinaryLiteral ol) {
@@ -82,7 +82,7 @@ public class LevelHierarchy implements Iterable<Level> {
     }
 
     private Set<Predicate> computePredicatesInLowerLevels(int currentLevelIndex, List<Level> levels) {
-        Set<Predicate> result = new HashSet<>();
+        Set<Predicate> result = new LinkedHashSet<>();
         for (int index = 0; index < currentLevelIndex; ++index) {
             result.addAll(levels.get(index).getAllPredicates());
         }

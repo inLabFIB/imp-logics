@@ -59,11 +59,11 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
                 .flatMap(Collection::stream)
                 .filter(l -> l instanceof OrdinaryLiteral)
                 .map(l -> (OrdinaryLiteral) l)
-                .map(ol -> ol.getAtom().getPredicateName()).collect(Collectors.toSet());
+                .map(ol -> ol.getAtom().getPredicateName()).collect(Collectors.toCollection(LinkedHashSet::new));
         return predicateNamesFromConstraint.stream()
                 .map(predicateName -> obtainNestedPredicateNames(logicSchema, predicateName))
                 .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private static Set<String> obtainNestedPredicateNames(LogicSchema logicSchema, String predicateName) {
@@ -72,7 +72,7 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
             return Set.of(predicateName);
         }
 
-        Set<String> predicateNames = new HashSet<>();
+        Set<String> predicateNames = new LinkedHashSet<>();
         predicateNames.add(predicateName);
         for (DerivationRule derivationRule : logicSchema.getDerivationRulesByPredicateName(predicateName)) {
             Set<String> predicateNamesFromDerivationRule = derivationRule.getBody().stream()
@@ -80,7 +80,7 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
                     .map(l -> (OrdinaryLiteral) l)
                     .map(ol -> ol.getAtom().getPredicateName())
                     .map(p -> obtainNestedPredicateNames(logicSchema, p))
-                    .flatMap(Collection::stream).collect(Collectors.toSet());
+                    .flatMap(Collection::stream).collect(Collectors.toCollection(LinkedHashSet::new));
 
             predicateNames.addAll(predicateNamesFromDerivationRule);
         }

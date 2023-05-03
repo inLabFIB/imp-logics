@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +48,7 @@ public class LogicConstraint extends NormalClause {
         Set<Variable> variablesInNegativeOrdinaryLiterals = getBody().getVariablesInNegativeOrdinaryLiterals();
         Set<Variable> variablesInBuiltInLiterals = getBody().getVariablesInBuiltInLiterals();
 
-        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiterals = new HashSet<>();
+        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiterals = new LinkedHashSet<>();
         variablesInNegativeLiteralsOrBuiltInLiterals.addAll(variablesInNegativeOrdinaryLiterals);
         variablesInNegativeLiteralsOrBuiltInLiterals.addAll(variablesInBuiltInLiterals);
         return variablesInPositiveOrdinaryLiterals.containsAll(variablesInNegativeLiteralsOrBuiltInLiterals);

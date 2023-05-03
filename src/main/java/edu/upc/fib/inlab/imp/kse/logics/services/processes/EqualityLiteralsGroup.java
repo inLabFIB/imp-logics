@@ -29,14 +29,14 @@ class EqualityLiteralsGroup {
     private Set<Term> getTerms() {
         return equalityLiterals.stream()
                 .flatMap(equality -> equality.getTerms().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private Set<Variable> getVariables() {
         return getTerms().stream()
                 .filter(Term::isVariable)
                 .map(Variable.class::cast)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     boolean containsTerm(Term term) {
@@ -62,7 +62,7 @@ class EqualityLiteralsGroup {
         Set<Term> terms = getTerms();
         Set<Term> constantTerms = terms.stream()
                 .filter(Term::isConstant)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         if (constantTerms.size() == 1) {
             return Optional.of(constantTerms.iterator().next());

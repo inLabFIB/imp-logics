@@ -11,7 +11,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.Derivatio
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicConstraintWithIDSpecBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -97,11 +97,11 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
         Set<Atom> alwaysTrueHeads = predicate.getDerivationRules().stream()
                 .map(DerivationRule::getHead)
                 .filter(this::isAlwaysTrue)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         Set<DerivationRule> nonTrivialRules = predicate.getDerivationRules().stream()
                 .filter(rule -> !isTrivialRule(rule))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         Set<Atom> necessaryAlwaysTrueAtoms = removeRedundantAtoms(alwaysTrueHeads);
 
@@ -119,7 +119,7 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
     }
 
     private Set<Atom> removeRedundantAtoms(Set<Atom> alwaysTrueHeads) {
-        Set<Atom> necessaryAtoms = new HashSet<>(alwaysTrueHeads);
+        Set<Atom> necessaryAtoms = new LinkedHashSet<>(alwaysTrueHeads);
         for (Atom atom : alwaysTrueHeads) {
             necessaryAtoms.remove(atom);
             if (!isRedundantWithAnyOf(atom, necessaryAtoms)) {

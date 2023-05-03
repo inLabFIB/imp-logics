@@ -3,7 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +48,7 @@ public class DerivationRule extends NormalClause {
     }
 
     public Set<Variable> getExistencialVariables() {
-        Set<Variable> existencialVariables = new HashSet<>(getBody().getUsedVariables());
+        Set<Variable> existencialVariables = new LinkedHashSet<>(getBody().getUsedVariables());
         existencialVariables.removeAll(getUniversalVariables());
         return existencialVariables;
     }
@@ -61,7 +61,7 @@ public class DerivationRule extends NormalClause {
         Set<Variable> variablesInBuiltInLiterals = getBody().getVariablesInBuiltInLiterals();
         Set<Variable> variablesInHead = getHead().getVariables();
 
-        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiteralsOrHead = new HashSet<>();
+        Set<Variable> variablesInNegativeLiteralsOrBuiltInLiteralsOrHead = new LinkedHashSet<>();
         variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInNegativeOrdinaryLiterals);
         variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInBuiltInLiterals);
         variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInHead);

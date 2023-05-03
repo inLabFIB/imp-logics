@@ -90,7 +90,7 @@ public class ImmutableLiteralsList implements List<Literal> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return new HashSet<>(literalList).containsAll(c);
+        return new LinkedHashSet<>(literalList).containsAll(c);
     }
 
     @Deprecated
@@ -181,7 +181,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     public Set<Variable> getUsedVariables() {
         return this.literalList.stream()
                 .map(Literal::getUsedVariables)
-                .reduce(new HashSet<>(),
+                .reduce(new LinkedHashSet<>(),
                         (subtotal, element) -> {
                             subtotal.addAll(element);
                             return subtotal;
@@ -194,21 +194,21 @@ public class ImmutableLiteralsList implements List<Literal> {
                 .map(OrdinaryLiteral.class::cast)
                 .filter(OrdinaryLiteral::isPositive)
                 .flatMap(ordinaryLiteral -> ordinaryLiteral.getUsedVariables().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Variable> getVariablesInNegativeOrdinaryLiterals() {
         return literalList.stream()
                 .filter(l -> l instanceof OrdinaryLiteral ol && ol.isNegative())
                 .flatMap(l -> l.getUsedVariables().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Variable> getVariablesInBuiltInLiterals() {
         return literalList.stream()
                 .filter(BuiltInLiteral.class::isInstance)
                 .flatMap(l -> l.getUsedVariables().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public List<ImmutableLiteralsList> unfold(int index, boolean unfoldNegatedLiterals) {
@@ -284,7 +284,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
     private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals) {
-        Set<Variable> usedVariables = new HashSet<>();
+        Set<Variable> usedVariables = new LinkedHashSet<>();
         usedVariables.addAll(previousLiterals.getUsedVariables());
         usedVariables.addAll(unfoldedLiterals.getUsedVariables());
         usedVariables.addAll(nextLiterals.getUsedVariables());
@@ -294,8 +294,8 @@ public class ImmutableLiteralsList implements List<Literal> {
     private Set<Variable> computePotentiallyClashingVariables(Set<Variable> sharedVariables, ImmutableLiteralsList... literalListSet) {
         Set<Variable> potentiallyClashingVariables = Arrays.stream(literalListSet)
                 .map(ImmutableLiteralsList::getUsedVariables)
-                .reduce(new HashSet<>(), (element, subtotal) -> {
-                    Set<Variable> total = new HashSet<>(subtotal);
+                .reduce(new LinkedHashSet<>(), (element, subtotal) -> {
+                    Set<Variable> total = new LinkedHashSet<>(subtotal);
                     total.addAll(element);
                     return total;
                 });

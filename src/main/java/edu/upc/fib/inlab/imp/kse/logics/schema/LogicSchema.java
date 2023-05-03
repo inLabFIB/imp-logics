@@ -97,13 +97,13 @@ public class LogicSchema {
         return predicatesByName.values().stream()
                 .filter(Predicate::isDerived)
                 .flatMap(p -> p.getDerivationRules().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Predicate> getAllDerivedPredicates() {
         return predicatesByName.values().stream()
                 .filter(Predicate::isDerived)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -151,7 +151,7 @@ public class LogicSchema {
             Set<Predicate> predicates = predicateToLevelMap.entrySet().stream()
                     .filter(entry -> entry.getValue().equals(finalIndex))
                     .map(Map.Entry::getKey)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             levels.add(new Level(predicates));
         }
         return levels;
