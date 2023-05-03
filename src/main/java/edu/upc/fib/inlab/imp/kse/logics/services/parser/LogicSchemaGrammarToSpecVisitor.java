@@ -70,9 +70,9 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
     }
 
     @Override
-    public OrdinaryLiteralSpec visitAtom(LogicSchemaGrammarParser.AtomContext ctx) {
-        String predicateName = ctx.predicate().getText();
-        List<TermSpec> termSpecList = createTermsList(ctx.termsList());
+    public OrdinaryLiteralSpec visitPositiveAtom(LogicSchemaGrammarParser.PositiveAtomContext ctx) {
+        String predicateName = ctx.atom().predicate().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
         return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
     }
 

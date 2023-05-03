@@ -47,7 +47,8 @@ builtInLiteral: comparisonBuiltInLiteral | booleanBuiltInLiteral | customBuiltIn
 comparisonBuiltInLiteral: term OPERATOR term;
 booleanBuiltInLiteral: BOOLEAN OPENPAR CLOSEPAR;
 customBuiltInLiteral: BUILTIN_PREDICATE OPENPAR termsList CLOSEPAR;
-ordinaryLiteral: atom | negatedAtom;
+ordinaryLiteral: positiveAtom | negatedAtom;
+positiveAtom: atom;
 negatedAtom: NOT OPENPAR atom CLOSEPAR;
 atom: predicate OPENPAR termsList CLOSEPAR;
 termsList: | term (COMMA term)*;
