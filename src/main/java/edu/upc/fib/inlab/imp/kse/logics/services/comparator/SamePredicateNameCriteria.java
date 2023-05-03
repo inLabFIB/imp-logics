@@ -13,6 +13,7 @@ import java.util.Optional;
 public class SamePredicateNameCriteria implements DerivedOrdinaryLiteralHomomorphismCriteria {
     @Override
     public Optional<Substitution> computeHomomorphismExtensionForDerivedOrdinaryLiteral(HomomorphismFinder homomorphismFinder, Substitution currentSubstitution, OrdinaryLiteral domainLiteral, OrdinaryLiteral rangeLiteral) {
+        if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
         return homomorphismFinder.computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
     }
 }

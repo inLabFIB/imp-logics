@@ -211,6 +211,39 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
             }
+
+            @Nested
+            class SameNameDerivationRuleCriteria {
+                @Test
+                public void should_findHomomorphism_whenUsingSameName() {
+                    ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
+                    ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
+
+                    HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
+                    Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
+                    assertThat(homomorphismOpt).isPresent();
+                }
+
+                @Test
+                public void should_notFindHomomorphism_whenUsingSameName_butDifferentPolarity() {
+                    ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
+                    ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), not(Derived(x))", "Derived(x) :- Q(x)");
+
+                    HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
+                    Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
+                    assertThat(homomorphismOpt).isNotPresent();
+                }
+
+                @Test
+                public void should_notFindHomomorphism_whenUsingDifferentNames() {
+                    ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived1(x)", "Derived1(x) :- Q(x)");
+                    ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Derived2(x)", "Derived2(x) :- Q(x)");
+
+                    HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
+                    Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
+                    assertThat(homomorphismOpt).isNotPresent();
+                }
+            }
         }
     }
 
