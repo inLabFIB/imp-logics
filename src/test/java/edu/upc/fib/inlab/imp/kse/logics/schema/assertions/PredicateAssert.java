@@ -100,7 +100,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
 
     private boolean isDerivationRuleContainedModusStructure(DerivationRule derivationRule, List<DerivationRule> listOfRules) {
         for (DerivationRule aRuleOfTheList : listOfRules) {
-            if (new LogicStructureComparator().haveSameStructureRecursively(derivationRule, aRuleOfTheList)) {
+            if (new LogicStructureComparator(true).haveSameStructure(derivationRule, aRuleOfTheList)) {
                 return true;
             }
         }

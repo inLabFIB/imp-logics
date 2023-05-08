@@ -22,16 +22,59 @@ import java.util.Objects;
  * not only the structure of these list of literals, but also checking the structure of the underlying derivation rules.
  * <p>
  * When applying non-recursive checks, two literals "P(x)", where one is base, and the other derived, are determined
- * to have the same structure, since the comaprator will not check their derivation rules.
+ * to have the same structure, since the comparator will not check their derivation rules.
  */
 public class LogicStructureComparator {
 
+    private final boolean recursively;
+
+    public LogicStructureComparator(boolean recursive) {
+        this.recursively = recursive;
+    }
+
+    public LogicStructureComparator() {
+        this(false);
+    }
+
     /**
-     * @param first  not-null
-     * @param second not-null
+     * @param first  not null logic constraint
+     * @param second not null logic constraint
+     * @return whether both logic constraints have the same structure. ConstraintIDs are ignored in the check
+     */
+    public boolean haveSameStructure(LogicConstraint first, LogicConstraint second) {
+        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
+        if (Objects.isNull(second)) throw new IllegalArgumentException("Second rule cannot be null");
+        return haveSameStructure(first.getBody(), second.getBody());
+    }
+
+    /**
+     * @param first  not null derivation rule
+     * @param second not null derivation rule
+     * @return whether both derivation rules have the same structure
+     */
+    public boolean haveSameStructure(DerivationRule first, DerivationRule second) {
+        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
+        if (Objects.isNull(second)) throw new IllegalArgumentException("second rule cannot be null");
+        return haveSameStructure(first.getHead(), second.getHead()) &&
+                haveSameStructure(first.getBody(), second.getBody());
+    }
+
+    /**
+     * @param first  not null literal list
+     * @param second not null literal list
      * @return whether both list of literals have the same structure
      */
     public boolean haveSameStructure(List<Literal> first, List<Literal> second) {
+        if (recursively) return haveSameStructureRecursively(first, second);
+        else return haveSameStructureNonRecursive(first, second);
+    }
+
+    /**
+     * @param first  not null literal list
+     * @param second not null literal list
+     * @return whether both list of literals have the same structure, non recursively
+     */
+    public boolean haveSameStructureNonRecursive(List<Literal> first, List<Literal> second) {
         if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
         if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
         if (first.size() != second.size()) return false;
@@ -46,6 +89,26 @@ public class LogicStructureComparator {
         return allSameStructure;
     }
 
+    /**
+     * @param first  not null literal list
+     * @param second not null literal list
+     * @return whether both list of literals have the same structure, recursively
+     */
+    public boolean haveSameStructureRecursively(List<Literal> first, List<Literal> second) {
+        if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
+        if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
+        if (!haveSameStructureNonRecursive(first, second)) return false;
+
+        boolean allSame = true;
+        for (int i = 0; i < first.size() && allSame; ++i) {
+            Literal firstLiteral = first.get(i);
+            Literal secondLiteral = second.get(i);
+            allSame = haveSameDefinitionRulesRecursively(firstLiteral, secondLiteral);
+        }
+
+        return allSame;
+    }
+
     private boolean haveSameStructure(Literal firstLiteral, Literal secondLiteral) {
         if (firstLiteral instanceof OrdinaryLiteral firstOLit) {
             if (secondLiteral instanceof OrdinaryLiteral secondOLit) {
@@ -57,6 +120,18 @@ public class LogicStructureComparator {
             }
         }
         return false;
+    }
+
+    private boolean haveSameDefinitionRulesRecursively(Literal firstLiteral, Literal secondLiteral) {
+        if (firstLiteral instanceof OrdinaryLiteral firstOrdinaryLiteral) {
+            if (secondLiteral instanceof OrdinaryLiteral secondOrdinaryLiteral) {
+                List<DerivationRule> derivationRules1 = firstOrdinaryLiteral.getAtom().getPredicate().getDerivationRules();
+                List<DerivationRule> derivationRules2 = secondOrdinaryLiteral.getAtom().getPredicate().getDerivationRules();
+                return haveSameDefinitionRulesRecursively(derivationRules1, derivationRules2);
+            } else return false;
+        } else if (firstLiteral instanceof BuiltInLiteral) {
+            return secondLiteral instanceof BuiltInLiteral;
+        } else throw new RuntimeException("Unrecognized firstLiteral type: " + firstLiteral.getClass().getName());
     }
 
     private boolean haveSameStructure(BuiltInLiteral firstBIL, BuiltInLiteral secondBIL) {
@@ -96,102 +171,26 @@ public class LogicStructureComparator {
                 term1.getName().equals(term2.getName());
     }
 
-    /**
-     * @param first  not-null
-     * @param second not-null
-     * @return whether both derivation rules have the same structure
-     */
-    public boolean haveSameStructure(DerivationRule first, DerivationRule second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("second rule cannot be null");
-        return haveSameStructure(first.getHead(), second.getHead()) &&
-                haveSameStructure(first.getBody(), second.getBody());
-    }
-
-    /**
-     * @param first  not-null
-     * @param second not-null
-     * @return whether both list of literals have the same structure, recursively
-     */
-    public boolean haveSameStructureRecursively(List<Literal> first, List<Literal> second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
-        if (!haveSameStructure(first, second)) return false;
-
-        boolean allSame = true;
-        for (int i = 0; i < first.size() && allSame; ++i) {
-            Literal firstLiteral = first.get(i);
-            Literal secondLiteral = second.get(i);
-            allSame = haveSameDefinitionRulesRecursively(firstLiteral, secondLiteral);
-        }
-
-        return allSame;
-    }
-
-    private boolean haveSameDefinitionRulesRecursively(Literal firstLiteral, Literal secondLiteral) {
-        if (firstLiteral instanceof OrdinaryLiteral firstOlit) {
-            if (secondLiteral instanceof OrdinaryLiteral secondOlit) {
-                List<DerivationRule> derivationRules1 = firstOlit.getAtom().getPredicate().getDerivationRules();
-                List<DerivationRule> derivationRules2 = secondOlit.getAtom().getPredicate().getDerivationRules();
-                return haveSameDefinitionRulesRecursively(derivationRules1, derivationRules2);
-            } else return false;
-        } else if (firstLiteral instanceof BuiltInLiteral) {
-            return secondLiteral instanceof BuiltInLiteral;
-        } else throw new RuntimeException("Unrecognized firstLiteral type: " + firstLiteral.getClass().getName());
-    }
 
     private boolean haveSameDefinitionRulesRecursively(List<DerivationRule> derivationRules1, List<DerivationRule> derivationRules2) {
         for (DerivationRule rule1 : derivationRules1) {
-            if (!isContainedInRecursively(rule1, derivationRules2)) return false;
+            if (isNotContainedInRecursively(rule1, derivationRules2)) return false;
         }
         for (DerivationRule rule2 : derivationRules2) {
-            if (!isContainedInRecursively(rule2, derivationRules1)) return false;
+            if (isNotContainedInRecursively(rule2, derivationRules1)) return false;
         }
         return true;
     }
 
+    private boolean isNotContainedInRecursively(DerivationRule rule, List<DerivationRule> derivationRules) {
+        return !isContainedInRecursively(rule, derivationRules);
+    }
+
     private boolean isContainedInRecursively(DerivationRule rule, List<DerivationRule> derivationRules) {
         for (DerivationRule ruleFromList : derivationRules) {
-            if (haveSameStructureRecursively(rule, ruleFromList)) return true;
+            if (haveSameStructure(rule, ruleFromList)) return true;
         }
         return false;
-    }
-
-    /**
-     * @param first  not-null
-     * @param second not-null
-     * @return whether both derivation rules have the same structure, recursively
-     */
-    public boolean haveSameStructureRecursively(DerivationRule first, DerivationRule second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("second rule cannot be null");
-
-        return haveSameStructure(first, second) &&
-                haveSameStructureRecursively(first.getBody(), second.getBody());
-    }
-
-    /**
-     * @param first  not-null
-     * @param second not-null
-     * @return whether both logic constraints have the same structure. ConstraintIDs are ignored in the check
-     */
-    public boolean haveSameStructure(LogicConstraint first, LogicConstraint second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("Second rule cannot be null");
-
-        return haveSameStructure(first.getBody(), second.getBody());
-    }
-
-    /**
-     * @param first  not-null
-     * @param second not-null
-     * @return whether both logic constraints have the same structure, recursively. ConstraintIDs are ignored in the check
-     */
-    public boolean haveSameStructureRecursively(LogicConstraint first, LogicConstraint second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First rule cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("Second rule cannot be null");
-
-        return haveSameStructureRecursively(first.getBody(), second.getBody());
     }
 
 

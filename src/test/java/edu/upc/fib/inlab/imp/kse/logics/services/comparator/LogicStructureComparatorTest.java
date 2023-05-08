@@ -90,8 +90,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenFirstLiteralsListIsNull() {
                     ImmutableLiteralsList rule = ImmutableLiteralsListMother.create("R(x, y), not(S(x)), x<y");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(null, rule))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(null, rule))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
 
@@ -99,8 +99,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenSecondLiteralsListIsNull() {
                     ImmutableLiteralsList rule = ImmutableLiteralsListMother.create("R(x, y), not(S(x)), x<y");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(rule, null))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(rule, null))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
             }
@@ -114,8 +114,8 @@ public class LogicStructureComparatorTest {
                         "R(x, y), not(S(x))",
                         "R(x, y) :- A(x, y)");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isTrue();
             }
@@ -131,8 +131,8 @@ public class LogicStructureComparatorTest {
                         "R(x, y) :- B(x, y)\n" +
                                 "R(x, y) :- A(x, y)");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isTrue();
             }
@@ -146,8 +146,8 @@ public class LogicStructureComparatorTest {
                         "R(x, y), not(S(x))",
                         "R(a, b) :- A(a, b)");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isFalse();
             }
@@ -163,8 +163,8 @@ public class LogicStructureComparatorTest {
                         "R(x, y) :- A(x, y)\n" +
                                 "A(x, y) :- C(x, y)");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isFalse();
             }
@@ -268,8 +268,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenFirstLiteralsListIsNull() {
                     DerivationRule rule = DerivationRuleMother.create("P(x) :- R(x, y), not(S(x)), x<y");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(null, rule))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(null, rule))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
 
@@ -277,8 +277,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenSecondLiteralsListIsNull() {
                     DerivationRule rule = DerivationRuleMother.create("P(x) :- R(x, y), not(S(x)), x<y");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(rule, null))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(rule, null))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
             }
@@ -298,8 +298,8 @@ public class LogicStructureComparatorTest {
                                 A(x, y) :- B(x, y)
                                 """, "P");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isTrue();
             }
@@ -319,8 +319,8 @@ public class LogicStructureComparatorTest {
                                 A(x, y) :- C(x, y)
                                 """, "P");
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(firstRule, secondRule);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(firstRule, secondRule);
 
                 assertThat(equivalence).isFalse();
             }
@@ -380,8 +380,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenFirstLogicConstraintIsNull() {
                     LogicConstraint constraint = LogicConstraintMother.createWithID("@1 :- P(x), R(1)");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(null, constraint))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(null, constraint))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
 
@@ -389,8 +389,8 @@ public class LogicStructureComparatorTest {
                 public void should_throwException_whenSecondLogicConstraintIsNull() {
                     LogicConstraint constraint = LogicConstraintMother.createWithID("@1 :- P(x), R(1)");
 
-                    LogicStructureComparator comparator = new LogicStructureComparator();
-                    assertThatThrownBy(() -> comparator.haveSameStructureRecursively(constraint, null))
+                    LogicStructureComparator comparator = new LogicStructureComparator(true);
+                    assertThatThrownBy(() -> comparator.haveSameStructure(constraint, null))
                             .isInstanceOf(IllegalArgumentException.class);
                 }
             }
@@ -410,8 +410,8 @@ public class LogicStructureComparatorTest {
                                  R(x, y) :- T(x, y)
                         """);
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(constraint1, constraint2);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(constraint1, constraint2);
 
                 assertThat(equivalence).isTrue();
             }
@@ -430,8 +430,8 @@ public class LogicStructureComparatorTest {
                                  R(x, y) :- S(x, y)
                         """);
 
-                boolean equivalence = new LogicStructureComparator()
-                        .haveSameStructureRecursively(constraint1, constraint2);
+                boolean equivalence = new LogicStructureComparator(true)
+                        .haveSameStructure(constraint1, constraint2);
 
                 assertThat(equivalence).isFalse();
             }

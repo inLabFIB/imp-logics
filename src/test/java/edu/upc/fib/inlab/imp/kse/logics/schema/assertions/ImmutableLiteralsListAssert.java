@@ -127,8 +127,8 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
      */
     @SuppressWarnings("UnusedReturnValue")
     public ImmutableLiteralsListAssert hasSameStructureAs(ImmutableLiteralsList expectedLiteralsList) {
-        boolean haveSameStructureRecursively = new LogicStructureComparator()
-                .haveSameStructureRecursively(actual, expectedLiteralsList);
+        boolean haveSameStructureRecursively = new LogicStructureComparator(true)
+                .haveSameStructure(actual, expectedLiteralsList);
         Assertions.assertThat(haveSameStructureRecursively)
                 .describedAs("Actual literal list: " + actual + " \n" +
                         "has not the same structure as expected literal list: " + expectedLiteralsList).isTrue();
