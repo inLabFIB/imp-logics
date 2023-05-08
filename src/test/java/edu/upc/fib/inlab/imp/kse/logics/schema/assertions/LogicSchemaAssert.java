@@ -106,7 +106,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
 
     private boolean logicConstraintIsContainedInListModusStructure(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
         for (LogicConstraint aConstraintFromSet : constraintSet) {
-            if (new LogicStructureComparator(true).haveSameStructure(constraint, aConstraintFromSet)) {
+            if (new LogicStructureComparator(true, true).haveSameStructure(constraint, aConstraintFromSet)) {
                 return true;
             }
         }

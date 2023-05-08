@@ -27,13 +27,15 @@ import java.util.Objects;
 public class LogicStructureComparator {
 
     private final boolean recursively;
+    private final boolean literalOrderMatter;
 
-    public LogicStructureComparator(boolean recursive) {
+    public LogicStructureComparator(boolean recursive, boolean literalOrderMatter) {
         this.recursively = recursive;
+        this.literalOrderMatter = literalOrderMatter;
     }
 
     public LogicStructureComparator() {
-        this(false);
+        this(false, true);
     }
 
     /**
@@ -65,6 +67,8 @@ public class LogicStructureComparator {
      * @return whether both list of literals have the same structure
      */
     public boolean haveSameStructure(List<Literal> first, List<Literal> second) {
+        if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
+        if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
         if (recursively) return haveSameStructureRecursively(first, second);
         else return haveSameStructureNonRecursive(first, second);
     }
@@ -75,18 +79,23 @@ public class LogicStructureComparator {
      * @return whether both list of literals have the same structure, non recursively
      */
     public boolean haveSameStructureNonRecursive(List<Literal> first, List<Literal> second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
         if (first.size() != second.size()) return false;
 
-        boolean allSameStructure = true;
-        for (int i = 0; i < first.size() && allSameStructure; ++i) {
-            Literal firstLiteral = first.get(i);
-            Literal secondLiteral = second.get(i);
-            allSameStructure = haveSameStructure(firstLiteral, secondLiteral);
+        if (literalOrderMatter) {
+            boolean allSameStructure = true;
+            for (int i = 0; i < first.size() && allSameStructure; ++i) {
+                Literal firstLiteral = first.get(i);
+                Literal secondLiteral = second.get(i);
+                allSameStructure = haveSameStructure(firstLiteral, secondLiteral);
+            }
+            return allSameStructure;
+        } else {
+            return first.stream().allMatch(fisrtLiteral ->
+                    second.stream().anyMatch(secondLiteral -> haveSameStructure(fisrtLiteral, secondLiteral))
+            ) && second.stream().allMatch(secondLiteral ->
+                    first.stream().anyMatch(fisrtLiteral -> haveSameStructure(fisrtLiteral, secondLiteral))
+            );
         }
-
-        return allSameStructure;
     }
 
     /**
@@ -95,18 +104,23 @@ public class LogicStructureComparator {
      * @return whether both list of literals have the same structure, recursively
      */
     public boolean haveSameStructureRecursively(List<Literal> first, List<Literal> second) {
-        if (Objects.isNull(first)) throw new IllegalArgumentException("First literals cannot be null");
-        if (Objects.isNull(second)) throw new IllegalArgumentException("Second literals cannot be null");
         if (!haveSameStructureNonRecursive(first, second)) return false;
 
-        boolean allSame = true;
-        for (int i = 0; i < first.size() && allSame; ++i) {
-            Literal firstLiteral = first.get(i);
-            Literal secondLiteral = second.get(i);
-            allSame = haveSameDefinitionRulesRecursively(firstLiteral, secondLiteral);
+        if (literalOrderMatter) {
+            boolean allSame = true;
+            for (int i = 0; i < first.size() && allSame; ++i) {
+                Literal firstLiteral = first.get(i);
+                Literal secondLiteral = second.get(i);
+                allSame = haveSameDefinitionRulesRecursively(firstLiteral, secondLiteral);
+            }
+            return allSame;
+        } else {
+            return first.stream().allMatch(fisrtLiteral ->
+                    second.stream().anyMatch(secondLiteral -> haveSameDefinitionRulesRecursively(fisrtLiteral, secondLiteral))
+            ) && second.stream().allMatch(secondLiteral ->
+                    first.stream().anyMatch(fisrtLiteral -> haveSameDefinitionRulesRecursively(fisrtLiteral, secondLiteral))
+            );
         }
-
-        return allSame;
     }
 
     private boolean haveSameStructure(Literal firstLiteral, Literal secondLiteral) {
