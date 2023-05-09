@@ -5,6 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CustomBuiltInLiteral extends BuiltInLiteral {
     /**
@@ -41,4 +42,10 @@ public class CustomBuiltInLiteral extends BuiltInLiteral {
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public String toString() {
+        String termsAsString = terms.stream().map(Term::getName).collect(Collectors.joining(", "));
+        return this.operationName + "(" + termsAsString + ")";
+    }
+
 }
