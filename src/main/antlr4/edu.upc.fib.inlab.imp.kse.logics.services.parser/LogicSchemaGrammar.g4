@@ -18,7 +18,7 @@ BOOLEAN:        'TRUE' | 'FALSE';
 OPERATOR:       '='|'<>'|'<'|'>'|'<='|'>=';
 STRING:         SINGLE_QUOTE | DOUBLE_QUOTE;
 NUMBER:         DECIMAL | FLOAT | REAL;
-ALPHANUMERIC_WITH_PRIMA: ALPHANUMERIC [']? {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
+ALPHANUMERIC_WITH_PRIMA: ALPHANUMERIC [']* {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(LogicSchemaGrammarParser.BUILTIN_PREDICATE);};
 CONSTRAINTID:   '@' ALPHANUMERIC;
 NEWLINE:        '\r'? '\n';
 WS:             [ \t]+ -> skip ; // toss out whitespace

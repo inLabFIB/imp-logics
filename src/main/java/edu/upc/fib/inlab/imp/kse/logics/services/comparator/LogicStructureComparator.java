@@ -187,17 +187,8 @@ public class LogicStructureComparator {
 
 
     private boolean haveSameDefinitionRulesRecursively(List<DerivationRule> derivationRules1, List<DerivationRule> derivationRules2) {
-        for (DerivationRule rule1 : derivationRules1) {
-            if (isNotContainedInRecursively(rule1, derivationRules2)) return false;
-        }
-        for (DerivationRule rule2 : derivationRules2) {
-            if (isNotContainedInRecursively(rule2, derivationRules1)) return false;
-        }
-        return true;
-    }
-
-    private boolean isNotContainedInRecursively(DerivationRule rule, List<DerivationRule> derivationRules) {
-        return !isContainedInRecursively(rule, derivationRules);
+        return derivationRules1.stream().allMatch(rule1 -> isContainedInRecursively(rule1, derivationRules2)) &&
+                derivationRules2.stream().allMatch(rule2 -> isContainedInRecursively(rule2, derivationRules1));
     }
 
     private boolean isContainedInRecursively(DerivationRule rule, List<DerivationRule> derivationRules) {

@@ -13,6 +13,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSche
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>This class is in charge of transforming one logic schema into an equivalent logic schema where every derived
@@ -45,6 +47,8 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
     }
 
     private static final String SUFFIX_SEPARATOR = "_";
+    private static final String PRIMA_CHAR = "'";
+    private static final Pattern SUFFIX_PRIME_PATTERN = Pattern.compile("(?<primaSuffix>'*)$");
 
     /**
      * Creates an SingleDerivationRuleTransformer that will use the SuffixMultipleConstraintIDGenerator as a strategy
@@ -207,7 +211,10 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         return listOfDerivationRuleBodies.stream()
                 .map(listOfLiteralSpecs -> {
                     //TODO - Generate a new name for the predicate
-                    String newPredicateName = rule.getHead().getPredicateName() + SUFFIX_SEPARATOR + i.getAndIncrement();
+                    String newPredicateName = concatSuffix(
+                            rule.getHead().getPredicateName(),
+                            Integer.toString(i.getAndIncrement())
+                    );
                     return new DerivationRuleSpecBuilder()
                             .addHead(newPredicateName, LogicSchemaToSpecHelper.buildTermsSpecs(rule.getHead().getTerms()))
                             .addAllLiteralSpecs(listOfLiteralSpecs)
@@ -215,6 +222,12 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
                 }).toList();
     }
 
+    private static String concatSuffix(String predicateName, String suffix) {
+        String predicateNameWithoutSuffix = predicateName.replaceAll(PRIMA_CHAR, "");
+        Matcher matcher = SUFFIX_PRIME_PATTERN.matcher(predicateName);
+        String primaSuffix = matcher.find() ? matcher.group("primaSuffix") : "";
+        return predicateNameWithoutSuffix + SUFFIX_SEPARATOR + suffix + primaSuffix;
+    }
 
     private List<BodySpecFragment> buildBodySpecFragmentsByLiteralsList(ImmutableLiteralsList literalsList,
                                                                         PredicateNameToNewPredicateNamesMap predicateTransformMap) {

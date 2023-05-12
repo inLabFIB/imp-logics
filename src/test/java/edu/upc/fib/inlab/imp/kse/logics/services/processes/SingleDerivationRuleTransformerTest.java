@@ -266,4 +266,31 @@ class SingleDerivationRuleTransformerTest {
                     .constraintIDComesFrom("1", "1");
         }
     }
+
+    @Nested
+    class PredicateNameSuffixes {
+
+        @Test
+        void should_movePrimesToEndPredicateName_whenAddSuffix() {
+            String schemaString = """
+                    @1 :- T(x, y), not(P''(x))
+                    P''(x) :- R(x, y)
+                    P''(x) :- S(x, y)
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            String expectedSchemaString = """
+                    @1 :- T(x, y), not(P_1''(x)), not(P_2''(x))
+                    P_1''(x) :- R(x, y)
+                    P_2''(x) :- S(x, y)
+                    """;
+            LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
+
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
+    }
 }
