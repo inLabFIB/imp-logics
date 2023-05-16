@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -278,9 +279,57 @@ class SchemaUnfolderTest {
 
                 LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
-                                @1 :- R(x, y, z), not(T(x,z))
+                                    @1 :- R(x, y, z), not(T(x,z))
+                                    S(x,z) :- T(x,z)
+                                """);
+
+                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+            }
+
+            @Disabled("Unexpected behaviour. Cartesian product is used instead of old normalization. This might" +
+                      "generate a lot of constraints given predicates with multiple complex derivation rules.")
+            @Test
+            public void should_unfoldNegatedLiterals_withMoreThanOneDefinition_whenUsingNegationExtendedParameter() {
+                LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    @1 :- R(x, y, z), not(S(x,z))
+                                    S(x,z) :- T1(x,z), T2(x,z)
+                                    S(x,z) :- Q1(x,z), Q2(x,z)
+                                """);
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder(true)
+                        .unfold(logicSchema);
+
+                LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                                """
+                                    @1 :- R(x, y, z), not(S1(x,z)), not(S2(x,z))
+                                    S(x,z) :- T1(x,z), T2(x,z)
+                                    S(x,z) :- Q1(x,z), Q2(x,z)
+                                    S1(x,z) :- T1(x,z), T2(x,z)
+                                    S2(x,z) :- Q1(x,z), Q2(x,z)
+                              """);
+
+                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+            }
+
+            @Test
+            public void should_unfoldNegatedLiterals_withMoreThanOneDefinitionWithOnlyOneLiteral_whenUsingNegationExtendedParameter() {
+                LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                    @1 :- R(x, y, z), not(S(x,z))
+                                    S(x,z) :- T(x,z)
+                                    S(x,z) :- Q(x,z)
+                                """);
+
+                LogicSchema unfoldedSchema = new SchemaUnfolder(true)
+                        .unfold(logicSchema);
+
+                LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                @1 :- R(x, y, z), not(T(x,z)), not(Q(x,z))
                                 S(x,z) :- T(x,z)
-                                    """
+                                S(x,z) :- Q(x,z)
+                                """
                 );
 
                 LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
