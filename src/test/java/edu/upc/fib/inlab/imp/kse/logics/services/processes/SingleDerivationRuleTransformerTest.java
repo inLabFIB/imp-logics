@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -112,6 +113,34 @@ class SingleDerivationRuleTransformerTest {
 
     @Nested
     class ByExample {
+
+        @Disabled("Needs to be fixed")
+        @Test
+        void should_notRemoveLogicConstraint_whenOnlyContainsATrueBooleanBuiltInLiteral() {
+            String schemaString = """
+                    @1 :- TRUE()
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+        }
+
+        @Disabled("Needs to be fixed")
+        @Test
+        void should_notRemoveLogicConstraint_whenOnlyContainsAFalseBooleanBuiltInLiteral() {
+            String schemaString = """
+                    @1 :- FALSE()
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+        }
 
         @Test
         void should_notTransformLogicSchema_whenNotContainsMultipleDerivationsRulesByPredicate() {
