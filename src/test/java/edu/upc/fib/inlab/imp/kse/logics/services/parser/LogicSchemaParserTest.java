@@ -17,8 +17,20 @@ import java.util.stream.Stream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class LogicSchemaParserTest {
+
+
+    @Test
+    public void should_fail_whenSchemaContainsErrorSyntax() {
+        String schemaString = """
+                            "@1 :- q(x),
+                            q(x) :- p(x, y), r(y)
+                """;
+
+        assertThatThrownBy(() -> new LogicSchemaWithIDsParser().parse(schemaString));
+    }
 
     @Test
     public void should_containPredicate_whenPredicateAppearsInConstraint() {

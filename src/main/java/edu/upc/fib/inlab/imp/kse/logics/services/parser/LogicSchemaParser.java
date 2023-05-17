@@ -7,9 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicSchemaSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 
 import java.util.Set;
 
@@ -40,10 +38,18 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     public LogicSchemaSpec<T> parseToSpec(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, builtInPredicateNameChecker);
+        lexer.addErrorListener(new LexerErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
     }
 
+    private static class LexerErrorListener extends BaseErrorListener {
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+            throw new RuntimeException("line " + line + ":" + charPositionInLine + " " + msg);
+        }
+
+    }
 }
