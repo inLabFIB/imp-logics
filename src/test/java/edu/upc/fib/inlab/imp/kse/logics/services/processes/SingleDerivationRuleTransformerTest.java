@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
@@ -75,6 +76,21 @@ class SingleDerivationRuleTransformerTest {
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchema);
 
             assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
+        @Test
+        void should_notMaintain_DerivedPredicatesWihtMultipleRules() {
+            String schemaString = """
+                    P(x) :- R(x, y)
+                    P(x) :- S(x, y)
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            assertThatThrownBy(() -> logicSchemaTransformed.getPredicateByName("P"))
+                    .isInstanceOf(PredicateNotExists.class);
         }
 
         @Test

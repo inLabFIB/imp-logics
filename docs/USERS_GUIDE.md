@@ -137,3 +137,55 @@ When using the parser, and the builders, IMP logics will, by default, interpret 
 - Variables are the rest of strings
 
 However, such strategy can be overridden by providing a new implementation of the class `StringToTermSpecFactory`.
+
+## Applying processes to the Schema
+
+There are several processes that, given some logic schema, returns a new logic schema. Such processes
+ranges from unfolding the schema, to a process to remove equalities and replace them for the corresponding
+substitution. The idea of the processes is to retrieve an equivalent logic schema but with some transformation
+that makes it easier to work with.
+
+We distinguish between two kinds of services. Those which retrieves a query-equivalent logic schema, and those
+which retrieves a consistent-equivalent logic schema.
+
+We refer as `query-equivalent logic schema` to some new logic schema `S` s.t., for any query `q` posed
+over the original schema, `q` brings the very same result in `S`. This means that a query-equivalent logic
+schema has the very same predicates (base and derived) than the original schema, since a query might be posed
+over such predicates. On the following we list such processes:
+
+- BodySorter
+- EqualityReplacer
+- SchemaUnfolder
+- TrivialLiteralCleaner
+
+The complete specification of each process is given in the corresponding Javadocs.
+
+We refer as `consistent-equivalent logic schema` to some new logic schema `S` s.t., for any set of base
+facts posed over the original schema, such set of facts is consistent in `S` iff it was consistent in the original
+schema. This means that a consistent-equivalent logic schema might have less predicates than the original schema
+(i.e., those predicates and derivation rules not used in any logic constraint might disappear). On the following we
+list such processes, together the reason they are not query-equivalent:
+
+- PredicateCleaner: it removes those predicates not used (neither directly, nor transitively) in the logic constraints
+- SingleDerivationRuleTransformer: it replaces the derived predicates with multiple derivation rules for several
+  derived predicates with single derivation rules.
+
+The complete specification of each process is given in the corresponding Javadocs.
+
+### Using pipelines
+
+We can apply several logic processes to a logic schema through a LogicProcessPipeline. E.g.
+
+```java
+List<LogicProcess> logicProcesses=List.of(new BodySorter(),new PredicateCleaner());
+        LogicProcessPipeline pipeline=new LogicProcessPipeline(logicProcesses);
+        LogicSchema logicSchemaOutput=pipeline.execute(schema);
+```
+
+### Using SchemaTransformation
+
+Similarly to the logic schema process, there is the concept of logic schema transformation process.
+A `LogicSchemaTransformationProcess` is a logic process that, additionally, permits storing some traceability
+between the transformation in a new object we call `SchemaTransformation`.
+
+More details can be found in the Javadocs.
