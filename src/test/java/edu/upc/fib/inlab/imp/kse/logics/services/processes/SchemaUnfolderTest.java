@@ -1,9 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +22,7 @@ class SchemaUnfolderTest {
 
         @Test
         public void should_throwException_whenSchemaIsNull() {
-            SchemaUnfolder unfolder = new SchemaUnfolder();
-            assertThatThrownBy(() -> unfolder.unfold(null))
+            assertThatThrownBy(() -> new SchemaUnfolder().unfold(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -39,6 +36,26 @@ class SchemaUnfolderTest {
             LogicSchema unfoldedEmptySchema = new SchemaUnfolder().unfold(emptySchema);
 
             assertThat(unfoldedEmptySchema).isEmpty();
+        }
+
+        @Test
+        public void should_maintainDerivationRules_whenDerivationRuleNotUsedInConstraint() {
+            LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                A(a, b) :- B(a, b)
+                            """
+            );
+
+            LogicSchema unfoldedSchema = new SchemaUnfolder().unfold(schema);
+
+            LogicSchema expectedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                    """
+                                @1 :- R(x, y), S(y)
+                                A(a, b) :- B(a, b)
+                            """
+            );
+            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
         }
 
         @Test
@@ -260,7 +277,7 @@ class SchemaUnfolderTest {
                                     """
                 );
 
-                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
             }
         }
 
@@ -283,11 +300,9 @@ class SchemaUnfolderTest {
                                     S(x,z) :- T(x,z)
                                 """);
 
-                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
             }
 
-            @Disabled("Unexpected behaviour. Cartesian product is used instead of old normalization. This might" +
-                      "generate a lot of constraints given predicates with multiple complex derivation rules.")
             @Test
             public void should_unfoldNegatedLiterals_withMoreThanOneDefinition_whenUsingNegationExtendedParameter() {
                 LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
@@ -301,15 +316,17 @@ class SchemaUnfolderTest {
                         .unfold(logicSchema);
 
                 LogicSchema expectedUnfoldedSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
+                        """
+                                      @1_1 :- R(x, y, z), not(T1(x,z)), not(Q1(x,z))
+                                      @1_2 :- R(x, y, z), not(T1(x,z)), not(Q2(x,z))
+                                      @1_3 :- R(x, y, z), not(T2(x,z)), not(Q1(x,z))
+                                      @1_4 :- R(x, y, z), not(T2(x,z)), not(Q2(x,z))
+                                      S(x,z) :- T1(x,z), T2(x,z)
+                                      S(x,z) :- Q1(x,z), Q2(x,z)
                                 """
-                                    @1 :- R(x, y, z), not(S1(x,z)), not(S2(x,z))
-                                    S(x,z) :- T1(x,z), T2(x,z)
-                                    S(x,z) :- Q1(x,z), Q2(x,z)
-                                    S1(x,z) :- T1(x,z), T2(x,z)
-                                    S2(x,z) :- Q1(x,z), Q2(x,z)
-                              """);
+                );
 
-                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
             }
 
             @Test
@@ -332,7 +349,7 @@ class SchemaUnfolderTest {
                                 """
                 );
 
-                LogicSchemaAssert.assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
             }
         }
     }
