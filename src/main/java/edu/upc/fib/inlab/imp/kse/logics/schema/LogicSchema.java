@@ -41,7 +41,7 @@ public class LogicSchema {
     }
 
     public boolean isEmpty() {
-        return predicatesByName.isEmpty();
+        return predicatesByName.isEmpty() && constraintsByID.isEmpty();
     }
 
     private void checkDerivedPredicatesUsesPredicatesFromSchema() {
@@ -146,7 +146,10 @@ public class LogicSchema {
 
     private List<Level> createLevels(Map<Predicate, Integer> predicateToLevelMap) {
         List<Level> levels = new LinkedList<>();
-        for (int index = 0; predicateToLevelMap.containsValue(index); ++index) {
+        Optional<Integer> max = predicateToLevelMap.values().stream().max(Integer::compareTo);
+        if (max.isEmpty()) return levels;
+
+        for (int index = 0; index <= max.get(); ++index) {
             int finalIndex = index;
             Set<Predicate> predicates = predicateToLevelMap.entrySet().stream()
                     .filter(entry -> entry.getValue().equals(finalIndex))

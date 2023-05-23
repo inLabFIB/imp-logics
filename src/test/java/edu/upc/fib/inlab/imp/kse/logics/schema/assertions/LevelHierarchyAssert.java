@@ -25,4 +25,11 @@ public class LevelHierarchyAssert extends AbstractAssert<LevelHierarchyAssert, L
         LevelAssert.assertThat(actualLevel).containsExactlyPredicateNames(predicateNames);
         return this;
     }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public LevelHierarchyAssert hasNoPredicateInLevel(int level) {
+        Level actualLevel = actual.getLevel(level);
+        LevelAssert.assertThat(actualLevel).isEmpty();
+        return this;
+    }
 }

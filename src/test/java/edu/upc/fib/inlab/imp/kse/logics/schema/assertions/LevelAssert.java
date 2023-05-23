@@ -28,4 +28,9 @@ public class LevelAssert extends AbstractAssert<LevelAssert, Level> {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
+    public LevelAssert isEmpty() {
+        Assertions.assertThat(actual.getAllPredicates()).isEmpty();
+        return this;
+    }
 }

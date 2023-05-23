@@ -51,17 +51,17 @@ public class LevelHierarchy implements Iterable<Level> {
         for (int index = 0; index < levels.size(); ++index) {
             Set<Predicate> predicatesInLowerLevels = computePredicatesInLowerLevels(index, levels);
             Set<Predicate> predicatesInCurrentLevel = levels.get(index).getAllPredicates();
-            checkLevelCorrectess(predicatesInCurrentLevel, predicatesInLowerLevels);
+            checkLevelCorrectness(predicatesInCurrentLevel, predicatesInLowerLevels);
         }
     }
 
-    private void checkLevelCorrectess(Set<Predicate> predicatesInCurrentLevel, Set<Predicate> predicatesInLowerLevels) {
+    private void checkLevelCorrectness(Set<Predicate> predicatesInCurrentLevel, Set<Predicate> predicatesInLowerLevels) {
         for (Predicate predicate : predicatesInCurrentLevel) {
-            checkPredicatdIsDefinedInTermsOfOtherPredicates(predicate, predicatesInLowerLevels);
+            checkPredicateIsDefinedInTermsOfOtherPredicates(predicate, predicatesInLowerLevels);
         }
     }
 
-    private void checkPredicatdIsDefinedInTermsOfOtherPredicates(Predicate predicate, Set<Predicate> predicatesInLowerLevels) {
+    private void checkPredicateIsDefinedInTermsOfOtherPredicates(Predicate predicate, Set<Predicate> predicatesInLowerLevels) {
         Set<Predicate> predicatesUsedInDefinition = computePredicatesUsedInDefinition(predicate);
         if (!predicatesInLowerLevels.containsAll(predicatesUsedInDefinition)) {
             throw new LevelHierarchyException("Predicate " + predicate.getName() + "uses predicates from higher levels of the hierarchy");

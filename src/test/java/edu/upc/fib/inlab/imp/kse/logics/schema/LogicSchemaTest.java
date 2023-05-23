@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LevelHierarchy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -142,6 +143,34 @@ public class LogicSchemaTest {
 
     @Nested
     class ComputeLevelHierarchy {
+
+        @Test
+        public void should_includeDerivedLiterals_ThatDoesNotUseBasePredicates_inFirstHierarchyLevel() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- TRUE()
+                    """);
+
+            LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(levelHierarchy).hasNoPredicateInLevel(0);
+            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(1, "P");
+        }
+
+        @Test
+        public void should_makeDerivedLiterals_DefinedOverDerivedLiterals_ThatDoesNotUseBasePredicates_inNextHierarchyLevel() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- TRUE()
+                    Q(x) :- P(x)
+                    """);
+
+            LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
+
+            LevelHierarchyAssert.assertThat(levelHierarchy).hasNoPredicateInLevel(0);
+            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(1, "P");
+            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(2, "Q");
+        }
+
+
         @Test
         public void should_returnNoLevel_whenThereIsNoPredicate() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
@@ -207,6 +236,39 @@ public class LogicSchemaTest {
                     .containsExactlyPredicateNamesInLevel(0, "S1")
                     .containsExactlyPredicateNamesInLevel(1, "R2")
                     .containsExactlyPredicateNamesInLevel(2, "P");
+        }
+    }
+
+    @Nested
+    class IsEmpty {
+
+        @Test
+        public void should_beEmpty_whenLogicSchemaIsEmpty() {
+            LogicSchema logicSchema = new LogicSchema(Collections.emptySet(), Collections.emptySet());
+            assertThat(logicSchema.isEmpty()).isTrue();
+        }
+
+        @Test
+        public void should_beNotEmpty_whenLogicSchemaOnlyContainsBasePredicates() {
+            Set<Predicate> predicates = Set.of(new Predicate("P", 2));
+            LogicSchema logicSchema = new LogicSchema(predicates, Collections.emptySet());
+            assertThat(logicSchema.isEmpty()).isFalse();
+        }
+
+        @Test
+        public void should_beNotEmpty_whenLogicSchemaContainsLogicConstraintWithPredicates() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    @1 :- a < b
+                    """);
+            assertThat(logicSchema.isEmpty()).isFalse();
+        }
+
+        @Test
+        public void should_beNotEmpty_whenLogicSchemaContainsDerivationRule() {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
+                    P(x) :- a < b
+                    """);
+            assertThat(logicSchema.isEmpty()).isFalse();
         }
     }
 

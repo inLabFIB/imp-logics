@@ -120,6 +120,7 @@ class LevelHierarchyTest {
 
     @Nested
     class ReturnLevelTests {
+
         @Test
         public void should_throwException_whenPredicateIsNull() {
             LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));

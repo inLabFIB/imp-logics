@@ -15,13 +15,14 @@ public class Level {
      * Invariants:
      * - predicate set cannot be null
      * - predicate set cannot contain nulls
-     * - predicate set cannot be empty
      * - predicate must be unmodifiable
+     *
+     * A level can be empty. This is necessary for schemas which do not contain base predicates but contains
+     * derived predicates (e.g. "P(x) :- TRUE()")
      */
 
     public Level(Set<Predicate> predicates) {
         if (Objects.isNull(predicates)) throw new IllegalArgumentException("Predicates cannot be null");
-        if (predicates.isEmpty()) throw new IllegalArgumentException("Predicates cannot be empty");
         if (predicates.stream().anyMatch(Objects::isNull))
             throw new IllegalArgumentException("Predicates cannot contain null");
 

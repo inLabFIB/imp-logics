@@ -122,19 +122,23 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
 
     private List<DerivationRuleSpec> buildNewDerivationRules(LevelHierarchy levelHierarchy, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
         List<DerivationRuleSpec> allRules = new LinkedList<>();
-        for (Level level : levelHierarchy.getDerivedLevels()) {
-            List<DerivationRuleSpec> newRules = buildDerivationRuleSpecsByLevel(level, predicateTransformMap);
-            allRules.addAll(newRules);
+        if (levelHierarchy.getNumberOfLevels() > 0) {
+            for (Level level : levelHierarchy.getDerivedLevels()) {
+                List<DerivationRuleSpec> newRules = buildDerivationRuleSpecsByLevel(level, predicateTransformMap);
+                allRules.addAll(newRules);
+            }
         }
         return allRules;
     }
 
     private List<PredicateSpec> buildNewPredicates(LevelHierarchy levelHierarchy, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
         List<PredicateSpec> allPredicates = new LinkedList<>();
-        Level baseLevel = levelHierarchy.getBasePredicatesLevel();
-        for (Predicate basePredicate : baseLevel.getAllPredicates()) {
-            PredicateSpec newPredicate = buildBasePredicateSpec(basePredicate, predicateTransformMap);
-            allPredicates.add(newPredicate);
+        if (levelHierarchy.getNumberOfLevels() > 0) {
+            Level baseLevel = levelHierarchy.getBasePredicatesLevel();
+            for (Predicate basePredicate : baseLevel.getAllPredicates()) {
+                PredicateSpec newPredicate = buildBasePredicateSpec(basePredicate, predicateTransformMap);
+                allPredicates.add(newPredicate);
+            }
         }
         return allPredicates;
     }

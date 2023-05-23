@@ -3,7 +3,6 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +56,27 @@ class SingleDerivationRuleTransformerTest {
 
     @Nested
     class ByProperties {
+
+        @Test
+        void should_maintainDerivationRules_whenNotUsedInLogicConstraints() {
+            String schemaString = """
+                    @1 :- T(x, y), P(x)
+                    A(x) :- B(x, y)
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            String expectedSchema = """
+                    @1 :- T(x, y), P(x)
+                    A(x) :- B(x, y)
+                    """;
+            LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchema);
+
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+        }
+
         @Test
         void should_transformLogicSchema_FromOneConstraintWithNDerivationRules_ToNConstraints_withPositiveLiteral() {
             String schemaString = """
@@ -114,7 +134,6 @@ class SingleDerivationRuleTransformerTest {
     @Nested
     class ByExample {
 
-        @Disabled("Needs to be fixed")
         @Test
         void should_notRemoveLogicConstraint_whenOnlyContainsATrueBooleanBuiltInLiteral() {
             String schemaString = """
@@ -128,7 +147,20 @@ class SingleDerivationRuleTransformerTest {
             assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
         }
 
-        @Disabled("Needs to be fixed")
+        @Test
+        void should_notRemoveDerivationRule_whenOnlyContainsATrueBooleanBuiltInLiteral() {
+            String schemaString = """
+                    P(x) :- TRUE()
+                    """;
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
+            LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
+
+            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+        }
+
+
         @Test
         void should_notRemoveLogicConstraint_whenOnlyContainsAFalseBooleanBuiltInLiteral() {
             String schemaString = """
