@@ -29,20 +29,8 @@ public class ImmutableLiteralsList implements List<Literal> {
         this(Arrays.stream(literal).toList());
     }
 
-    public ImmutableLiteralsList getSorted() {
-        List<Literal> positiveOrdinaryLiterals = stream()
-                .filter(literal -> literal instanceof OrdinaryLiteral ol && ol.isPositive())
-                .toList();
-        List<Literal> negatedOrdinaryLiterals = stream()
-                .filter(literal -> literal instanceof OrdinaryLiteral ol && ol.isNegative())
-                .toList();
-        List<Literal> builtinLiterals = stream().filter(literal -> literal instanceof BuiltInLiteral).toList();
-
-        List<Literal> sortedBody = new ArrayList<>();
-        sortedBody.addAll(positiveOrdinaryLiterals);
-        sortedBody.addAll(negatedOrdinaryLiterals);
-        sortedBody.addAll(builtinLiterals);
-
+    public ImmutableLiteralsList sortLiterals(Comparator<Literal> literalComparator) {
+        List<Literal> sortedBody = stream().sorted(literalComparator).toList();
         return new ImmutableLiteralsList(sortedBody);
     }
 

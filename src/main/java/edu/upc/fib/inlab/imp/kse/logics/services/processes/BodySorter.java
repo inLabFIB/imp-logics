@@ -1,13 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
-import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +18,26 @@ import java.util.Set;
  * can be obtained by first evaluating the positive literals.
  */
 public class BodySorter extends LogicSchemaTransformationProcess {
+
+    private final Comparator<Literal> literalComparator;
+
+    public BodySorter(Comparator<Literal> literalComparator) {
+        this.literalComparator = literalComparator;
+    }
+
+    public BodySorter() {
+        this((l1, l2) -> {
+            if (l1 instanceof OrdinaryLiteral ol1 && l2 instanceof OrdinaryLiteral ol2) {
+                if (ol1.isPositive() && ol2.isNegative()) return -1;
+                else if (ol1.isNegative() && ol2.isPositive()) return 1;
+            } else if (l1 instanceof OrdinaryLiteral && l2 instanceof BuiltInLiteral) {
+                return -1;
+            } else if (l1 instanceof BuiltInLiteral && l2 instanceof OrdinaryLiteral) {
+                return 1;
+            }
+            return 0;
+        });
+    }
 
     /**
      * @param logicSchema not-null
@@ -55,11 +73,11 @@ public class BodySorter extends LogicSchemaTransformationProcess {
         return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
     }
 
-    private static List<LogicConstraintWithIDSpec> sortBodyInLogicConstraints(Set<LogicConstraint> allLogicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
+    private List<LogicConstraintWithIDSpec> sortBodyInLogicConstraints(Set<LogicConstraint> allLogicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {
         return allLogicConstraints.stream()
                 .map(
                         lc -> {
-                            ImmutableLiteralsList sortedBody = lc.getBody().getSorted();
+                            ImmutableLiteralsList sortedBody = lc.getBody().sortLiterals(literalComparator);
                             BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(sortedBody);
                             schemaTraceabilityMap.addConstraintIDOrigin(lc.getID(), lc.getID());
                             return new LogicConstraintWithIDSpec(lc.getID().id(), bodySpec);
@@ -68,11 +86,11 @@ public class BodySorter extends LogicSchemaTransformationProcess {
                 .toList();
     }
 
-    private static List<DerivationRuleSpec> sortBodyInDerivationRules(Set<DerivationRule> allDerivationRules) {
+    private List<DerivationRuleSpec> sortBodyInDerivationRules(Set<DerivationRule> allDerivationRules) {
         return allDerivationRules.stream()
                 .map(
                         dr -> {
-                            ImmutableLiteralsList sortedBody = dr.getBody().getSorted();
+                            ImmutableLiteralsList sortedBody = dr.getBody().sortLiterals(literalComparator);
                             BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(sortedBody);
                             List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHead().getTerms());
                             return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
