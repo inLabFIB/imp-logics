@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.services.LiteralComparator;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
@@ -26,17 +27,7 @@ public class BodySorter extends LogicSchemaTransformationProcess {
     }
 
     public BodySorter() {
-        this((l1, l2) -> {
-            if (l1 instanceof OrdinaryLiteral ol1 && l2 instanceof OrdinaryLiteral ol2) {
-                if (ol1.isPositive() && ol2.isNegative()) return -1;
-                else if (ol1.isNegative() && ol2.isPositive()) return 1;
-            } else if (l1 instanceof OrdinaryLiteral && l2 instanceof BuiltInLiteral) {
-                return -1;
-            } else if (l1 instanceof BuiltInLiteral && l2 instanceof OrdinaryLiteral) {
-                return 1;
-            }
-            return 0;
-        });
+        this(new LiteralComparator());
     }
 
     /**

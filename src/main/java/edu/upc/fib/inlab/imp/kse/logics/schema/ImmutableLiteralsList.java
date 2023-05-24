@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariable;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
+import edu.upc.fib.inlab.imp.kse.logics.services.LiteralComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +30,22 @@ public class ImmutableLiteralsList implements List<Literal> {
         this(Arrays.stream(literal).toList());
     }
 
+    /**
+     * Sort literals in next order: positive literals, negative literals, built-in literals
+     *
+     * @return a new sorted list of literals
+     * @deprecated Use {@link #sortLiterals(Comparator)} instead
+     */
+    @Deprecated()
+    public ImmutableLiteralsList getSorted() {
+        return sortLiterals(new LiteralComparator());
+    }
+
+    /**
+     * Sort literals in next order: positive literals, negative literals, built-in literals
+     *
+     * @return a new sorted list of literals
+     */
     public ImmutableLiteralsList sortLiterals(Comparator<Literal> literalComparator) {
         List<Literal> sortedBody = stream().sorted(literalComparator).toList();
         return new ImmutableLiteralsList(sortedBody);
