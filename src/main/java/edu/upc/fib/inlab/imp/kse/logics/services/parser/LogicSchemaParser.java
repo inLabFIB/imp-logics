@@ -38,6 +38,7 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     public LogicSchemaSpec<T> parseToSpec(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         LogicSchemaGrammarLexer lexer = new LogicSchemaGrammarLexer(input, builtInPredicateNameChecker);
+        lexer.removeErrorListeners();
         lexer.addErrorListener(new LexerErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LogicSchemaGrammarParser parser = new LogicSchemaGrammarParser(tokens);
