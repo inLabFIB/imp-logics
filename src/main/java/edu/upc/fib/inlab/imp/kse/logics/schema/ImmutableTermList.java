@@ -170,4 +170,16 @@ public class ImmutableTermList implements List<Term> {
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ImmutableTermList terms)) return false;
+        return Objects.equals(termsList, terms.termsList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(termsList);
+    }
 }

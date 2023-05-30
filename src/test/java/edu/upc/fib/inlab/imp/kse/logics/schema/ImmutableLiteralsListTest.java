@@ -2,15 +2,20 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -305,4 +310,66 @@ public class ImmutableLiteralsListTest {
             }
         }
     }
+
+    @Nested
+    class EqualsTest {
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("equalsLiterals")
+        public void should_returnTrue_whenLiteralsAreEquals(String description, List<String> stringLiterals) {
+            List<Literal> ordinaryLiterals = stringLiterals.stream()
+                    .map(stringLiteral -> (Literal) LiteralMother.createOrdinaryLiteral(stringLiteral))
+                    .toList();
+            ImmutableLiteralsList immutableLiteralsList1 = new ImmutableLiteralsList(ordinaryLiterals);
+            ImmutableLiteralsList immutableLiteralsList2 = new ImmutableLiteralsList(ordinaryLiterals);
+
+            boolean equals = immutableLiteralsList1.equals(immutableLiteralsList2);
+
+            assertThat(equals).isTrue();
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("notEqualsLiterals")
+        public void should_returnFalse_whenLiteralsAreNotEquals(String description, String literalsList1, String literalsList2) {
+            ImmutableLiteralsList immutableLiteralsList1 = ImmutableLiteralsListMother.create(literalsList1);
+            ImmutableLiteralsList immutableLiteralsList2 = ImmutableLiteralsListMother.create(literalsList2);
+            boolean equals = immutableLiteralsList1.equals(immutableLiteralsList2);
+
+            assertThat(equals).as(description).isFalse();
+        }
+
+        private static Stream<Arguments> equalsLiterals() {
+            return Stream.of(
+                    Arguments.of("Literal List with one literal",
+                            List.of("P(x, y)")
+                    ),
+                    Arguments.of("Literal List with several literals",
+                            List.of("P(x, y)", "Q(x, y)")
+                    )
+            );
+        }
+
+        private static Stream<Arguments> notEqualsLiterals() {
+            return Stream.of(
+                    Arguments.of("Literal List with different size",
+                            "P(x, y), Q(x, y)",
+                            "P(x, y)"
+                    ),
+                    Arguments.of("Literal List with different literals",
+                            "P(x, y), Q(x, y)",
+                            "P(x, y), Q(x, z)"
+                    ),
+                    Arguments.of("Literal List with different order",
+                            "P(x, y), Q(x, y)",
+                            "Q(x, y), P(x, y)"
+                    ),
+                    Arguments.of("Literal List with different literals order",
+                            "P(x, y), Q(x, y)",
+                            "Q(x, y), P(x, z)"
+                    )
+            );
+        }
+
+    }
+
 }

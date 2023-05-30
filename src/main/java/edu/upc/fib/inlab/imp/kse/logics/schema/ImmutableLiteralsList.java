@@ -319,5 +319,15 @@ public class ImmutableLiteralsList implements List<Literal> {
         return visitor.visit(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ImmutableLiteralsList that)) return false;
+        return Objects.equals(literalList, that.literalList);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(literalList);
+    }
 }

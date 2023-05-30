@@ -6,10 +6,14 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -92,4 +96,51 @@ public class ImmutableTermListTest {
                 .contains(new Variable("x"), new Variable("y"));
     }
 
+    @Nested
+    class EqualsTest {
+
+        @Test
+        public void should_returnTrue_whenTermsAreEquals() {
+            ImmutableTermList immutableTermList1 = TermMother.createTerms("x", "1", "y");
+            ImmutableTermList immutableTermList2 = TermMother.createTerms("x", "1", "y");
+
+            boolean equals = immutableTermList1.equals(immutableTermList2);
+
+            assertThat(equals).isTrue();
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("notEqualsTerms")
+        public void should_returnFalse_whenTermsAreNotEquals(String description, ImmutableTermList immutableTermList1, ImmutableTermList immutableTermList2) {
+            boolean equals = immutableTermList1.equals(immutableTermList2);
+
+            assertThat(equals).as(description).isFalse();
+        }
+
+        private static Stream<Arguments> notEqualsTerms() {
+            return Stream.of(
+                    Arguments.of("Terms in diferent order",
+                            TermMother.createTerms("x", "y"),
+                            TermMother.createTerms("y", "x")
+                    ),
+                    Arguments.of("Terms List with different size (size1 > size2)",
+                            TermMother.createTerms("x", "y"),
+                            TermMother.createTerms("x", "y", "z")
+                    ),
+                    Arguments.of("Terms List with different size (size1 < size2)",
+                            TermMother.createTerms("x", "y", "z"),
+                            TermMother.createTerms("x", "y")
+                    ),
+                    Arguments.of("With constants in list 2",
+                            TermMother.createTerms("x", "y"),
+                            TermMother.createTerms("x", "1")
+                    ),
+                    Arguments.of("With constants in list 1",
+                            TermMother.createTerms("x", "1"),
+                            TermMother.createTerms("x", "y")
+                    )
+            );
+        }
+
+    }
 }
