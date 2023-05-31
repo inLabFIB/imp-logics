@@ -11,7 +11,7 @@ import java.util.Objects;
  * A pipeline of SchemaTransformationProcessPipeline.
  * This class is useful for chaining several transformations over a logic schema.
  */
-public class SchemaTransformationProcessPipeline {
+public class SchemaTransformationProcessPipeline extends LogicSchemaTransformationProcess {
 
     private final List<SchemaTransformationProcess> transformationProcesses;
 
@@ -35,6 +35,7 @@ public class SchemaTransformationProcessPipeline {
      * @param inputLogicSchema not null
      * @return the result of applying the pipeline into the inputLogicSchema
      */
+    @Override
     public SchemaTransformation executeTransformation(LogicSchema inputLogicSchema) {
         checkLogicSchema(inputLogicSchema);
         List<SchemaTransformation> transformations = new LinkedList<>();
@@ -56,10 +57,6 @@ public class SchemaTransformationProcessPipeline {
         //to the original ones.
         SchemaTraceabilityMap schemaTraceabilityMap = SchemaTraceabilityMap.collapseMaps(reversedList);
         return new SchemaTransformation(inputLogicSchema, currentLogicSchema, schemaTraceabilityMap);
-    }
-
-    private static void checkLogicSchema(LogicSchema inputLogicSchema) {
-        if (Objects.isNull(inputLogicSchema)) throw new IllegalArgumentException("Input logic schema cannot be null");
     }
 
 }
