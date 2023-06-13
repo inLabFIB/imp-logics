@@ -5,6 +5,9 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.Optional;
 
+/**
+ * Implementation of BooleanBuiltInLiteral constants TRUE(), and FALSE()
+ */
 public class BooleanBuiltInLiteral extends BuiltInLiteral {
 
     public static final String TRUE = "TRUE";

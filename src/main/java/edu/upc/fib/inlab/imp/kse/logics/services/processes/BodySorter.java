@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
-import edu.upc.fib.inlab.imp.kse.logics.services.LiteralComparator;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralComparator;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;

@@ -23,6 +23,11 @@ import java.util.Optional;
  * </p>
  *
  * <p>
+ * If you want to search an homomorphism considering, also, derived literals, you can inject a DerivedOrdinaryLiteralHomomorphismCriteria
+ * and define its behavior.
+ * </p>
+ *
+ * <p>
  * It is worth to mention that the finder can find homomorphisms between built-in literals with their symmetric
  * comparison operations.
  * E.g. the finder can realize that "a < b" is homomorphic to "b > a".

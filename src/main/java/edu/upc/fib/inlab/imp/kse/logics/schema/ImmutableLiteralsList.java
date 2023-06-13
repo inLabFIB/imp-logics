@@ -1,9 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralComparator;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariable;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
-import edu.upc.fib.inlab.imp.kse.logics.services.LiteralComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;

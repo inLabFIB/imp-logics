@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services;
+package edu.upc.fib.inlab.imp.kse.logics.schema.utils;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.BuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;

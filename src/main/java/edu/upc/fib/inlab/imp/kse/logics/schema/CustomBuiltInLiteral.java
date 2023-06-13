@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of non-standard built-in literals.
+ * That is, built-in literals that are not the usual arithmetic comparisons.
+ */
 public class CustomBuiltInLiteral extends BuiltInLiteral {
     /**
      * Invariants:
