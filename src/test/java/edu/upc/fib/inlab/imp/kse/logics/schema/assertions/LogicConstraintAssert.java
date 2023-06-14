@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintSpec;
@@ -48,7 +49,8 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
      */
     @SuppressWarnings("unused")
     public LogicConstraintAssert isLogicallyEquivalent(LogicConstraint expected) {
-        Assertions.assertThat(new LogicEquivalenceAnalyzer().areEquivalent(actual, expected))
+        LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
+        Assertions.assertThat((boolean) logicEquivalenceAnalyzer.areEquivalent(actual, expected).orElse(false))
                 .overridingErrorMessage("Actual constraint: " + actual.toString() + "\n" +
                         "   is not equivalent to \n" +
                         "Expected constraint: " + expected.toString()

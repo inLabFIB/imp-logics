@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicStructureComparator;
 import org.assertj.core.api.AbstractListAssert;
@@ -15,7 +16,7 @@ import java.util.List;
 import static org.assertj.core.util.Lists.newArrayList;
 
 public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLiteralsListAssert, ImmutableLiteralsList, Literal, LiteralAssert> {
-    private final LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new LogicEquivalenceAnalyzer();
+    private final LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
 
     protected ImmutableLiteralsListAssert(ImmutableLiteralsList actual) {
         super(actual, ImmutableLiteralsListAssert.class);
@@ -34,7 +35,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
      * @return this assert
      */
     public ImmutableLiteralsListAssert isLogicallyEquivalentTo(ImmutableLiteralsList expected) {
-        boolean equivalence = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
+        boolean equivalence = logicEquivalenceAnalyzer.areEquivalent(actual, expected).orElse(false);
         Assertions.assertThat(equivalence)
                 .describedAs("Actual literals list: " + actual.toString() + "\n" +
                         "   is not equivalent to\n" +

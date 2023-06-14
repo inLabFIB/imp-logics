@@ -3,7 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.DerivationRuleSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.TermSpec;
@@ -48,7 +48,7 @@ public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
      */
     @SuppressWarnings("unused")
     public DerivationRuleAssert isLogicallyEquivalent(DerivationRule expected) {
-        Assertions.assertThat(new LogicEquivalenceAnalyzer().areEquivalent(actual, expected))
+        Assertions.assertThat(new HomomorphismBasedEquivalenceAnalyzer().areEquivalent(actual, expected).orElse(false))
                 .overridingErrorMessage("Actual rule: " + actual.toString() + "\n" +
                         "   is not equivalent to \n" +
                         "Expected rule: " + expected.toString()

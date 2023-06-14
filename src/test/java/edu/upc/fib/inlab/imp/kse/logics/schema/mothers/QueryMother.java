@@ -22,4 +22,17 @@ public class QueryMother {
         }
         return new Query(terms, List.of(new OrdinaryLiteral(new Atom(predicateInBody, terms))));
     }
+
+    public static Query createQuery(List<String> termsString, String queryString) {
+        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString);
+        List<Term> headTerms = TermMother.createTerms(termsString);
+        return new Query(headTerms, immutableLiteralsList);
+    }
+
+    public static Query createQuery(List<String> termsString, String queryString, String derivationRuleString) {
+        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString, derivationRuleString);
+        List<Term> headTerms = TermMother.createTerms(termsString);
+        return new Query(headTerms, immutableLiteralsList);
+    }
+
 }

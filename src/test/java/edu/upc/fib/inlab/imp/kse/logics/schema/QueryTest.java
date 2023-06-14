@@ -1,6 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.QueryMother;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -56,5 +58,33 @@ public class QueryTest {
         List<Literal> body = new LinkedList<>();
         body.add(LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x")));
         return body;
+    }
+
+    @Nested
+    class IsConjunctiveQuery {
+
+        @Test
+        public void should_ReturnTrue_When_QueryIsConjunctive() {
+            Query query = QueryMother.createQuery(List.of("x"), "P(x), Q(x)");
+            assertThat(query.isConjunctiveQuery()).isTrue();
+        }
+
+        @Test
+        public void should_ReturnFalse_When_QueryContainsNegation() {
+            Query query = QueryMother.createQuery(List.of("x"), "P(x), not(Q(x))");
+            assertThat(query.isConjunctiveQuery()).isFalse();
+        }
+
+        @Test
+        public void should_ReturnFalse_When_QueryContainsBuiltinLiteral() {
+            Query query = QueryMother.createQuery(List.of("x"), "P(x), x > 0");
+            assertThat(query.isConjunctiveQuery()).isFalse();
+        }
+
+        @Test
+        public void should_ReturnFalse_When_QueryContainsDerivedLiteral() {
+            Query query = QueryMother.createQuery(List.of("x"), "P(x), R(x)", "R(x) :- Q(x)");
+            assertThat(query.isConjunctiveQuery()).isFalse();
+        }
     }
 }

@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicStructureComparator;
 import org.assertj.core.api.AbstractAssert;
@@ -151,7 +152,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
 
     private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule aRuleOfTheList : listOfRules) {
-            if (analyzer.areEquivalent(derivationRule, aRuleOfTheList)) {
+            if (analyzer.areEquivalent(derivationRule, aRuleOfTheList).orElse(false)) {
                 return true;
             }
         }
@@ -182,7 +183,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
      */
     @SuppressWarnings("UnusedReturnValue")
     public PredicateAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
-        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules(), new LogicEquivalenceAnalyzer())) {
+        if (!isDerivationRuleContained(expectedRule, actual.getDerivationRules(), new HomomorphismBasedEquivalenceAnalyzer())) {
             Assertions.fail("Missing derivation rule " + expectedRule);
         }
         return this;

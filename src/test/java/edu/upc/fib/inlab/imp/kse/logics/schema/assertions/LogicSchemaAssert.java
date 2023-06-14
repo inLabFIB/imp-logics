@@ -170,12 +170,12 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
     private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
-        return logicConstraintIsContainedInList(constraint, constraintSet, new LogicEquivalenceAnalyzer());
+        return logicConstraintIsContainedInList(constraint, constraintSet, new HomomorphismBasedEquivalenceAnalyzer());
     }
 
     private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
         for (LogicConstraint aConstraintFromSet : constraintSet) {
-            if (analyzer.areEquivalent(constraint, aConstraintFromSet)) {
+            if (analyzer.areEquivalent(constraint, aConstraintFromSet).orElse(false)) {
                 return true;
             }
         }
@@ -227,7 +227,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         }
 
         public LogicEquivalenceAnalyzer getAnalyzer() {
-            return new LogicEquivalenceAnalyzer(new HomomorphismFinder(this.criteria));
+            return new HomomorphismBasedEquivalenceAnalyzer(new HomomorphismFinder(this.criteria));
         }
 
     }

@@ -39,4 +39,8 @@ public class Query {
     public ImmutableLiteralsList getBody() {
         return body;
     }
+
+    public boolean isConjunctiveQuery() {
+        return body.stream().allMatch(l -> l instanceof OrdinaryLiteral ol && ol.isPositive() && ol.isBase());
+    }
 }
