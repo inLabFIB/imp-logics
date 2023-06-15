@@ -166,11 +166,11 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         boolean predicateGeneratesSingleRule = predicateGeneratesSingleRule(predicate, predicateTransformMap);
 
         if (predicateGeneratesSingleRule) {
-            DerivationRule dr = predicate.getDerivationRules().get(0);
+            DerivationRule dr = predicate.getFirstDerivationRule();
             List<LogicSchemaToSpecHelper.BodySpecFragment> lists = buildBodySpecFragmentsByLiteralsList(dr.getBody(), predicateTransformMap);
             List<LiteralSpec> literalSpecs = lists.get(0);
             DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
-                    .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHead().getTerms()))
+                    .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHeadTerms()))
                     .addAllLiteralSpecs(literalSpecs)
                     .build();
             result.add(derivationRuleSpec);
@@ -192,7 +192,7 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
     private static boolean predicateGeneratesSingleRule(Predicate predicate, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
         boolean isSimple = false;
         if (predicate.getDerivationRules().size() == 1) {
-            DerivationRule dr = predicate.getDerivationRules().get(0);
+            DerivationRule dr = predicate.getFirstDerivationRule();
             isSimple = dr.getBody().stream()
                     .filter(l -> l instanceof OrdinaryLiteral)
                     .map(l -> (OrdinaryLiteral) l)
@@ -215,7 +215,7 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
                             Integer.toString(i.getAndIncrement())
                     );
                     return new DerivationRuleSpecBuilder()
-                            .addHead(newPredicateName, LogicSchemaToSpecHelper.buildTermsSpecs(rule.getHead().getTerms()))
+                            .addHead(newPredicateName, LogicSchemaToSpecHelper.buildTermsSpecs(rule.getHeadTerms()))
                             .addAllLiteralSpecs(listOfLiteralSpecs)
                             .build();
                 }).toList();

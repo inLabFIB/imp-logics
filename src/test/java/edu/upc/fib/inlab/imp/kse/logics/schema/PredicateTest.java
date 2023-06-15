@@ -82,21 +82,21 @@ public class PredicateTest {
     public void should_ReturnDerivationRule_WithThisPredicateInHead() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule1));
-        assertThat(predicate.getDerivationRules().get(0).getHead().getPredicate()).isSameAs(predicate);
+        assertThat(predicate.getFirstDerivationRule().getHead().getPredicate()).isSameAs(predicate);
     }
 
     @Test
     public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
-        assertThat(predicate.getDerivationRules().get(0).getHead().getTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
+        assertThat(predicate.getFirstDerivationRule().getHeadTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
     }
 
     @Test
     public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
-        assertThat(predicate.getDerivationRules().get(0).getBody()).containsExactlyElementsOf(definitionRule.getBody());
+        assertThat(predicate.getFirstDerivationRule().getBody()).containsExactlyElementsOf(definitionRule.getBody());
     }
 
     @Test

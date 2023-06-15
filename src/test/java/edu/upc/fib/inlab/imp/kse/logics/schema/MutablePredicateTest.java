@@ -77,21 +77,21 @@ public class MutablePredicateTest {
     public void should_ReturnDerivationRule_WithThisPredicateInHead() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule1));
-        assertThat(mutablePredicate.getDerivationRules().get(0).getHead().getPredicate()).isSameAs(mutablePredicate);
+        assertThat(mutablePredicate.getFirstDerivationRule().getHead().getPredicate()).isSameAs(mutablePredicate);
     }
 
     @Test
     public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule));
-        assertThat(mutablePredicate.getDerivationRules().get(0).getHead().getTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
+        assertThat(mutablePredicate.getFirstDerivationRule().getHeadTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
     }
 
     @Test
     public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule1));
-        assertThat(mutablePredicate.getDerivationRules().get(0).getBody()).containsExactlyElementsOf(definitionRule1.getBody());
+        assertThat(mutablePredicate.getFirstDerivationRule().getBody()).containsExactlyElementsOf(definitionRule1.getBody());
     }
 
     @Test

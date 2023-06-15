@@ -36,7 +36,7 @@ public class HomomorphicRulesHomomorphismCriteria implements DerivedOrdinaryLite
 
     private boolean checkDomainDerivationRuleIsIncludedInRangeDerivationRules(HomomorphismFinder homomorphismFinder, DerivationRule domainRule, List<DerivationRule> rangeRules) {
         return rangeRules.stream().anyMatch(rangeRule -> {
-            Substitution headSubstitution = new Substitution(domainRule.getHead().getTerms(), rangeRule.getHead().getTerms());
+            Substitution headSubstitution = new Substitution(domainRule.getHeadTerms(), rangeRule.getHeadTerms());
             return homomorphismFinder.computeHomomorphismExtensionForLiteralsList(headSubstitution, domainRule.getBody(), rangeRule.getBody()).isPresent();
         });
     }

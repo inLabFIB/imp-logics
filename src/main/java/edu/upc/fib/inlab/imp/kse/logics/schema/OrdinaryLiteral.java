@@ -216,7 +216,7 @@ public class OrdinaryLiteral extends Literal {
 
     private boolean hasNoExistentialVariableInDerivationRules() {
         return this.getAtom().getPredicate().getDerivationRules().stream()
-                .flatMap(dr -> dr.getExistencialVariables().stream())
+                .flatMap(dr -> dr.getExistentialVariables().stream())
                 .findAny()
                 .isEmpty();
     }

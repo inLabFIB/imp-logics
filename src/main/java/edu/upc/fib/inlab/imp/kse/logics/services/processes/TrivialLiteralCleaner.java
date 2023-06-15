@@ -131,7 +131,7 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
 
     private static DerivationRuleSpec buildFalseRuleForPredicate(Predicate predicate) {
         return new DerivationRuleSpecBuilder()
-                .addHead(predicate.getName(), LogicSchemaToSpecHelper.createVariableSpecs(predicate.getArity()))
+                .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(predicate.getFirstDerivationRule().getHeadTerms()))
                 .addLiteralSpec(LogicSchemaToSpecHelper.buildFalseLiteralSpec())
                 .build();
     }
@@ -162,8 +162,8 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
         List<LiteralSpec> literalSpecList = cleanTrivialLiteralsInLiteralList(nonTrivialRule.getBody());
         return new DerivationRuleSpecBuilder()
                 .addHead(
-                        nonTrivialRule.getHead().getPredicate().getName(),
-                        LogicSchemaToSpecHelper.buildTermsSpecs(nonTrivialRule.getHead().getTerms())
+                        nonTrivialRule.getHead().getPredicateName(),
+                        LogicSchemaToSpecHelper.buildTermsSpecs(nonTrivialRule.getHeadTerms())
                 )
                 .addAllLiteralSpecs(literalSpecList)
                 .build();

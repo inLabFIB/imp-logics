@@ -34,23 +34,18 @@ public class DerivationRule extends NormalClause {
         return head;
     }
 
-    @Override
-    public String toString() {
-        return head.toString() + " :- " + this.getBody();
-    }
-
-    public <T> T accept(LogicSchemaVisitor<T> visitor) {
-        return visitor.visit(this);
+    public ImmutableTermList getHeadTerms() {
+        return head.getTerms();
     }
 
     public Set<Variable> getUniversalVariables() {
         return head.getTerms().getUsedVariables();
     }
 
-    public Set<Variable> getExistencialVariables() {
-        Set<Variable> existencialVariables = new LinkedHashSet<>(getBody().getUsedVariables());
-        existencialVariables.removeAll(getUniversalVariables());
-        return existencialVariables;
+    public Set<Variable> getExistentialVariables() {
+        Set<Variable> existentialVariables = new LinkedHashSet<>(getBody().getUsedVariables());
+        existentialVariables.removeAll(getUniversalVariables());
+        return existentialVariables;
     }
 
     @Override
@@ -67,5 +62,14 @@ public class DerivationRule extends NormalClause {
         variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInHead);
 
         return variablesInPositiveOrdinaryLiterals.containsAll(variablesInNegativeLiteralsOrBuiltInLiteralsOrHead);
+    }
+
+    @Override
+    public String toString() {
+        return head.toString() + " :- " + this.getBody();
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

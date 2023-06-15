@@ -118,7 +118,8 @@ public class EqualityReplacerTest {
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(expectedLogicConstraintString);
-            assertThat(schemaTransformation.transformed()).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(schemaTransformation.transformed()).hasSameStructureAs(expectedLogicSchema);
+
         }
 
         @ParameterizedTest
@@ -129,7 +130,7 @@ public class EqualityReplacerTest {
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(expectedLogicConstraintString);
-            assertThat(schemaTransformation.transformed()).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(schemaTransformation.transformed()).hasSameStructureAs(expectedLogicSchema);
         }
 
     }

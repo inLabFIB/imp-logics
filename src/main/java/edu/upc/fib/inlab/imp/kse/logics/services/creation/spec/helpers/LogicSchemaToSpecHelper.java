@@ -16,7 +16,7 @@ public class LogicSchemaToSpecHelper {
 
     public static DerivationRuleSpec buildDerivationRuleSpec(DerivationRule dr) {
         BodySpec bodySpec = buildBodySpec(dr.getBody());
-        List<TermSpec> termSpecs = buildTermsSpecs(dr.getHead().getTerms());
+        List<TermSpec> termSpecs = buildTermsSpecs(dr.getHeadTerms());
         return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
     }
 
@@ -109,15 +109,6 @@ public class LogicSchemaToSpecHelper {
 
     public static BuiltInLiteralSpec buildTrueLiteralSpec() {
         return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(new BooleanBuiltInLiteral(true));
-    }
-
-    //TODO: maybe remove this functions because it has a constant string "x"
-    public static List<TermSpec> createVariableSpecs(int arity) {
-        List<TermSpec> result = new LinkedList<>();
-        for (int i = 1; i <= arity; i++) {
-            result.add(new VariableSpec("x" + i));
-        }
-        return result;
     }
 
     public static List<BodySpecFragment> cartesianProduct(List<BodySpecFragment> firstListOfFragments, List<BodySpecFragment> secondListOfFragments) {

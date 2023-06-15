@@ -126,7 +126,7 @@ public class Atom {
          *
          */
         Set<Variable> potentiallyClashingVariables = this.terms.getUsedVariables();
-        potentiallyClashingVariables.removeAll(derivationRule.getHead().getTerms().getUsedVariables());
+        potentiallyClashingVariables.removeAll(derivationRule.getHeadTerms().getUsedVariables());
         return potentiallyClashingVariables;
     }
 

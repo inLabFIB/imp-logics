@@ -83,7 +83,7 @@ public class BodySorter extends LogicSchemaTransformationProcess {
                         dr -> {
                             ImmutableLiteralsList sortedBody = dr.getBody().sortLiterals(literalComparator);
                             BodySpec bodySpec = LogicSchemaToSpecHelper.buildBodySpec(sortedBody);
-                            List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHead().getTerms());
+                            List<TermSpec> termSpecs = LogicSchemaToSpecHelper.buildTermsSpecs(dr.getHeadTerms());
                             return new DerivationRuleSpec(dr.getHead().getPredicateName(), termSpecs, bodySpec);
                         }
                 )

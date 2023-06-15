@@ -173,7 +173,7 @@ public class OrdinaryLiteralTest {
                 DerivationRule derivationRule = DerivationRuleMother.create("Derived(x) :- NonNegatableLiteral(x)",
                         "Derived",
                         Set.of("NonNegatableLiteral"));
-                OrdinaryLiteral negatedDerivedLiteral = new OrdinaryLiteral(new Atom(derivationRule.getHead().getPredicate(), derivationRule.getHead().getTerms()), false);
+                OrdinaryLiteral negatedDerivedLiteral = new OrdinaryLiteral(new Atom(derivationRule.getHead().getPredicate(), derivationRule.getHeadTerms()), false);
 
                 List<ImmutableLiteralsList> unfoldedLiteralsList = negatedDerivedLiteral.unfoldWithNegationExtension();
 

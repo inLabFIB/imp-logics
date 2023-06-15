@@ -87,6 +87,12 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
 
+    /**
+     * @param expectedSchema not null
+     * @return whether the actual schema has the same structure as the expected schemas as defined by LogicStructureComparator,
+     * using a recursive check, and considering the order of the literals
+     */
+    @SuppressWarnings("UnusedReturnValue")
     public LogicSchemaAssert hasSameStructureAs(LogicSchema expectedSchema) {
         assertAllPredicatesHaveSameStructure(expectedSchema);
         assertAllLogicConstraintsHaveSameStructure(expectedSchema);

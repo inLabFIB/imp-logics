@@ -78,7 +78,7 @@ public class DerivationRuleTest {
         public void should_returnExistencialVariables_whenDerivationRuleHasExistencialVariables(String derivationRuleString, Set<Variable> expectedExistencialVariables) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
 
-            Set<Variable> universalVariables = derivationRule.getExistencialVariables();
+            Set<Variable> universalVariables = derivationRule.getExistentialVariables();
 
             assertThat(universalVariables).containsExactlyInAnyOrderElementsOf(expectedExistencialVariables);
         }
