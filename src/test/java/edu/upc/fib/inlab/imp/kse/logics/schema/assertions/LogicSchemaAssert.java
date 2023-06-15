@@ -3,12 +3,17 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.*;
+import edu.upc.fib.inlab.imp.kse.logics.services.printer.LogicSchemaPrinter;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
+import java.util.Optional;
 import java.util.Set;
 
 public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSchema> {
+
+    private HomomorphismBasedEquivalenceAnalyzer analyzer = new HomomorphismBasedEquivalenceAnalyzer();
+
     public LogicSchemaAssert(LogicSchema logicSchema) {
         super(logicSchema, LogicSchemaAssert.class);
     }
@@ -153,33 +158,48 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
 
     protected LogicSchemaAssert assertAllLogicConstraintsAreEquivalentAccordingToAnalyzer(LogicSchema expectedSchema, LogicEquivalenceAnalyzer analyzer) {
         for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
-            boolean actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints(), analyzer);
-            if (!actualIsExpected) {
+            Optional<Boolean> actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints(), analyzer);
+            if (actualIsExpected.isPresent() && !actualIsExpected.get()) {
                 Assertions.fail("Actual constraint \"" + actualConstraint + "\" is not expected");
+            } else if (actualIsExpected.isEmpty()) {
+                Assertions.fail("Current logicEquivalenceAnalyzer: " + analyzer.getClass().getName() + "\n" +
+                        " could not determine if actual constraint: " + actualConstraint + "\n" +
+                        "   is present in schema\n" +
+                        "Expected schema: " + new LogicSchemaPrinter().print(expectedSchema) + "\n");
             }
         }
 
         for (LogicConstraint expectedConstraint : expectedSchema.getAllLogicConstraints()) {
-            boolean expectedIsFound = logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), analyzer);
-            if (!expectedIsFound) {
+            Optional<Boolean> expectedIsFound = logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), analyzer);
+            if (expectedIsFound.isPresent() && !expectedIsFound.get()) {
                 Assertions.fail("Expected constraint \"" + expectedConstraint + "\" is missing");
+            } else if (expectedIsFound.isEmpty()) {
+                Assertions.fail("Current logicEquivalenceAnalyzer: " + analyzer.getClass().getName() + "\n" +
+                        " could not determine if expected constraint: " + expectedConstraint + "\n" +
+                        "   is present in schema\n" +
+                        "Actual schema: " + new LogicSchemaPrinter().print(actual) + "\n");
             }
         }
 
         return this;
     }
 
-    private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
-        return logicConstraintIsContainedInList(constraint, constraintSet, new HomomorphismBasedEquivalenceAnalyzer());
+    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
+        return logicConstraintIsContainedInList(constraint, constraintSet, analyzer);
     }
 
-    private boolean logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
+    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
+        boolean unknownFound = false;
         for (LogicConstraint aConstraintFromSet : constraintSet) {
-            if (analyzer.areEquivalent(constraint, aConstraintFromSet).orElse(false)) {
-                return true;
+            Optional<Boolean> equivalenceResult = analyzer.areEquivalent(constraint, aConstraintFromSet);
+            if (equivalenceResult.isPresent() && equivalenceResult.get()) {
+                return Optional.of(true);
+            } else if (equivalenceResult.isEmpty()) {
+                unknownFound = true;
             }
         }
-        return false;
+        if (unknownFound) return Optional.empty();
+        return Optional.of(false);
     }
 
     /**
@@ -241,8 +261,14 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      */
     @SuppressWarnings("unused")
     public LogicSchemaAssert containsEquivalentConstraint(LogicConstraint expectedConstraint) {
-        if (!this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints())) {
+        Optional<Boolean> containmentResult = this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints());
+        if (containmentResult.isPresent() && !containmentResult.get()) {
             Assertions.fail("Missing expected constraint " + expectedConstraint);
+        } else if (containmentResult.isEmpty()) {
+            Assertions.fail("Current logicEquivalenceAnalyzer: " + analyzer.getClass().getName() + "\n" +
+                    " could not determine if expected constraint: " + expectedConstraint + "\n" +
+                    "   is present in schema\n" +
+                    "Actual schema: " + new LogicSchemaPrinter().print(actual) + "\n");
         }
         return this;
     }
@@ -257,8 +283,14 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      */
     @SuppressWarnings("unused")
     public LogicSchemaAssert containsEquivalentConstraint(LogicConstraint expectedConstraint, DerivedLiteralStrategy derivedLiteralsStrategy) {
-        if (!this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), derivedLiteralsStrategy.getAnalyzer())) {
+        Optional<Boolean> containmentResult = this.logicConstraintIsContainedInList(expectedConstraint, actual.getAllLogicConstraints(), derivedLiteralsStrategy.getAnalyzer());
+        if (containmentResult.isPresent() && !containmentResult.get()) {
             Assertions.fail("Missing expected constraint " + expectedConstraint);
+        } else if (containmentResult.isEmpty()) {
+            Assertions.fail("Current logicEquivalenceAnalyzer: " + analyzer.getClass().getName() + "\n" +
+                    " could not determine if expected constraint: " + expectedConstraint + "\n" +
+                    "   is present in schema\n" +
+                    "Actual schema: " + new LogicSchemaPrinter().print(actual) + "\n");
         }
         return this;
     }

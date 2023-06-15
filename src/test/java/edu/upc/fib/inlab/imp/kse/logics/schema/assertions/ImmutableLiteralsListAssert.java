@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.util.Lists.newArrayList;
 
@@ -35,12 +36,19 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
      * @return this assert
      */
     public ImmutableLiteralsListAssert isLogicallyEquivalentTo(ImmutableLiteralsList expected) {
-        boolean equivalence = logicEquivalenceAnalyzer.areEquivalent(actual, expected).orElse(false);
-        Assertions.assertThat(equivalence)
-                .describedAs("Actual literals list: " + actual.toString() + "\n" +
-                        "   is not equivalent to\n" +
-                        "Expected literals list: " + expected.toString() + "\n")
-                .isTrue();
+        Optional<Boolean> equivalenceResult = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
+        if (equivalenceResult.isPresent()) {
+            Assertions.assertThat(equivalenceResult)
+                    .describedAs("Actual literals list: " + actual.toString() + "\n" +
+                            "   is not equivalent to\n" +
+                            "Expected literals list: " + expected.toString() + "\n")
+                    .contains(true);
+        } else {
+            Assertions.fail("Current logicEquivalenceAnalyzer: " + logicEquivalenceAnalyzer.getClass().getName() + "\n" +
+                    " could not determine if actual literals list: " + actual.toString() + "\n" +
+                    "   is equivalent to\n" +
+                    "Expected literals list: " + expected.toString() + "\n");
+        }
         return this;
     }
 

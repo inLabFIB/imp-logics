@@ -9,6 +9,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintSp
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
 import org.assertj.core.api.Assertions;
 
+import java.util.Optional;
+
 public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
     public LogicConstraintAssert(LogicConstraint logicConstraint) {
         super(logicConstraint, LogicConstraintAssert.class);
@@ -50,12 +52,21 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
     @SuppressWarnings("unused")
     public LogicConstraintAssert isLogicallyEquivalent(LogicConstraint expected) {
         LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
-        Assertions.assertThat((boolean) logicEquivalenceAnalyzer.areEquivalent(actual, expected).orElse(false))
-                .overridingErrorMessage("Actual constraint: " + actual.toString() + "\n" +
-                        "   is not equivalent to \n" +
-                        "Expected constraint: " + expected.toString()
-                )
-                .isTrue();
+
+        Optional<Boolean> equivalenceResult = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
+        if (equivalenceResult.isPresent()) {
+            Assertions.assertThat(equivalenceResult)
+                    .overridingErrorMessage("Actual constraint: " + actual.toString() + "\n" +
+                            "   is not equivalent to \n" +
+                            "Expected constraint: " + expected.toString()
+                    )
+                    .contains(true);
+        } else {
+            Assertions.fail("Current logicEquivalenceAnalyzer: " + logicEquivalenceAnalyzer.getClass().getName() + "\n" +
+                    " could not determine if actual constraint: " + actual.toString() + "\n" +
+                    "   is equivalent to\n" +
+                    "Expected constraint: " + expected.toString() + "\n");
+        }
         return this;
     }
 
