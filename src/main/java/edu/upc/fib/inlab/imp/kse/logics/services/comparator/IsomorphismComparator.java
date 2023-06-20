@@ -18,20 +18,20 @@ public class IsomorphismComparator {
         this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
     }
 
-    public boolean isIsomorphic(ImmutableLiteralsList literalListFirst, ImmutableLiteralsList literalListSecond) {
-        return computeIsomorphismRecursive(literalListFirst, literalListSecond, new LiteralIsomorphism()).isPresent();
+    public boolean isIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2) {
+        return computeIsomorphismRecursive(literals1, literals2, new LiteralIsomorphism()).isPresent();
     }
 
-    private Optional<LiteralIsomorphism> computeIsomorphismRecursive(ImmutableLiteralsList literalListFirst, ImmutableLiteralsList literalListSecond, LiteralIsomorphism literalIsomorphism) {
-        if (literalListFirst.isEmpty() && literalListSecond.isEmpty()) return Optional.of(new LiteralIsomorphism());
+    private Optional<LiteralIsomorphism> computeIsomorphismRecursive(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
+        if (literals1.isEmpty() && literals2.isEmpty()) return Optional.of(new LiteralIsomorphism());
         else {
-            Literal firstLiteral = literalListFirst.get(0);
-            List<Literal> secondLiteralCandidates = obtainLiteralCandidates(firstLiteral, literalListSecond, literalIsomorphism);
-            for (Literal secondLiteral : secondLiteralCandidates) {
-                LiteralIsomorphism newLiteralIsomorphism = createNewIsomorphism(literalIsomorphism, firstLiteral, secondLiteral);
+            Literal l1 = literals1.get(0);
+            List<Literal> secondLiteralCandidates = obtainLiteralCandidates(l1, literals2, literalIsomorphism);
+            for (Literal l2 : secondLiteralCandidates) {
+                LiteralIsomorphism newLiteralIsomorphism = createNewIsomorphism(l1, l2, literalIsomorphism);
                 Optional<LiteralIsomorphism> isomorphicRecursive = computeIsomorphismRecursive(
-                        newListRemovingLiteral(literalListFirst, firstLiteral),
-                        newListRemovingLiteral(literalListSecond, secondLiteral),
+                        newListRemovingLiteral(literals1, l1),
+                        newListRemovingLiteral(literals2, l2),
                         newLiteralIsomorphism);
                 if (isomorphicRecursive.isPresent()) return isomorphicRecursive;
             }
@@ -39,17 +39,17 @@ public class IsomorphismComparator {
         }
     }
 
-    private List<Literal> obtainLiteralCandidates(Literal firstLiteral, ImmutableLiteralsList literalListSecond, LiteralIsomorphism literalIsomorphism) {
+    private List<Literal> obtainLiteralCandidates(Literal l1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
         List<Literal> secondLiteralCandidates = new ArrayList<>();
         if (!changeLiteralOrderAllowed) {
-            Literal secondLiteral = literalListSecond.get(0);
-            if (canBeIsomorphic(firstLiteral, secondLiteral, literalIsomorphism)) {
-                secondLiteralCandidates.add(secondLiteral);
+            Literal l2 = literals2.get(0);
+            if (canBeIsomorphic(l1, l2, literalIsomorphism)) {
+                secondLiteralCandidates.add(l2);
             }
             return secondLiteralCandidates;
         } else {
-            for (Literal secondLiteral : literalListSecond) {
-                if (canBeIsomorphic(firstLiteral, secondLiteral, literalIsomorphism)) {
+            for (Literal secondLiteral : literals2) {
+                if (canBeIsomorphic(l1, secondLiteral, literalIsomorphism)) {
                     secondLiteralCandidates.add(secondLiteral);
                 }
             }
@@ -57,51 +57,56 @@ public class IsomorphismComparator {
         }
     }
 
-    private boolean canBeIsomorphic(Literal firstLiteral, Literal secondLiteral, LiteralIsomorphism literalIsomorphism) {
-        if (literalIsomorphism.containsInRange(secondLiteral)) return false;
-        if (firstLiteral instanceof OrdinaryLiteral firstOl && secondLiteral instanceof OrdinaryLiteral secondOl) {
-            return canBeIsomorphic(literalIsomorphism, firstOl, secondOl);
+    private boolean canBeIsomorphic(Literal l1, Literal l2, LiteralIsomorphism literalIsomorphism) {
+        if (literalIsomorphism.containsInRange(l2)) return false;
+        if (l1 instanceof OrdinaryLiteral ol1 && l2 instanceof OrdinaryLiteral ol2) {
+            return canBeIsomorphic(ol1, ol2, literalIsomorphism);
         } else {
             throw new RuntimeException("To be implemented");
         }
     }
 
-    private static boolean canBeIsomorphic(LiteralIsomorphism literalIsomorphism, OrdinaryLiteral firstOl, OrdinaryLiteral secondOl) {
-        if (!haveSamePredicateNames(firstOl, secondOl)) return false;
-        if (!haveSamePolarity(firstOl, secondOl)) return false;
-        if (haveDifferentMap(literalIsomorphism, firstOl, secondOl)) return false;
-        return literalIsomorphism.termsAreCompatibleWithIsomorphism(firstOl.getTerms(), secondOl.getTerms());
+    private boolean canBeIsomorphic(OrdinaryLiteral ol1, OrdinaryLiteral ol2, LiteralIsomorphism literalIsomorphism) {
+        if (!haveSamePredicateNames(ol1, ol2)) return false;
+        if (!haveSamePolarity(ol1, ol2)) return false;
+        if (haveDifferentMap(ol1, ol2, literalIsomorphism)) return false;
+        if (changeVariableNamesAllowed) {
+            return literalIsomorphism.termsAreCompatibleWithIsomorphism(ol1.getTerms(), ol2.getTerms());
+        } else {
+            return ol1.getTerms().hasSameTerms(ol2.getTerms());
+        }
     }
 
-    private static boolean haveDifferentMap(LiteralIsomorphism literalIsomorphism, OrdinaryLiteral firstOl, OrdinaryLiteral secondOl) {
-        if (literalIsomorphism.containsInDomain(firstOl)) {
-            return !literalIsomorphism.get(firstOl).equals(secondOl);
+
+    private static boolean haveDifferentMap(OrdinaryLiteral ol1, OrdinaryLiteral ol2, LiteralIsomorphism literalIsomorphism) {
+        if (literalIsomorphism.containsInDomain(ol1)) {
+            return !literalIsomorphism.get(ol1).equals(ol2);
         }
-        if (literalIsomorphism.containsInRange(secondOl)) {
-            return !literalIsomorphism.get(secondOl).equals(firstOl);
+        if (literalIsomorphism.containsInRange(ol2)) {
+            return !literalIsomorphism.get(ol2).equals(ol1);
         }
         return false;
     }
 
 
-    private static boolean haveSamePolarity(OrdinaryLiteral firstOl, OrdinaryLiteral secondOl) {
-        return firstOl.isPositive() == secondOl.isPositive();
+    private static boolean haveSamePolarity(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
+        return ol1.isPositive() == ol2.isPositive();
     }
 
 
-    private static boolean haveSamePredicateNames(OrdinaryLiteral firstOl, OrdinaryLiteral secondOl) {
-        return firstOl.getPredicateName().equals(secondOl.getPredicateName());
+    private static boolean haveSamePredicateNames(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
+        return ol1.getPredicateName().equals(ol2.getPredicateName());
     }
 
-    private LiteralIsomorphism createNewIsomorphism(LiteralIsomorphism literalIsomorphism, Literal firstLiteral, Literal secondLiteral) {
+    private LiteralIsomorphism createNewIsomorphism(Literal l1, Literal l2, LiteralIsomorphism literalIsomorphism) {
         LiteralIsomorphism newLiteralIsomorphism = new LiteralIsomorphism(literalIsomorphism);
-        newLiteralIsomorphism.add(firstLiteral, secondLiteral);
+        newLiteralIsomorphism.add(l1, l2);
         return newLiteralIsomorphism;
     }
 
-    private ImmutableLiteralsList newListRemovingLiteral(ImmutableLiteralsList literalList, Literal literal) {
-        List<Literal> newLiteralList = new ArrayList<>(literalList);
-        newLiteralList.remove(literal);
+    private ImmutableLiteralsList newListRemovingLiteral(ImmutableLiteralsList literals, Literal l) {
+        List<Literal> newLiteralList = new ArrayList<>(literals);
+        newLiteralList.remove(l);
         return new ImmutableLiteralsList(newLiteralList);
     }
 

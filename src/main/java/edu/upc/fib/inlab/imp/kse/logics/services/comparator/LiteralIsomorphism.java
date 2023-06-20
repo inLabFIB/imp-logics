@@ -15,21 +15,21 @@ public class LiteralIsomorphism {
     }
 
     public LiteralIsomorphism(LiteralIsomorphism literalIsomorphism) {
-        this.map = new BiMap<>(literalIsomorphism.map);
+        map = new BiMap<>(literalIsomorphism.map);
     }
 
-    public <T extends Literal> void add(T firstLiteral, T secondLiteral) {
-        if (map.containsKey(firstLiteral) || map.containsValue(secondLiteral))
-            throw new LiteralAlreadyMappedInIsomorphismException(firstLiteral, secondLiteral);
-        this.map.put(firstLiteral, secondLiteral);
+    public void add(Literal l1, Literal l2) {
+        if (map.containsKey(l1) || map.containsValue(l2))
+            throw new LiteralAlreadyMappedInIsomorphismException(l1, l2);
+        this.map.put(l1, l2);
     }
 
-    public boolean containsInDomain(Literal literal) {
-        return map.containsKey(literal);
+    public boolean containsInDomain(Literal l) {
+        return map.containsKey(l);
     }
 
-    public boolean containsInRange(Literal literal) {
-        return map.containsValue(literal);
+    public boolean containsInRange(Literal l) {
+        return map.containsValue(l);
     }
 
     public boolean termsAreCompatibleWithIsomorphism(ImmutableTermList terms1, ImmutableTermList terms2) {
@@ -40,12 +40,12 @@ public class LiteralIsomorphism {
     private TermIsomorphism computeTermIsomorphism() {
         TermIsomorphism termIsomorphism = new TermIsomorphism();
         for (Map.Entry<Literal, Literal> entry : this.map.entrySet()) {
-            addTermsIntoTermIsomorphism(termIsomorphism, entry.getKey(), entry.getValue());
+            addTermsIntoTermIsomorphism(entry.getKey(), entry.getValue(), termIsomorphism);
         }
         return termIsomorphism;
     }
 
-    private void addTermsIntoTermIsomorphism(TermIsomorphism termIsomorphism, Literal l1, Literal l2) {
+    private void addTermsIntoTermIsomorphism(Literal l1, Literal l2, TermIsomorphism termIsomorphism) {
         for (int i = 0; i < l1.getArity(); ++i) {
             Term t1 = l1.getTerms().get(i);
             Term t2 = l2.getTerms().get(i);
@@ -53,8 +53,9 @@ public class LiteralIsomorphism {
         }
     }
 
-    public <T extends Literal> T get(T firstOl) {
-        return (T) map.get(firstOl);
+    @SuppressWarnings("unchecked")
+    public <L extends Literal> L get(L l) {
+        return (L) map.get(l);
     }
 
     private static class TermIsomorphism {
