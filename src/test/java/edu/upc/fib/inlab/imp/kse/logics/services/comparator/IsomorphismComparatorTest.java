@@ -51,12 +51,6 @@ class IsomorphismComparatorTest {
 
         }
 
-
-        // Parametrizado por:
-        // - Nombres de predicados derivados (changeDerivedPredicateNameAllowed)
-        // - Nombres de variables (changeVariableNamesAllowed)
-        // - Orden de literales (changeLiteralOrderAllowed)
-
         @Disabled("WIP")
         @Nested
         class ChangingDerivedPredicateName {
