@@ -12,10 +12,12 @@ public class IsomorphismComparator {
 
     private final boolean changeVariableNamesAllowed;
     private final boolean changeLiteralOrderAllowed;
+    private final boolean changingDerivedPredicateNameAllowed;
 
-    public IsomorphismComparator(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed) {
+    public IsomorphismComparator(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed) {
         this.changeVariableNamesAllowed = changeVariableNamesAllowed;
         this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
+        this.changingDerivedPredicateNameAllowed = changingDerivedPredicateNameAllowed;
     }
 
     public boolean isIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2) {
@@ -67,9 +69,19 @@ public class IsomorphismComparator {
     }
 
     private boolean canBeIsomorphic(OrdinaryLiteral ol1, OrdinaryLiteral ol2, LiteralIsomorphism literalIsomorphism) {
-        if (!haveSamePredicateNames(ol1, ol2)) return false;
+        if (ol1.isBase() != ol2.isBase()) return false;
+        if (ol1.isBase() && !haveSamePredicateNames(ol1, ol2)) return false;
+        if (ol1.isDerived()) {
+            if (changingDerivedPredicateNameAllowed) {
+                if (!literalIsomorphism.predicatesAreCompatibleWithIsomorphism(ol1.getPredicate(), ol2.getPredicate()))
+                    return false;
+            } else {
+                if (!haveSamePredicateNames(ol1, ol2)) return false;
+            }
+        }
         if (!haveSamePolarity(ol1, ol2)) return false;
         if (haveDifferentMap(ol1, ol2, literalIsomorphism)) return false;
+        if (ol1.getArity() != ol2.getArity()) return false;
         if (changeVariableNamesAllowed) {
             return literalIsomorphism.termsAreCompatibleWithIsomorphism(ol1.getTerms(), ol2.getTerms());
         } else {

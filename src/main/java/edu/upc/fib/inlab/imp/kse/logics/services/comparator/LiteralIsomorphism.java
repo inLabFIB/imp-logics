@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.LiteralAlreadyMappedInIsomorphismException;
 
@@ -51,6 +52,14 @@ public class LiteralIsomorphism {
             Term t2 = l2.getTerms().get(i);
             termIsomorphism.put(t1, t2);
         }
+    }
+
+    public boolean predicatesAreCompatibleWithIsomorphism(Predicate predicate1, Predicate predicate2) {
+        //TODO: implement this
+        //Doubt: who is responsible to check the isomorphism between the derivation rules of the derived predicates?
+//        PredicateIsomorphism predicateIsomorphism = computePredicateIsomorphism();
+//        return predicateIsomorphism.predicateAreCompatibleWithIsomorphism(terms1, terms2);
+        return true;
     }
 
     @SuppressWarnings("unchecked")
