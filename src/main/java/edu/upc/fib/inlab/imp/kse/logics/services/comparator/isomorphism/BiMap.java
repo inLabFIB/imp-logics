@@ -1,4 +1,4 @@
-package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
+package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
