@@ -4,11 +4,14 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LogicConstraintWithIDSpec;
+import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class ImmutableLiteralsListMother {
     private final static LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser();
@@ -31,5 +34,15 @@ public class ImmutableLiteralsListMother {
             result.add(create(litOfLiterals, derivationRules));
         }
         return result;
+    }
+
+
+    public static ImmutableLiteralsList createWithCustomBuiltinLiterals(String listOfLiterals, Set<String> customBuiltInPredicateNames) {
+        LogicSchemaParser<LogicConstraintWithIDSpec> parser = new LogicSchemaWithIDsParser(
+                new AllVariableTermTypeCriteria(),
+                new CustomBuiltInPredicateNameChecker(customBuiltInPredicateNames)
+        );
+        LogicSchema domainSchema = parser.parse("@1 :- " + listOfLiterals);
+        return domainSchema.getLogicConstraintByID(new ConstraintID("1")).getBody();
     }
 }

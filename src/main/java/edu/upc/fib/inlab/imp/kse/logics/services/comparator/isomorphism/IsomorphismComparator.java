@@ -32,7 +32,7 @@ public class IsomorphismComparator {
     private boolean areDerivationRuleHeadsIsomorphic(Atom h1, Atom h2) {
         //TODO: we are replicating this code in DerivedPredicateIsomorphism
         if (!changingDerivedPredicateNameAllowed && !h1.getPredicateName().equals(h2.getPredicateName())) return false;
-        return new TermIsomorphism().canIncludeIntoIsomorphism(h1.getTerms(), h2.getTerms());
+        return new TermIsomorphism(changeVariableNamesAllowed).canIncludeIntoIsomorphism(h1.getTerms(), h2.getTerms());
     }
 
     public boolean areIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2) {
@@ -90,7 +90,7 @@ public class IsomorphismComparator {
     }
 
     private TermIsomorphism computeTermIsomorphism(ImmutableTermList terms1, ImmutableTermList terms2) {
-        TermIsomorphism result = new TermIsomorphism();
+        TermIsomorphism result = new TermIsomorphism(changeVariableNamesAllowed);
         for (int i = 0; i < terms1.size(); ++i) {
             result.put(terms1.get(i), terms2.get(i));
         }

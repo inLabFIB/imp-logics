@@ -9,13 +9,19 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
  */
 class TermIsomorphism {
     private final BiMap<Term, Term> map;
+    private final boolean changeVariableNamesAllowed;
 
-    TermIsomorphism() {
-        map = new BiMap<>();
+    private TermIsomorphism(boolean changeVariableNamesAllowed, BiMap<Term, Term> map) {
+        this.changeVariableNamesAllowed = changeVariableNamesAllowed;
+        this.map = new BiMap<>(map);
+    }
+
+    TermIsomorphism(boolean changeVariableNamesAllowed) {
+        this(changeVariableNamesAllowed, new BiMap<>());
     }
 
     TermIsomorphism(TermIsomorphism termIsomorphism) {
-        this.map = new BiMap<>(termIsomorphism.map);
+        this(termIsomorphism.changeVariableNamesAllowed, termIsomorphism.map);
     }
 
     /**

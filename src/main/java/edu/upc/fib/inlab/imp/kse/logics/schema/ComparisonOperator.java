@@ -19,6 +19,25 @@ public enum ComparisonOperator {
     NOT_EQUALS("<>");
 
     private static final Map<String, ComparisonOperator> LOOKUP = new HashMap<>();
+    private static final Map<ComparisonOperator, ComparisonOperator> SYMMETRIC =
+            Map.of(
+                    LESS_THAN, GREATER_THAN,
+                    LESS_OR_EQUALS, GREATER_OR_EQUALS,
+                    EQUALS, EQUALS,
+                    GREATER_THAN, LESS_THAN,
+                    GREATER_OR_EQUALS, LESS_OR_EQUALS,
+                    NOT_EQUALS, NOT_EQUALS
+            );
+
+    private static final Map<ComparisonOperator, ComparisonOperator> NEGATED =
+            Map.of(
+                    LESS_THAN, GREATER_OR_EQUALS,
+                    LESS_OR_EQUALS, GREATER_THAN,
+                    EQUALS, NOT_EQUALS,
+                    GREATER_THAN, LESS_OR_EQUALS,
+                    GREATER_OR_EQUALS, LESS_THAN,
+                    NOT_EQUALS, EQUALS
+            );
 
     static {
         for (ComparisonOperator op : ComparisonOperator.values()) {
@@ -41,25 +60,15 @@ public enum ComparisonOperator {
     }
 
     public boolean isSymmetric(ComparisonOperator rangeOperator) {
-        return switch (this) {
-            case LESS_THAN -> rangeOperator.equals(GREATER_THAN);
-            case LESS_OR_EQUALS -> rangeOperator.equals(GREATER_OR_EQUALS);
-            case EQUALS -> rangeOperator.equals(EQUALS);
-            case GREATER_THAN -> rangeOperator.equals(LESS_THAN);
-            case GREATER_OR_EQUALS -> rangeOperator.equals(LESS_OR_EQUALS);
-            case NOT_EQUALS -> rangeOperator.equals(NOT_EQUALS);
-        };
+        return this.equals(rangeOperator.getSymmetric());
     }
 
     public ComparisonOperator getNegatedOperator() {
-        return switch (this) {
-            case LESS_THAN -> GREATER_OR_EQUALS;
-            case LESS_OR_EQUALS -> GREATER_THAN;
-            case EQUALS -> NOT_EQUALS;
-            case GREATER_THAN -> LESS_OR_EQUALS;
-            case GREATER_OR_EQUALS -> LESS_THAN;
-            case NOT_EQUALS -> EQUALS;
-        };
+        return NEGATED.get(this);
+    }
+
+    public ComparisonOperator getSymmetric() {
+        return SYMMETRIC.get(this);
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
