@@ -41,8 +41,7 @@ class DerivedPredicateIsomorphism {
     }
 
     boolean canDerivedPredicatesBeIsomorphic(Predicate p1, Predicate p2) {
-        //TODO: use parameter of changing names
-        if (!p1.getName().equals(p2.getName())) return false;
+        if (!changingDerivedPredicateNameAllowed && !p1.getName().equals(p2.getName())) return false;
         if (map.containsValue(p1) && !map.get(p1).equals(p2)) return false;
         if (map.containsValue(p2)) return false;
         return haveIsomorphicDerivationRules(p1, p2);

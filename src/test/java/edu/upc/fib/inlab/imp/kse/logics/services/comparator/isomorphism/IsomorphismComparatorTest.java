@@ -2,7 +2,6 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +56,6 @@ class IsomorphismComparatorTest {
 
         }
 
-        @Disabled("WIP")
         @Nested
         class ChangingDerivedPredicateName {
 
@@ -319,7 +317,6 @@ class IsomorphismComparatorTest {
     class LogicConstraintIsomorphismTest {
 
     }
-
 
     @Nested
     class DerivationRuleIsomorphismTest {

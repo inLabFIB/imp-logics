@@ -30,7 +30,8 @@ public class IsomorphismComparator {
     }
 
     private boolean areDerivationRuleHeadsIsomorphic(Atom h1, Atom h2) {
-        if (!h1.getPredicateName().equals(h2.getPredicateName())) return false;
+        //TODO: we are replicating this code in DerivedPredicateIsomorphism
+        if (!changingDerivedPredicateNameAllowed && !h1.getPredicateName().equals(h2.getPredicateName())) return false;
         return new TermIsomorphism().canIncludeIntoIsomorphism(h1.getTerms(), h2.getTerms());
     }
 
@@ -41,17 +42,17 @@ public class IsomorphismComparator {
 
 
     private Optional<LiteralIsomorphism> computeIsomorphismRecursive(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
-        if (literals1.isEmpty() && literals2.isEmpty()) return Optional.of(newLiteralIsomorphism());
-        else {
-            Literal l1 = literals1.get(0);
-            List<Literal> secondLiteralCandidates = obtainLiteralCandidates(l1, literals2, literalIsomorphism);
-            for (Literal l2 : secondLiteralCandidates) {
-                LiteralIsomorphism newLiteralIsomorphism = createNewIsomorphism(l1, l2, literalIsomorphism);
-                Optional<LiteralIsomorphism> isomorphicRecursive = computeIsomorphismRecursive(newListRemovingLiteral(literals1, l1), newListRemovingLiteral(literals2, l2), newLiteralIsomorphism);
-                if (isomorphicRecursive.isPresent()) return isomorphicRecursive;
-            }
-            return Optional.empty();
+        if (literals1.size() != literals2.size()) return Optional.empty();
+        if (literals1.isEmpty()) return Optional.of(newLiteralIsomorphism());
+
+        Literal l1 = literals1.get(0);
+        List<Literal> secondLiteralCandidates = obtainLiteralCandidates(l1, literals2, literalIsomorphism);
+        for (Literal l2 : secondLiteralCandidates) {
+            LiteralIsomorphism newLiteralIsomorphism = createNewIsomorphism(l1, l2, literalIsomorphism);
+            Optional<LiteralIsomorphism> isomorphicRecursive = computeIsomorphismRecursive(newListRemovingLiteral(literals1, l1), newListRemovingLiteral(literals2, l2), newLiteralIsomorphism);
+            if (isomorphicRecursive.isPresent()) return isomorphicRecursive;
         }
+        return Optional.empty();
     }
 
     private List<Literal> obtainLiteralCandidates(Literal l1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
