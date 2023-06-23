@@ -1,10 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.PredicateComparator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Order of derivation rules of a predicate is not important.
@@ -22,18 +21,10 @@ public class IsomorphismComparator {
     }
 
     public boolean areIsomorphic(DerivationRule dr1, DerivationRule dr2) {
-        Atom h1 = dr1.getHead();
-        Atom h2 = dr2.getHead();
-        if (!areDerivationRuleHeadsIsomorphic(h1, h2)) return false;
-        LiteralIsomorphism literalIsomorphism = initializeLiteralIsomorphism(h1, h2);
-        return computeIsomorphismRecursive(dr1.getBody(), dr2.getBody(), literalIsomorphism).isPresent();
+        return new DerivedPredicateIsomorphism(changeLiteralOrderAllowed, changeVariableNamesAllowed, changingDerivedPredicateNameAllowed)
+                .areIsomorphic(dr1, dr2);
     }
 
-    private boolean areDerivationRuleHeadsIsomorphic(Atom h1, Atom h2) {
-        //TODO: we are replicating this code in DerivedPredicateIsomorphism
-        if (!changingDerivedPredicateNameAllowed && !h1.getPredicateName().equals(h2.getPredicateName())) return false;
-        return new TermIsomorphism(changeVariableNamesAllowed).canIncludeIntoIsomorphism(h1.getTerms(), h2.getTerms());
-    }
 
     public boolean areIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2) {
         LiteralIsomorphism literalIsomorphism = newLiteralIsomorphism();
@@ -41,7 +32,7 @@ public class IsomorphismComparator {
     }
 
 
-    private Optional<LiteralIsomorphism> computeIsomorphismRecursive(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
+    Optional<LiteralIsomorphism> computeIsomorphismRecursive(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2, LiteralIsomorphism literalIsomorphism) {
         if (literals1.size() != literals2.size()) return Optional.empty();
         if (literals1.isEmpty()) return Optional.of(newLiteralIsomorphism());
 
@@ -84,22 +75,6 @@ public class IsomorphismComparator {
         return new ImmutableLiteralsList(newLiteralList);
     }
 
-    private LiteralIsomorphism initializeLiteralIsomorphism(Atom h1, Atom h2) {
-        TermIsomorphism termIsomorphism = computeTermIsomorphism(h1.getTerms(), h2.getTerms());
-        return newLiteralIsomorphism(termIsomorphism);
-    }
-
-    private TermIsomorphism computeTermIsomorphism(ImmutableTermList terms1, ImmutableTermList terms2) {
-        TermIsomorphism result = new TermIsomorphism(changeVariableNamesAllowed);
-        for (int i = 0; i < terms1.size(); ++i) {
-            result.put(terms1.get(i), terms2.get(i));
-        }
-        return result;
-    }
-
-    private LiteralIsomorphism newLiteralIsomorphism(TermIsomorphism termIsomorphism) {
-        return new LiteralIsomorphism(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed, termIsomorphism);
-    }
 
     private LiteralIsomorphism newLiteralIsomorphism() {
         return new LiteralIsomorphism(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed);
@@ -112,4 +87,66 @@ public class IsomorphismComparator {
     public boolean areIsomorphic(LogicConstraint constraint1, LogicConstraint constraint2) {
         return areIsomorphic(constraint1.getBody(), constraint2.getBody());
     }
+
+    public boolean areIsomorphic(LogicSchema schema1, LogicSchema schema2) {
+        if (!areBasePredicatesIsomorphic(schema1, schema2)) return false;
+        return areNormalClausesIsomorphic(schema1, schema2);
+    }
+
+    private boolean areBasePredicatesIsomorphic(LogicSchema schema1, LogicSchema schema2) {
+        List<Predicate> basePredicates1 = schema1.getAllPredicates().stream().filter(Predicate::isBase).toList();
+        List<Predicate> basePredicates2 = schema2.getAllPredicates().stream().filter(Predicate::isBase).toList();
+        return allContainedIn(basePredicates2, basePredicates1) && allContainedIn(basePredicates1, basePredicates2);
+    }
+
+    private boolean allContainedIn(List<Predicate> basePredicates1, List<Predicate> basePredicates2) {
+        return basePredicates2.stream().allMatch(p -> anyMatchPredicate(basePredicates1, p));
+    }
+
+    private boolean anyMatchPredicate(List<Predicate> basePredicates, Predicate predicate) {
+        return basePredicates.stream().anyMatch(otherPredicate -> PredicateComparator.hasSameNameAndArityAs(predicate, otherPredicate));
+    }
+
+    private boolean areNormalClausesIsomorphic(LogicSchema schema1, LogicSchema schema2) {
+        if (!areLogicConstraintsIsomorphic(schema1.getAllLogicConstraints(), schema2.getAllLogicConstraints()))
+            return false;
+        return !areDerivationRulesIsomorphic(schema1.getAllDerivationRules(), schema2.getAllDerivationRules());
+    }
+
+    private boolean areLogicConstraintsIsomorphic(Set<LogicConstraint> constraints1, Set<LogicConstraint> constraints2) {
+        if (constraints1.size() != constraints2.size()) return false;
+        if (constraints1.isEmpty()) return true;
+
+        LogicConstraint constraint1 = constraints1.iterator().next();
+        for (LogicConstraint constraint2 : constraints2) {
+            if (areIsomorphic(constraint1, constraint2)) {
+                Set<LogicConstraint> newConstraints1 = removeFrom(constraints1, constraint1);
+                Set<LogicConstraint> newConstraints2 = removeFrom(constraints2, constraint2);
+                if (areLogicConstraintsIsomorphic(newConstraints1, newConstraints2)) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean areDerivationRulesIsomorphic(Set<DerivationRule> rules1, Set<DerivationRule> rules2) {
+        if (rules1.size() != rules2.size()) return false;
+        if (rules1.isEmpty()) return true;
+
+        DerivationRule rule1 = rules1.stream().findFirst().orElseThrow();
+        for (DerivationRule rule2 : rules2) {
+            if (areIsomorphic(rule1, rule2)) {
+                Set<DerivationRule> newRules1 = removeFrom(rules1, rule1);
+                Set<DerivationRule> newRules2 = removeFrom(rules2, rule2);
+                if (areDerivationRulesIsomorphic(newRules1, newRules2)) return true;
+            }
+        }
+        return false;
+    }
+
+    private <T extends NormalClause> Set<T> removeFrom(Set<T> clauses, T clause) {
+        Set<T> result = new LinkedHashSet<>(clauses);
+        result.remove(clause);
+        return result;
+    }
+
 }

@@ -24,6 +24,14 @@ class TermIsomorphism {
         this(termIsomorphism.changeVariableNamesAllowed, termIsomorphism.map);
     }
 
+    static TermIsomorphism computeTermIsomorphism(ImmutableTermList terms1, ImmutableTermList terms2, boolean changeVariableNamesAllowed) {
+        TermIsomorphism result = new TermIsomorphism(changeVariableNamesAllowed);
+        for (int i = 0; i < terms1.size(); ++i) {
+            result.put(terms1.get(i), terms2.get(i));
+        }
+        return result;
+    }
+
     /**
      * @param t1 a term
      * @param t2 a term

@@ -1,9 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +16,13 @@ class DerivedPredicateIsomorphism {
     private final boolean changeVariableNamesAllowed;
     private final boolean changingDerivedPredicateNameAllowed;
 
+    private DerivedPredicateIsomorphism(boolean changeLiteralOrderAllowed, boolean changeVariableNamesAllowed, boolean changingDerivedPredicateNameAllowed, BiMap<Predicate, Predicate> map) {
+        this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
+        this.changeVariableNamesAllowed = changeVariableNamesAllowed;
+        this.changingDerivedPredicateNameAllowed = changingDerivedPredicateNameAllowed;
+        this.map = new BiMap<>(map);
+    }
+
     DerivedPredicateIsomorphism(boolean changeLiteralOrderAllowed, boolean changeVariableNamesAllowed, boolean changingDerivedPredicateNameAllowed, LiteralIsomorphism literalIsomorphism) {
         this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
         this.changeVariableNamesAllowed = changeVariableNamesAllowed;
@@ -26,8 +30,28 @@ class DerivedPredicateIsomorphism {
         this.map = initializeMap(literalIsomorphism);
     }
 
+    DerivedPredicateIsomorphism(boolean changeLiteralOrderAllowed, boolean changeVariableNamesAllowed, boolean changingDerivedPredicateNameAllowed) {
+        this(
+                changeLiteralOrderAllowed,
+                changeVariableNamesAllowed,
+                changingDerivedPredicateNameAllowed,
+                new BiMap<>()
+        );
+    }
+
+    DerivedPredicateIsomorphism(DerivedPredicateIsomorphism initialDerivedPredicateIsomorphism) {
+        this(
+                initialDerivedPredicateIsomorphism.changeLiteralOrderAllowed,
+                initialDerivedPredicateIsomorphism.changeVariableNamesAllowed,
+                initialDerivedPredicateIsomorphism.changingDerivedPredicateNameAllowed,
+                initialDerivedPredicateIsomorphism.map
+        );
+    }
+
     private BiMap<Predicate, Predicate> initializeMap(LiteralIsomorphism literalIsomorphism) {
-        BiMap<Predicate, Predicate> map = new BiMap<>();
+        DerivedPredicateIsomorphism initial = literalIsomorphism.getInitialDerivedPredicateIsomorphism();
+
+        BiMap<Predicate, Predicate> map = new BiMap<>(initial.map);
         for (Map.Entry<Literal, Literal> entry : literalIsomorphism.entrySet()) {
             Literal l1 = entry.getKey();
             Literal l2 = entry.getValue();
@@ -37,6 +61,7 @@ class DerivedPredicateIsomorphism {
                 }
             }
         }
+
         return map;
     }
 
@@ -66,8 +91,8 @@ class DerivedPredicateIsomorphism {
         for (DerivationRule dr2 : rules2) {
             if (areIsomorphic(dr1, dr2)) {
                 List<DerivationRule> newRules1 = new LinkedList<>(rules1);
-                newRules1.remove(dr1);
                 List<DerivationRule> newRules2 = new LinkedList<>(rules2);
+                newRules1.remove(dr1);
                 newRules2.remove(dr2);
                 if (haveIsomorphicDerivationRulesRec(newRules1, newRules2)) return true;
             }
@@ -75,9 +100,25 @@ class DerivedPredicateIsomorphism {
         return false;
     }
 
-    private boolean areIsomorphic(DerivationRule dr1, DerivationRule dr2) {
+    boolean areIsomorphic(DerivationRule dr1, DerivationRule dr2) {
+        Atom h1 = dr1.getHead();
+        Atom h2 = dr2.getHead();
+        if (!areDerivationRuleHeadsIsomorphic(h1, h2)) return false;
+        LiteralIsomorphism literalIsomorphism = initializeLiteralIsomorphism(h1, h2);
+
         return new IsomorphismComparator(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed)
-                .areIsomorphic(dr1, dr2);
+                .computeIsomorphismRecursive(dr1.getBody(), dr2.getBody(), literalIsomorphism).isPresent();
+    }
+
+    private boolean areDerivationRuleHeadsIsomorphic(Atom h1, Atom h2) {
+        //TODO: we are replicating this code in DerivedPredicateIsomorphism
+        if (!changingDerivedPredicateNameAllowed && !h1.getPredicateName().equals(h2.getPredicateName())) return false;
+        return new TermIsomorphism(changeVariableNamesAllowed).canIncludeIntoIsomorphism(h1.getTerms(), h2.getTerms());
+    }
+
+    private LiteralIsomorphism initializeLiteralIsomorphism(Atom h1, Atom h2) {
+        TermIsomorphism termIsomorphism = TermIsomorphism.computeTermIsomorphism(h1.getTerms(), h2.getTerms(), changeVariableNamesAllowed);
+        return new LiteralIsomorphism(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed, termIsomorphism, this);
     }
 
 }

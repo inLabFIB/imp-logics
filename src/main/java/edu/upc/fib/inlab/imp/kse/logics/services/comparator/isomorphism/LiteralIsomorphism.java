@@ -22,30 +22,38 @@ class LiteralIsomorphism {
     private final boolean changeLiteralOrderAllowed;
     private final boolean changingDerivedPredicateNameAllowed;
     private final TermIsomorphism initialTermIsomorphism;
+    private final DerivedPredicateIsomorphism initialDerivedPredicateIsomorphism;
 
-    private LiteralIsomorphism(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed, TermIsomorphism termIsomorphism, BiMap<Literal, Literal> map) {
+    private LiteralIsomorphism(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed, TermIsomorphism termIsomorphism, DerivedPredicateIsomorphism derivedPredicateIsomorphism, BiMap<Literal, Literal> map) {
         this.changeVariableNamesAllowed = changeVariableNamesAllowed;
         this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
         this.changingDerivedPredicateNameAllowed = changingDerivedPredicateNameAllowed;
         this.map = new BiMap<>(map);
         this.initialTermIsomorphism = termIsomorphism;
+        this.initialDerivedPredicateIsomorphism = derivedPredicateIsomorphism;
     }
 
-    LiteralIsomorphism(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed, TermIsomorphism termIsomorphism) {
-        this(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed, termIsomorphism, new BiMap<>());
+    LiteralIsomorphism(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed, TermIsomorphism termIsomorphism, DerivedPredicateIsomorphism derivedPredicateIsomorphism) {
+        this(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed, termIsomorphism, derivedPredicateIsomorphism, new BiMap<>());
     }
 
     LiteralIsomorphism(LiteralIsomorphism literalIsomorphism) {
-        this(literalIsomorphism.changeVariableNamesAllowed,
+        this(
+                literalIsomorphism.changeVariableNamesAllowed,
                 literalIsomorphism.changeLiteralOrderAllowed,
                 literalIsomorphism.changingDerivedPredicateNameAllowed,
-                new TermIsomorphism(literalIsomorphism.changeVariableNamesAllowed),
+                new TermIsomorphism(literalIsomorphism.initialTermIsomorphism),
+                new DerivedPredicateIsomorphism(literalIsomorphism.initialDerivedPredicateIsomorphism),
                 literalIsomorphism.map
         );
     }
 
     LiteralIsomorphism(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed) {
-        this(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed, new TermIsomorphism(changeVariableNamesAllowed), new BiMap<>());
+        this(changeVariableNamesAllowed, changeLiteralOrderAllowed, changingDerivedPredicateNameAllowed,
+                new TermIsomorphism(changeVariableNamesAllowed),
+                new DerivedPredicateIsomorphism(changeLiteralOrderAllowed, changeVariableNamesAllowed, changingDerivedPredicateNameAllowed),
+                new BiMap<>()
+        );
     }
 
     Set<Map.Entry<Literal, Literal>> entrySet() {
@@ -201,4 +209,7 @@ class LiteralIsomorphism {
     }
 
 
+    DerivedPredicateIsomorphism getInitialDerivedPredicateIsomorphism() {
+        return this.initialDerivedPredicateIsomorphism;
+    }
 }
