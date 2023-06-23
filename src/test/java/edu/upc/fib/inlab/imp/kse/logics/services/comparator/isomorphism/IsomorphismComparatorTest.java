@@ -1,13 +1,18 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ComparisonOperator;
+import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
+import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -16,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 class IsomorphismComparatorTest {
 
@@ -445,7 +451,6 @@ class IsomorphismComparatorTest {
                         )
                 );
             }
-
         }
 
         @Nested
@@ -525,12 +530,73 @@ class IsomorphismComparatorTest {
 
     @Nested
     class LogicConstraintIsomorphismTest {
+        @Test
+        public void should_invokeImmutableLiteralsListIsomorphism_withLogicConstraintBodies() {
+            LogicConstraint constraint1 = createDummy();
+            LogicConstraint constraint2 = createDummy();
+
+            IsomorphismComparator spyComparator = spy(new IsomorphismComparator(false, false, false));
+            spyComparator.areIsomorphic(constraint1, constraint2);
+
+            verify(spyComparator).areIsomorphic(constraint1.getBody(), constraint2.getBody());
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        public void should_returnSameResult_asImmutableLiteralsListIsomorphism(boolean expectedResult) {
+            LogicConstraint constraint1 = createDummy();
+            LogicConstraint constraint2 = createDummy();
+
+            IsomorphismComparator spyComparator = spy(new IsomorphismComparator(false, false, false));
+            doReturn(expectedResult).when(spyComparator).areIsomorphic(any(ImmutableLiteralsList.class), any(ImmutableLiteralsList.class));
+
+            boolean areIsomorphic = spyComparator.areIsomorphic(constraint1, constraint2);
+
+            assertThat(areIsomorphic).isEqualTo(expectedResult);
+        }
+
+        private LogicConstraint createDummy() {
+            return LogicConstraintMother.createWithoutID(":- P(x)");
+        }
+
+        @Test
+        public void should_returnTrue_whenLogicConstraintsAreIsomorphic_butHaveDifferentIDs() {
+            LogicConstraint constraint1 = LogicConstraintMother.createWithID("@1 :- P(x)");
+            LogicConstraint constraint2 = LogicConstraintMother.createWithID("@2 :- P(x)");
+
+            IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
+            boolean areIsomorphic = comparator.areIsomorphic(constraint1, constraint2);
+
+            assertThat(areIsomorphic).describedAs("Identical logic constraints should be isomorphic despite having different IDs").isTrue();
+        }
+
 
     }
 
     @Nested
     class DerivationRuleIsomorphismTest {
+        /**
+         * The derivation rules are already tested within the immutable literals list.
+         */
+        @Test
+        public void should_returnTrue_whenDerivationRulesAreIsomorphic() {
+            DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
+            DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
 
+            IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
+            boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+            assertThat(areIsomorphic).isTrue();
+        }
+
+        @Test
+        public void should_returnFalse_whenDerivationRulesAreNotIsomorphic() {
+            DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
+            DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), R(x)");
+
+            IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
+            boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+            assertThat(areIsomorphic).isFalse();
+        }
     }
 
 }

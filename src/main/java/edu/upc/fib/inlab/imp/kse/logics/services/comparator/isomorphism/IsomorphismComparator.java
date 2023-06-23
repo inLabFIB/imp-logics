@@ -108,4 +108,8 @@ public class IsomorphismComparator {
     private LiteralIsomorphism newLiteralIsomorphism(LiteralIsomorphism literalIsomorphism) {
         return new LiteralIsomorphism(literalIsomorphism);
     }
+
+    public boolean areIsomorphic(LogicConstraint constraint1, LogicConstraint constraint2) {
+        return areIsomorphic(constraint1.getBody(), constraint2.getBody());
+    }
 }
