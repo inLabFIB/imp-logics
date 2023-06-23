@@ -7,8 +7,10 @@ import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.Substitut
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * <p> This class is responsible for checking whether there is an homomorphism between two NormalClauses.
@@ -46,14 +48,14 @@ public class HomomorphismFinder {
      * As expected, we say that a substitution s1 is an extension of a substitution s2 if all the mappings of s2 are contained in s1.
      */
 
-    private final Optional<DerivedOrdinaryLiteralHomomorphismCriteria> derivedOrdinaryLiteralHomomorphismCriteria;
+    private final DerivedOrdinaryLiteralHomomorphismCriteria derivedOrdinaryLiteralHomomorphismCriteria;
 
     public HomomorphismFinder() {
-        derivedOrdinaryLiteralHomomorphismCriteria = Optional.empty();
+        this(null);
     }
 
     public HomomorphismFinder(DerivedOrdinaryLiteralHomomorphismCriteria derivedOrdinaryLiteralHomomorphismCriteria) {
-        this.derivedOrdinaryLiteralHomomorphismCriteria = Optional.ofNullable(derivedOrdinaryLiteralHomomorphismCriteria);
+        this.derivedOrdinaryLiteralHomomorphismCriteria = derivedOrdinaryLiteralHomomorphismCriteria;
     }
 
     /**
@@ -64,8 +66,8 @@ public class HomomorphismFinder {
      * @return optional containing a homomorphism between the two, if exists
      */
     public Optional<Substitution> findHomomorphism(DerivationRule domainRule, DerivationRule rangeRule) {
-        if (Objects.isNull(domainRule)) throw new IllegalArgumentException("DomainRule cannot be null");
-        if (Objects.isNull(rangeRule)) throw new IllegalArgumentException("RangeRule cannot be null");
+        if (isNull(domainRule)) throw new IllegalArgumentException("DomainRule cannot be null");
+        if (isNull(rangeRule)) throw new IllegalArgumentException("RangeRule cannot be null");
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainRule.getBody());
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeRule.getBody());
 
@@ -82,8 +84,8 @@ public class HomomorphismFinder {
      * @return optional containing a homomorphism between the two, if exists
      */
     public Optional<Substitution> findHomomorphism(LogicConstraint domainLogicConstraint, LogicConstraint rangeLogicConstraint) {
-        if (Objects.isNull(domainLogicConstraint)) throw new IllegalArgumentException("DomainLiterals cannot be null");
-        if (Objects.isNull(rangeLogicConstraint)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        if (isNull(domainLogicConstraint)) throw new IllegalArgumentException("DomainLiterals cannot be null");
+        if (isNull(rangeLogicConstraint)) throw new IllegalArgumentException("RangeLiterals cannot be null");
         return findHomomorphism(domainLogicConstraint.getBody(), rangeLogicConstraint.getBody());
     }
 
@@ -94,8 +96,8 @@ public class HomomorphismFinder {
      * in rangeLiterals
      */
     public Optional<Substitution> findHomomorphism(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
-        if (Objects.isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
-        if (Objects.isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        if (isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
+        if (isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainLiterals);
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeLiterals);
 
@@ -111,7 +113,7 @@ public class HomomorphismFinder {
     }
 
     private void checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(List<Literal> literals) {
-        if (this.derivedOrdinaryLiteralHomomorphismCriteria.isPresent()) return;
+        if (nonNull(derivedOrdinaryLiteralHomomorphismCriteria)) return;
         if (literals.stream()
                 .filter(l -> l instanceof OrdinaryLiteral)
                 .map(l -> (OrdinaryLiteral) l)
@@ -228,8 +230,8 @@ public class HomomorphismFinder {
             if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
             return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
         } else {
+            if (isNull(derivedOrdinaryLiteralHomomorphismCriteria)) throw new DerivedLiteralInHomomorphismCheck();
             return derivedOrdinaryLiteralHomomorphismCriteria
-                    .orElseThrow(DerivedLiteralInHomomorphismCheck::new)
                     .computeHomomorphismExtensionForDerivedOrdinaryLiteral(this, currentSubstitution, domainLiteral, rangeLiteral);
         }
     }
