@@ -89,6 +89,13 @@ public class LogicSchema {
         return new LinkedHashSet<>(predicatesByName.values());
     }
 
+    public Set<NormalClause> getAllNormalClauses() {
+        Set<NormalClause> normalClauses = new LinkedHashSet<>(getAllLogicConstraints());
+        normalClauses.addAll(getAllDerivationRules());
+        return normalClauses;
+    }
+
+
     public Set<LogicConstraint> getAllLogicConstraints() {
         return new LinkedHashSet<>(constraintsByID.values());
     }

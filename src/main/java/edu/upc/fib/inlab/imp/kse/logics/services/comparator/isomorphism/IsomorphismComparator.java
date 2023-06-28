@@ -3,7 +3,10 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.PredicateComparator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
@@ -84,7 +87,10 @@ public class IsomorphismComparator {
         for (DerivationRule rule2 : getRuleCandidates(rules2, rule1)) {
             Optional<TermMap> termMap = computeTermMap(rule1.getHeadTerms(), rule2.getHeadTerms());
             if (termMap.isPresent()) {
-                if (areIsomorphic(rule1.getBody(), rule2.getBody(), predicateMap, new LiteralMap(), termMap.get(), remainingJob)) {
+                boolean bodiesAndRestOfDerivationRulesAreIsomorphic = areIsomorphic(rule1.getBody(), rule2.getBody(), predicateMap, new LiteralMap(), termMap.get(),
+                        () -> areIsomorphic(removeFrom(rules1, rule1), removeFrom(rules2, rule2), predicateMap, remainingJob)
+                );
+                if (bodiesAndRestOfDerivationRulesAreIsomorphic) {
                     return true;
                 }
             }
@@ -92,6 +98,49 @@ public class IsomorphismComparator {
         return false;
     }
 
+    /**
+     * @param remainingJob
+     * @return whether there is an isomorphism between rules1, and rules2, satisfying the predicateMap given and the remainingJob
+     */
+    private boolean areIsomorphicNormalClausesLists(List<NormalClause> clauses1, List<NormalClause> clauses2, PredicateMap predicateMap, BooleanSupplier remainingJob) {
+        if (clauses1.size() != clauses2.size()) return false;
+        if (clauses1.isEmpty()) return remainingJob.getAsBoolean();
+
+        NormalClause clause1 = clauses1.get(0);
+        for (NormalClause clause2 : getClauseCandidates(clauses2, clause1)) {
+            Optional<TermMap> termMap = computeTermMapFromClause(clause1, clause2);
+            if (termMap.isPresent()) {
+                boolean bodiesAndRestOfNormalClausesAreIsomorphic = areIsomorphic(clause1.getBody(), clause2.getBody(), predicateMap, new LiteralMap(), termMap.get(),
+                        () -> areIsomorphicNormalClausesLists(removeFrom(clauses1, clause1), removeFrom(clauses2, clause2), predicateMap, remainingJob)
+                );
+                if (bodiesAndRestOfNormalClausesAreIsomorphic) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Optional<TermMap> computeTermMapFromClause(NormalClause clause1, NormalClause clause2) {
+        if (clause1 instanceof LogicConstraint && clause2 instanceof LogicConstraint) {
+            return Optional.of(new TermMap());
+        } else if (clause1 instanceof DerivationRule rule1 && clause2 instanceof DerivationRule rule2) {
+            return computeTermMap(rule1.getHeadTerms(), rule2.getHeadTerms());
+        }
+        return Optional.empty();
+    }
+
+    private <T extends NormalClause> List<T> getClauseCandidates(List<NormalClause> clauseList, T clause) {
+        List<T> result = new LinkedList<>();
+        for (NormalClause candidate : clauseList) {
+            if (candidate instanceof LogicConstraint && clause instanceof LogicConstraint) {
+                result.add((T) candidate);
+            } else if (candidate instanceof DerivationRule && clause instanceof DerivationRule) {
+                result.add((T) candidate);
+            }
+        }
+        return result;
+    }
 
     /**
      * @param literals1
@@ -336,43 +385,13 @@ public class IsomorphismComparator {
     }
 
     private boolean areNormalClausesIsomorphic(LogicSchema schema1, LogicSchema schema2) {
-        if (!areLogicConstraintsIsomorphic(schema1.getAllLogicConstraints(), schema2.getAllLogicConstraints()))
-            return false;
-        return areDerivationRulesIsomorphic(schema1.getAllDerivationRules(), schema2.getAllDerivationRules());
+        List<NormalClause> normalClauses1 = new LinkedList<>(schema1.getAllNormalClauses());
+        List<NormalClause> normalClauses2 = new LinkedList<>(schema2.getAllNormalClauses());
+        return areIsomorphicNormalClausesLists(normalClauses1, normalClauses2, new PredicateMap(), () -> true);
     }
 
-    private boolean areLogicConstraintsIsomorphic(Set<LogicConstraint> constraints1, Set<LogicConstraint> constraints2) {
-        if (constraints1.size() != constraints2.size()) return false;
-        if (constraints1.isEmpty()) return true;
-
-        LogicConstraint constraint1 = constraints1.iterator().next();
-        for (LogicConstraint constraint2 : constraints2) {
-            if (areIsomorphic(constraint1, constraint2)) {
-                Set<LogicConstraint> newConstraints1 = removeFrom(constraints1, constraint1);
-                Set<LogicConstraint> newConstraints2 = removeFrom(constraints2, constraint2);
-                if (areLogicConstraintsIsomorphic(newConstraints1, newConstraints2)) return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean areDerivationRulesIsomorphic(Set<DerivationRule> rules1, Set<DerivationRule> rules2) {
-        if (rules1.size() != rules2.size()) return false;
-        if (rules1.isEmpty()) return true;
-
-        DerivationRule rule1 = rules1.stream().findFirst().orElseThrow();
-        for (DerivationRule rule2 : rules2) {
-            if (areIsomorphic(rule1, rule2)) {
-                Set<DerivationRule> newRules1 = removeFrom(rules1, rule1);
-                Set<DerivationRule> newRules2 = removeFrom(rules2, rule2);
-                if (areDerivationRulesIsomorphic(newRules1, newRules2)) return true;
-            }
-        }
-        return false;
-    }
-
-    private <T extends NormalClause> Set<T> removeFrom(Set<T> clauses, T clause) {
-        Set<T> result = new LinkedHashSet<>(clauses);
+    private <T extends NormalClause> List<T> removeFrom(List<T> clauses, T clause) {
+        List<T> result = new LinkedList<>(clauses);
         result.remove(clause);
         return result;
     }

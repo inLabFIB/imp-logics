@@ -6,7 +6,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMoth
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -399,6 +398,25 @@ class IsomorphismComparatorTest {
                                                 S1(x) :- T(x)
                                                 S2(x) :- T(x)
                                                 R(x) :- U(x)
+                                                """
+                                )
+                        ),
+                        Arguments.of(
+                                "Two derived predicates are not isomorphic if one of its derivation rules is not isomorphic",
+                                ImmutableLiteralsListMother.create(
+                                        "P(x), Der(x)",
+                                        """
+                                                Der(x) :- R(x, y)
+                                                Der(x) :- R2(x, y)
+                                                Der(x) :- R3(x, y)
+                                                """
+                                ),
+                                ImmutableLiteralsListMother.create(
+                                        "P(x), Der(x)",
+                                        """
+                                                Der(x) :- R(x, y)
+                                                Der(x) :- R2(x, y)
+                                                Der(x) :- R4(x, y)
                                                 """
                                 )
                         )
@@ -806,7 +824,6 @@ class IsomorphismComparatorTest {
             );
         }
 
-        @Disabled
         @ParameterizedTest(name = "[{index}] {0}")
         @MethodSource("provideNonIsomorphicSchemas")
         public void should_returnFalse_whenSchemaDiffer_inNumberOfRepeatedIsomorphicDerivationRules(String name, LogicSchema schema1, LogicSchema schema2) {
