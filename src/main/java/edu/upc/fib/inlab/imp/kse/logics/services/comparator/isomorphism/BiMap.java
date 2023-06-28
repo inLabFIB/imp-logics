@@ -1,14 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class BiMap<K, V> {
 
     private LinkedHashMap<K, V> map = new LinkedHashMap<>();
     private LinkedHashMap<V, K> inverseMap = new LinkedHashMap<>();
-
 
     public BiMap(BiMap<K, V> bimap) {
         this.map = new LinkedHashMap<>(bimap.map);
@@ -27,15 +24,17 @@ public class BiMap<K, V> {
         return map.get(k);
     }
 
-    public boolean containsKey(K k) {
+    void remove(K k) {
+        V v = map.remove(k);
+        inverseMap.remove(v);
+    }
+
+    boolean containsKey(K k) {
         return map.containsKey(k);
     }
 
-    public boolean containsValue(V v) {
+    boolean containsValue(V v) {
         return inverseMap.containsKey(v);
     }
 
-    public Set<Map.Entry<K, V>> entrySet() {
-        return map.entrySet();
-    }
 }

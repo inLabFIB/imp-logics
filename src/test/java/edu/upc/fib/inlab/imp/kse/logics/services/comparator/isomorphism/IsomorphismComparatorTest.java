@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@Disabled
 class IsomorphismComparatorTest {
 
     @Nested
@@ -173,6 +172,11 @@ class IsomorphismComparatorTest {
                     assertThat(isIsomorphism).describedAs(name).isFalse();
                 }
 
+                // x < y
+                // x<->y
+                // y<->x
+                // x > y
+
                 private static Stream<Arguments> provideBuiltInLiteralsNotIsomorphic() {
                     List<Arguments> arguments = new LinkedList<>();
                     for (ComparisonOperator operator : ComparisonOperator.values()) {
@@ -312,6 +316,29 @@ class IsomorphismComparatorTest {
                                                 Der2(x) :- S(x)
                                                 Der2(x) :- T(x)
                                                 """)
+                        ),
+                        Arguments.of(
+                                "Several derivation rules, with several depths, changing the order or rules",
+                                ImmutableLiteralsListMother.create(
+                                        "P(x), Q(x), R(x)",
+                                        """ 
+                                                P(x) :- A(x)
+                                                P(x) :- B(x)
+                                                Q(x) :- B(x)
+                                                R(x) :- B(x)
+                                                A(x) :- a(x)
+                                                B(x) :- a(x)
+                                                """),
+                                ImmutableLiteralsListMother.create(
+                                        "P'(x), Q'(x), R'(x)",
+                                        """ 
+                                                P'(x) :- B'(x)
+                                                P'(x) :- A'(x)
+                                                Q'(x) :- B'(x)
+                                                R'(x) :- B'(x)
+                                                A'(x) :- a(x)
+                                                B'(x) :- a(x)
+                                                """)
                         )
                 );
             }
@@ -321,9 +348,7 @@ class IsomorphismComparatorTest {
             public void changeDerivedPredicateNameAllowed_resultFalse(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
                 boolean changingDerivedPredicateNameAllowed = true;
                 IsomorphismComparator isomorphismComparator = new IsomorphismComparator(false, false, changingDerivedPredicateNameAllowed);
-
                 boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-
                 assertThat(isIsomorphism).describedAs(name).isFalse();
             }
 
@@ -628,27 +653,63 @@ class IsomorphismComparatorTest {
 
     @Nested
     class DerivationRuleIsomorphismTest {
-        /**
-         * The derivation rules are already tested within the immutable literals list.
-         */
-        @Test
-        public void should_returnTrue_whenDerivationRulesAreIsomorphic() {
-            DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
-            DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
 
-            IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
-            boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
-            assertThat(areIsomorphic).isTrue();
+        @Nested
+        class ParameterIndependentTest {
+
+            /**
+             * The derivation rules are already tested within the immutable literals list.
+             */
+            @Test
+            public void should_returnTrue_whenDerivationRulesAreIsomorphic() {
+                DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
+                DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
+                boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+                assertThat(areIsomorphic).isTrue();
+            }
+
+            @Test
+            public void should_returnFalse_whenDerivationRulesAreNotIsomorphic() {
+                DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
+                DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), R(x)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
+                boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+                assertThat(areIsomorphic).isFalse();
+            }
+
         }
 
-        @Test
-        public void should_returnFalse_whenDerivationRulesAreNotIsomorphic() {
-            DerivationRule rule1 = DerivationRuleMother.create("P(x) :- Q(x, y), not(R(x))");
-            DerivationRule rule2 = DerivationRuleMother.create("P(x) :- Q(x, y), R(x)");
+        @Nested
+        class ParameterIntegrationTest {
 
-            IsomorphismComparator comparator = new IsomorphismComparator(false, false, false);
-            boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
-            assertThat(areIsomorphic).isFalse();
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideNonIsomorphicDerivationRules")
+            public void should_returnFalse_whenDerivationRulesAreNotIsomorphic(String name, DerivationRule rule1, DerivationRule rule2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(true, true, true);
+                boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+                assertThat(areIsomorphic).describedAs(name).isFalse();
+            }
+
+            private static Stream<Arguments> provideNonIsomorphicDerivationRules() {
+
+                return Stream.of(
+                        Arguments.of(
+                                "Head with different term names",
+                                DerivationRuleMother.create("P(x) :- Q(x, y)"),
+                                DerivationRuleMother.create("P(y) :- Q(x, y)")
+                        ),
+                        Arguments.of(
+                                "Head with term which does not exist in normal clause",
+                                DerivationRuleMother.create("P(x) :- Q(x, y)"),
+                                DerivationRuleMother.create("P(a) :- Q(x, y)")
+                        )
+                );
+
+            }
+
         }
     }
 
@@ -692,55 +753,127 @@ class IsomorphismComparatorTest {
             assertThat(areIsomorphic).isFalse();
         }
 
-        @Test
-        public void should_returnTrue_whenSchemasAreIsomorphic() {
-            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDs(
-                    """
-                            @1 :- P(x), not(Q(x)), Der1(x), x > 4
-                            @2 :- P(x), not(Q(x)), Der2(x), x < 0
-                            Der1(x) :- S(x, y)
-                            Der2(x) :- S(x, y), not(T(y))
-                            Der2(x) :- S2(x, y), not(T(y))
-                            """);
-            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDs(
-                    """
-                            @101 :- P(a), not(Q(a)), Der2'(a), a < 0
-                            @102 :- P(a), not(Q(a)), a > 4 , Der1'(a)
-                            Der2'(a) :- not(T(b)), S(a, b)
-                            Der1'(a) :- S(a, b)
-                            Der2'(a) :- S2(a, b), not(T(b))
-                            """);
-
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("provideIsomorphicSchemas")
+        public void should_returnTrue_whenSchemasAreIsomorphic(String name, LogicSchema schema1, LogicSchema schema2) {
             IsomorphismComparator comparator = new IsomorphismComparator(true, true, true);
             boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
-
-            assertThat(areIsomorphic).isTrue();
+            assertThat(areIsomorphic).describedAs(name).isTrue();
         }
 
-        @Test
-        public void should_returnFalse_whenSchemaDiffer_inNumberOfRepeatedIsomorphicDerivationRules() {
-            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDs(
-                    """
-                            @1 :- P1(x), Q(x)
-                            @2 :- P2(x), Q(x)
-                            Q(x) :- R(x)
-                            S(x) :- R(x)
-                            """);
+        private static Stream<Arguments> provideIsomorphicSchemas() {
+            return Stream.of(
+                    Arguments.of(
+                            "Case 1",
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @1 :- P(x), not(Q(x)), Der1(x), x > 4
+                                            @2 :- P(x), not(Q(x)), Der2(x), x < 0
+                                            Der1(x) :- S(x, y)
+                                            Der2(x) :- S(x, y), not(T(y))
+                                            Der2(x) :- S2(x, y), not(T(y))
+                                            """),
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @101 :- P(a), not(Q(a)), Der2'(a), a < 0
+                                            @102 :- P(a), not(Q(a)), a > 4 , Der1'(a)
+                                            Der2'(a) :- not(T(b)), S(a, b)
+                                            Der1'(a) :- S(a, b)
+                                            Der2'(a) :- S2(a, b), not(T(b))
+                                            """)
+                    ),
+                    Arguments.of(
+                            "Case 2",
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            P(x) :- A(x)
+                                            P(x) :- B(x)
+                                            Q(x) :- B(x)
+                                            R(x) :- B(x)
+                                            A(x) :- a(x)
+                                            B(x) :- a(x)
+                                            """),
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            P'(x) :- B'(x)
+                                            P'(x) :- A'(x)
+                                            Q'(x) :- B'(x)
+                                            R'(x) :- B'(x)
+                                            A'(x) :- a(x)
+                                            B'(x) :- a(x)
+                                            """)
+                    )
+            );
+        }
 
-            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDs(
-                    """
-                            @1 :- P1(x), Q(x)
-                            @2 :- P2(x), S(x)
-                            Q(x) :- R(x)
-                            S(x) :- R(x)
-                            """);
-
-            boolean changingDerivedPredicateNameAllowed = true;
-            IsomorphismComparator comparator = new IsomorphismComparator(false, false, changingDerivedPredicateNameAllowed);
+        @Disabled
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("provideNonIsomorphicSchemas")
+        public void should_returnFalse_whenSchemaDiffer_inNumberOfRepeatedIsomorphicDerivationRules(String name, LogicSchema schema1, LogicSchema schema2) {
+            IsomorphismComparator comparator = new IsomorphismComparator(true, true, true);
             boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
+            assertThat(areIsomorphic).describedAs(name).isFalse();
+        }
 
-            assertThat(areIsomorphic).isFalse();
+        private static Stream<Arguments> provideNonIsomorphicSchemas() {
+            return Stream.of(
+                    Arguments.of(
+                            "Cannot map the same predicate, from logic constraints, to two different predicates",
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @1 :- P1(x), Q(x)
+                                            @2 :- P2(x), Q(x)
+                                            Q(x) :- R(x)
+                                            S(x) :- R(x)
+                                            """),
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @1 :- P1(x), Q(x)
+                                            @2 :- P2(x), S(x)
+                                            Q(x) :- R(x)
+                                            S(x) :- R(x)
+                                            """)
+                    ),
+                    Arguments.of(
+                            "Cannot map the same predicate, from derivation rules, to several predicates",
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            P(x) :- A(x)
+                                            P(x) :- B(x)
+                                            Q(x) :- B(x)
+                                            R(x) :- B(x)
+                                            A(x) :- a(x)
+                                            B(x) :- a(x)
+                                            """),
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            P'(x) :- A'(x)
+                                            P'(x) :- B'(x)
+                                            Q'(x) :- A'(x)
+                                            R'(x) :- B'(x)
+                                            A'(x) :- a(x)
+                                            B'(x) :- a(x)
+                                            """)
+                    ),
+                    Arguments.of(
+                            "Cannot map the same predicate, from logic constraint and derivation rule, to two different predicates",
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @1 :- A(x)
+                                            P(x) :- A(x)
+                                            A(x) :- a(x)
+                                            B(x) :- a(x)
+                                            """),
+
+                            LogicSchemaMother.buildLogicSchemaWithIDs(
+                                    """
+                                            @1 :- A'(x)
+                                            P(x) :- B'(x)
+                                            A'(x) :- a(x)
+                                            B'(x) :- a(x)
+                                            """)
+                    )
+            );
         }
     }
-
 }
