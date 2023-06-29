@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Class to recognize whether two list of literals (or derivation rules, or logic constraints) are isomorphic.
  * Two list of literals are isomorphic, iff they have a bijective map respecting:
  * - kind of literal (OrdinaryLiterals can only be mapped to OrdinaryLiterals, the same with BuiltInLiterals, etc).
- * - Polarity of mapped literals
+ * - Polarity of mapped ordinary literals
  * - Names of base predicates
  * - the induced mapping of the variables is also an isomorphism (there is a bijective map of terms, where variables
  * are mapped to variables, and constants to the same value constants)
@@ -27,8 +27,90 @@ import java.util.stream.Collectors;
  * When allowing to change the name of derived predicates, two derived literals can be mapped iff their derivation rules
  * are isomorphic. In such case, there must also exist a bijective map of derived predicate names (i.e., the same
  * predicate name cannot be mapped twice to two different predicate names, despite all their rules being isomorphic).
+ * <p>
+ * Note: the comparison of predicate/term names is case-sensitive.
  */
 public class IsomorphismComparator {
+    /**
+     * This class implements a backtracking search of isomorphisms.
+     * Such search is quite tricky. Hence, we first discuss the problem, and then, discuss its current solution.
+     * <p>
+     * <h2>The problem</h2>
+     * Assume the most difficult case. That is, we want to search for an isomorphism between schemas,
+     * where we want to permit renaming variables, changing the order of the literals, and changing the name of derived predicates.
+     * <p>
+     * Coherently, we must backtrack, during the search, with three different things:
+     * <ul>
+     * <li> Order of NormalClauses (we must try to make isomorphic normalClause1 from schema 1 with normalClause 1,2,3... from schema2)
+     * <li> Names of DerivedPredicates (we must try to make isomorphic derivedPredicateName1 from schema 1 with predicatePredicateName 1,2,3... from schema 2)
+     * <li> Order of Literals (we must try to make isomorphic literal1 from normalClause1 with literal 1,2,3... from normalClause2)
+     * <br> (do not that we do not need to backtrack with terms, because an isomorphism of literals induces an isomorphism of terms.
+     * That is, if we map the literal "P(x)" to "P(y)", implicitly, we are defining a terms map "x->y")
+     * </ul>
+     * <p>
+     * A possible (naive) algorithm might have been to blindly backtrack all such mappings. It would have been something like this:
+     * </p>
+     * <ul>
+     * <li> F1: Define an algorithm that tries all possible maps of LogicConstraints from one schema, to the other, and in the base case, invokes F2
+     * <li> F2: Define an algorithm that tries all possible maps of DerivedPredicates from one schema, to the other, and in the base case, invokes F3 for each pair of derived predicates
+     * <li> F3: Define an algorithm that tries all possible maps of DerivationRules for those derived predicates, and in the base case, invoke F4
+     * <li> F4: Define an algorithm that tries all possible maps of Literals from one rule, to the other rule until finding the isomorphism.
+     * </ul>
+     * <p>
+     * This strategy would have been very inefficient since, in essence, it is too blind and tries all possible combinations of almost everything.
+     * If the schemas had been too large, such algorithm, probably, would have never work.
+     *
+     * <h2>The current solution</h2>
+     * <h3> The general idea: From top to bottom</h3>
+     * We look for a solution where decisions are made on the fly, and propagated from top to bottom.
+     * That is, if we decide to make isomorphic the following derivation rules:
+     * <ul>
+     * <li> Der(x) :- P(x), Q(x)
+     * <li> Der(x) :- P'(x), Q'(x)
+     * </ul>
+     * Do note that, implicitly, we are also deciding to map P to: P' (or Q'), and nothing else. The basic idea, hence,
+     * is to propagate such solution downwards. That is, if we decide to map P to P', we must then try to make isomorphic
+     * their derivation rules which, in its turn, will decide more predicates mappings, which will make more
+     * derivation rules isomorphic, etc. Do note that this is recursive, and somehow, remembers the structure of a tree.
+     * <p>
+     * The problem is that two derived predicate names cannot be mapped to two different predicate names, and each branch
+     * of the tree might try to map the same predicate name to two different predicate names. Consider the following example:
+     * <ul>
+     * <li> Der(x) :- P(x), Q(x), R(x)
+     * <br> P(x) :- A(x)
+     * <br> Q(x) :- B(x)
+     * <br> R(x) :- A(x)
+     * <br> A(x) :- a(x)
+     * <br> B(x) :- a(x)
+     * <li> Der(x) :- P'(x), Q'(x), R'(x)
+     * <br> P'(x) :- B'(x)
+     * <br> Q'(x) :- A'(x)
+     * <br> R'(x) :- A'(x)
+     * <br> A'(x) :- a(x)
+     * <br> B'(x) :- a(x)
+     * </ul>
+     * If we try to map P to P', we are also inducing that A must be mapped to B'.
+     * If we try to map Q to Q', we are also inducing that B must be mapped to A'.
+     * If we try to map R to R', we are also inducing that A must be mapped to A'.
+     * Do note that we have reached a contradiction.
+     * <p>
+     * Hence, each branch must be aware of the predicate names renaming proposed by other branches.
+     * This can be solved by making each branch return its induced predicateMap, and making each branch
+     * use the previous inducedMap by the other branch to extend it.
+     * <p>
+     * The problem gets really difficult when each branch can induce several possible maps. Indeed, we cannot
+     * return all the possible induced maps since there might be too many.
+     * <p>
+     * To avoid retrieving the several possible maps, what we do is to pass a lambda functions during the recursion
+     * that, intuitively, checks the remaining part of the tree. That is, when we try to map P to P', and apply a recursive
+     * call to make the map of its brothers (Q, and R), we annotate, in the lambda function, that we lack computing
+     * the isomorphism of the definition rule of P (that will induce the predicate map A to B').
+     * <p>
+     * As a result, the recursion tries to map P->P', Q->Q', R->R', and then, reaches a base case where there is no more
+     * literals to map. In the base case, the recursion applies the lambdas that contains the remaining jobs. That is,
+     * it first checks the derivation rules of P, then the derivation rules of Q, and then the derivation rules of R.
+     * If the lambda fails, the algorithm bactracks and checks the ramaining part of the tree with another combination.
+     */
 
     private final boolean changeVariableNamesAllowed;
     private final boolean changeLiteralOrderAllowed;
@@ -40,26 +122,54 @@ public class IsomorphismComparator {
         this.changingDerivedPredicateNameAllowed = changingDerivedPredicateNameAllowed;
     }
 
-    public boolean areIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2) {
+    /**
+     * Check whether two lists of literals are isomorphic
+     *
+     * @param literals1 a list of literals
+     * @param literals2 a list of literals
+     * @return boolean indicating whether the two lists of literals are isomorphic
+     */
+    public boolean areIsomorphic(List<Literal> literals1, List<Literal> literals2) {
         return areIsomorphic(literals1, literals2, new PredicateMap(), new LiteralMap(), new TermMap(), () -> true);
     }
 
+    /**
+     * Check whether two logic constraints are isomorphic
+     *
+     * @param constraint1 a logic constraint
+     * @param constraint2 a logic constraint
+     * @return boolean indicating whether the two logic constraints are isomorphic
+     */
     public boolean areIsomorphic(LogicConstraint constraint1, LogicConstraint constraint2) {
         return areIsomorphic(constraint1.getBody(), constraint2.getBody());
     }
 
+    /**
+     * Check whether two derivation rules are isomorphic
+     *
+     * @param derivationRule1 a derivation rule
+     * @param derivationRule2 a derivation rule
+     * @return boolean indicating whether the two derivation rules are isomorphic
+     */
+    public boolean areIsomorphic(DerivationRule derivationRule1, DerivationRule derivationRule2) {
+        Atom head1 = derivationRule1.getHead();
+        Atom head2 = derivationRule2.getHead();
+        Optional<TermMap> termMap = areDerivationRuleHeadsIsomorphic(head1, head2);
+        return termMap
+                .filter(map -> areIsomorphic(derivationRule1.getBody(), derivationRule2.getBody(), new PredicateMap(), new LiteralMap(), map, () -> true))
+                .isPresent();
+    }
+
+    /**
+     * Check whether two logic schemas are isomorphic
+     *
+     * @param schema1 a logic schema
+     * @param schema2 a logic schema
+     * @return boolean indicating whether the two logic schemas are isomorphic
+     */
     public boolean areIsomorphic(LogicSchema schema1, LogicSchema schema2) {
         if (!areBasePredicatesIsomorphic(schema1, schema2)) return false;
         return areNormalClausesIsomorphic(schema1, schema2);
-    }
-
-    public boolean areIsomorphic(DerivationRule dr1, DerivationRule dr2) {
-        Atom head1 = dr1.getHead();
-        Atom head2 = dr2.getHead();
-        Optional<TermMap> termMap = areDerivationRuleHeadsIsomorphic(head1, head2);
-        return termMap
-                .filter(map -> areIsomorphic(dr1.getBody(), dr2.getBody(), new PredicateMap(), new LiteralMap(), map, () -> true))
-                .isPresent();
     }
 
     private Optional<TermMap> areDerivationRuleHeadsIsomorphic(Atom head1, Atom head2) {
@@ -76,7 +186,7 @@ public class IsomorphismComparator {
      * @param rules2       defines some predicate P2 with the same arity n
      * @param predicateMap already includes a map between P1 and P2. When exiting the function, it includes, also
      *                     a possible combination of predicate maps that proves such isomorphism.
-     * @param remainingJob
+     * @param remainingJob a boolean supplier (function without parameter) that must be true when searching the isomorphism
      * @return whether there is an isomorphism between rules1, and rules2, satisfying the predicateMap given and the remainingJob
      */
     private boolean areIsomorphic(List<DerivationRule> rules1, List<DerivationRule> rules2, PredicateMap predicateMap, BooleanSupplier remainingJob) {
@@ -84,7 +194,8 @@ public class IsomorphismComparator {
         if (rules1.isEmpty()) return remainingJob.getAsBoolean();
 
         DerivationRule rule1 = rules1.get(0);
-        for (DerivationRule rule2 : getRuleCandidates(rules2, rule1)) {
+        List<DerivationRule> ruleCandidates = getRulesOfSameBodySize(rules2, rule1);
+        for (DerivationRule rule2 : ruleCandidates) {
             Optional<TermMap> termMap = computeTermMap(rule1.getHeadTerms(), rule2.getHeadTerms());
             if (termMap.isPresent()) {
                 boolean bodiesAndRestOfDerivationRulesAreIsomorphic = areIsomorphic(rule1.getBody(), rule2.getBody(), predicateMap, new LiteralMap(), termMap.get(),
@@ -99,16 +210,21 @@ public class IsomorphismComparator {
     }
 
     /**
-     * @param remainingJob
-     * @return whether there is an isomorphism between rules1, and rules2, satisfying the predicateMap given and the remainingJob
+     * @param clauses1 not null
+     * @param clauses2 not null
+     * @param predicateMap not null. When exiting, contains a predicateMap that is compatible with an isomorphism
+     *                     between clauses1 and clauses2, if it exists. If there is none, it returns the same
+     *                     predicateMap with no modification
+     * @param remainingJob not null
+     * @return whether there is an isomorphism between clauses1, and clauses2, satisfying the predicateMap given and the remainingJob
      */
     private boolean areIsomorphicNormalClausesLists(List<NormalClause> clauses1, List<NormalClause> clauses2, PredicateMap predicateMap, BooleanSupplier remainingJob) {
         if (clauses1.size() != clauses2.size()) return false;
         if (clauses1.isEmpty()) return remainingJob.getAsBoolean();
 
         NormalClause clause1 = clauses1.get(0);
-        for (NormalClause clause2 : getClauseCandidates(clauses2, clause1)) {
-            Optional<TermMap> termMap = computeTermMapFromClause(clause1, clause2);
+        for (NormalClause clause2 : clauses2) {
+            Optional<TermMap> termMap = computeInitialTermMapFromClause(clause1, clause2);
             if (termMap.isPresent()) {
                 boolean bodiesAndRestOfNormalClausesAreIsomorphic = areIsomorphic(clause1.getBody(), clause2.getBody(), predicateMap, new LiteralMap(), termMap.get(),
                         () -> areIsomorphicNormalClausesLists(removeFrom(clauses1, clause1), removeFrom(clauses2, clause2), predicateMap, remainingJob)
@@ -121,7 +237,13 @@ public class IsomorphismComparator {
         return false;
     }
 
-    private Optional<TermMap> computeTermMapFromClause(NormalClause clause1, NormalClause clause2) {
+    /**
+     * @param clause1 not null
+     * @param clause2 not null
+     * @return a termMap that maps the head of clause1 to the head of clause2, if the clauses are derivation rules,
+     * or an empty termMap, if the clauses are LogicConstraints. Otherwise, return no termMap.
+     */
+    private Optional<TermMap> computeInitialTermMapFromClause(NormalClause clause1, NormalClause clause2) {
         if (clause1 instanceof LogicConstraint && clause2 instanceof LogicConstraint) {
             return Optional.of(new TermMap());
         } else if (clause1 instanceof DerivationRule rule1 && clause2 instanceof DerivationRule rule2) {
@@ -130,37 +252,30 @@ public class IsomorphismComparator {
         return Optional.empty();
     }
 
-    private <T extends NormalClause> List<T> getClauseCandidates(List<NormalClause> clauseList, T clause) {
-        List<T> result = new LinkedList<>();
-        for (NormalClause candidate : clauseList) {
-            if (candidate instanceof LogicConstraint && clause instanceof LogicConstraint) {
-                result.add((T) candidate);
-            } else if (candidate instanceof DerivationRule && clause instanceof DerivationRule) {
-                result.add((T) candidate);
-            }
-        }
-        return result;
-    }
 
     /**
-     * @param literals1
-     * @param literals2
-     * @param predicateMap will contain, when exiting the function, the predicates map that proves such isomorphism,
-     *                     if exists, or the same predicateMap, with no modification, if it does not exist.
-     * @param termMap
-     * @param remainingJob
-     * @return whether there is isomorphism between literals1, and literals2, respecting the given predicateMap, and termMap, and satisfying the remainingJob
+     * @param literals1    not null
+     * @param literals2    not null
+     * @param predicateMap not null. Will contain, when exiting the function, a predicates map
+     *                     that is compatible with an isomorphism between literals1 and literals2
+     *                     if it exists. If it does not exist, it contains the same predicateMap,
+     *                     with no modification.
+     * @param termMap      not null
+     * @param remainingJob not null
+     * @return whether there is isomorphism between literals1, and literals2,
+     * respecting the given predicateMap, and termMap, and satisfying the remainingJob
      */
-    private boolean areIsomorphic(ImmutableLiteralsList literals1, ImmutableLiteralsList literals2, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap, BooleanSupplier remainingJob) {
+    private boolean areIsomorphic(List<Literal> literals1, List<Literal> literals2, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap, BooleanSupplier remainingJob) {
         if (literals1.size() != literals2.size()) return false;
         if (literals1.isEmpty()) return remainingJob.getAsBoolean();
 
         Literal literal1 = literals1.get(0);
-        for (LiteralCandidate literalCandidate : getLiteralCandidates(literal1, literals2, predicateMap, literalMap, termMap)) {
+        List<IsomorphicLiteral> isomorphicLiteral = obtainIsomorphicLiterals(literal1, literals2, predicateMap, literalMap, termMap);
+        for (IsomorphicLiteral literalCandidate : isomorphicLiteral) {
             Optional<Predicate> newAddedPredicateInMap = updatePredicateMap(literal1, literalCandidate.literal(), predicateMap);
             LiteralMap newLiteralMap = computeNewLiteralMap(literal1, literalCandidate.literal(), literalMap);
-            ImmutableLiteralsList newLiterals1 = removeFromLiteralsList(literals1, literal1);
-            ImmutableLiteralsList newLiterals2 = removeFromLiteralsList(literals2, literalCandidate.literal());
+            List<Literal> newLiterals1 = removeFromLiteralsList(literals1, literal1);
+            List<Literal> newLiterals2 = removeFromLiteralsList(literals2, literalCandidate.literal());
             boolean brothersAreIsomorphicRec = areIsomorphic(newLiterals1, newLiterals2, predicateMap, newLiteralMap, literalCandidate.termMap(), () -> {
                 if (literal1 instanceof OrdinaryLiteral ol1 && ol1.isDerived() && literalCandidate.literal() instanceof OrdinaryLiteral ol2) {
                     return areSonsIsomorphic(ol1, ol2, predicateMap, remainingJob);
@@ -176,8 +291,8 @@ public class IsomorphismComparator {
     }
 
     /**
-     * @param literal1
-     * @param literal2
+     * @param literal1 not null
+     * @param literal2 not null
      * @param literalMap does not map literal1 neither literal2
      * @return a new literalMap containing the given literal map and a map literal1<->literal2
      */
@@ -198,22 +313,31 @@ public class IsomorphismComparator {
     }
 
 
+    /**
+     * @param ol1          not null, and derived
+     * @param ol2          not null, and derived
+     * @param predicateMap already mapping the predicate of ol1 to the predicate of ol2. Contains a predicateMap compatible
+     *                     with an isomorphism between the derivationRules of ol1, and the derivationRules of ol2.
+     * @param remainingJob not null
+     * @return whether there is an isomorphism between the derivation rules of ol1, and the derivationRules of ol2,
+     * satisfying the given predicateName, and remaining job.
+     */
     private boolean areSonsIsomorphic(OrdinaryLiteral ol1, OrdinaryLiteral ol2, PredicateMap predicateMap, BooleanSupplier remainingJob) {
         return areIsomorphic(ol1.getPredicate().getDerivationRules(), ol2.getPredicate().getDerivationRules(), predicateMap, remainingJob);
     }
 
-    private ImmutableLiteralsList removeFromLiteralsList(ImmutableLiteralsList literals, Literal literal) {
-        return new ImmutableLiteralsList(literals.stream()
+    private List<Literal> removeFromLiteralsList(List<Literal> literals, Literal literal) {
+        return literals.stream()
                 .filter(l -> l != literal)
-                .collect(Collectors.toCollection(LinkedList::new)));
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**
      * @param rules defines a predicate P2
      * @param rule  defines a predicate P
-     * @return all those derivation rules from rules that might be isomorphic to rule
+     * @return all those derivation rules from rules that have the same body size as rule
      */
-    private List<DerivationRule> getRuleCandidates(List<DerivationRule> rules, DerivationRule rule) {
+    private List<DerivationRule> getRulesOfSameBodySize(List<DerivationRule> rules, DerivationRule rule) {
         return rules.stream()
                 .filter(candidateRule -> hasSameBodySize(rule, candidateRule))
                 .collect(Collectors.toCollection(LinkedList::new));
@@ -224,37 +348,37 @@ public class IsomorphismComparator {
     }
 
     /**
-     * @param literal
-     * @param literals
-     * @param predicateMap
-     * @param literalMap
-     * @param termMap
-     * @return all those literals from literals that might be isomorphic to literal according to the predicateMap, the termMap, and the literalMap
+     * @param literal      not null
+     * @param literalList  not null
+     * @param predicateMap not null
+     * @param literalMap   not null
+     * @param termMap      not null
+     * @return all those literals from literalList that are isomorphic to literal satisfying the predicateMap, the literalMap,
+     * and the termMap.
      */
-    private List<LiteralCandidate> getLiteralCandidates(Literal literal, ImmutableLiteralsList literals, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap) {
-        List<LiteralCandidate> result = new LinkedList<>();
+    private List<IsomorphicLiteral> obtainIsomorphicLiterals(Literal literal, List<Literal> literalList, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap) {
+        List<IsomorphicLiteral> result = new LinkedList<>();
         if (changeLiteralOrderAllowed) {
-            for (Literal candidateLiteral : literals) {
-
+            for (Literal candidateLiteral : literalList) {
                 Optional<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
-                resultTermMap.ifPresent(map -> result.add(new LiteralCandidate(candidateLiteral, map)));
+                resultTermMap.ifPresent(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
 
             }
         } else {
-            Literal candidateLiteral = literals.get(0);
+            Literal candidateLiteral = literalList.get(0);
             Optional<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
-            resultTermMap.ifPresent(map -> result.add(new LiteralCandidate(candidateLiteral, map)));
+            resultTermMap.ifPresent(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
 
         }
         return result;
     }
 
     /**
-     * @param l1
-     * @param l2
-     * @param predicateMap
-     * @param literalMap
-     * @param termMap
+     * @param l1 not null
+     * @param l2 not null
+     * @param predicateMap not null
+     * @param literalMap not null
+     * @param termMap not null.
      * @return a new termMap, containing the map given in the input, that makes the terms of l1 isomorphic to the terms of l2,
      * only if l1 can be isomorphic to l2 (e.g., they have the same predicate name, etc)
      */
