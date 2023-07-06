@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.DerivationRuleSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.TermSpec;
@@ -45,6 +46,7 @@ public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
      *
      * @param expected not-null
      * @return this assertion
+     * @see LogicEquivalenceAnalyzer
      */
     @SuppressWarnings("unused")
     public DerivationRuleAssert isLogicallyEquivalent(DerivationRule expected) {

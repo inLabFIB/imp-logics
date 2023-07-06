@@ -48,6 +48,7 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
      *
      * @param expected not-null
      * @return this assertion
+     * @see LogicEquivalenceAnalyzer
      */
     @SuppressWarnings("unused")
     public LogicConstraintAssert isLogicallyEquivalent(LogicConstraint expected) {
