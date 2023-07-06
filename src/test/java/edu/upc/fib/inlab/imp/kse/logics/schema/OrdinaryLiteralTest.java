@@ -6,6 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -165,7 +166,8 @@ public class OrdinaryLiteralTest {
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList);
+                        .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                        .isIsomorphicTo(expectedLiteralsList);
             }
 
             @Test
@@ -198,7 +200,8 @@ public class OrdinaryLiteralTest {
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList);
+                        .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                        .isIsomorphicTo(expectedLiteralsList);
             }
 
             public static Stream<Arguments> literalsAndItsNegation() {
@@ -233,7 +236,8 @@ public class OrdinaryLiteralTest {
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList);
+                        .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                        .isIsomorphicTo(expectedLiteralsList);
             }
 
             @Test
@@ -257,7 +261,8 @@ public class OrdinaryLiteralTest {
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
                 expectedUnfolded.forEach(expected ->
                         Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> assertThat(unfolded)
-                                .hasSameStructureAs(expected)));
+                                .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                                .isIsomorphicTo(expected)));
             }
 
 
@@ -283,7 +288,8 @@ public class OrdinaryLiteralTest {
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
-                        .hasSameStructureAs(expectedLiteralsList1);
+                        .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
+                        .isIsomorphicTo(expectedLiteralsList1);
             }
 
 
@@ -317,7 +323,8 @@ public class OrdinaryLiteralTest {
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(6);
                 expectedUnfolded.forEach(expected ->
                         Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> assertThat(unfolded)
-                                .hasSameStructureAs(expected)));
+                                .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
+                                .isIsomorphicTo(expected)));
             }
 
         }

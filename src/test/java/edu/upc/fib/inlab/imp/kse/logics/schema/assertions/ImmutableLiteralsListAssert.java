@@ -7,6 +7,8 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicStructureComparator;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismComparator;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -18,6 +20,8 @@ import static org.assertj.core.util.Lists.newArrayList;
 
 public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLiteralsListAssert, ImmutableLiteralsList, Literal, LiteralAssert> {
     private final LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
+    private IsomorphismOptions isomorphismOptions = new IsomorphismOptions();
+
 
     protected ImmutableLiteralsListAssert(ImmutableLiteralsList actual) {
         super(actual, ImmutableLiteralsListAssert.class);
@@ -29,11 +33,11 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
 
 
     /**
-     * Checks whether the actual literals are the same as the expected literals up-to renaming
-     * variables, and derived predicate names.
+     * Checks whether the actual literals are the same as the expected literals.
      *
      * @param expected not null
      * @return this assert
+     * @see LogicEquivalenceAnalyzer
      */
     public ImmutableLiteralsListAssert isLogicallyEquivalentTo(ImmutableLiteralsList expected) {
         Optional<Boolean> equivalenceResult = logicEquivalenceAnalyzer.areEquivalent(actual, expected);
@@ -135,12 +139,27 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
      * @return this assert
      */
     @SuppressWarnings("UnusedReturnValue")
+    @Deprecated
     public ImmutableLiteralsListAssert hasSameStructureAs(ImmutableLiteralsList expectedLiteralsList) {
         boolean haveSameStructureRecursively = new LogicStructureComparator(true, true)
                 .haveSameStructure(actual, expectedLiteralsList);
         Assertions.assertThat(haveSameStructureRecursively)
                 .describedAs("Actual literal list: " + actual + " \n" +
                         "has not the same structure as expected literal list: " + expectedLiteralsList).isTrue();
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public ImmutableLiteralsListAssert isIsomorphicTo(ImmutableLiteralsList expectedLiteralsList) {
+        boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expectedLiteralsList);
+        Assertions.assertThat(haveIsomorphism)
+                .describedAs("Actual literal list: " + actual + " \n" +
+                        "has not the same structure as expected literal list: " + expectedLiteralsList).isTrue();
+        return this;
+    }
+
+    public ImmutableLiteralsListAssert usingIsomorphismOptions(IsomorphismOptions options) {
+        isomorphismOptions = new IsomorphismOptions(options);
         return this;
     }
 
