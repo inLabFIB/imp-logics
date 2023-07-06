@@ -3,6 +3,8 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.*;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismComparator;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.services.printer.LogicSchemaPrinter;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
@@ -13,6 +15,7 @@ import java.util.Set;
 public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSchema> {
 
     private HomomorphismBasedEquivalenceAnalyzer analyzer = new HomomorphismBasedEquivalenceAnalyzer();
+    private IsomorphismOptions isomorphismOptions = new IsomorphismOptions();
 
     public LogicSchemaAssert(LogicSchema logicSchema) {
         super(logicSchema, LogicSchemaAssert.class);
@@ -87,12 +90,21 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
+    public LogicSchemaAssert isIsomorphicTo(LogicSchema expected) {
+        boolean isomorphic = new IsomorphismComparator(this.isomorphismOptions).areIsomorphic(this.actual, expected);
+        Assertions.assertThat(isomorphic).describedAs("Actual logic schema is not isomorphic to expected logic schema").isTrue();
+        return this;
+    }
+
     /**
      * @param expectedSchema not null
      * @return whether the actual schema has the same structure as the expected schemas as defined by LogicStructureComparator,
      * using a recursive check, and considering the order of the literals
+     * @deprecated Use isIsomorphicTo method
      */
     @SuppressWarnings("UnusedReturnValue")
+    @Deprecated
     public LogicSchemaAssert hasSameStructureAs(LogicSchema expectedSchema) {
         assertAllPredicatesHaveSameStructure(expectedSchema);
         assertAllLogicConstraintsHaveSameStructure(expectedSchema);
@@ -162,7 +174,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         return this;
     }
 
-    protected LogicSchemaAssert assertAllLogicConstraintsAreEquivalentAccordingToAnalyzer(LogicSchema expectedSchema, LogicEquivalenceAnalyzer analyzer) {
+    private void assertAllLogicConstraintsAreEquivalentAccordingToAnalyzer(LogicSchema expectedSchema, LogicEquivalenceAnalyzer analyzer) {
         for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
             Optional<Boolean> actualIsExpected = logicConstraintIsContainedInList(actualConstraint, expectedSchema.getAllLogicConstraints(), analyzer);
             if (actualIsExpected.isPresent() && !actualIsExpected.get()) {
@@ -186,8 +198,6 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
                         "Actual schema: " + new LogicSchemaPrinter().print(actual) + "\n");
             }
         }
-
-        return this;
     }
 
     private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
@@ -358,6 +368,11 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
     public LogicSchemaAssert containsEquivalentPredicate(Predicate expectedPredicate) {
         Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
         PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
+        return this;
+    }
+
+    public LogicSchemaAssert usingIsomorphismOptions(IsomorphismOptions options) {
+        isomorphismOptions = new IsomorphismOptions(options);
         return this;
     }
 

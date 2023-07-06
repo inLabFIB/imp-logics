@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +56,9 @@ class SchemaUnfolderTest {
                                 A(a, b) :- B(a, b)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Test
@@ -75,7 +78,9 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Test
@@ -95,7 +100,9 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Test
@@ -115,7 +122,9 @@ class SchemaUnfolderTest {
                                 R(a, b) :- T(a, b)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Test
@@ -137,7 +146,9 @@ class SchemaUnfolderTest {
                                 T(c, d) :- U(c, d, z)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Test
@@ -166,7 +177,9 @@ class SchemaUnfolderTest {
                                 S(y) :- S2(y)
                             """
             );
-            assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+            assertThat(unfoldedSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                    .isIsomorphicTo(expectedSchema);
         }
 
         @Nested
@@ -188,7 +201,9 @@ class SchemaUnfolderTest {
                                     R(a, 1) :- T(a, b)
                                 """
                 );
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedSchema);
             }
 
             @Test
@@ -211,7 +226,9 @@ class SchemaUnfolderTest {
                                     R(a, 2) :- TT(a, b)
                                 """
                 );
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedSchema);
             }
 
             @Test
@@ -231,7 +248,9 @@ class SchemaUnfolderTest {
                                     R(a, 1) :- T(a, b)
                                 """
                 );
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedSchema);
             }
 
             @Test
@@ -254,7 +273,9 @@ class SchemaUnfolderTest {
                                     R(a, 2) :- TT(a, b)
                                 """
                 );
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedSchema);
             }
         }
 
@@ -277,7 +298,9 @@ class SchemaUnfolderTest {
                                     """
                 );
 
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedUnfoldedSchema);
             }
         }
 
@@ -300,7 +323,9 @@ class SchemaUnfolderTest {
                                     S(x,z) :- T(x,z)
                                 """);
 
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, false, false))
+                        .isIsomorphicTo(expectedUnfoldedSchema);
             }
 
             @Test
@@ -326,7 +351,9 @@ class SchemaUnfolderTest {
                                 """
                 );
 
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedUnfoldedSchema);
             }
 
             @Test
@@ -349,7 +376,9 @@ class SchemaUnfolderTest {
                                 """
                 );
 
-                assertThat(unfoldedSchema).isLogicallyEquivalentTo(expectedUnfoldedSchema);
+                assertThat(unfoldedSchema)
+                        .usingIsomorphismOptions(new IsomorphismOptions(true, true, false))
+                        .isIsomorphicTo(expectedUnfoldedSchema);
             }
         }
     }

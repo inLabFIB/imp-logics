@@ -109,17 +109,17 @@ public class IsomorphismComparator {
      * As a result, the recursion tries to map P->P', Q->Q', R->R', and then, reaches a base case where there is no more
      * literals to map. In the base case, the recursion applies the lambdas that contains the remaining jobs. That is,
      * it first checks the derivation rules of P, then the derivation rules of Q, and then the derivation rules of R.
-     * If the lambda fails, the algorithm bactracks and checks the ramaining part of the tree with another combination.
+     * If the lambda fails, the algorithm backtracks and checks the ramaining part of the tree with another combination.
      */
 
     private final boolean changeVariableNamesAllowed;
     private final boolean changeLiteralOrderAllowed;
     private final boolean changingDerivedPredicateNameAllowed;
 
-    public IsomorphismComparator(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed, boolean changingDerivedPredicateNameAllowed) {
-        this.changeVariableNamesAllowed = changeVariableNamesAllowed;
-        this.changeLiteralOrderAllowed = changeLiteralOrderAllowed;
-        this.changingDerivedPredicateNameAllowed = changingDerivedPredicateNameAllowed;
+    public IsomorphismComparator(IsomorphismOptions options) {
+        this.changeVariableNamesAllowed = options.changeVariableNamesAllowed();
+        this.changeLiteralOrderAllowed = options.changeLiteralOrderAllowed();
+        this.changingDerivedPredicateNameAllowed = options.changingDerivedPredicateNameAllowed();
     }
 
     /**
@@ -360,36 +360,35 @@ public class IsomorphismComparator {
         List<IsomorphicLiteral> result = new LinkedList<>();
         if (changeLiteralOrderAllowed) {
             for (Literal candidateLiteral : literalList) {
-                Optional<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
-                resultTermMap.ifPresent(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
-
+                List<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
+                resultTermMap.forEach(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
             }
         } else {
             Literal candidateLiteral = literalList.get(0);
-            Optional<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
-            resultTermMap.ifPresent(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
-
+            List<TermMap> resultTermMap = findTermMapForLiterals(literal, candidateLiteral, predicateMap, literalMap, termMap);
+            resultTermMap.forEach(map -> result.add(new IsomorphicLiteral(candidateLiteral, map)));
         }
         return result;
     }
 
     /**
-     * @param l1 not null
-     * @param l2 not null
+     * @param l1           not null
+     * @param l2           not null
      * @param predicateMap not null
-     * @param literalMap not null
-     * @param termMap not null.
-     * @return a new termMap, containing the map given in the input, that makes the terms of l1 isomorphic to the terms of l2,
-     * only if l1 can be isomorphic to l2 (e.g., they have the same predicate name, etc)
+     * @param literalMap   not null
+     * @param termMap      not null.
+     * @return a list of termMap, containing the map given in the input, that makes the terms of l1 isomorphic to the terms of l2,
+     * only if l1 can be isomorphic to l2 (e.g., they have the same predicate name, etc). It is a list since "a = b" have two maps with
+     * "c = d" (a->b, b->d; a->d, b->c)
      */
-    private Optional<TermMap> findTermMapForLiterals(Literal l1, Literal l2, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap) {
-        if (literalMap.containsInRange(l2)) return Optional.empty();
+    private List<TermMap> findTermMapForLiterals(Literal l1, Literal l2, PredicateMap predicateMap, LiteralMap literalMap, TermMap termMap) {
+        if (literalMap.containsInRange(l2)) return List.of();
         if (l1 instanceof OrdinaryLiteral ol1 && l2 instanceof OrdinaryLiteral ol2) {
-            return findTermMapForLiterals(ol1, ol2, predicateMap, termMap);
+            return findTermMapForLiterals(ol1, ol2, predicateMap, termMap).stream().toList();
         } else if (l1 instanceof BuiltInLiteral bl1 && l2 instanceof BuiltInLiteral bl2) {
             return findTermMapForLiterals(bl1, bl2, termMap);
         } else if (!l1.getClass().getName().equals(l2.getClass().getName())) {
-            return Optional.empty();
+            return List.of();
         } else {
             throw new RuntimeException("To be implemented");
         }
@@ -426,35 +425,33 @@ public class IsomorphismComparator {
         return !ol1.getPredicateName().equals(ol2.getPredicateName());
     }
 
-    private Optional<TermMap> findTermMapForLiterals(BuiltInLiteral bl1, BuiltInLiteral bl2, TermMap termMap) {
+    private List<TermMap> findTermMapForLiterals(BuiltInLiteral bl1, BuiltInLiteral bl2, TermMap termMap) {
         if (bl1 instanceof ComparisonBuiltInLiteral cbl1 && bl2 instanceof ComparisonBuiltInLiteral cbl2) {
             return findTermMapForLiterals(cbl1, cbl2, termMap);
         } else if (bl1 instanceof BooleanBuiltInLiteral bbl1 && bl2 instanceof BooleanBuiltInLiteral bbl2) {
-            return findTermMapForLiterals(bbl1, bbl2, termMap);
+            return findTermMapForLiterals(bbl1, bbl2, termMap).stream().toList();
         } else if (bl1 instanceof CustomBuiltInLiteral cbl1 && bl2 instanceof CustomBuiltInLiteral cbl2) {
-            return findTermMapForLiterals(cbl1, cbl2, termMap);
+            return findTermMapForLiterals(cbl1, cbl2, termMap).stream().toList();
         } else if (!bl1.getClass().getName().equals(bl2.getClass().getName())) {
-            return Optional.empty();
+            return List.of();
         } else {
             throw new RuntimeException("To be implemented");
         }
     }
 
-    private Optional<TermMap> findTermMapForLiterals(ComparisonBuiltInLiteral cbl1, ComparisonBuiltInLiteral cbl2, TermMap termMap) {
+    private List<TermMap> findTermMapForLiterals(ComparisonBuiltInLiteral cbl1, ComparisonBuiltInLiteral cbl2, TermMap termMap) {
+        List<TermMap> result = new LinkedList<>();
         ComparisonOperator operator1 = cbl1.getOperator();
         ComparisonOperator operator2 = cbl2.getOperator();
         Optional<TermMap> newTermMap = computeNewTermMap(cbl1.getTerms(), cbl2.getTerms(), termMap);
         Optional<TermMap> newReverseTermMap = computeNewTermMap(cbl1.getTerms(), reverseTerms(cbl2.getTerms()), termMap);
         if (operator1.equals(operator2)) {
-            if (ComparisonOperator.EQUALS.equals(operator1) || ComparisonOperator.NOT_EQUALS.equals(operator1)) {
-                return newTermMap.isPresent() ? newTermMap : newReverseTermMap;
-            } else {
-                return newTermMap;
-            }
-        } else if (operator1.isSymmetric(operator2)) {
-            return newReverseTermMap;
+            newTermMap.ifPresent(result::add);
         }
-        return Optional.empty();
+        if (operator1.isSymmetric(operator2)) {
+            newReverseTermMap.ifPresent(result::add);
+        }
+        return result;
     }
 
     private static ImmutableTermList reverseTerms(ImmutableTermList terms2) {

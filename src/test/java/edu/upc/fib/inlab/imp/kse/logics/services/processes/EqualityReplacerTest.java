@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -118,7 +119,9 @@ public class EqualityReplacerTest {
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(expectedLogicConstraintString);
-            assertThat(schemaTransformation.transformed()).hasSameStructureAs(expectedLogicSchema);
+            assertThat(schemaTransformation.transformed())
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
 
         }
 
@@ -130,7 +133,9 @@ public class EqualityReplacerTest {
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(expectedLogicConstraintString);
-            assertThat(schemaTransformation.transformed()).hasSameStructureAs(expectedLogicSchema);
+            assertThat(schemaTransformation.transformed())
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }

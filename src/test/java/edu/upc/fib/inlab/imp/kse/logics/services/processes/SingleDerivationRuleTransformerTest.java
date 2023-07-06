@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,9 @@ class SingleDerivationRuleTransformerTest {
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchema);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         @Test
@@ -160,7 +163,9 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(logicSchema);
         }
 
         @Test
@@ -173,7 +178,9 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(logicSchema);
         }
 
 
@@ -187,7 +194,9 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(logicSchema);
         }
 
         @Test
@@ -203,7 +212,9 @@ class SingleDerivationRuleTransformerTest {
             SingleDerivationRuleTransformer singleDerivationRuleTransformer = new SingleDerivationRuleTransformer();
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(logicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(logicSchema);
         }
 
         @Test
@@ -226,7 +237,9 @@ class SingleDerivationRuleTransformerTest {
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, true))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         @Test
@@ -280,7 +293,9 @@ class SingleDerivationRuleTransformerTest {
                     P_3(x) :- B(x, y)
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, true))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         @Test
@@ -306,7 +321,9 @@ class SingleDerivationRuleTransformerTest {
                     A_2(x, y) :- D(x, y)
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, true))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }
@@ -366,7 +383,9 @@ class SingleDerivationRuleTransformerTest {
                     """;
             LogicSchema expectedLogicSchema = new LogicSchemaWithIDsParser().parse(expectedSchemaString);
 
-            assertThat(logicSchemaTransformed).isLogicallyEquivalentTo(expectedLogicSchema);
+            assertThat(logicSchemaTransformed)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, true))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }

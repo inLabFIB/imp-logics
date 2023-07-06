@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
 import org.junit.jupiter.api.Nested;
@@ -74,7 +75,9 @@ public class TrivialLiteralCleanerTest {
                          @1 :- P(X)
                          P(x) :- Q(x)
                     """);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }
@@ -122,7 +125,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         public static Stream<Arguments> provideDerivationRulesAndBooleanBuiltinLiterals() {
@@ -164,7 +169,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
 
@@ -207,7 +214,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         public static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads() {
@@ -311,7 +320,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         public static Stream<Arguments> provideLogicSchemas() {
@@ -354,7 +365,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         public static Stream<Arguments> provideLogicSchemasWithNegation() {
@@ -421,7 +434,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }
@@ -565,7 +580,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
 
@@ -582,7 +599,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         @ParameterizedTest(name = "{0} -> {1}")
@@ -598,7 +617,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
 
     }
@@ -635,7 +656,9 @@ public class TrivialLiteralCleanerTest {
             LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchema, additionalExpectedPredicates);
-            assertThat(actualLogicSchema).hasSameStructureAs(expectedLogicSchema);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
         }
     }
 }
