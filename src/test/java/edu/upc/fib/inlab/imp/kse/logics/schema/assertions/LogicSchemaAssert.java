@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSchema> {
 
-    private HomomorphismBasedEquivalenceAnalyzer analyzer = new HomomorphismBasedEquivalenceAnalyzer();
+    private final HomomorphismBasedEquivalenceAnalyzer analyzer = new HomomorphismBasedEquivalenceAnalyzer();
     private IsomorphismOptions isomorphismOptions = new IsomorphismOptions();
 
     public LogicSchemaAssert(LogicSchema logicSchema) {
@@ -82,7 +82,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      * @param expectedSchema not null
      * @return this assert
      */
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public LogicSchemaAssert isLogicallyEquivalentTo(LogicSchema expectedSchema) {
         assertAllPredicatesAreEquivalent(expectedSchema);
         assertAllLogicConstraintsAreEquivalent(expectedSchema);
@@ -95,63 +95,6 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         boolean isomorphic = new IsomorphismComparator(this.isomorphismOptions).areIsomorphic(this.actual, expected);
         Assertions.assertThat(isomorphic).describedAs("Actual logic schema is not isomorphic to expected logic schema").isTrue();
         return this;
-    }
-
-    /**
-     * @param expectedSchema not null
-     * @return whether the actual schema has the same structure as the expected schemas as defined by LogicStructureComparator,
-     * using a recursive check, and considering the order of the literals
-     * @deprecated Use isIsomorphicTo method
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    @Deprecated
-    public LogicSchemaAssert hasSameStructureAs(LogicSchema expectedSchema) {
-        assertAllPredicatesHaveSameStructure(expectedSchema);
-        assertAllLogicConstraintsHaveSameStructure(expectedSchema);
-        return this;
-    }
-
-    private void assertAllLogicConstraintsHaveSameStructure(LogicSchema expectedSchema) {
-        for (LogicConstraint actualConstraint : actual.getAllLogicConstraints()) {
-            boolean actualIsExpected = logicConstraintIsContainedInListModusStructure(actualConstraint, expectedSchema.getAllLogicConstraints());
-            if (!actualIsExpected) {
-                Assertions.fail("Actual constraint \"" + actualConstraint + "\" is not expected");
-            }
-        }
-
-        for (LogicConstraint expectedConstraint : expectedSchema.getAllLogicConstraints()) {
-            boolean expectedIsFound = logicConstraintIsContainedInListModusStructure(expectedConstraint, actual.getAllLogicConstraints());
-            if (!expectedIsFound) {
-                Assertions.fail("Expected constraint \"" + expectedConstraint + "\" is missing");
-            }
-        }
-    }
-
-    private boolean logicConstraintIsContainedInListModusStructure(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
-        for (LogicConstraint aConstraintFromSet : constraintSet) {
-            if (new LogicStructureComparator(true, true).haveSameStructure(constraint, aConstraintFromSet)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void assertAllPredicatesHaveSameStructure(LogicSchema expectedSchema) {
-        for (Predicate actualPredicate : actual.getAllPredicates()) {
-            try {
-                Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
-                PredicateAssert.assertThat(actualPredicate).hasSameStructureAs(expectedPredicate);
-            } catch (PredicateNotExists e) {
-                Assertions.fail("Actual predicate " + actualPredicate.getName() + " was not expected");
-            }
-        }
-        for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
-            try {
-                actual.getPredicateByName(expectedPredicate.getName());
-            } catch (PredicateNotExists e) {
-                Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
-            }
-        }
     }
 
 
