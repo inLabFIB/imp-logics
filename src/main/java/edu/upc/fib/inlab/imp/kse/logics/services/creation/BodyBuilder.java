@@ -2,14 +2,12 @@ package edu.upc.fib.inlab.imp.kse.logics.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class in charge of instantiating the body of some normal clause given the predicates of the schema
@@ -18,10 +16,9 @@ class BodyBuilder {
     private final LiteralFactory literalFactory;
     private final List<Literal> body;
 
-    //TODO: Change parameter predicatesByName Map by LiteralFactory
-    public BodyBuilder(Map<String, ? extends Predicate> predicatesByName) {
+    public BodyBuilder(LiteralFactory literalFactory) {
         body = new LinkedList<>();
-        literalFactory = new LiteralFactory(predicatesByName);
+        this.literalFactory = literalFactory;
     }
 
     public BodyBuilder addLiteral(LiteralSpec literalSpec) {

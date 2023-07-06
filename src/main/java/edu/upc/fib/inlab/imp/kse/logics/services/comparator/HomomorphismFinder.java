@@ -96,12 +96,24 @@ public class HomomorphismFinder {
      * in rangeLiterals
      */
     public Optional<Substitution> findHomomorphism(List<Literal> domainLiterals, List<Literal> rangeLiterals) {
+        return this.findHomomorphism(domainLiterals, rangeLiterals, new Substitution());
+    }
+
+    /**
+     * @param domainLiterals      is not null, but might be empty. Does not contain derived literals
+     * @param rangeLiterals       is not null, neither contains derived literals
+     * @param initialSubstitution is not null
+     * @return a new substitution containing the given one, if exists, that would make domainLiterals to be contained
+     * in rangeLiterals
+     */
+    public Optional<Substitution> findHomomorphism(List<Literal> domainLiterals, List<Literal> rangeLiterals, Substitution initialSubstitution) {
         if (isNull(domainLiterals)) throw new IllegalArgumentException("DomainLiterals cannot be null");
         if (isNull(rangeLiterals)) throw new IllegalArgumentException("RangeLiterals cannot be null");
+        if (isNull(initialSubstitution)) throw new IllegalArgumentException("InitialSubstitution cannot be null");
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(domainLiterals);
         checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(rangeLiterals);
 
-        return computeHomomorphismExtensionForLiteralsList(new Substitution(), new ImmutableLiteralsList(domainLiterals), new ImmutableLiteralsList(rangeLiterals));
+        return computeHomomorphismExtensionForLiteralsList(initialSubstitution, new ImmutableLiteralsList(domainLiterals), new ImmutableLiteralsList(rangeLiterals));
     }
 
     private Optional<Substitution> findHomomorphismForHead(Atom domainHead, Atom rangeHead) {
@@ -127,7 +139,7 @@ public class HomomorphismFinder {
      * @return an extension of the currentSubstitution, if exists, that would make domainLiterals to be contained
      * in rangeLiterals
      */
-    protected Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, ImmutableLiteralsList domainLiterals, ImmutableLiteralsList rangeLiterals) {
+    protected Optional<Substitution> computeHomomorphismExtensionForLiteralsList(Substitution currentSubstitution, List<Literal> domainLiterals, ImmutableLiteralsList rangeLiterals) {
         if (domainLiterals.isEmpty()) return Optional.of(currentSubstitution);
         else {
             Literal domainLiteral = domainLiterals.get(0);
@@ -265,4 +277,6 @@ public class HomomorphismFinder {
             return Optional.empty();
         }
     }
+
+
 }

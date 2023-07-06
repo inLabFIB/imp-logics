@@ -104,7 +104,7 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
         addPredicatesFromBody(bodySpec);
-        return new BodyBuilder(predicatesByName).addLiterals(bodySpec).build();
+        return new BodyBuilder(new LiteralFactory(predicatesByName)).addLiterals(bodySpec).build();
     }
 
     private void addPredicatesFromBody(List<LiteralSpec> bodySpec) {

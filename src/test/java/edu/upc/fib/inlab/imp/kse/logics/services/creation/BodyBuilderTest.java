@@ -31,7 +31,8 @@ public class BodyBuilderTest {
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         OrdinaryLiteralSpec literalSpec = new OrdinaryLiteralSpec("P", termFactory.createTermSpecs("x", "y"), true);
 
-        BodyBuilder bodyBuilder = new BodyBuilder(Map.of("P", new Predicate("P", 2)));
+        final Map<String, Predicate> predicateMap = Map.of("P", new Predicate("P", 2));
+        BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(predicateMap));
         ImmutableLiteralsList body = bodyBuilder
                 .addLiteral(literalSpec)
                 .build();
@@ -48,7 +49,7 @@ public class BodyBuilderTest {
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
 
-        ImmutableLiteralsList body = new BodyBuilder(Collections.emptyMap())
+        ImmutableLiteralsList body = new BodyBuilder(new LiteralFactory(Collections.emptyMap()))
                 .addLiteral(builtInLiteralSpec)
                 .build();
 
@@ -64,7 +65,7 @@ public class BodyBuilderTest {
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y", "z");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
 
-        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
+        BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(Collections.emptyMap()));
         assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
                 WrongNumberOfTermsInBuiltInLiteral.class
         );
@@ -76,7 +77,7 @@ public class BodyBuilderTest {
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("ANYEQ", termSpecList);
 
-        BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
+        BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(Collections.emptyMap()));
         bodyBuilder.addLiteral(builtInLiteralSpec);
         ImmutableLiteralsList body = bodyBuilder.build();
 
@@ -95,7 +96,7 @@ public class BodyBuilderTest {
             List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec(booleanOperator, termSpecList);
 
-            BodyBuilder bodyBuilder = new BodyBuilder(Collections.emptyMap());
+            BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(Collections.emptyMap()));
             assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
                     WrongNumberOfTermsInBuiltInLiteral.class
             );
@@ -107,7 +108,7 @@ public class BodyBuilderTest {
         public void should_createBooleanBuiltIn_when_booleanBuiltInLiteralSpecContainsTerms(String booleanOperator) {
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec(booleanOperator, Collections.emptyList());
 
-            ImmutableLiteralsList body = new BodyBuilder(Collections.emptyMap())
+            ImmutableLiteralsList body = new BodyBuilder(new LiteralFactory(Collections.emptyMap()))
                     .addLiteral(builtInLiteralSpec)
                     .build();
 
@@ -132,7 +133,7 @@ public class BodyBuilderTest {
             List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("customBuiltInLiteral", termSpecList);
 
-            ImmutableLiteralsList body = new BodyBuilder(Collections.emptyMap())
+            ImmutableLiteralsList body = new BodyBuilder(new LiteralFactory(Collections.emptyMap()))
                     .addLiteral(builtInLiteralSpec)
                     .build();
 

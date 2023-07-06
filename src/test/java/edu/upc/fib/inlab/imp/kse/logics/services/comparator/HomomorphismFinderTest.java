@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
@@ -39,6 +40,13 @@ class HomomorphismFinderTest {
             }
 
             @Test
+            public void should_throwException_whenInitialSubstitution_isNull() {
+                HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), List.of(), null))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @Test
             public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
                 ImmutableLiteralsList domainLiteralList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
                         "R(x, y) :- T(x, y)");
@@ -57,6 +65,8 @@ class HomomorphismFinderTest {
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), rangeLiteralsList))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
+
+
         }
 
         @Nested
@@ -241,6 +251,30 @@ class HomomorphismFinderTest {
 
                     HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
                     Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
+                    assertThat(homomorphismOpt).isNotPresent();
+                }
+
+                @Test
+                public void should_findHomomorphism_whenGivingInitialCompatibleHomomorphism() {
+                    ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
+                    ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
+
+                    HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
+                    Substitution substitution = new Substitution();
+                    substitution.addMapping(new Variable("x"), new Variable("x"));
+                    Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList, substitution);
+                    assertThat(homomorphismOpt).isPresent();
+                }
+
+                @Test
+                public void should_notFindHomomorphism_whenGivingInitialIncompatibleHomomorphism() {
+                    ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
+                    ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
+
+                    HomomorphismFinder homomorphismFinder = new HomomorphismFinder(new SamePredicateNameCriteria());
+                    Substitution substitution = new Substitution();
+                    substitution.addMapping(new Variable("x"), new Variable("y"));
+                    Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList, substitution);
                     assertThat(homomorphismOpt).isNotPresent();
                 }
             }

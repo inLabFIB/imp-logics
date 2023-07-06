@@ -12,6 +12,7 @@ import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -130,12 +131,34 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         }
     }
 
+    /**
+     * Checks whether the actual literals has an isomorphism to the expected literals without
+     * changing the variable names given by parameter.
+     * <p>
+     * This assert is useful, for instance, to check the correct unfolding of a derived atom. E.g.: suppose an atom
+     * "P(a)" with derivation rule "P(x) :- R(x, a)". Its unfolding should bring a result isomorphic to "R(a,a')"
+     * possibly changing the variable "a'" but not "a".
+     *
+     * @param expected            not null
+     * @param varNamesNotToChange not null
+     * @return this assert
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public ImmutableLiteralsListAssert isIsomorphicToWithoutReplacingVariables(ImmutableLiteralsList expected, String... varNamesNotToChange) {
+        boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expected, varNamesNotToChange);
+        Assertions.assertThat(haveIsomorphism)
+                .describedAs("Actual literal list: " + actual + " \n" +
+                        "has no isomorphism with the expected literal list: " + expected +
+                        " without changing the variable names: " + Arrays.toString(varNamesNotToChange)).isTrue();
+        return this;
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public ImmutableLiteralsListAssert isIsomorphicTo(ImmutableLiteralsList expectedLiteralsList) {
         boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expectedLiteralsList);
         Assertions.assertThat(haveIsomorphism)
                 .describedAs("Actual literal list: " + actual + " \n" +
-                        "has not the same structure as expected literal list: " + expectedLiteralsList).isTrue();
+                        "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
         return this;
     }
 

@@ -20,7 +20,6 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
         return new LogicConstraintAssert(actual);
     }
 
-    //TODO: Review assertion cases withId or notId
     @SuppressWarnings("UnusedReturnValue")
     public LogicConstraintAssert correspondsSpecWithId(LogicConstraintWithIDSpec spec) {
         Assertions.assertThat(actual.getID().id()).isEqualTo(spec.getId());

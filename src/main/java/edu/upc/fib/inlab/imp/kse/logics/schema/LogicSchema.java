@@ -53,7 +53,6 @@ public class LogicSchema {
     }
 
     private void checkPredicatesBelongsToSchema(NormalClause c) {
-        //TODO: replace by a visitor that obtains Predicates
         for (Literal l : c.getBody()) {
             if (l instanceof OrdinaryLiteral ol) {
                 Predicate predicateFromConstraint = ol.getAtom().getPredicate();

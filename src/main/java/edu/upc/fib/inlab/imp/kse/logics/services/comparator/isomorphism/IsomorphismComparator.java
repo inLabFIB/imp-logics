@@ -134,6 +134,23 @@ public class IsomorphismComparator {
     }
 
     /**
+     * Check whether two lists of literals are isomorphic without renaming the variable names given by parameter
+     *
+     * @param literals1           a list of literals
+     * @param literals2           a list of literals
+     * @param varNamesNotToChange a list of variable names not to change
+     * @return boolean indicating whether the two lists of literals are isomorphic
+     */
+    public boolean areIsomorphic(List<Literal> literals1, List<Literal> literals2, String... varNamesNotToChange) {
+        TermMap termMap = new TermMap();
+        for (String varName : varNamesNotToChange) {
+            Term term = new Variable(varName);
+            termMap.put(term, term);
+        }
+        return areIsomorphic(literals1, literals2, new PredicateMap(), new LiteralMap(), termMap, () -> true);
+    }
+
+    /**
      * Check whether two logic constraints are isomorphic
      *
      * @param constraint1 a logic constraint

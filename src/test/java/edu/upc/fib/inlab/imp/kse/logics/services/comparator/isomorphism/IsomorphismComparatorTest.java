@@ -460,6 +460,26 @@ class IsomorphismComparatorTest {
         @Nested
         class ChangingVariableNames {
 
+            @Test
+            public void changeVariableNamesAllowed_resultTrue_whenVarNamesNotToChangeAreCompatible() {
+                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(true, false, false));
+                ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("P(x), R(x, y)");
+                ImmutableLiteralsList list2 = ImmutableLiteralsListMother.create("P(x), R(x, b)");
+                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2, "x");
+
+                assertThat(isIsomorphism).isTrue();
+            }
+
+            @Test
+            public void changeVariableNamesAllowed_resultFalse_whenVarNamesNotToChangeAreIncompatible() {
+                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(true, false, false));
+                ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("P(x), R(x, y)");
+                ImmutableLiteralsList list2 = ImmutableLiteralsListMother.create("P(x), R(x, b)");
+                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2, "y");
+
+                assertThat(isIsomorphism).isFalse();
+            }
+
             @ParameterizedTest(name = "[{index}] {0}")
             @MethodSource("provideIsomorphicLiteralListsAllowingVariableNamesChanges")
             public void changeVariableNamesAllowed_resultTrue(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {

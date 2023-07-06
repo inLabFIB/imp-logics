@@ -89,7 +89,6 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
             return new SchemaTransformation(logicSchema, transformedSchema, new SchemaTraceabilityMap());
         }
 
-        //TODO: ????
         PredicateNameToNewPredicateNamesMap predicateTransformMap = new PredicateNameToNewPredicateNamesMap();
         SchemaTraceabilityMap constraintTransformMap = new SchemaTraceabilityMap();
 
