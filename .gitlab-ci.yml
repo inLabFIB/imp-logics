@@ -1,38 +1,36 @@
 image: maven:3-openjdk-17-slim
+
 cache:
   paths:
-    - ./.m2/repository
-    - backend/target
+    - .m2/repository
+    - target/
   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
 
 variables:
-  MAVEN_CLI_OPTS: "--batch-mode"
+  MAVEN_CLI_OPTS: "-s ci_settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
 
 stages:
   - test
-  - build
   - deploy
 
 test:unit:
   stage: test
   script:
-    - mvn clean test -U
+    - mvn clean test -U $MAVEN_CLI_OPTS
   artifacts:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
 
-build:release:
-  stage: build
-  script:
-    - mvn package -DskipTests -U
-  artifacts:
-    paths:
-      - target/imp-logics-core-*.jar
-
 deploy:release:
   stage: deploy
   script:
-    - mvn deploy -DskipTests -s ci_settings.xml
-
+    - mvn deploy -DskipTests -U $MAVEN_CLI_OPTS
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
