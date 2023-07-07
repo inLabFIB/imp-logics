@@ -17,7 +17,6 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return new LiteralAssert(actual);
     }
 
-    //TODO: Try use hierarchy of Asserts
     @SuppressWarnings("UnusedReturnValue")
     public LiteralAssert correspondsSpec(LiteralSpec spec) {
         if (actual instanceof OrdinaryLiteral actualOrdinaryLiteral) {

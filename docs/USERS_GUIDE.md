@@ -24,7 +24,7 @@ Structurally, a LogicSchema is a set of:
 A logic schema bounds all such objects together and ensures their consistency. That is:
 
 - PredicateKey: There are no 2 predicates with the same name in the logic schema
-- LogicConstraintKey: There are no 2 logic constraints with the same constriantID
+- LogicConstraintKey: There are no 2 logic constraints with the same constraintID
 - PredicateClosure: All derived predicates and logic constraints are defined using predicates that belongs to the schema
 
 ## Instantiating a logic schema
@@ -32,8 +32,8 @@ A logic schema bounds all such objects together and ensures their consistency. T
 To better instantiate a logic schema, we provide three mechanisms:
 
 - LogicSchemaParser: parses a String codifying a logic schema according to some grammar
-- LogicSchemaBuilder: programatically creates, in an incremental fashion, a logic schema
-- LogicSchemaFactory: programatically creates, in a single step, a logic schema
+- LogicSchemaBuilder: programmatically creates, in an incremental fashion, a logic schema
+- LogicSchemaFactory: programmatically creates, in a single step, a logic schema
 
 To better grasp the intuition between the three methods, we provide an easy example for each of them.
 
@@ -127,7 +127,7 @@ If you want to manage the IDs automatically, you should use:
 - LogicSchemaFactory<LogicConstraintWithoutIDSpec> in case you are using the factory.
 
 By default, IMP logics will use consecutive numbers, starting form 1, to identify your constraints (e.g. 1, 2, 3, ...)
-However, such strategy can be overriden by providing a new implementation of the class `ConstraintIDGenerator`.
+However, such strategy can be overridden by providing a new implementation of the class `ConstraintIDGenerator`.
 
 ### Creating constants or variables
 
@@ -162,7 +162,7 @@ The complete specification of each process is given in the corresponding Javadoc
 
 We refer as `consistent-equivalent logic schema` to some new logic schema `S` s.t., for any set of base
 facts posed over the original schema, such set of facts is consistent in `S` iff it was consistent in the original
-schema. This means that a consistent-equivalent logic schema might have less predicates than the original schema
+schema. This means that a consistent-equivalent logic schema might have fewer predicates than the original schema
 (i.e., those predicates and derivation rules not used in any logic constraint might disappear). On the following we
 list such processes, together the reason they are not query-equivalent:
 

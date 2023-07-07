@@ -1,10 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
-import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicSchemaMother;
+import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.PredicateSpec;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +20,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class IsomorphismComparatorTest {
+
+    @Nested
+    class PredicateIsomorphismTest {
+
+        @Test
+        public void should_returnTrue_whenPredicateAreIsomorphic() {
+            IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+            Predicate predicate1 = DerivedPredicateMother.createDerivedPredicate("P", """
+                        P(x) :- Q(x, y)
+                    """);
+            Predicate predicate2 = DerivedPredicateMother.createDerivedPredicate("P", """
+                        P(x) :- Q(x, y)
+                    """);
+            boolean isIsomorphism = isomorphismComparator.areIsomorphic(predicate1, predicate2);
+            assertThat(isIsomorphism).isTrue();
+        }
+
+        @Test
+        public void should_returnFalse_whenPredicatesAreNotIsomorphic() {
+            IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+            Predicate predicate1 = DerivedPredicateMother.createDerivedPredicate("P", """
+                        P(x) :- Q(x, y)
+                    """);
+            Predicate predicate2 = DerivedPredicateMother.createDerivedPredicate("P", """
+                        P(x) :- Q(x, y), R(x, y)
+                    """);
+            boolean isIsomorphism = isomorphismComparator.areIsomorphic(predicate1, predicate2);
+            assertThat(isIsomorphism).isFalse();
+        }
+    }
 
     @Nested
     class LiteralListIsomorphismTest {

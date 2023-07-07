@@ -72,7 +72,7 @@ public class SchemaTraceabilityMap {
         SchemaTraceabilityMap result = new SchemaTraceabilityMap(current);
         current.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
             ConstraintID newOriginalId = this.getOriginalConstraintID(originalId);
-            if (Objects.isNull(newOriginalId)) throw new MapsDoNotJoin("Could not join " + originalId + "");
+            if (Objects.isNull(newOriginalId)) throw new MapsDoNotJoin("Could not join " + originalId);
             result.addConstraintIDOrigin(finalId, newOriginalId);
         });
         return result;

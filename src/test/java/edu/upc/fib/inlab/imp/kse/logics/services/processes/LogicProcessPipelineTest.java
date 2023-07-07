@@ -29,7 +29,7 @@ class LogicProcessPipelineTest {
         }
 
         @Test
-        public void should_ThrowException_when_processPipelineConstainsNull() {
+        public void should_ThrowException_when_processPipelineContainsNull() {
             List<LogicProcess> processes = new LinkedList<>();
             processes.add(null);
             assertThatThrownBy(() -> new LogicProcessPipeline(processes))

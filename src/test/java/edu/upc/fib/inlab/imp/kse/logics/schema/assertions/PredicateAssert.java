@@ -4,7 +4,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicStructureComparator;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
@@ -46,7 +45,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
      * <p>
      * When both are derived, it is undecidable to know whether they are equivalent, or not. Hence, this assert
      * applies a sound (but incomplete) strategy based on checking whether their derivation rules are homomorphic,
-     * where on its turn, two derivated literals are considered to be homomorphic iff their terms are homomorphic and
+     * where on its turn, two derived literals are considered to be homomorphic iff their terms are homomorphic and
      * their derivation rules are homomorphic too.
      */
     @SuppressWarnings("UnusedReturnValue")
@@ -56,56 +55,6 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         checkIsBaseIffExpectedIsBase(expectedPredicate);
         checkDerivationRulesEquivalenceWithStrategy(expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy.HOMOMORPHIC_RULES);
         return this;
-    }
-
-    /**
-     * Two predicates are said to have the same structure if:
-     * - they have the same name,
-     * - they have the same arity,
-     * - they are both base, or they are both derived
-     * - their derivation rules have the very same structure, recursively, according to the LogicStructureComparator
-     *
-     * @param expectedPredicate not null
-     * @return whether the actual predicate has the same structure as the expectedPredicate
-     */
-    public PredicateAssert hasSameStructureAs(Predicate expectedPredicate) {
-        checkHasSameName(expectedPredicate);
-        checkHasSameArity(expectedPredicate);
-        checkIsBaseIffExpectedIsBase(expectedPredicate);
-        checkDerivationRulesHaveSameStructure(expectedPredicate);
-        return this;
-    }
-
-    private void checkDerivationRulesHaveSameStructure(Predicate expectedPredicate) {
-        assertThatAllActualDerivationRulesAreExpectedModusStructure(expectedPredicate.getDerivationRules());
-        assertThatAllExpectedDerivationRulesAreContainedModusStructure(expectedPredicate.getDerivationRules());
-    }
-
-    private void assertThatAllExpectedDerivationRulesAreContainedModusStructure(List<DerivationRule> expectedDerivationRules) {
-        for (DerivationRule expectedDerivationRule : expectedDerivationRules) {
-            boolean expectedFoundInActual = isDerivationRuleContainedModusStructure(expectedDerivationRule, actual.getDerivationRules());
-            if (!expectedFoundInActual) {
-                Assertions.fail("Derivation rule \"" + expectedDerivationRule + "\" expected, but missing in actual");
-            }
-        }
-    }
-
-    private void assertThatAllActualDerivationRulesAreExpectedModusStructure(List<DerivationRule> expectedDerivationRules) {
-        for (DerivationRule actualDerivationRule : actual.getDerivationRules()) {
-            boolean isExpected = isDerivationRuleContainedModusStructure(actualDerivationRule, expectedDerivationRules);
-            if (!isExpected) {
-                Assertions.fail("Derivation rule \"" + actualDerivationRule + "\" is not expected");
-            }
-        }
-    }
-
-    private boolean isDerivationRuleContainedModusStructure(DerivationRule derivationRule, List<DerivationRule> listOfRules) {
-        for (DerivationRule aRuleOfTheList : listOfRules) {
-            if (new LogicStructureComparator(true, true).haveSameStructure(derivationRule, aRuleOfTheList)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     protected void checkDerivationRulesEquivalenceWithStrategy(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {

@@ -15,7 +15,7 @@ public class LogicSchemaWithIDsParser extends LogicSchemaParser<LogicConstraintW
     }
 
     @Override
-    protected LogicSchemaGrammarToSpecVisitor<LogicConstraintWithIDSpec> createVisitor(StringToTermSpecFactory stringToTermSpecFactory, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+    protected LogicSchemaGrammarToSpecVisitor<LogicConstraintWithIDSpec> createVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         return new LogicSchemaWithIDsGrammarToSpecVisitor(stringToTermSpecFactory);
     }
 

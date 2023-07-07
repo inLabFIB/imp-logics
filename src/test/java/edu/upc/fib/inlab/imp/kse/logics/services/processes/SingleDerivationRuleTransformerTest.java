@@ -82,7 +82,7 @@ class SingleDerivationRuleTransformerTest {
         }
 
         @Test
-        void should_notMaintain_DerivedPredicatesWihtMultipleRules() {
+        void should_notMaintain_DerivedPredicatesWithMultipleRules() {
             String schemaString = """
                     P(x) :- R(x, y)
                     P(x) :- S(x, y)

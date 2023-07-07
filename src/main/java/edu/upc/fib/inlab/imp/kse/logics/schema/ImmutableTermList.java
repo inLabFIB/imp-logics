@@ -167,14 +167,6 @@ public class ImmutableTermList implements List<Term> {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public boolean hasSameTerms(ImmutableTermList terms) {
-        if (termsList.size() != terms.size()) return false;
-        for (int i = 0; i < terms.size(); ++i) {
-            if (!termsList.get(i).equals(terms.get(i))) return false;
-        }
-        return true;
-    }
-
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }

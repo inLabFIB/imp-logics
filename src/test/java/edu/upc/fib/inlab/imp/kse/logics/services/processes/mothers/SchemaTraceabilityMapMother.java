@@ -13,7 +13,7 @@ public class SchemaTraceabilityMapMother {
         return result;
     }
 
-    public static SchemaTraceabilityMap createEmpyMap() {
+    public static SchemaTraceabilityMap createEmptyMap() {
         return create(Map.of());
     }
 }

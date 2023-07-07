@@ -76,7 +76,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      * Do note that this comparison is NOT agnostic with the name of the derived predicates.
      * <p>
      * Since this check is not decidable, this method applies a sound (but not complete) strategy.
-     * In particular, for each normal clause of one schema, it tries to find an homomorphic normal clause of the other
+     * In particular, for each normal clause of one schema, it tries to find a homomorphic normal clause of the other
      * schema, and viceversa.
      *
      * @param expectedSchema not null
@@ -103,7 +103,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      * Do note that this comparison IS agnostic with the name of the derived predicates.
      * <p>
      * Since this check is not decidable, this method applies a sound (but not complete) strategy.
-     * In particular, for each logicConstraint of one schema, it tries to find an homomorphic logicConstraint of the other
+     * In particular, for each logicConstraint of one schema, it tries to find a homomorphic logicConstraint of the other
      * schema, and viceversa. In such case, two derived ordinary literals are considered to be homomorphic if they have
      * homomorphic definition rules. In practice, this means that two logic constraints are equivalent if they are
      * the same up-to renaming of variables and derived predicate names.
@@ -166,7 +166,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
      * Do note that this comparison is NOT agnostic with the name of the derived predicates.
      * <p>
      * Since this check is not decidable, this method applies a sound (but not complete) strategy.
-     * In particular, for each derivation rule of one schema, it tries to find an homomorphic derivation rule of the other
+     * In particular, for each derivation rule of one schema, it tries to find a homomorphic derivation rule of the other
      * schema, and viceversa.
      *
      * @param expectedSchema not null

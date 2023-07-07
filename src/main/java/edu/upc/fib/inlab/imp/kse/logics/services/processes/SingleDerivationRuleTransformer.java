@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * P_1 :- A, B <br>
  * P_2 :- C, D <br>
  *
- * <p> Consequently, any apparison of predicates which have been transformed (such as the predicate P in the previous
+ * <p> Consequently, any apparition of predicates which have been transformed (such as the predicate P in the previous
  * example), is replaced by its new transformed predicates. E.g.:</p>
  * :- P, R <br>
  * :- S, not(P) <br>

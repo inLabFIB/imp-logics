@@ -132,7 +132,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     }
 
     /**
-     * Checks whether the actual literals has an isomorphism to the expected literals without
+     * Checks whether the actual literals have an isomorphism to the expected literals without
      * changing the variable names given by parameter.
      * <p>
      * This assert is useful, for instance, to check the correct unfolding of a derived atom. E.g.: suppose an atom

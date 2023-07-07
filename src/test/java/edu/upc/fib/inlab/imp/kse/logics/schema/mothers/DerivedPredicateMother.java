@@ -25,4 +25,8 @@ public class DerivedPredicateMother {
         return new Predicate(predicateName, 0, List.of(query));
 
     }
+
+    public static Predicate createDerivedPredicate(String predicateName, String schemaString) {
+        return LogicSchemaMother.buildLogicSchemaWithIDs(schemaString).getPredicateByName(predicateName);
+    }
 }

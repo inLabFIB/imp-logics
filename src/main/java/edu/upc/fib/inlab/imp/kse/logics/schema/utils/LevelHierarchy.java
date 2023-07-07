@@ -101,7 +101,7 @@ public class LevelHierarchy implements Iterable<Level> {
      * May throw exception if predicate is not contained in the hierarchy
      *
      * @param predicate a non-null predicate
-     * @return the index of the predicate predicate
+     * @return the index of the predicate
      */
     public int getLevelIndexOfPredicate(Predicate predicate) {
         if (Objects.isNull(predicate)) throw new IllegalArgumentException("Predicate cannot be null");
@@ -149,8 +149,4 @@ public class LevelHierarchy implements Iterable<Level> {
         Iterable.super.forEach(action);
     }
 
-    @Override
-    public Spliterator<Level> spliterator() {
-        return Iterable.super.spliterator();
-    }
 }

@@ -21,11 +21,11 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     }
 
     public LogicSchemaParser(TermTypeCriteria termTypeCriteria, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker) {
-        visitor = createVisitor(new StringToTermSpecFactory(termTypeCriteria), builtInPredicateNameChecker);
+        visitor = createVisitor(new StringToTermSpecFactory(termTypeCriteria));
         this.builtInPredicateNameChecker = builtInPredicateNameChecker;
     }
 
-    protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker);
+    protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);
 
     protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
 

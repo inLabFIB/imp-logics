@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LogicEquivalenceAnalyzer {
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     Optional<Boolean> UNKNOWN = Optional.empty();
 
     Optional<Boolean> areEquivalent(List<Literal> first, List<Literal> second);

@@ -20,7 +20,7 @@ public class SchemaTraceabilityMapTest {
             @Test
             public void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
                 SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
-                        .createEmpyMap();
+                        .createEmptyMap();
                 assertThatThrownBy(() -> emptyMap.joinMap(null))
                         .isInstanceOf(IllegalArgumentException.class);
             }

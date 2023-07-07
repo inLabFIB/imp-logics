@@ -122,7 +122,7 @@ public class Atom {
          * and we have the derivation rule "P(x, y, a) :- R(x, y, a, b, c)"
          *
          * The variables that can clash during the unfolding are: 'b' and 'c'.
-         * Indeed, 'a' cannot cause a clash, because any apparison of 'a' in the derivation rule will disappear.
+         * Indeed, 'a' cannot cause a clash, because any apparition of 'a' in the derivation rule will disappear.
          *
          */
         Set<Variable> potentiallyClashingVariables = this.terms.getUsedVariables();

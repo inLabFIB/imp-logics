@@ -3,10 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.PredicateComparator;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
@@ -109,7 +106,7 @@ public class IsomorphismComparator {
      * As a result, the recursion tries to map P->P', Q->Q', R->R', and then, reaches a base case where there is no more
      * literals to map. In the base case, the recursion applies the lambdas that contains the remaining jobs. That is,
      * it first checks the derivation rules of P, then the derivation rules of Q, and then the derivation rules of R.
-     * If the lambda fails, the algorithm backtracks and checks the ramaining part of the tree with another combination.
+     * If the lambda fails, the algorithm backtracks and checks the remaining part of the tree with another combination.
      */
 
     private final boolean changeVariableNamesAllowed;
@@ -329,11 +326,29 @@ public class IsomorphismComparator {
         return Optional.empty();
     }
 
+    /**
+     * @param p1 not null
+     * @param p2 not null
+     * @return whether there is an isomorphism between the derivation rules of ol1, and the derivationRules of ol2,
+     * satisfying the given predicateName, and remaining job.
+     */
+    public boolean areIsomorphic(Predicate p1, Predicate p2) {
+        if (Objects.isNull(p1)) throw new IllegalArgumentException("p1 cannot be null");
+        if (Objects.isNull(p2)) throw new IllegalArgumentException("p2 cannot be null");
+        if (p1.getArity() != p2.getArity()) return false;
+        if (p1.isDerived() != p2.isDerived()) return false;
+        if (this.changingDerivedPredicateNameAllowed && p1.getName().equals(p2.getName())) return false;
+        PredicateMap predicateMap = new PredicateMap();
+        predicateMap.put(p1, p2);
+        return areIsomorphic(p1.getDerivationRules(), p2.getDerivationRules(), predicateMap, () -> true);
+    }
+
 
     /**
      * @param ol1          not null, and derived
      * @param ol2          not null, and derived
-     * @param predicateMap already mapping the predicate of ol1 to the predicate of ol2. Contains a predicateMap compatible
+     * @param predicateMap already mapping the predicate of ol1 to the predicate of ol2. After invoking the method,
+     *                     it contains a predicateMap compatible
      *                     with an isomorphism between the derivationRules of ol1, and the derivationRules of ol2.
      * @param remainingJob not null
      * @return whether there is an isomorphism between the derivation rules of ol1, and the derivationRules of ol2,

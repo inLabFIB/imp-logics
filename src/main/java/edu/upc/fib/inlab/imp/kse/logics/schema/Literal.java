@@ -31,7 +31,7 @@ public abstract class Literal {
     public abstract <T> T accept(LogicSchemaVisitor<T> visitor);
 
     /**
-     * This method buils a new literal that is the negation of this one.
+     * This method builds a new literal that is the negation of this one.
      * E.g.: given an ordinary literal "P(x)" it will return a new literal "not(P(x))",
      * or given a built-in literal "x < y" it will return "x >= y"
      * <p>
