@@ -22,6 +22,39 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class LogicSchemaParserTest {
 
 
+    @Nested
+    class PredicateAndVariableSyntaxTests {
+        @Test
+        void should_allowPredicateNames_withSymbols() {
+            String schemaString = "@1 :- p:$?_s(a)";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema)
+                    .containsPredicate("p:$?_s", 1);
+        }
+
+        @Test
+        void should_allowTermNames_withSymbols() {
+            String schemaString = "@1 :- p(a:$?_s)";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema.getAllLogicConstraints())
+                    .hasSize(1);
+
+            LogicConstraint logicConstraint = logicSchema.getAllLogicConstraints().stream().findFirst().orElseThrow();
+
+            assertThat(logicConstraint.getBody())
+                    .hasSize(1)
+                    .first()
+                    .hasPredicate("p", 1)
+                    .hasVariable(0, "a:$?_s");
+
+        }
+
+    }
+
     @Test
     public void should_fail_whenSchemaContainsErrorSyntax() {
         String schemaString = """
