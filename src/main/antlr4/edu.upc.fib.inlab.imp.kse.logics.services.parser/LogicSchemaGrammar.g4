@@ -33,7 +33,7 @@ fragment DEC_DIGIT:     [0-9];
 fragment DECIMAL:       DEC_DIGIT+;
 fragment FLOAT:         DEC_DOT_DEC;
 fragment REAL:          (DECIMAL  | DEC_DOT_DEC) (('E'|'e') [+-]? DEC_DIGIT+);
-fragment ALPHANUMERIC:  [a-zA-Z0-9_]+;
+fragment ALPHANUMERIC:  [a-zA-Z0-9_$?:]+;
 fragment SINGLE_QUOTE:  '\'' (~'\'' | '\\\'')* '\'';
 fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
