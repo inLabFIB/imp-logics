@@ -43,6 +43,9 @@ public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
     /**
      * Checks whether the actual rule is the same as the expected logic rule up-to renaming
      * variables, and derived predicate names.
+     * <br>
+     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity
+     * That is, two predicates of different logic schemas can be considered equal
      *
      * @param expected not-null
      * @return this assertion

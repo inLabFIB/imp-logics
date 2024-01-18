@@ -44,6 +44,9 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
     /**
      * Checks whether the actual constraint is the same as the expected logic constraint up-to renaming
      * variables, and derived predicate names.
+     * <br>
+     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity
+     * That is, two predicates of different logic schemas can be considered equal
      *
      * @param expected not-null
      * @return this assertion

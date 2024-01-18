@@ -33,7 +33,11 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
 
 
     /**
-     * Checks whether the actual literals are the same as the expected literals.
+     * Checks whether the actual literals are the same as the expected literals up to renaming variable names
+     * and derived predicate names.
+     * <br>
+     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity
+     * That is, two predicates of different logic schemas can be considered equal
      *
      * @param expected not null
      * @return this assert
@@ -106,9 +110,9 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
 
     @SuppressWarnings("UnusedReturnValue")
     public ImmutableLiteralsListAssert hasLiteral(int index, String expectedLiteralString) {
-        Assertions.assertThat(actual.size())
+        Assertions.assertThat(actual)
                 .withFailMessage("Expecting to have some element at index %d", index)
-                .isGreaterThan(index);
+                .hasSizeGreaterThan(index);
 
         Literal expectedLiteral = LiteralParser.parseLiteral(expectedLiteralString);
         Literal actualLiteral = actual.get(index);
