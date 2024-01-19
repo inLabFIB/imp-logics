@@ -20,7 +20,8 @@ public abstract class Literal {
 
     /**
      * @param substitution not null
-     * @return a new Literal after applying the given substitution
+     * @return a literal after applying the given substitution. The literal will be new if some term has changed,
+     * otherwise it will be the same
      */
     public abstract Literal applySubstitution(Substitution substitution);
 

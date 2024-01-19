@@ -55,7 +55,7 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
 
     @Override
     public BooleanBuiltInLiteral applySubstitution(Substitution substitution) {
-        return new BooleanBuiltInLiteral(value);
+        return this;
     }
 
     @Override

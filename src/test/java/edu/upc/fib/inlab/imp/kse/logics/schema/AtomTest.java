@@ -27,19 +27,19 @@ public class AtomTest {
     @Nested
     class CreationTests {
         @Test
-        public void should_ThrowException_WhenCreatingAtomWithNullPredicate() {
+        void should_ThrowException_WhenCreatingAtomWithNullPredicate() {
             assertThatThrownBy(() -> new Atom(null, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_ThrowException_WhenCreatingAtomWithNullListOfTerms() {
+        void should_ThrowException_WhenCreatingAtomWithNullListOfTerms() {
             assertThatThrownBy(() -> new Atom(new MutablePredicate("P", 0), null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_MakeTermsListImmutable_WhenCreatingTheAtom() {
+        void should_MakeTermsListImmutable_WhenCreatingTheAtom() {
             List<Term> terms = new LinkedList<>();
             terms.add(new Variable("x"));
             Atom atom = new Atom(new MutablePredicate("P", 1), terms);
@@ -57,7 +57,7 @@ public class AtomTest {
 
         @ParameterizedTest
         @MethodSource("provideWrongAritiesAndLists")
-        public void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms) {
+        void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms) {
             assertThatThrownBy(() -> new Atom(new MutablePredicate("P", arity), terms))
                     .isInstanceOf(ArityMismatch.class);
         }
@@ -67,7 +67,7 @@ public class AtomTest {
     class SubstitutionTests {
 
         @Test
-        public void should_ReturnNewAtomReplacingTerms_WhenApplyingSubstitution() {
+        void should_ReturnNewAtomReplacingTerms_WhenApplyingSubstitution() {
             Atom atom = AtomMother.createAtomWithVariableNames("P", List.of("a", "b"));
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("a", "1")
@@ -105,7 +105,7 @@ public class AtomTest {
     @Nested
     class UnfoldTests {
         @Test
-        public void should_ReturnLiteralListWithThisAtom_WhenPredicateIsBase() {
+        void should_ReturnLiteralListWithThisAtom_WhenPredicateIsBase() {
             Atom atom = AtomMother.createAtomWithVariableNames("P", List.of("x"));
 
             List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
@@ -117,7 +117,7 @@ public class AtomTest {
         }
 
         @Test
-        public void should_ReturnSingleLiteralsList_WhenPredicateHasUniqueDefinitionRule() {
+        void should_ReturnSingleLiteralsList_WhenPredicateHasUniqueDefinitionRule() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, z)");
             Atom atom = AtomMother.createAtom(logicSchema, "P", "a", "b");
 
@@ -130,7 +130,7 @@ public class AtomTest {
         }
 
         @Test
-        public void should_ReturnSeveralLiteralsList_WhenPredicateHasUniqueDefinitionRule() {
+        void should_ReturnSeveralLiteralsList_WhenPredicateHasUniqueDefinitionRule() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
                         P(x, y) :- R(x, y), S(y, z)
                         P(x, y) :- R(x, y), T(y, z)
@@ -149,7 +149,7 @@ public class AtomTest {
         }
 
         @Test
-        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
+        void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, a, b)");
             Atom atom = AtomMother.createAtom(logicSchema, "P", "a", "b");
 
@@ -162,7 +162,7 @@ public class AtomTest {
         }
 
         @Test
-        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms_evenInTheHead() {
+        void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms_evenInTheHead() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(b, a) :- R(b, a)");
             Atom atom = AtomMother.createAtom(logicSchema, "P", "a", "b");
 
@@ -177,7 +177,7 @@ public class AtomTest {
         @Nested
         class UnfoldingWithConstantsInHeadTests {
             @Test
-            public void should_obtainOneRule_whenThereIsOneDerivationRule() {
+            void should_obtainOneRule_whenThereIsOneDerivationRule() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, 1) :- T(a, b)");
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
 
@@ -190,7 +190,7 @@ public class AtomTest {
             }
 
             @Test
-            public void should_obtainTwoRules_whenThereAreTwoRules_EachOneWithDifferentConstants() {
+            void should_obtainTwoRules_whenThereAreTwoRules_EachOneWithDifferentConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
                                         R(a, 1) :- T(a, b)
                                         R(a, 2) :- TT(a, b)
@@ -210,7 +210,7 @@ public class AtomTest {
             }
 
             @Test
-            public void should_obtainTwoRules_whenThereAreTwoRules_WithOnlyOneWithConstants() {
+            void should_obtainTwoRules_whenThereAreTwoRules_WithOnlyOneWithConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
                                         R(a, 1) :- T(a, b)
                                         R(a, b) :- TT(a, b)
@@ -231,7 +231,7 @@ public class AtomTest {
             }
 
             @Test
-            public void should_obtainOneRuleWithContradictoryBuiltIn_whenThereIsOneRule_NotMatchingConstants() {
+            void should_obtainOneRuleWithContradictoryBuiltIn_whenThereIsOneRule_NotMatchingConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
                                         R(a, 1) :- T(a, b)
                         """);
@@ -249,7 +249,7 @@ public class AtomTest {
         @Nested
         class UnfoldingWithRepeatedVariablesInHeadTests {
             @Test
-            public void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead() {
+            void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, b, a) :- T(a, b)");
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y", "z");
 
@@ -262,7 +262,7 @@ public class AtomTest {
             }
 
             @Test
-            public void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead_andAtomHasRepeatedVariables() {
+            void should_addBuiltInLiteral_whenFindingRepeatedVariablesInHead_andAtomHasRepeatedVariables() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("R(a, a, b) :- T(a, b)");
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y", "y");
 

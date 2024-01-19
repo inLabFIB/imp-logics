@@ -39,7 +39,9 @@ public class CustomBuiltInLiteral extends BuiltInLiteral {
 
     @Override
     public CustomBuiltInLiteral applySubstitution(Substitution substitution) {
-        return new CustomBuiltInLiteral(this.operationName, terms.applySubstitution(substitution));
+        if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
+            return new CustomBuiltInLiteral(this.operationName, terms.applySubstitution(substitution));
+        } else return this;
     }
 
     @Override

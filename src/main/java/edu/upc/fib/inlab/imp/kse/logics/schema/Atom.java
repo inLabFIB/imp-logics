@@ -162,8 +162,15 @@ public class Atom {
         return predicate.isBase();
     }
 
+    /**
+     * @param substitution not null
+     * @return an atom after applying the given substitution. The atom will be new if some term has changed.
+     * Otherwise, it will be the same
+     */
     public Atom applySubstitution(Substitution substitution) {
-        return new Atom(this.predicate, this.terms.applySubstitution(substitution));
+        if (substitution.replacesSomeVariableOf(this.getVariables())) {
+            return new Atom(this.predicate, this.terms.applySubstitution(substitution));
+        } else return this;
     }
 
     @Override

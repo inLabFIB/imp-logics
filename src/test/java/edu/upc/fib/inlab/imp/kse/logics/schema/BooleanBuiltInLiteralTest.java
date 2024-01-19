@@ -45,16 +45,14 @@ public class BooleanBuiltInLiteralTest {
             BooleanBuiltInLiteral substitutedLiteral = booleanBuiltInLiteral.applySubstitution(new Substitution());
 
             assertThat(substitutedLiteral)
-                    .isNotSameAs(booleanBuiltInLiteral)
-                    .hasOperationName(booleanBuiltInLiteral.getOperationName())
-                    .hasNoTerms();
+                    .isSameAs(booleanBuiltInLiteral);
         }
     }
 
     @Nested
     class BuildNegatedLiteralTest {
         @Test
-        public void should_ReturnTrue_WhenIsFalse() {
+        void should_ReturnTrue_WhenIsFalse() {
             BooleanBuiltInLiteral booleanBuiltInLiteral = new BooleanBuiltInLiteral(false);
 
             BooleanBuiltInLiteral negatedBol = booleanBuiltInLiteral.buildNegatedLiteral();
@@ -63,7 +61,7 @@ public class BooleanBuiltInLiteralTest {
         }
 
         @Test
-        public void should_ReturnFalse_WhenIsTrue() {
+        void should_ReturnFalse_WhenIsTrue() {
             BooleanBuiltInLiteral booleanBuiltInLiteral = new BooleanBuiltInLiteral(true);
 
             BooleanBuiltInLiteral negatedBol = booleanBuiltInLiteral.buildNegatedLiteral();

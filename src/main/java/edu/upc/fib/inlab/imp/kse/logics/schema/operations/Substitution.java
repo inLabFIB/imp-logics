@@ -123,6 +123,10 @@ public class Substitution {
         return this.termsMap.isEmpty();
     }
 
+    public boolean replacesSomeVariableOf(Set<Variable> variables) {
+        return variables.stream().anyMatch(v -> this.termsMap.containsKey(v));
+    }
+
     public Set<Variable> getUsedVariables() {
         Set<Variable> variablesInDomain = this.termsMap.keySet();
         Set<Variable> variablesInRange = this.termsMap.values().stream()
@@ -145,4 +149,6 @@ public class Substitution {
                         entry.getValue().isVariable() &&
                                 entry.getValue().getName().equals(entry.getKey().getName()));
     }
+
+
 }

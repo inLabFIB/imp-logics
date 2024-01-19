@@ -50,10 +50,12 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
 
     @Override
     public ComparisonBuiltInLiteral applySubstitution(Substitution substitution) {
-        return new ComparisonBuiltInLiteral(leftTerm.applySubstitution(substitution),
-                rightTerm.applySubstitution(substitution),
-                operator
-        );
+        if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
+            return new ComparisonBuiltInLiteral(leftTerm.applySubstitution(substitution),
+                    rightTerm.applySubstitution(substitution),
+                    operator
+            );
+        } else return this;
     }
 
     @Override

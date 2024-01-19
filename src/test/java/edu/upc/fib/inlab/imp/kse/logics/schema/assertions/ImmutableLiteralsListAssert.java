@@ -65,6 +65,52 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         return this;
     }
 
+    /* LITERAL COMES FROM ASSERTS */
+    public ImmutableLiteralsListAssert literalHasNoOriginal(int i) {
+        assertThat(actual).hasSizeGreaterThan(i);
+
+        Literal actualLit = actual.get(i);
+        Assertions.assertThat(actual.getOriginalLiteral(actualLit))
+                .as("Literal " + actualLit + " has an original literal")
+                .isNotPresent();
+
+        return this;
+    }
+
+    /**
+     * Checks that the currentLiteral has an original literal which is exactly the same (i.e., same object reference)
+     * as the expectedOriginalLiteral
+     *
+     * @param currentLiteral          not null
+     * @param expectedOriginalLiteral not null
+     * @return this assert
+     */
+    public ImmutableLiteralsListAssert literalComesFrom(Literal currentLiteral, Literal expectedOriginalLiteral) {
+        Optional<Literal> actualOriginalLiteral = actual.getOriginalLiteral(currentLiteral);
+        assertThat(actual).contains(currentLiteral);
+        Assertions.assertThat(actualOriginalLiteral)
+                .as("No original literal for " + currentLiteral)
+                .isPresent();
+        Assertions.assertThat(actualOriginalLiteral)
+                .as("Original literal of " + currentLiteral + " is " + actualOriginalLiteral.get() + ", but has not the same reference as " + expectedOriginalLiteral)
+                .containsSame(expectedOriginalLiteral);
+        return this;
+    }
+
+    /**
+     * Checks that the i-th literal has an original literal which is exactly the same (i.e., same object reference)
+     * as the expectedOriginalLiteral
+     *
+     * @param i                       >= 0
+     * @param expectedOriginalLiteral not null
+     * @return this assert
+     */
+    public ImmutableLiteralsListAssert literalComesFrom(int i, Literal expectedOriginalLiteral) {
+        Literal currentLiteral = this.actual.get(i);
+        return this.literalComesFrom(currentLiteral, expectedOriginalLiteral);
+    }
+
+    /* CONTAINMENT ASSERTS */
     public ImmutableLiteralsListAssert containsOrdinaryLiteral(String predicateName, String... variableNames) {
         Assertions.assertThat(actual).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
@@ -84,16 +130,6 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                         .containsVariables(variableNames)
         );
         return this;
-    }
-
-    @Override
-    protected LiteralAssert toAssert(Literal value, String description) {
-        return LiteralAssert.assertThat(value).as(description);
-    }
-
-    @Override
-    protected ImmutableLiteralsListAssert newAbstractIterableAssert(Iterable<? extends Literal> iterable) {
-        return assertThat(new ImmutableLiteralsList(newArrayList(iterable)));
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -135,6 +171,8 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         }
     }
 
+    /* ISOMORPHIC ASSERTS */
+
     /**
      * Checks whether the actual literals have an isomorphism to the expected literals without
      * changing the variable names given by parameter.
@@ -170,5 +208,17 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         isomorphismOptions = new IsomorphismOptions(options);
         return this;
     }
+
+    /* AUXILIARS */
+    @Override
+    protected LiteralAssert toAssert(Literal value, String description) {
+        return LiteralAssert.assertThat(value).as(description);
+    }
+
+    @Override
+    protected ImmutableLiteralsListAssert newAbstractIterableAssert(Iterable<? extends Literal> iterable) {
+        return assertThat(new ImmutableLiteralsList(newArrayList(iterable)));
+    }
+
 
 }

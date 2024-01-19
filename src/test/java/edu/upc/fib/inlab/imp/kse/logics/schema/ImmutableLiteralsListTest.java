@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.ImmutableLiteralsListAssert;
+import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicInstanceOfAssertFactories;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
@@ -18,15 +19,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 public class ImmutableLiteralsListTest {
 
     @Nested
     class CreateImmutableLiteralsList {
         @Test
-        public void should_throwException_whenTryCreateImmutableLiteralsListWithElementNull() {
+        void should_throwException_whenTryCreateImmutableLiteralsListWithElementNull() {
             List<Literal> listWithNull = new LinkedList<>();
             listWithNull.add(null);
             assertThatThrownBy(() -> new ImmutableLiteralsList(listWithNull))
@@ -34,18 +34,18 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_throwException_whenTryCreateImmutableLiteralsListWithNull() {
+        void should_throwException_whenTryCreateImmutableLiteralsListWithNull() {
             assertThatThrownBy(() -> new ImmutableLiteralsList((List<Literal>) null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_createImmutableLiteralsEmptyList() {
+        void should_createImmutableLiteralsEmptyList() {
             assertThat(new ImmutableLiteralsList()).isEmpty();
         }
 
         @Test
-        public void should_createEmptyLiteralList_whenCreatingImmutableLiteralList_withEmptyList() {
+        void should_createEmptyLiteralList_whenCreatingImmutableLiteralList_withEmptyList() {
             ImmutableLiteralsList actualTermList = new ImmutableLiteralsList(List.of());
             ImmutableLiteralsListAssert.assertThat(actualTermList).isEmpty();
         }
@@ -54,7 +54,7 @@ public class ImmutableLiteralsListTest {
     @Nested
     class ApplySubstitution {
         @Test
-        public void should_ReturnNewLiteralsList_WithReplacedTerms_WhenApplyingSubstitution() {
+        void should_ReturnNewLiteralsList_WithReplacedTerms_WhenApplyingSubstitution() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, y), R(y, z), x < y");
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("x", "a")
@@ -69,12 +69,30 @@ public class ImmutableLiteralsListTest {
                     .containsOrdinaryLiteral("R", "y", "z")
                     .containsComparisonBuiltInLiteral("a", "<", "y");
         }
+
+        @Nested
+        class Traceability {
+            @Test
+            void should_rememberOriginalLiterals_WhenApplyingSubstitution() {
+                ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, y), R(y, z), x < y");
+                Substitution substitution = new SubstitutionBuilder()
+                        .addMapping("x", "a")
+                        .build();
+
+                ImmutableLiteralsList actualLiteralsList = immutableLiteralsList.applySubstitution(substitution);
+
+                ImmutableLiteralsListAssert.assertThat(actualLiteralsList)
+                        .literalComesFrom(0, immutableLiteralsList.get(0))
+                        .literalHasNoOriginal(1)
+                        .literalComesFrom(2, immutableLiteralsList.get(2));
+            }
+        }
     }
 
     @Nested
     class ReturnVariables {
         @Test
-        public void should_ReturnUsedVariables() {
+        void should_ReturnUsedVariables() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), R(y, 2), x < y");
 
             Set<Variable> usedVariables = immutableLiteralsList.getUsedVariables();
@@ -85,7 +103,7 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_returnVariables_fromPositiveOrdinaryLiterals() {
+        void should_returnVariables_fromPositiveOrdinaryLiterals() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
 
             Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInPositiveOrdinaryLiterals();
@@ -95,7 +113,7 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_returnVariables_fromNegativeOrdinaryLiterals() {
+        void should_returnVariables_fromNegativeOrdinaryLiterals() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
 
             Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInNegativeOrdinaryLiterals();
@@ -105,7 +123,7 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_returnVariables_fromFromBuiltInLiterals() {
+        void should_returnVariables_fromFromBuiltInLiterals() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x, 1), not(R(y, 2)), a < b");
 
             Set<Variable> variablesInPositiveOrdinaryLiterals = immutableLiteralsList.getVariablesInBuiltInLiterals();
@@ -119,14 +137,14 @@ public class ImmutableLiteralsListTest {
     @Nested
     class UnfoldingTests {
         @Test
-        public void should_returnLiteralsList_whenUnfoldedLiteralIsBase() {
+        void should_returnLiteralsList_whenUnfoldedLiteralIsBase() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x), R(x)");
 
             List<ImmutableLiteralsList> actualUnfoldingList = immutableLiteralsList.unfold(0);
 
-            assertThat(actualUnfoldingList).hasSize(1);
-            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfoldingList)
+                    .hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(2)
                     .containsOrdinaryLiteral("P", "x")
                     .containsOrdinaryLiteral("R", "x");
@@ -134,14 +152,13 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_returnLiteralsList_whenUnfoldedLiteralIsBuiltIn() {
+        void should_returnLiteralsList_whenUnfoldedLiteralIsBuiltIn() {
             ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create("P(x), R(x, y), x <= y");
 
             List<ImmutableLiteralsList> actualUnfoldingList = immutableLiteralsList.unfold(2);
 
-            assertThat(actualUnfoldingList).hasSize(1);
-            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfoldingList).hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(3)
                     .containsOrdinaryLiteral("P", "x")
                     .containsOrdinaryLiteral("R", "x", "y")
@@ -150,7 +167,7 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_returnSameLiteralList_whenLiteralIsDerived_butNegated() {
+        void should_returnSameLiteralList_whenLiteralIsDerived_butNegated() {
             ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                     "R(a, b), not(P(a, b))",
                     "P(x, y) :- S(x, y)"
@@ -158,16 +175,15 @@ public class ImmutableLiteralsListTest {
 
             List<ImmutableLiteralsList> actualUnfoldingList = literalsList.unfold(1);
 
-            assertThat(actualUnfoldingList).hasSize(1);
-            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfoldingList).hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(2)
                     .containsOrdinaryLiteral(false, "P", "a", "b")
                     .containsOrdinaryLiteral("R", "a", "b");
         }
 
         @Test
-        public void should_returnListWithDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
+        void should_returnListWithDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
             ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                     "R(a, b), P(a, b)",
                     "P(x, y) :- S(x, y)"
@@ -175,16 +191,15 @@ public class ImmutableLiteralsListTest {
 
             List<ImmutableLiteralsList> actualUnfoldingList = literalsList.unfold(1);
 
-            assertThat(actualUnfoldingList).hasSize(1);
-            ImmutableLiteralsList actualUnfolding = actualUnfoldingList.get(0);
-            ImmutableLiteralsListAssert.assertThat(actualUnfolding)
+            assertThat(actualUnfoldingList).hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(2)
                     .containsOrdinaryLiteral("R", "a", "b")
                     .containsOrdinaryLiteral("S", "a", "b");
         }
 
         @Test
-        public void should_returnSeveralLists_whenLiteralHasSeveralDefinitionRules() {
+        void should_returnSeveralLists_whenLiteralHasSeveralDefinitionRules() {
             ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                     "R(a, b), P(a, b)",
                     """
@@ -194,8 +209,8 @@ public class ImmutableLiteralsListTest {
             );
             List<ImmutableLiteralsList> unfoldedLiteral = literalsList.unfold(1);
 
-            assertThat(unfoldedLiteral).hasSize(2);
-            ImmutableLiteralsListAssert.assertThat(unfoldedLiteral.get(0))
+            assertThat(unfoldedLiteral).hasSize(2)
+                    .element(0, as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(2)
                     .containsOrdinaryLiteral("R", "a", "b")
                     .containsOrdinaryLiteral("S", "a", "b");
@@ -206,7 +221,7 @@ public class ImmutableLiteralsListTest {
         }
 
         @Test
-        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
+        void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
             ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                     "R(a, b), P(a, b), U(b, z)",
                     "P(x, y) :- S(x, y), T(y, z), V(a, b)"
@@ -215,15 +230,15 @@ public class ImmutableLiteralsListTest {
             List<ImmutableLiteralsList> unfoldedAtom = literalsList.unfold(1);
 
             ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("R(a, b), S(a, b), T(b, z'), V(a',b'), U(b,z)");
-            assertThat(unfoldedAtom).hasSize(1);
-            ImmutableLiteralsListAssert.assertThat(unfoldedAtom.get(0))
+            assertThat(unfoldedAtom).hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(5)
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("S", "a", "b");
         }
 
         @Test
-        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_evenWithTermsInDerivationHead() {
+        void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_evenWithTermsInDerivationHead() {
             ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                     "P(a, b), Q(z)",
                     "P(x, y) :- S(x,y), R(x, y, a, b, z)"
@@ -232,17 +247,76 @@ public class ImmutableLiteralsListTest {
             List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(0);
 
             ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create("S(a, b), R(a, b, a', b', z'), Q(z)");
-            assertThat(unfoldedLiteralsList).hasSize(1);
-            ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+            assertThat(unfoldedLiteralsList).hasSize(1)
+                    .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                     .hasSize(3)
                     .isLogicallyEquivalentTo(expectedLiteralsList)
                     .containsOrdinaryLiteral("S", "a", "b");
         }
 
         @Nested
+        class Traceability {
+            @Test
+            void should_rememberOriginalLiterals_whenThereIsOneDerivationRule() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "A(x), Derived(x), C(x)",
+                        "Derived(x) :- B1(x), B2(x)");
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(1);
+
+                assertThat(unfoldedLiteralsList)
+                        .hasSize(1)
+                        .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
+                        .literalHasNoOriginal(0)
+                        .literalComesFrom(1, literalsList.get(1))
+                        .literalComesFrom(2, literalsList.get(1))
+                        .literalHasNoOriginal(3);
+            }
+
+            @Test
+            void should_rememberOriginalLiterals_whenThereAreSeveralDerivationRules() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create("A(x), Derived(x), C(x)",
+                        """
+                                Derived(x) :- B1(x), B2(x)
+                                Derived(x) :- B3(x), B4(x)
+                                """);
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(1);
+
+                assertThat(unfoldedLiteralsList)
+                        .hasSize(2);
+
+                for (ImmutableLiteralsList unfoldedLiterals : unfoldedLiteralsList) {
+                    ImmutableLiteralsListAssert.assertThat(unfoldedLiterals)
+                            .literalHasNoOriginal(0)
+                            .literalComesFrom(1, literalsList.get(1))
+                            .literalComesFrom(2, literalsList.get(1))
+                            .literalHasNoOriginal(3);
+                }
+            }
+
+            @Test
+            void should_rememberOriginalLiterals_whenWeApplySubstitutionToAvoidClash() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "A(x), Derived(x), C(y)",
+                        "Derived(x) :- B1(x), B2(y)");
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(1);
+
+                assertThat(unfoldedLiteralsList)
+                        .hasSize(1)
+                        .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
+                        .literalHasNoOriginal(0)
+                        .literalComesFrom(1, literalsList.get(1))
+                        .literalComesFrom(2, literalsList.get(1))
+                        .literalHasNoOriginal(3);
+            }
+        }
+
+        @Nested
         class UnfoldingNegatedLiterals {
             @Test
-            public void should_returnSameLiteralsList_whenNegatedLiteralCannotBeUnfolded() {
+            void should_returnSameLiteralsList_whenNegatedLiteralCannotBeUnfolded() {
                 ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                         "P(x), not(Derived())",
                         "Derived() :- A(x)"
@@ -255,14 +329,14 @@ public class ImmutableLiteralsListTest {
                         "Derived() :- A(x)"
                 );
 
-                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1)
+                        .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                         .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
                         .isIsomorphicTo(expectedLiteralsList);
             }
 
             @Test
-            public void should_returnOneLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoOneRule() {
+            void should_returnOneLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoOneRule() {
                 ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                         "P(x), not(Derived(x))",
                         """
@@ -281,14 +355,14 @@ public class ImmutableLiteralsListTest {
                                 """
                 );
 
-                Assertions.assertThat(unfoldedLiteralsList).hasSize(1);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                Assertions.assertThat(unfoldedLiteralsList).hasSize(1)
+                        .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                         .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
                         .isIsomorphicTo(expectedLiteralsList);
             }
 
             @Test
-            public void should_returnSeveralLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoSeveralRules() {
+            void should_returnSeveralLiteralsListUnfolded_whenNegatedLiteralCanBeUnfolded_IntoSeveralRules() {
                 ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
                         "P(x), not(Derived(x))",
                         "Derived(x) :- A(x), B(x)"
@@ -305,8 +379,8 @@ public class ImmutableLiteralsListTest {
                         "Derived(x) :- A(x), B(x)"
                 );
 
-                Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
-                ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
+                assertThat(unfoldedLiteralsList).hasSize(2)
+                        .element(0, as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
                         .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
                         .isIsomorphicTo(expectedLiteralsList1);
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(1))
@@ -321,7 +395,7 @@ public class ImmutableLiteralsListTest {
 
         @ParameterizedTest(name = "{0}")
         @MethodSource("equalsLiterals")
-        public void should_returnTrue_whenLiteralsAreEquals(String description, List<String> stringLiterals) {
+        void should_returnTrue_whenLiteralsAreEquals(String description, List<String> stringLiterals) {
             List<Literal> ordinaryLiterals = stringLiterals.stream()
                     .map(stringLiteral -> (Literal) LiteralMother.createOrdinaryLiteral(stringLiteral))
                     .toList();
@@ -335,7 +409,7 @@ public class ImmutableLiteralsListTest {
 
         @ParameterizedTest(name = "{0}")
         @MethodSource("notEqualsLiterals")
-        public void should_returnFalse_whenLiteralsAreNotEquals(String description, String literalsList1, String literalsList2) {
+        void should_returnFalse_whenLiteralsAreNotEquals(String description, String literalsList1, String literalsList2) {
             ImmutableLiteralsList immutableLiteralsList1 = ImmutableLiteralsListMother.create(literalsList1);
             ImmutableLiteralsList immutableLiteralsList2 = ImmutableLiteralsListMother.create(literalsList2);
             boolean equals = immutableLiteralsList1.equals(immutableLiteralsList2);

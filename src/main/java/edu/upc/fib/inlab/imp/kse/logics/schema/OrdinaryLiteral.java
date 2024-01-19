@@ -60,9 +60,12 @@ public class OrdinaryLiteral extends Literal {
         return atom.getTerms();
     }
 
+
     @Override
     public OrdinaryLiteral applySubstitution(Substitution substitution) {
-        return new OrdinaryLiteral(atom.applySubstitution(substitution), isPositive);
+        if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
+            return new OrdinaryLiteral(atom.applySubstitution(substitution), isPositive);
+        } else return this;
     }
 
     @Override

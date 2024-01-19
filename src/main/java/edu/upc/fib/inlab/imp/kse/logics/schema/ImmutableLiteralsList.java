@@ -9,25 +9,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * An immutable list of literals
+ * An immutable list of literals.
+ * <br>
+ * When the immutable list has been created through an unfolding, or applying a substitution, it remembers
+ * which literals has been replaced with which other literals
  */
 public class ImmutableLiteralsList implements List<Literal> {
     /**
      * Invariants:
      * - literalsList is not null
      * - literalsList has no nulls
+     * - originalLiteralMap maps the literals of literalList to the original literals of the ImmutableLiteralsList
+     * that has created this literal through an unfolding, or through applying a substitution.
      */
     private final List<Literal> literalList;
 
+    private final Map<Literal, Literal> originalLiteralMap;
+
     public ImmutableLiteralsList(List<Literal> literalList) {
-        if (Objects.isNull(literalList)) throw new IllegalArgumentException("LiteralList cannot be null");
-        if (literalList.stream().anyMatch(Objects::isNull))
-            throw new IllegalArgumentException("LiteralList cannot contain null elements");
-        this.literalList = Collections.unmodifiableList(literalList);
+        this(literalList, Collections.emptyMap());
     }
 
     public ImmutableLiteralsList(Literal... literal) {
         this(Arrays.stream(literal).toList());
+    }
+
+    private ImmutableLiteralsList(List<Literal> literalList, Map<Literal, Literal> originalLiteralMap) {
+        if (Objects.isNull(literalList)) throw new IllegalArgumentException("LiteralList cannot be null");
+        if (literalList.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("LiteralList cannot contain null elements");
+        this.literalList = Collections.unmodifiableList(literalList);
+        this.originalLiteralMap = Collections.unmodifiableMap(originalLiteralMap);
     }
 
     /**
@@ -81,12 +93,18 @@ public class ImmutableLiteralsList implements List<Literal> {
         return literalList.toArray(a);
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean add(Literal literal) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean remove(Object o) {
@@ -98,30 +116,45 @@ public class ImmutableLiteralsList implements List<Literal> {
         return new LinkedHashSet<>(literalList).containsAll(c);
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean addAll(Collection<? extends Literal> c) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean addAll(int index, Collection<? extends Literal> c) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public void clear() {
@@ -133,18 +166,27 @@ public class ImmutableLiteralsList implements List<Literal> {
         return literalList.get(index);
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public Literal set(int index, Literal element) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public void add(int index, Literal element) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @deprecated Unsupported operation.
+     */
     @Deprecated
     @Override
     public Literal remove(int index) {
@@ -177,10 +219,21 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
     public ImmutableLiteralsList applySubstitution(Substitution substitution) {
-        return new ImmutableLiteralsList(
-                this.literalList.stream()
-                        .map(l -> l.applySubstitution(substitution))
-                        .toList());
+        List<Literal> substitutedLiteralsList = this.literalList.stream()
+                .map(l -> l.applySubstitution(substitution))
+                .toList();
+
+        Map<Literal, Literal> newOriginalLiteralMap = new HashMap<>();
+        for (int i = 0; i < literalList.size(); ++i) {
+            Literal originalLiteral = literalList.get(i);
+            Literal literalAfterSubs = substitutedLiteralsList.get(i);
+            if (literalAfterSubs != originalLiteral) {
+                newOriginalLiteralMap.put(literalAfterSubs, originalLiteral);
+            }
+        }
+
+        return new ImmutableLiteralsList(substitutedLiteralsList, newOriginalLiteralMap);
+
     }
 
     public Set<Variable> getUsedVariables() {
@@ -225,7 +278,7 @@ public class ImmutableLiteralsList implements List<Literal> {
 
             List<ImmutableLiteralsList> result = new LinkedList<>();
             for (ImmutableLiteralsList unfoldedLiterals : unfoldedLiteralsList) {
-                result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal.getUsedVariables()));
+                result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal));
             }
             return result;
         } else return List.of(this);
@@ -266,14 +319,30 @@ public class ImmutableLiteralsList implements List<Literal> {
         return unfold(index, true);
     }
 
-    private ImmutableLiteralsList combineLiteralsAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Set<Variable> sharedVariables) {
-        Substitution substitutionForClashingTerms = computeSubstitutionForAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, sharedVariables);
+    /**
+     * @param currentLiteral not null
+     * @return the literal that has created the given literal through an unfolding, or through applying a substitution
+     * to a previous ImmutableLiteralsList.
+     */
+    public Optional<Literal> getOriginalLiteral(Literal currentLiteral) {
+        Objects.requireNonNull(currentLiteral);
+        return Optional.ofNullable(originalLiteralMap.get(currentLiteral));
+    }
 
-        List<Literal> result = new LinkedList<>();
-        result.addAll(previousLiterals);
-        result.addAll(unfoldedLiterals.applySubstitution(substitutionForClashingTerms));
+
+    private ImmutableLiteralsList combineLiteralsAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Literal unfoldedLiteral) {
+        Substitution substitutionForClashingTerms = computeSubstitutionForAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, unfoldedLiteral.getUsedVariables());
+
+        List<Literal> result = new LinkedList<>(previousLiterals);
+        ImmutableLiteralsList substitutedLiterals = unfoldedLiterals.applySubstitution(substitutionForClashingTerms);
+        result.addAll(substitutedLiterals);
         result.addAll(nextLiterals);
-        return new ImmutableLiteralsList(result);
+
+
+        Map<Literal, Literal> newOriginalLiteralMap = new HashMap<>();
+        substitutedLiterals.forEach(l -> newOriginalLiteralMap.put(l, unfoldedLiteral));
+
+        return new ImmutableLiteralsList(result, newOriginalLiteralMap);
     }
 
     private Substitution computeSubstitutionForAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Set<Variable> sharedVariables) {
