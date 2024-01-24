@@ -8,6 +8,8 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An immutable list of literals.
  * <br>
@@ -25,21 +27,23 @@ public class ImmutableLiteralsList implements List<Literal> {
     private final List<Literal> literalList;
 
     private final Map<Literal, Literal> originalLiteralMap;
+    private final Map<LiteralPosition, LiteralPosition> originalLiteralPositionMap;
 
     public ImmutableLiteralsList(List<Literal> literalList) {
-        this(literalList, Collections.emptyMap());
+        this(literalList, Collections.emptyMap(), Collections.emptyMap());
     }
 
     public ImmutableLiteralsList(Literal... literal) {
         this(Arrays.stream(literal).toList());
     }
 
-    private ImmutableLiteralsList(List<Literal> literalList, Map<Literal, Literal> originalLiteralMap) {
+    private ImmutableLiteralsList(List<Literal> literalList, Map<Literal, Literal> originalLiteralMap, Map<LiteralPosition, LiteralPosition> originalLiteralPositionMap) {
         if (Objects.isNull(literalList)) throw new IllegalArgumentException("LiteralList cannot be null");
         if (literalList.stream().anyMatch(Objects::isNull))
             throw new IllegalArgumentException("LiteralList cannot contain null elements");
         this.literalList = Collections.unmodifiableList(literalList);
         this.originalLiteralMap = Collections.unmodifiableMap(originalLiteralMap);
+        this.originalLiteralPositionMap = Collections.unmodifiableMap(originalLiteralPositionMap);
     }
 
     /**
@@ -232,7 +236,8 @@ public class ImmutableLiteralsList implements List<Literal> {
             }
         }
 
-        return new ImmutableLiteralsList(substitutedLiteralsList, newOriginalLiteralMap);
+        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new HashMap<>();
+        return new ImmutableLiteralsList(substitutedLiteralsList, newOriginalLiteralMap, newOriginalLiteralPositionMap);
 
     }
 
@@ -325,8 +330,17 @@ public class ImmutableLiteralsList implements List<Literal> {
      * to a previous ImmutableLiteralsList.
      */
     public Optional<Literal> getOriginalLiteral(Literal currentLiteral) {
-        Objects.requireNonNull(currentLiteral);
+        requireNonNull(currentLiteral);
         return Optional.ofNullable(originalLiteralMap.get(currentLiteral));
+    }
+
+
+    public Optional<LiteralPosition> getOriginalLiteralPosition(Literal currentLiteral, int termIndex) {
+        requireNonNull(currentLiteral);
+        if (termIndex < 0 || termIndex >= currentLiteral.getTerms().size()) {
+            throw new IllegalArgumentException("Term index out of bounds in current Literal " + currentLiteral);
+        }
+        return Optional.ofNullable(originalLiteralPositionMap.get(new LiteralPosition(currentLiteral, termIndex)));
     }
 
 
@@ -338,11 +352,11 @@ public class ImmutableLiteralsList implements List<Literal> {
         result.addAll(substitutedLiterals);
         result.addAll(nextLiterals);
 
-
         Map<Literal, Literal> newOriginalLiteralMap = new HashMap<>();
         substitutedLiterals.forEach(l -> newOriginalLiteralMap.put(l, unfoldedLiteral));
 
-        return new ImmutableLiteralsList(result, newOriginalLiteralMap);
+        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new HashMap<>();
+        return new ImmutableLiteralsList(result, newOriginalLiteralMap, newOriginalLiteralPositionMap);
     }
 
     private Substitution computeSubstitutionForAvoidingClash(ImmutableLiteralsList previousLiterals, ImmutableLiteralsList unfoldedLiterals, ImmutableLiteralsList nextLiterals, Set<Variable> sharedVariables) {

@@ -8,6 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -311,6 +312,29 @@ public class ImmutableLiteralsListTest {
                         .literalComesFrom(2, literalsList.get(1))
                         .literalHasNoOriginal(3);
             }
+
+            @Disabled("WIP IMPL-565")
+            @Test
+            void should_rememberOriginalLiteralPositions_whenWeApplyUnfold() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "A(1,1)",
+                        "A(x,y) :- B(x,y,1), B(x,x,x)");
+
+                List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(0);
+
+                // SOLUTION: B(1,1,1), B(1,1,1)
+                assertThat(unfoldedLiteralsList)
+                        .hasSize(1)
+                        .first(as(LogicInstanceOfAssertFactories.IMMUTABLE_LITERALS_LIST))
+                        .hasSize(2)
+                        .literalPositionComesFrom(0, 0, literalsList.get(0), 0)
+                        .literalPositionComesFrom(0, 1, literalsList.get(0), 1)
+                        .literalPositionHasNoOriginal(0, 2)
+                        .literalPositionComesFrom(1, 0, literalsList.get(0), 0)
+                        .literalPositionComesFrom(1, 1, literalsList.get(0), 0)
+                        .literalPositionComesFrom(1, 2, literalsList.get(0), 0);
+            }
+
         }
 
         @Nested

@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
+import edu.upc.fib.inlab.imp.kse.logics.schema.LiteralPosition;
 import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
@@ -108,6 +109,41 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     public ImmutableLiteralsListAssert literalComesFrom(int i, Literal expectedOriginalLiteral) {
         Literal currentLiteral = this.actual.get(i);
         return this.literalComesFrom(currentLiteral, expectedOriginalLiteral);
+    }
+
+    public ImmutableLiteralsListAssert literalPositionComesFrom(
+            int literalIndex, int termIndex,
+            Literal expectedOriginalLiteral, int expectedOriginalTerm
+    ) {
+        Literal currentLiteral = this.actual.get(literalIndex);
+        return this.literalPositionComesFrom(currentLiteral, termIndex, expectedOriginalLiteral, expectedOriginalTerm);
+    }
+
+    public ImmutableLiteralsListAssert literalPositionComesFrom(
+            Literal currentLiteral, int termIndex,
+            Literal expectedOriginalLiteral, int expectedOriginalTerm
+    ) {
+        Optional<LiteralPosition> actualOriginalLiteralPosition = actual.getOriginalLiteralPosition(currentLiteral, termIndex);
+        LiteralPosition currentLiteralPosition = new LiteralPosition(currentLiteral, termIndex);
+        LiteralPosition expectedOriginalLiteralPosition = new LiteralPosition(expectedOriginalLiteral, expectedOriginalTerm);
+        Assertions.assertThat(actualOriginalLiteralPosition)
+                .as("No original literal position for " + currentLiteralPosition)
+                .isPresent()
+                .as("Original literal position of " + currentLiteralPosition + " is " + actualOriginalLiteralPosition.get() + ", but has not the same reference as " + expectedOriginalLiteralPosition)
+                .containsSame(expectedOriginalLiteralPosition);
+        return this;
+    }
+
+    public ImmutableLiteralsListAssert literalPositionHasNoOriginal(int literalIndex, int termIndex) {
+        assertThat(actual).hasSizeGreaterThan(literalIndex);
+
+        Literal actualLit = actual.get(literalIndex);
+        LiteralPosition actualLiteralPosition = new LiteralPosition(actualLit, termIndex);
+        Assertions.assertThat(actual.getOriginalLiteralPosition(actualLit, termIndex))
+                .as("Literal Position" + actualLiteralPosition + " has an original literal position")
+                .isNotPresent();
+
+        return this;
     }
 
     /* CONTAINMENT ASSERTS */
