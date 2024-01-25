@@ -137,6 +137,17 @@ public class OrdinaryLiteral extends Literal {
 
 
     /**
+     * @param derivationRuleIndex derivation rule to use for the unfolding
+     * @return the corresponding derivation rule applying a substitution that unifies the rule head with this terms
+     */
+    protected ImmutableLiteralsList unfold(int derivationRuleIndex) {
+        if (isNegative()) {
+            return new ImmutableLiteralsList(this);
+        }
+        return atom.unfold(derivationRuleIndex);
+    }
+
+    /**
      * The listOfLists is interpreted as an OR of ANDS. This is consistent with the interpretation
      * of a list of derivation rules of some predicate P, which makes a derived literal of P evaluate
      * to true if one of the bodies of the derivation rules of P evaluates to true.

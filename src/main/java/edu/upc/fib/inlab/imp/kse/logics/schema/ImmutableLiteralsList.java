@@ -276,16 +276,57 @@ public class ImmutableLiteralsList implements List<Literal> {
 
     public List<ImmutableLiteralsList> unfold(int index, boolean unfoldNegatedLiterals) {
         Literal literal = this.literalList.get(index);
+        List<ImmutableLiteralsList> result = new LinkedList<>();
+
         if (literal instanceof OrdinaryLiteral ordinaryLiteral) {
             ImmutableLiteralsList previousLiterals = this.subList(0, index);
-            List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfold(unfoldNegatedLiterals);
             ImmutableLiteralsList nextLiterals = this.subList(index + 1, literalList.size());
 
-            List<ImmutableLiteralsList> result = new LinkedList<>();
-            for (ImmutableLiteralsList unfoldedLiterals : unfoldedLiteralsList) {
-                result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal));
+            if (ordinaryLiteral.isBase() || (ordinaryLiteral.isNegative() && !unfoldNegatedLiterals)) {
+                //If the literal is base, or it is negated and we do not apply negation extension we return
+                //a new immutable literals list without changes
+                List<Literal> literals = new LinkedList<>(previousLiterals);
+                literals.add(ordinaryLiteral);
+                literals.addAll(nextLiterals);
+                result.add(new ImmutableLiteralsList(literals));
+                return result;
             }
-            return result;
+            if (ordinaryLiteral.isNegative() && unfoldNegatedLiterals) {
+                //Here the literal is derived, negated, and we want to apply the negtion extension
+                //TODO: this case does not store traceability, right now
+                for (ImmutableLiteralsList unfoldedLiterals : ordinaryLiteral.unfold(unfoldNegatedLiterals)) {
+                    result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal));
+                }
+                return result;
+            } else {
+                //Here the literal is derived and positive
+                for (int derivationRuleIndex = 0;
+                     derivationRuleIndex < ordinaryLiteral.getPredicate().getDerivationRules().size();
+                     ++derivationRuleIndex) {
+                    DerivationRule derivationRule = ordinaryLiteral.getPredicate().getDerivationRules().get(derivationRuleIndex);
+                    ImmutableLiteralsList unfoldedLiterals = ordinaryLiteral.unfold(derivationRuleIndex);
+                    ImmutableLiteralsList unfoldedLiteralsAvoidingClash = combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal);
+
+                    //ADDING TRACEABILITY of positions
+                    Map<LiteralPosition, LiteralPosition> literalPositionMap = new HashMap<>();
+                    for (int literalIndex = 0; literalIndex < derivationRule.getBody().size(); ++literalIndex) {
+                        Literal unfoldedLiteral = unfoldedLiterals.get(literalIndex);
+                        Literal literalFromRule = derivationRule.getBody().get(literalIndex);
+                        for (int termIndex = 0; termIndex < unfoldedLiteral.getArity(); ++termIndex) {
+                            //Checking whether the term from the original rule is a head variable.
+                            //If this is the case, we are propagating a literalPosition
+                            Term termFromRule = literalFromRule.getTerms().get(termIndex);
+                            if (termFromRule instanceof Variable && derivationRule.getHeadTerms().contains(termFromRule)) {
+                                int positionInHead = derivationRule.getHeadTerms().indexOf(termFromRule);
+                                literalPositionMap.put(new LiteralPosition(unfoldedLiteral, termIndex),
+                                        new LiteralPosition(literal, positionInHead));
+                            }
+                        }
+                    }
+                    result.add(new ImmutableLiteralsList(unfoldedLiteralsAvoidingClash, unfoldedLiteralsAvoidingClash.originalLiteralMap, literalPositionMap));
+                }
+                return result;
+            }
         } else return List.of(this);
     }
 

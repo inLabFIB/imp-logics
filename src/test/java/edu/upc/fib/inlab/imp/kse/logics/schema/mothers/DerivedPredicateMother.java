@@ -23,7 +23,6 @@ public class DerivedPredicateMother {
     public static Predicate createOArityDerivedPredicate(String predicateName, Predicate predicateP) {
         Query query = new Query(List.of(), List.of(new OrdinaryLiteral(new Atom(predicateP, List.of()))));
         return new Predicate(predicateName, 0, List.of(query));
-
     }
 
     public static Predicate createDerivedPredicate(String predicateName, String schemaString) {

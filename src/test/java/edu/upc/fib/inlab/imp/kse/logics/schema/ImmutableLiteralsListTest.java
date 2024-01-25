@@ -8,7 +8,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -313,7 +312,6 @@ public class ImmutableLiteralsListTest {
                         .literalHasNoOriginal(3);
             }
 
-            @Disabled("WIP IMPL-565")
             @Test
             void should_rememberOriginalLiteralPositions_whenWeApplyUnfold() {
                 ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(

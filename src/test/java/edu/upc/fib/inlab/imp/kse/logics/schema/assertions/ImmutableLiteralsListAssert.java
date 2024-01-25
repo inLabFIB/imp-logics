@@ -130,7 +130,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                 .as("No original literal position for " + currentLiteralPosition)
                 .isPresent()
                 .as("Original literal position of " + currentLiteralPosition + " is " + actualOriginalLiteralPosition.get() + ", but has not the same reference as " + expectedOriginalLiteralPosition)
-                .containsSame(expectedOriginalLiteralPosition);
+                .contains(expectedOriginalLiteralPosition);
         return this;
     }
 

@@ -69,21 +69,31 @@ public class Atom {
             return List.of(new ImmutableLiteralsList(new OrdinaryLiteral(this)));
         } else {
             List<ImmutableLiteralsList> result = new LinkedList<>();
-            for (DerivationRule derivationRule : this.getPredicate().getDerivationRules()) {
-                Set<Variable> potentiallyClashingVariables = computePotentiallyClashingVariables(derivationRule);
-                ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), potentiallyClashingVariables);
-                ImmutableLiteralsList bodyLiteralsApplyingSubstitution = computeLiteralsWhenUnifyingTheHead(derivationRule.getHead().terms, bodyLiteralsAvoidingClashWithThisTerms);
-                result.add(bodyLiteralsApplyingSubstitution);
+            for (int derivationRuleIndex = 0; derivationRuleIndex < this.getPredicate().getDerivationRules().size();
+                 derivationRuleIndex++) {
+                result.add(this.unfold(derivationRuleIndex));
             }
             return result;
+        }
+    }
+
+
+    protected ImmutableLiteralsList unfold(int derivationRuleIndex) {
+        if (this.isBase()) {
+            return new ImmutableLiteralsList(new OrdinaryLiteral(this));
+        } else {
+            DerivationRule derivationRule = this.getPredicate().getDerivationRules().get(derivationRuleIndex);
+            Set<Variable> potentiallyClashingVariables = computePotentiallyClashingVariables(derivationRule);
+            ImmutableLiteralsList bodyLiteralsAvoidingClashWithThisTerms = computeListThatAvoidsClash(derivationRule.getBody(), potentiallyClashingVariables);
+            return computeLiteralsWhenUnifyingTheHead(derivationRule.getHead().terms, bodyLiteralsAvoidingClashWithThisTerms);
         }
     }
 
     private ImmutableLiteralsList computeLiteralsWhenUnifyingTheHead(List<Term> headTerms, ImmutableLiteralsList bodyLiterals) {
         SubstitutionAndBuiltInLiterals substitutionAndBuiltInLiterals = computeSubstitutionForHeadAndAdditionalBuiltInLiterals(headTerms);
         ImmutableLiteralsList bodyLiteralsAfterSubstitution = bodyLiterals.applySubstitution(substitutionAndBuiltInLiterals.substitution());
-        List<Literal> allLiterals = new LinkedList<>(substitutionAndBuiltInLiterals.builtInLiterals);
-        allLiterals.addAll(bodyLiteralsAfterSubstitution);
+        List<Literal> allLiterals = new LinkedList<>(bodyLiteralsAfterSubstitution);
+        allLiterals.addAll(substitutionAndBuiltInLiterals.builtInLiterals);
         return new ImmutableLiteralsList(allLiterals);
     }
 
