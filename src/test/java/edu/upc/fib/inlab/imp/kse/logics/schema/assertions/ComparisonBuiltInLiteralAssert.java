@@ -40,4 +40,19 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         TermAssert.assertThat(actual.getRightTerm()).isVariable(variableName);
         return this;
     }
+
+    @SuppressWarnings("unused")
+    public ComparisonBuiltInLiteralAssert hasLeftConstant(String constantName) {
+        TermAssert.assertThat(actual.getLeftTerm()).isConstant(constantName);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue, unused")
+    public ComparisonBuiltInLiteralAssert hasRightConstant(String constantName) {
+        TermAssert.assertThat(actual.getRightTerm()).isConstant(constantName);
+        return this;
+    }
+
+
+
 }

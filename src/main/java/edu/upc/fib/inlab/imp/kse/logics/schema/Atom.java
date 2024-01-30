@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.ArityMismatch;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariable;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariableFactory;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
@@ -145,7 +145,7 @@ public class Atom {
         Substitution substitutionForClashingTerms = new Substitution();
         Set<Variable> currentlyUsedVariables = computeCurrentlyUsedVariables(literalsList, potentiallyClashingTerms);
         for (Term potentiallyClashingTerm : potentiallyClashingTerms) {
-            Variable newFreshVariable = NewFreshVariable.computeNewFreshVariable(potentiallyClashingTerm.getName(), currentlyUsedVariables);
+            Variable newFreshVariable = NewFreshVariableFactory.createNewFreshVariable(potentiallyClashingTerm.getName(), currentlyUsedVariables);
             substitutionForClashingTerms.addMapping(new Variable(potentiallyClashingTerm.getName()), newFreshVariable);
             currentlyUsedVariables.add(newFreshVariable);
         }

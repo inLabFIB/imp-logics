@@ -4,13 +4,24 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 
 import java.util.Set;
 
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public class NewFreshVariable {
 
-    public static Variable computeNewFreshVariable(String variableNamePrefix, Set<Variable> usedVariables) {
-        String proposedNewVariableName = variableNamePrefix;
-        while (usedVariables.contains(new Variable(proposedNewVariableName))) {
-            proposedNewVariableName = proposedNewVariableName + "'";
-        }
-        return new Variable(proposedNewVariableName);
+    private NewFreshVariable() {
+        throw new IllegalStateException("Utility class");
     }
+
+    @SuppressWarnings("unused")
+    public static Variable computeNewFreshVariable(String variableNamePrefix, Set<Variable> usedVariables) {
+        return NewFreshVariableFactory.createNewFreshVariable(variableNamePrefix, usedVariables);
+    }
+
+    @SuppressWarnings("unused")
+    public static Variable computeEnumeratedNewFreshVariable(String variableNamePrefix, Set<Variable> usedVariables) {
+        return NewFreshVariableFactory.createEnumeratedNewFreshVariable(variableNamePrefix, usedVariables);
+    }
+
 }

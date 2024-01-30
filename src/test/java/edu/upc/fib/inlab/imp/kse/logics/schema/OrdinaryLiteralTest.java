@@ -29,12 +29,12 @@ public class OrdinaryLiteralTest {
     @Nested
     class CreationTests {
         @Test
-        public void should_ThrowException_WhenCreatingOrdinaryLiteral_WithNullAtom() {
+        void should_ThrowException_WhenCreatingOrdinaryLiteral_WithNullAtom() {
             assertThatThrownBy(() -> new OrdinaryLiteral(null, true)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_CreatePositiveOrdinaryLiteral_WhenCreatingOrdinaryLiteral_WithNoSign() {
+        void should_CreatePositiveOrdinaryLiteral_WhenCreatingOrdinaryLiteral_WithNoSign() {
             OrdinaryLiteral oLiteral = new OrdinaryLiteral(AtomMother.createAtomWithVariableNames("P", List.of("x")));
             assertThat(oLiteral.isPositive()).isTrue();
         }
@@ -45,7 +45,7 @@ public class OrdinaryLiteralTest {
 
         @ParameterizedTest(name = "[{index}] Substitution for OrdinaryLiteral with isPositive = {0} case")
         @ValueSource(booleans = {true, false})
-        public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(boolean isPositiveParam) {
+        void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution(boolean isPositiveParam) {
             OrdinaryLiteral oLiteral = LiteralMother.createOrdinaryLiteral(isPositiveParam, "P", "x", "y");
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("x", "1")
@@ -57,10 +57,11 @@ public class OrdinaryLiteralTest {
             assertThat(newLiteral).isNotSameAs(oLiteral);
             LiteralAssert.assertThat(newLiteral)
                     .isNotSameAs(oLiteral)
-                    .isPositive(isPositiveParam)
                     .hasPredicate("P", 2)
                     .hasConstant(0, "1")
-                    .hasVariable(1, "b");
+                    .hasVariable(1, "b")
+                    .asOrdinaryLiteral()
+                    .isPositive(isPositiveParam);
         }
     }
 
@@ -68,7 +69,7 @@ public class OrdinaryLiteralTest {
     @Nested
     class UnfoldingTests {
         @Test
-        public void should_returnSameLiteral_whenLiteralIsBase() {
+        void should_returnSameLiteral_whenLiteralIsBase() {
             OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x"));
 
             List<ImmutableLiteralsList> actualUnfoldingList = ordinaryLiteral.unfold();
@@ -82,7 +83,7 @@ public class OrdinaryLiteralTest {
         }
 
         @Test
-        public void should_returnSameLiteral_whenLiteralIsDerived_butNegated() {
+        void should_returnSameLiteral_whenLiteralIsDerived_butNegated() {
             LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), not(S(x))");
             OrdinaryLiteral negatedOrdinaryLiteral = LiteralMother.createOrdinaryLiteral(schema, false, "P", "a", "b");
 
@@ -96,7 +97,7 @@ public class OrdinaryLiteralTest {
         }
 
         @Test
-        public void should_returnDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
+        void should_returnDefinitionRuleLiterals_whenHasOneDerivationRule_applyingSubstitutionForHeadTerms() {
             LogicSchema schema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, z)");
             OrdinaryLiteral derivedLiteral = LiteralMother.createOrdinaryLiteral(schema, true, "P", "a", "b");
 
@@ -112,7 +113,7 @@ public class OrdinaryLiteralTest {
         }
 
         @Test
-        public void should_returnSeveralDefinitionRules_whenLiteralHasSeveralDefinitionRules() {
+        void should_returnSeveralDefinitionRules_whenLiteralHasSeveralDefinitionRules() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
                         P(x, y) :- R(x, y), S(y, z)
                         P(x, y) :- R(x, y), T(y, z)
@@ -135,7 +136,7 @@ public class OrdinaryLiteralTest {
         }
 
         @Test
-        public void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
+        void should_ReturnLiteralsList_ReplacingTerms_WhenDefinitionRuleTermsClashes_WithThisTerms() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("P(x, y) :- R(x, y), S(y, a, b)");
             OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteral(logicSchema, "P", "a", "b");
 
@@ -152,7 +153,7 @@ public class OrdinaryLiteralTest {
         @Nested
         class NegatedUnfoldingTests {
             @Test
-            public void should_notUnfold_whenDefinitionRuleContainsExistentialVariable() {
+            void should_notUnfold_whenDefinitionRuleContainsExistentialVariable() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived())",
                         "Derived() :- A(x)");
@@ -171,7 +172,7 @@ public class OrdinaryLiteralTest {
             }
 
             @Test
-            public void should_notUnfold_whenDefinitionRuleContainsNonNegatableLiteral() {
+            void should_notUnfold_whenDefinitionRuleContainsNonNegatableLiteral() {
                 DerivationRule derivationRule = DerivationRuleMother.create("Derived(x) :- NonNegatableLiteral(x)",
                         "Derived",
                         Set.of("NonNegatableLiteral"));
@@ -185,7 +186,7 @@ public class OrdinaryLiteralTest {
             }
 
             @Test
-            public void should_unfoldNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleLiteral() {
+            void should_unfoldNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleLiteral() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived(x))",
                         "Derived(x) :- A(x)"
@@ -221,7 +222,7 @@ public class OrdinaryLiteralTest {
 
             @ParameterizedTest
             @MethodSource("literalsAndItsNegation")
-            public void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleNegatedLiteral(String literal, String negatedLiteral) {
+            void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withSingleNegatedLiteral(String literal, String negatedLiteral) {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived())",
                         "Derived() :- " + literal
@@ -241,7 +242,7 @@ public class OrdinaryLiteralTest {
             }
 
             @Test
-            public void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withMultipleLiterals() {
+            void should_removeDerivedNegatedLiteral_whenDefinitionRuleContainsSingleRule_withMultipleLiterals() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived(x))",
                         "Derived(x) :- A(x), B(x)"
@@ -267,7 +268,7 @@ public class OrdinaryLiteralTest {
 
 
             @Test
-            public void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSingleLiteral() {
+            void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSingleLiteral() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived(x))",
                         """
@@ -294,7 +295,7 @@ public class OrdinaryLiteralTest {
 
 
             @Test
-            public void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSeveralLiterals() {
+            void should_removeDerivedNegatedLiteral_whenThereAreSeveralDefinitionRules_withSeveralLiterals() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
                         "not(Derived())",
                         """
@@ -333,7 +334,7 @@ public class OrdinaryLiteralTest {
     @Nested
     class BuildNegatedLiteralTest {
         @Test
-        public void should_ReturnNewNegatedLiteral_WhenLiteralIsPositive() {
+        void should_ReturnNewNegatedLiteral_WhenLiteralIsPositive() {
             OrdinaryLiteral positiveOL = LiteralMother.createOrdinaryLiteral("P", "a", "b");
 
             OrdinaryLiteral negatedLiteral = positiveOL.buildNegatedLiteral();
@@ -345,7 +346,7 @@ public class OrdinaryLiteralTest {
         }
 
         @Test
-        public void should_ReturnNewPositiveLiteral_WhenLiteralIsNegative() {
+        void should_ReturnNewPositiveLiteral_WhenLiteralIsNegative() {
             OrdinaryLiteral positiveOL = LiteralMother.createOrdinaryLiteral(false, "P", "a", "b");
 
             OrdinaryLiteral negatedLiteral = positiveOL.buildNegatedLiteral();

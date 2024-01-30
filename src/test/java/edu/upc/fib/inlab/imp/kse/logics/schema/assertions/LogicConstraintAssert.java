@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions;
 import java.util.Optional;
 
 public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
+
     public LogicConstraintAssert(LogicConstraint logicConstraint) {
         super(logicConstraint, LogicConstraintAssert.class);
     }

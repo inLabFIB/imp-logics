@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
 public abstract class NormalClauseAssert<T extends NormalClause> extends AbstractAssert<NormalClauseAssert<T>, T> {
+
     public NormalClauseAssert(T actual, Class<?> selfType) {
         super(actual, selfType);
     }
@@ -43,12 +44,15 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
         Assertions.assertThat(actual.getBody()).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
                         .isComparisonBuiltInLiteral()
-                        .hasBuiltInComparisonOperation(comparisonOperator)
                         .containsVariables(leftVariable, rightVariable)
+                        .asComparisonBuiltInLiteral()
+                        .hasComparisonOperation(comparisonOperator)
+
         );
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public NormalClauseAssert<T> containsBooleanBuiltInLiteral(boolean booleanValue) {
         Assertions.assertThat(actual.getBody()).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
@@ -62,6 +66,7 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public NormalClauseAssert<T> containsCustomBuiltInLiteral(String operationName) {
         Assertions.assertThat(actual.getBody()).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)

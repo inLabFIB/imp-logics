@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralComparator;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariable;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.NewFreshVariableFactory;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
@@ -405,7 +405,7 @@ public class ImmutableLiteralsList implements List<Literal> {
         Set<Variable> currentlyUsedVariables = computeCurrentlyUsedVariables(previousLiterals, unfoldedLiterals, nextLiterals);
         Substitution substitutionForClashingTerms = new Substitution();
         for (Variable potentiallyClashingVariable : potentiallyClashingVariables) {
-            Variable newFreshVariable = NewFreshVariable.computeNewFreshVariable(potentiallyClashingVariable.getName(), currentlyUsedVariables);
+            Variable newFreshVariable = NewFreshVariableFactory.createNewFreshVariable(potentiallyClashingVariable.getName(), currentlyUsedVariables);
             substitutionForClashingTerms.addMapping(new Variable(potentiallyClashingVariable.getName()), newFreshVariable);
             currentlyUsedVariables.add(newFreshVariable);
         }

@@ -44,7 +44,7 @@ public class CustomBuiltInLiteralTest {
         }
 
         @Test
-        public void should_MakeTermsListImmutable() {
+        void should_MakeTermsListImmutable() {
             List<Term> terms = new LinkedList<>();
             terms.add(new Variable("x"));
             CustomBuiltInLiteral customBuiltIn = new CustomBuiltInLiteral("CustomBuiltIn", terms);
@@ -57,7 +57,7 @@ public class CustomBuiltInLiteralTest {
     class ApplySubstitution {
 
         @Test
-        public void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution() {
+        void should_returnNewLiteralWithSubstitutedTerms_WhenApplyingSubstitution() {
             CustomBuiltInLiteral customBuiltInLiteral = LiteralMother.createCustomBuiltInLiteral("CustomBuiltIn", "x");
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("x", "1")
@@ -67,8 +67,10 @@ public class CustomBuiltInLiteralTest {
 
             LiteralAssert.assertThat(newLiteral)
                     .isNotSameAs(customBuiltInLiteral)
-                    .hasBuiltInCustomOperation("CustomBuiltIn")
-                    .hasConstant(0, "1");
+                    .hasConstant(0, "1")
+                    .asBuiltInLiteral()
+                    .hasOperationName("CustomBuiltIn");
+
         }
     }
 }

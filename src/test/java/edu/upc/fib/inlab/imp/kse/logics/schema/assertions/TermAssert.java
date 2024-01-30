@@ -42,9 +42,34 @@ public class TermAssert extends AbstractAssert<TermAssert, Term> {
     }
 
     @SuppressWarnings("UnusedReturnValue")
+    public TermAssert isVariable() {
+        Assertions.assertThat(actual).isInstanceOf(Variable.class);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public TermAssert isNotVariable() {
+        Assertions.assertThat(actual).isNotInstanceOf(Variable.class);
+        return this;
+    }
+
+
+    @SuppressWarnings("UnusedReturnValue")
     public TermAssert isConstant(String constantName) {
         Assertions.assertThat(actual).isInstanceOf(Constant.class);
         Assertions.assertThat(actual.getName()).isEqualTo(constantName);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public TermAssert isConstant() {
+        Assertions.assertThat(actual).isInstanceOf(Constant.class);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public TermAssert isNotConstant() {
+        Assertions.assertThat(actual).isNotInstanceOf(Constant.class);
         return this;
     }
 

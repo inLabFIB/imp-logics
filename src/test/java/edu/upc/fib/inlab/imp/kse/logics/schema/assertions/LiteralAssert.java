@@ -42,9 +42,25 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return this;
     }
 
+    public OrdinaryLiteralAssert asOrdinaryLiteral() {
+        objects.assertIsInstanceOf(info, actual, OrdinaryLiteral.class);
+        return new OrdinaryLiteralAssert((OrdinaryLiteral) actual).as(info.description());
+    }
+
     public LiteralAssert isComparisonBuiltInLiteral() {
         Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
         return this;
+    }
+
+    @SuppressWarnings("unused")
+    public BuiltInLiteralAssert asBuiltInLiteral() {
+        objects.assertIsInstanceOf(info, actual, BuiltInLiteral.class);
+        return new BuiltInLiteralAssert((BuiltInLiteral) actual).as(info.description());
+    }
+
+    public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
+        objects.assertIsInstanceOf(info, actual, ComparisonBuiltInLiteral.class);
+        return new ComparisonBuiltInLiteralAssert((ComparisonBuiltInLiteral) actual).as(info.description());
     }
 
     public LiteralAssert hasPredicate(String predicateName, int arity) {
@@ -53,17 +69,6 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return this;
     }
 
-    public LiteralAssert hasBuiltInComparisonOperation(String comparisonOperator) {
-        Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
-        ComparisonBuiltInLiteralAssert.assertThat((ComparisonBuiltInLiteral) actual).hasComparisonOperation(comparisonOperator);
-        return this;
-    }
-
-    public LiteralAssert hasBuiltInCustomOperation(String comparisonOperator) {
-        Assertions.assertThat(actual).isInstanceOf(CustomBuiltInLiteral.class);
-        BuiltInLiteralAssert.assertThat((CustomBuiltInLiteral) actual).hasOperationName(comparisonOperator);
-        return this;
-    }
 
     @SuppressWarnings("UnusedReturnValue")
     public LiteralAssert hasVariable(int index, String variableName) {
@@ -93,11 +98,13 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return this;
     }
 
-    public LiteralAssert isPositive(boolean expected) {
-        Assertions.assertThat(actual).isInstanceOf(OrdinaryLiteral.class);
-        Assertions.assertThat(
-                        ((OrdinaryLiteral) actual).isPositive())
-                .isEqualTo(expected);
+    @SuppressWarnings("UnusedReturnValue, unused")
+    public LiteralAssert containsConstants(String... constantNames) {
+        for (int i = 0; i < constantNames.length; i++) {
+            String constantName = constantNames[i];
+            hasConstant(i, constantName);
+        }
         return this;
     }
+
 }

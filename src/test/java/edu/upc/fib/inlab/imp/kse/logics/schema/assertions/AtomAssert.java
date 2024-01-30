@@ -29,7 +29,6 @@ public class AtomAssert extends AbstractAssert<AtomAssert, Atom> {
      * @return this assert
      */
     @SuppressWarnings("UnusedReturnValue")
-
     public AtomAssert hasPredicate(Predicate predicate) {
         Assertions.assertThat(actual.getPredicate()).isSameAs(predicate);
         return this;

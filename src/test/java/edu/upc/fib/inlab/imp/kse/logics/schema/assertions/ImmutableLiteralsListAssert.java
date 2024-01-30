@@ -160,10 +160,11 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     public ImmutableLiteralsListAssert containsOrdinaryLiteral(boolean isPositive, String predicateName, String... variableNames) {
         Assertions.assertThat(actual).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
-                        .isOrdinaryLiteral()
+                        .containsVariables(variableNames)
+                        .asOrdinaryLiteral()
                         .isPositive(isPositive)
                         .hasPredicate(predicateName, variableNames.length)
-                        .containsVariables(variableNames)
+
         );
         return this;
     }
@@ -172,9 +173,10 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     public ImmutableLiteralsListAssert containsComparisonBuiltInLiteral(String leftVariableName, String comparisonOperator, String rightVariableName) {
         Assertions.assertThat(actual).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
-                        .isComparisonBuiltInLiteral()
-                        .hasBuiltInComparisonOperation(comparisonOperator)
                         .containsVariables(leftVariableName, rightVariableName)
+                        .asComparisonBuiltInLiteral()
+                        .hasComparisonOperation(comparisonOperator)
+
         );
         return this;
 
