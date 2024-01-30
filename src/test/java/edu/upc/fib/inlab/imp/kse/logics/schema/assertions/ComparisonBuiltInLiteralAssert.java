@@ -6,6 +6,7 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
 public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBuiltInLiteralAssert, ComparisonBuiltInLiteral> {
+
     public ComparisonBuiltInLiteralAssert(ComparisonBuiltInLiteral comparisonBuiltInLiteral) {
         super(comparisonBuiltInLiteral, ComparisonBuiltInLiteralAssert.class);
     }
@@ -30,6 +31,11 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         return this;
     }
 
+    @SuppressWarnings("unused")
+    public TermAssert leftTerm() {
+        return TermAssert.assertThat(actual.getLeftTerm());
+    }
+
     public ComparisonBuiltInLiteralAssert hasLeftVariable(String variableName) {
         TermAssert.assertThat(actual.getLeftTerm()).isVariable(variableName);
         return this;
@@ -39,6 +45,11 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
     public ComparisonBuiltInLiteralAssert hasRightVariable(String variableName) {
         TermAssert.assertThat(actual.getRightTerm()).isVariable(variableName);
         return this;
+    }
+
+    @SuppressWarnings("unused")
+    public TermAssert rightTerm() {
+        return TermAssert.assertThat(actual.getRightTerm());
     }
 
     @SuppressWarnings("unused")
@@ -52,7 +63,5 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         TermAssert.assertThat(actual.getRightTerm()).isConstant(constantName);
         return this;
     }
-
-
 
 }

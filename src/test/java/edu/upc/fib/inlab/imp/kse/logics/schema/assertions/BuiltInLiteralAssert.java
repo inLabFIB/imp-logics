@@ -33,6 +33,7 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         return this;
     }
 
+    @SuppressWarnings("unused")
     public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
         objects.assertIsInstanceOf(info, actual, ComparisonBuiltInLiteral.class);
         return new ComparisonBuiltInLiteralAssert((ComparisonBuiltInLiteral) actual).as(info.description());
