@@ -107,4 +107,10 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue, unused")
+    public LiteralAssert isGround() {
+        Assertions.assertThat(actual.isGround()).as("Literal " + actual + " should be ground").isTrue();
+        return this;
+    }
+
 }
