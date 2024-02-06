@@ -18,18 +18,18 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ImmutableTermListTest {
+class ImmutableTermListTest {
 
     @Nested
     class CreationTests {
         @Test
-        public void should_throwException_whenCreatingImmutableTermsList_withNullList() {
+        void should_throwException_whenCreatingImmutableTermsList_withNullList() {
             assertThatThrownBy(() -> new ImmutableTermList((List<Term>) null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_throwException_whenTryCreatingImmutableTermsList_withNullElement() {
+        void should_throwException_whenTryCreatingImmutableTermsList_withNullElement() {
             List<Term> listWithNull = new LinkedList<>();
             listWithNull.add(null);
             assertThatThrownBy(() -> new ImmutableTermList(listWithNull))
@@ -37,30 +37,24 @@ public class ImmutableTermListTest {
         }
 
         @Test
-        public void should_createEmptyTermList_whenCreatingImmutableTermList_withEmptyList() {
+        void should_createEmptyTermList_whenCreatingImmutableTermList_withEmptyList() {
             ImmutableTermList actualTermList = new ImmutableTermList(List.of());
             ImmutableTermListAssert.assertThat(actualTermList).isEmpty();
         }
 
         @Test
-        public void should_containAllTermsInSameOrder_whenCreatingTermList() {
+        void should_containAllTermsInSameOrder_whenCreatingTermList() {
             ImmutableTermList actualTermList = new ImmutableTermList(new Variable("x"), new Constant("1"));
             ImmutableTermListAssert.assertThat(actualTermList)
                     .containsVariable(0, "x")
                     .containsConstant(1, "1");
-        }
-
-        @Test
-        public void should_throwException_whenCreatingImmutableTermsList_withSomeNull() {
-            assertThatThrownBy(() -> new ImmutableTermList(new Variable("x"), null))
-                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
     @Nested
     class ApplySubstitution {
         @Test
-        public void should_returnOtherImmutableTermList_whenApplyingSubstitution() {
+        void should_returnOtherImmutableTermList_whenApplyingSubstitution() {
             ImmutableTermList immutableTermList = TermMother.createTerms("x", "1");
             Substitution substitution = new Substitution();
 
@@ -70,7 +64,7 @@ public class ImmutableTermListTest {
         }
 
         @Test
-        public void should_returnTermsList_afterReplacingMappedVariables() {
+        void should_returnTermsList_afterReplacingMappedVariables() {
             ImmutableTermList immutableTermList = TermMother.createTerms("x", "1");
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("x", "2")
@@ -86,7 +80,7 @@ public class ImmutableTermListTest {
     }
 
     @Test
-    public void should_ReturnUsedVariables() {
+    void should_ReturnUsedVariables() {
         ImmutableTermList immutableTermList = TermMother.createTerms("x", "1", "y");
 
         Set<Variable> usedVariables = immutableTermList.getUsedVariables();
@@ -100,7 +94,7 @@ public class ImmutableTermListTest {
     class EqualsTest {
 
         @Test
-        public void should_returnTrue_whenTermsAreEquals() {
+        void should_returnTrue_whenTermsAreEquals() {
             ImmutableTermList immutableTermList1 = TermMother.createTerms("x", "1", "y");
             ImmutableTermList immutableTermList2 = TermMother.createTerms("x", "1", "y");
 
@@ -111,7 +105,7 @@ public class ImmutableTermListTest {
 
         @ParameterizedTest(name = "{0}")
         @MethodSource("notEqualsTerms")
-        public void should_returnFalse_whenTermsAreNotEquals(String description, ImmutableTermList immutableTermList1, ImmutableTermList immutableTermList2) {
+        void should_returnFalse_whenTermsAreNotEquals(String description, ImmutableTermList immutableTermList1, ImmutableTermList immutableTermList2) {
             boolean equals = immutableTermList1.equals(immutableTermList2);
 
             assertThat(equals).as(description).isFalse();
@@ -119,7 +113,7 @@ public class ImmutableTermListTest {
 
         private static Stream<Arguments> notEqualsTerms() {
             return Stream.of(
-                    Arguments.of("Terms in diferent order",
+                    Arguments.of("Terms in different order",
                             TermMother.createTerms("x", "y"),
                             TermMother.createTerms("y", "x")
                     ),

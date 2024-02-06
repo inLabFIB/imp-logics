@@ -10,24 +10,24 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class NormalClauseTest {
+class NormalClauseTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingNormalClause_WithNullBody() {
+    void should_ThrowException_WhenCreatingNormalClause_WithNullBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
         assertThatThrownBy(() -> new LogicConstraint(constraintID, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingNormalClause_WithEmptyBody() {
+    void should_ThrowException_WhenCreatingNormalClause_WithEmptyBody() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
         assertThatThrownBy(() -> new LogicConstraint(constraintID, List.of()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_MakeBodyImmutable_WhenCreatingNormalClause_WithMutableListInput() {
+    void should_MakeBodyImmutable_WhenCreatingNormalClause_WithMutableListInput() {
         ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
         Literal literal = LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x"));
         List<Literal> body = createMutableList(literal);

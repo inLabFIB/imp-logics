@@ -16,7 +16,7 @@ public abstract class NormalClause {
      */
     private final ImmutableLiteralsList body;
 
-    public NormalClause(List<Literal> body) {
+    protected NormalClause(List<Literal> body) {
         if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
         if (body.isEmpty()) throw new IllegalArgumentException("Body cannot be empty");
         this.body = new ImmutableLiteralsList(body);
