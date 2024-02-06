@@ -46,11 +46,13 @@ public class TGD extends Dependency {
         return Collections.emptySet();
     }
 
+    //TODO: IMPL-569 Implement LINEAR DATALOG check
     @Override
     public boolean isLinear() {
         return false;
     }
 
+    //TODO: IMPR-187 Implement Guarded Datalog check
     @Override
     public boolean isGuarded() {
         return false;

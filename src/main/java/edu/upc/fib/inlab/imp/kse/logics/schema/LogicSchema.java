@@ -10,16 +10,19 @@ import java.util.stream.Collectors;
 
 /**
  * This class implements the representation of a logic schema.
+ * <br>
  * A logic schema bounds several predicates and constraints together guaranteeing their consistency.
  */
 public class LogicSchema {
     /**
      * Invariants:
-     * - We cannot have two predicates with the same name
-     * - We cannot have two logicConstraints with the same ConstraintID
-     * - All the predicates used in the constraints appear in the predicates
-     * - All the constraints are defined through predicates of the logicSchema
-     * - All the derivation rules defining the predicates are included in this logicSchema
+     * <ul>
+     *     <li>We cannot have two predicates with the same name</li>
+     *     <li>We cannot have two logicConstraints with the same ConstraintID</li>
+     *     <li>All the predicates used in the constraints appear in the predicates</li>
+     *     <li>All the constraints are defined through predicates of the logicSchema</li>
+     *     <li>All the derivation rules defining the predicates are included in this logicSchema</li>
+     * </ul>
      */
     private final Map<String, Predicate> predicatesByName = new HashMap<>();
     private final Map<ConstraintID, LogicConstraint> constraintsByID = new HashMap<>();

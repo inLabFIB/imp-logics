@@ -30,6 +30,9 @@ public abstract class Dependency {
         return body;
     }
 
+    //TODO: Abstract getHead method???
+//    public abstract Object getHead();
+
     public abstract Set<Variable> getUniversalVariables();
 
     public abstract Set<Variable> getExistentialVariables();
