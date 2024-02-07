@@ -79,6 +79,17 @@ public class DependencySchema {
         }
     }
 
+    public Set<Predicate> getAllPredicates() {
+        return new LinkedHashSet<>(predicatesByName.values());
+    }
+
+    public Predicate getPredicateByName(String predicateName) {
+        if (!predicatesByName.containsKey(predicateName)) {
+            throw new PredicateNotExists(predicateName);
+        }
+        return predicatesByName.get(predicateName);
+    }
+
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
         if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotExists(derivedPredicateName);
 
@@ -92,17 +103,6 @@ public class DependencySchema {
         return predicatesByName.values().stream()
                 .filter(Predicate::isDerived)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    public Predicate getPredicateByName(String predicateName) {
-        if (!predicatesByName.containsKey(predicateName)) {
-            throw new PredicateNotExists(predicateName);
-        }
-        return predicatesByName.get(predicateName);
-    }
-
-    public Set<Predicate> getAllPredicates() {
-        return new LinkedHashSet<>(predicatesByName.values());
     }
 
     public Set<Dependency> getDependencies() {

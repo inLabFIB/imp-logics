@@ -32,11 +32,13 @@ public class EGD extends Dependency {
         return head;
     }
 
+    //TODO: IMPR-195 Implement getU/EVariables methods
     @Override
     public Set<Variable> getUniversalVariables() {
         return Collections.emptySet();
     }
 
+    //TODO: IMPR-195 Implement getU/EVariables methods
     @Override
     public Set<Variable> getExistentialVariables() {
         return Collections.emptySet();
