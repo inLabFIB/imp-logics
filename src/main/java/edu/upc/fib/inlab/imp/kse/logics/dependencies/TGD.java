@@ -58,8 +58,9 @@ public class TGD extends Dependency {
 
     @Override
     public boolean isGuarded() {
+        Set<Variable> uVars = getUniversalVariables();
         for (Literal l: getBody()) {
-            if (new HashSet<>(l.getTerms()).containsAll(getUniversalVariables())) return true;
+            if (new HashSet<>(l.getTerms()).containsAll(uVars)) return true;
         }
         return false;
     }

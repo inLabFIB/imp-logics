@@ -128,6 +128,14 @@ class TGDTest {
 
             assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
         }
+
+        @Test
+        void linearTGDShouldAlwaysBeGuardedAsWell() {
+            Atom atom = AtomMother.createAtom("P", "x");
+
+            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isLinear()).isTrue();
+            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isGuarded()).isTrue();
+        }
     }
 
     @Nested
@@ -167,6 +175,32 @@ class TGDTest {
 
             assertThat(new TGD(body,createMutableAtomList(atom)).isGuarded()).isFalse();
         }
+
+        @Test //És aquest el comportament que desitgem? Segons la formalització del paper sembla que si.
+        void checkingGuardednessWhenNoVariablesArePresent_CheckShouldReturnTrue() {
+            List<Literal> body = List.of(
+                    LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
+                    LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
+                    LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
+            );
+            Atom atom = AtomMother.createAtom("P");
+
+            assertThat(new TGD(body, createMutableAtomList(atom)).isGuarded()).isTrue();
+        }
+
+        @Test
+        void guardedTGDNotAlwaysShouldBeLinear() {
+            List<Literal> body = List.of(
+                    LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("x"))),
+                    LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("x"))),
+                    LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("x")))
+            );
+            Atom atom = AtomMother.createAtom("P");
+
+            assertThat(new TGD(body, createMutableAtomList(atom)).isGuarded()).isTrue();
+            assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
+        }
+
     }
 
     private static List<Atom> createMutableAtomList(Atom... atoms) {
