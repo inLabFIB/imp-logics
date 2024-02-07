@@ -50,10 +50,9 @@ public class TGD extends Dependency {
                 .collect(Collectors.toSet());
     }
 
-    //TODO: IMPL-569 Implement LINEAR DATALOG check
     @Override
     public boolean isLinear() {
-        return false;
+        return getBody().size() == 1;
     }
 
     //TODO: IMPR-187 Implement Guarded Datalog check

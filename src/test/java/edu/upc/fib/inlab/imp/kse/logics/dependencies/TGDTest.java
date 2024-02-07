@@ -108,6 +108,28 @@ class TGDTest {
 
     }
 
+    @Nested
+    class LinearTGDTests {
+
+        @Test
+        void linearTGDShouldBeDetected() {
+            Atom atom = AtomMother.createAtom("P", "x");
+            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isLinear()).isTrue();
+        }
+
+        @Test
+        void nonLinearTGDShouldBeDetected() {
+            List<Literal> body = List.of(
+                    LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
+                    LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
+                    LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
+            );
+            Atom atom = AtomMother.createAtom("P");
+
+            assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
+        }
+    }
+
     private static List<Atom> createMutableAtomList(Atom... atoms) {
         return new LinkedList<>(List.of(atoms));
     }
