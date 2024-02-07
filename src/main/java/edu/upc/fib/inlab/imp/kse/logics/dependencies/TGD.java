@@ -1,14 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.Atom;
-import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableAtomList;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Tuple-Generating Dependency
@@ -36,16 +31,23 @@ public class TGD extends Dependency {
         return head;
     }
 
-    //TODO: IMPR-195 Implement getU/EVariables methods
     @Override
     public Set<Variable> getUniversalVariables() {
-        return Collections.emptySet();
+        return getBody().stream()
+                .flatMap(l -> l.getTerms().stream())
+                .filter(Variable.class::isInstance)
+                .map(t -> (Variable) t)
+                .collect(Collectors.toSet());
     }
 
-    //TODO: IMPR-195 Implement getU/EVariables methods
     @Override
     public Set<Variable> getExistentialVariables() {
-        return Collections.emptySet();
+        return getHead().stream()
+                .flatMap(a -> a.getTerms().stream())
+                .filter(Variable.class::isInstance)
+                .map(t -> (Variable) t)
+                .filter(t -> !getUniversalVariables().contains(t))
+                .collect(Collectors.toSet());
     }
 
     //TODO: IMPL-569 Implement LINEAR DATALOG check
