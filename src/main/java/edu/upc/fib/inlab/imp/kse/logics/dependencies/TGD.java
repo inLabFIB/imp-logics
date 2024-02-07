@@ -55,9 +55,12 @@ public class TGD extends Dependency {
         return getBody().size() == 1;
     }
 
-    //TODO: IMPR-187 Implement Guarded Datalog check
+
     @Override
     public boolean isGuarded() {
+        for (Literal l: getBody()) {
+            if (new HashSet<>(l.getTerms()).containsAll(getUniversalVariables())) return true;
+        }
         return false;
     }
 }

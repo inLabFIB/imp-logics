@@ -109,16 +109,16 @@ class TGDTest {
     }
 
     @Nested
-    class LinearTGDTests {
+    class LinearTGDCheckTests {
 
         @Test
-        void linearTGDShouldBeDetected() {
+        void linearTGDShouldBeDetected_CheckShouldReturnTrue() {
             Atom atom = AtomMother.createAtom("P", "x");
             assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isLinear()).isTrue();
         }
 
         @Test
-        void nonLinearTGDShouldBeDetected() {
+        void nonLinearTGDShouldBeDetected_CheckShouldReturnFalse() {
             List<Literal> body = List.of(
                     LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
                     LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
@@ -127,6 +127,45 @@ class TGDTest {
             Atom atom = AtomMother.createAtom("P");
 
             assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
+        }
+    }
+
+    @Nested
+    class GuardedTGDCheckTests {
+
+        @Test
+        void guardedTGDShouldBeDetected_CheckShouldReturnTrue() {
+            List<Literal> body = List.of(
+                    LiteralMother.createOrdinaryLiteral("R", List.of(
+                            new Variable("x"),
+                            new Variable("y")
+                    )),
+                    LiteralMother.createOrdinaryLiteral("S", List.of(
+                            new Variable("y"),
+                            new Variable("x"),
+                            new Variable("z")
+                    ))
+            );
+            Atom atom = AtomMother.createAtom("P", "z", "x", "w");
+
+            assertThat(new TGD(body,createMutableAtomList(atom)).isGuarded()).isTrue();
+        }
+
+        @Test
+        void nonGuardedTGDShouldBeDetected_CheckShouldReturnFalse() {
+            List<Literal> body = List.of(
+                    LiteralMother.createOrdinaryLiteral("R", List.of(
+                            new Variable("x"),
+                            new Variable("y")
+                    )),
+                    LiteralMother.createOrdinaryLiteral("R", List.of(
+                            new Variable("y"),
+                            new Variable("z")
+                    ))
+            );
+            Atom atom = AtomMother.createAtom("R", "x", "z");
+
+            assertThat(new TGD(body,createMutableAtomList(atom)).isGuarded()).isFalse();
         }
     }
 
