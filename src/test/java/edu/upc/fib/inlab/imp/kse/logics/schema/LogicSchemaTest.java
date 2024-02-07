@@ -19,9 +19,13 @@ class LogicSchemaTest {
     class Create {
         @Test
         void should_throwException_WhenCreatingLogicSchema_WithRepeatedPredicateName() {
-            Predicate p1 = new MutablePredicate("p", 1);
-            Predicate p2 = new MutablePredicate("p", 1);
-            assertThatThrownBy(() -> new LogicSchema(Set.of(p1, p2), Set.of()))
+            Set<Predicate> predicates = Set.of(
+                    new MutablePredicate("p", 1),
+                    new MutablePredicate("p", 1)
+            );
+            Set<LogicConstraint> constraints = Set.of();
+
+            assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
                     .isInstanceOf(RepeatedPredicateName.class);
         }
 
@@ -30,7 +34,10 @@ class LogicSchemaTest {
             Predicate p = new MutablePredicate("p", 1);
             LogicConstraint c1 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), p);
             LogicConstraint c2 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), p);
-            assertThatThrownBy(() -> new LogicSchema(Set.of(p), Set.of(c1, c2)))
+            Set<Predicate> predicates = Set.of(p);
+            Set<LogicConstraint> constraints = Set.of(c1, c2);
+
+            assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
                     .isInstanceOf(RepeatedConstraintID.class);
         }
 
@@ -38,7 +45,10 @@ class LogicSchemaTest {
         void should_throwException_WhenCreatingLogicSchema_WithConstraint_UsingPredicateNotFromSchema() {
             Predicate predicateNotInSchema = new MutablePredicate("p", 1);
             LogicConstraint c1 = LogicConstraintMother.createTrivialLogicConstraint(ConstraintIDMother.createConstraintID("1"), predicateNotInSchema);
-            assertThatThrownBy(() -> new LogicSchema(Set.of(), Set.of(c1)))
+            Set<Predicate> predicates = Set.of();
+            Set<LogicConstraint> constraints = Set.of(c1);
+
+            assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
                     .isInstanceOf(PredicateOutsideSchema.class);
         }
 
@@ -46,8 +56,10 @@ class LogicSchemaTest {
         void should_throwException_WhenCreatingLogicSchema_WithDerivedPredicate_UsingPredicateNotFromSchema() {
             Query query = QueryMother.createTrivialQuery(1, "predicateNotInSchemaName");
             Predicate derivedPredicate = new MutablePredicate("p", 1, List.of(query));
+            Set<Predicate> predicates = Set.of(derivedPredicate);
+            Set<LogicConstraint> constraints = Set.of();
 
-            assertThatThrownBy(() -> new LogicSchema(Set.of(derivedPredicate), Set.of()))
+            assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
                     .isInstanceOf(PredicateOutsideSchema.class);
         }
 
@@ -56,8 +68,8 @@ class LogicSchemaTest {
             Predicate basePredicate = new MutablePredicate("q", 1);
             String derivedPredicateName = "p";
             Predicate derivedPredicate = DerivedPredicateMother.createTrivialDerivedPredicate(derivedPredicateName, 1, List.of(basePredicate));
-            assertThatNoException().isThrownBy(() -> new LogicSchema(Set.of(derivedPredicate, basePredicate), Set.of()));
 
+            assertThatNoException().isThrownBy(() -> new LogicSchema(Set.of(derivedPredicate, basePredicate), Set.of()));
         }
     }
 
@@ -74,7 +86,8 @@ class LogicSchemaTest {
         @Test
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
-            assertThatThrownBy(() -> logicSchema.getPredicateByName("P"));
+            assertThatThrownBy(() -> logicSchema.getPredicateByName("p"))
+                    .isInstanceOf(PredicateNotExists.class);
         }
     }
 
@@ -151,9 +164,9 @@ class LogicSchemaTest {
                     """);
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
-
-            LevelHierarchyAssert.assertThat(levelHierarchy).hasNoPredicateInLevel(0);
-            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(1, "P");
+            LevelHierarchyAssert.assertThat(levelHierarchy)
+                    .hasNoPredicateInLevel(0)
+                    .containsExactlyPredicateNamesInLevel(1, "P");
         }
 
         @Test
@@ -165,9 +178,10 @@ class LogicSchemaTest {
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
 
-            LevelHierarchyAssert.assertThat(levelHierarchy).hasNoPredicateInLevel(0);
-            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(1, "P");
-            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(2, "Q");
+            LevelHierarchyAssert.assertThat(levelHierarchy)
+                    .hasNoPredicateInLevel(0)
+                    .containsExactlyPredicateNamesInLevel(1, "P")
+                    .containsExactlyPredicateNamesInLevel(2, "Q");
         }
 
 
@@ -188,8 +202,9 @@ class LogicSchemaTest {
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
 
-            LevelHierarchyAssert.assertThat(levelHierarchy).hasLevels(1);
-            LevelHierarchyAssert.assertThat(levelHierarchy).containsExactlyPredicateNamesInLevel(0, "P", "Q");
+            LevelHierarchyAssert.assertThat(levelHierarchy)
+                    .hasLevels(1)
+                    .containsExactlyPredicateNamesInLevel(0, "P", "Q");
         }
 
         @Test

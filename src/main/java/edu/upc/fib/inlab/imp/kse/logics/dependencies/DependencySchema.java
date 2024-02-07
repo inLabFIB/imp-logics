@@ -18,10 +18,9 @@ public class DependencySchema {
      * Invariants:
      * <ul>
      *     <li>We cannot have two predicates with the same name</li>
-     *     <li>We cannot have two logicConstraints with the same ConstraintID</li>
-     *     <li>All the predicates used in the constraints appear in the predicates</li>
-     *     <li>All the constraints are defined through predicates of the logicSchema</li>
-     *     <li>All the derivation rules defining the predicates are included in this logicSchema</li>
+     *     <li>All predicates used in the dependencies appear in the predicates set</li>
+     *     <li>All dependencies are defined through predicates of the dependencySchema</li>
+     *     <li>All derivation rules defining predicates are included in this dependencySchema</li>
      * </ul>
      */
     private final Map<String, Predicate> predicatesByName = new HashMap<>();
@@ -30,12 +29,12 @@ public class DependencySchema {
     public DependencySchema(Set<Predicate> predicates, Set<Dependency> dependencies) {
         predicates.forEach(predicate -> {
             if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateName(predicate.getName());
-            predicatesByName.put(predicate.getName(), predicate);
+            this.predicatesByName.put(predicate.getName(), predicate);
         });
 
         dependencies.forEach(d -> {
             checkPredicatesBelongsToSchema(d);
-            dependencies.add(d);
+            this.dependencies.add(d);
         });
 
         checkDerivedPredicatesUsesPredicatesFromSchema();
@@ -107,6 +106,10 @@ public class DependencySchema {
 
     public Set<Dependency> getDependencies() {
         return new HashSet<>(dependencies);
+    }
+
+    public boolean isEmpty() {
+        return predicatesByName.isEmpty() && dependencies.isEmpty();
     }
 
     //TODO: IMPR-189 Implement sticky check
