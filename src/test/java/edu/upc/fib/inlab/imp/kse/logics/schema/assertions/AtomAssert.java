@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.Atom;
+import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
@@ -51,5 +52,11 @@ public class AtomAssert extends AbstractAssert<AtomAssert, Atom> {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    public AtomAssert hasTerms(ImmutableTermList terms) {
+        ImmutableTermListAssert.assertThat(actual.getTerms())
+                .containsExactlyElementsOf(terms);
+        return this;
+    }
 
 }

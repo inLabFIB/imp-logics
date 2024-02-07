@@ -57,7 +57,7 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         return this;
     }
 
-    protected void checkDerivationRulesEquivalenceWithStrategy(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
+    public void checkDerivationRulesEquivalenceWithStrategy(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
         assertThatAllActualDerivationRulesAreEquivalentToExpected(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
         assertThatAllEquivalentExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
     }

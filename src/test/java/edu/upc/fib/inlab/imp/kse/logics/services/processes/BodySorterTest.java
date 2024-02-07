@@ -19,15 +19,16 @@ import java.util.stream.Stream;
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class BodySorterTest {
+class BodySorterTest {
 
     @Test
-    public void should_throwException_whenSortingNullSchema() {
-        assertThatThrownBy(() -> new BodySorter().sort(null))
+    void should_throwException_whenSortingNullSchema() {
+        BodySorter bodySorter = new BodySorter();
+        assertThatThrownBy(() -> bodySorter.sort(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    public static Stream<Arguments> provideLogicSchemasAndExpectedSortedBodies() {
+    static Stream<Arguments> provideLogicSchemasAndExpectedSortedBodies() {
         return Stream.of(
                 Arguments.of(
                         "Case 1",
@@ -59,7 +60,7 @@ public class BodySorterTest {
 
     @ParameterizedTest
     @MethodSource("provideLogicSchemasAndExpectedSortedBodies")
-    public void should_sortLogicSchemaBodies(String caseName, String bodyString, List<String> sortedLiterals) {
+    void should_sortLogicSchemaBodies(String caseName, String bodyString, List<String> sortedLiterals) {
         String constraintId = "1";
         String schemaString = String.format("@%s :- %s", constraintId, bodyString);
         LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
@@ -74,7 +75,7 @@ public class BodySorterTest {
 
     @ParameterizedTest
     @MethodSource("provideLogicSchemasAndExpectedSortedBodies")
-    public void should_sortDerivationRuleBodies(String caseName, String bodyString, List<String> sortedLiterals) {
+    void should_sortDerivationRuleBodies(String caseName, String bodyString, List<String> sortedLiterals) {
         String schemaString = String.format("q() :- %s", bodyString);
         LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
 
@@ -87,7 +88,7 @@ public class BodySorterTest {
     }
 
     @Test
-    public void should_maintainUnusedPredicatesInLogicSchema_when_ItContainsUnusedPredicates() {
+    void should_maintainUnusedPredicatesInLogicSchema_when_ItContainsUnusedPredicates() {
         PredicateSpec unusedPredicateSpec = new PredicateSpec("Z", 2);
 
         LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
@@ -100,7 +101,7 @@ public class BodySorterTest {
     }
 
     @Test
-    public void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
+    void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
         LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                 @1 :- P(x)
                 @2 :- Q(x)

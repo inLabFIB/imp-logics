@@ -199,7 +199,16 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                                     .hasPredicateName(expectedOL.getAtom().getPredicateName())
                                     .hasTerms(expectedOL.getAtom().getTerms())
                     );
-        }
+        } else {
+        } //Todo: implement this!!!
+
+//        else if (expectedLiteral instanceof BuiltInLiteral expectedBIL) {
+//            Assertions.assertThat(actualLiteral)
+//                    .asInstanceOf(InstanceOfAssertFactories.type(BuiltInLiteral.class))
+//                    .has
+//
+//            throw new RuntimeException("Not implemented yet!");
+//        }
         return this;
     }
 

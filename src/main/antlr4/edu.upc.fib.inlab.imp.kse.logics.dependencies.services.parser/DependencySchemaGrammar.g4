@@ -39,8 +39,10 @@ fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
 prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
 line: (COMMENT | dependency | derivationRule);
-dependency: body DEPENDENCY (tgd_head | egd_head);
-tgd_head: atom (COMMA atom)*;
+dependency: tgd | egd;
+tgd: body DEPENDENCY tgd_head;
+tgd_head: positiveAtom (COMMA positiveAtom)*;
+egd: body DEPENDENCY egd_head;
 egd_head: term '=' term;
 derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;

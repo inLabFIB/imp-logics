@@ -81,7 +81,7 @@ public class DependencySchemaBuilder {
     private void addDependency(DependencySpec dependencySpec) {
         ImmutableLiteralsList body = buildBody(dependencySpec.getBody());
         if (dependencySpec instanceof TGDSpec tgdSpec) {
-            List<LiteralSpec> castedList = tgdSpec.getHeadAtomSpecs()
+            List<LiteralSpec> castedList = tgdSpec.getHeadAtomSpecs().literals()
                     .stream()
                     .map(LiteralSpec.class::cast)
                     .toList();
@@ -115,9 +115,10 @@ public class DependencySchemaBuilder {
     }
 
     public DependencySchema build() {
-        Set<Predicate> predicates = new LinkedHashSet<>(predicatesByName.values());
-        Set<Dependency> dependencies = new LinkedHashSet<>(this.dependencies);
-        return new DependencySchema(predicates, dependencies);
+        return new DependencySchema(
+                new LinkedHashSet<>(this.predicatesByName.values()),
+                new LinkedHashSet<>(this.dependencies)
+        );
     }
 
     public DependencySchemaBuilder addAllDerivationRules(List<DerivationRuleSpec> newRules) {

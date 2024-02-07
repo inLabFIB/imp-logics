@@ -79,8 +79,7 @@ class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        assertThat(logicSchema)
-                .containsPredicate("p", 2);
+        assertThat(logicSchema).containsPredicate("p", 2);
     }
 
     @Test
@@ -89,8 +88,7 @@ class LogicSchemaParserTest {
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-        assertThat(logicSchema)
-                .containsConstraintID("1");
+        assertThat(logicSchema).containsConstraintID("1");
 
         LogicConstraint logicConstraint = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
         assertThat(logicConstraint)
