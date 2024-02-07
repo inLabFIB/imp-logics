@@ -19,8 +19,7 @@ import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAsse
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class LogicSchemaParserTest {
-
+class LogicSchemaParserTest {
 
     @Nested
     class PredicateAndVariableSyntaxTests {
@@ -50,23 +49,22 @@ public class LogicSchemaParserTest {
                     .first()
                     .hasPredicate("p", 1)
                     .hasVariable(0, "a:$?_s");
-
         }
-
     }
 
     @Test
-    public void should_fail_whenSchemaContainsErrorSyntax() {
+    void should_fail_whenSchemaContainsErrorSyntax() {
         String schemaString = """
                             "@1 :- q(x),
                             q(x) :- p(x, y), r(y)
                 """;
 
-        assertThatThrownBy(() -> new LogicSchemaWithIDsParser().parse(schemaString));
+        LogicSchemaWithIDsParser logicSchemaWithIDsParser = new LogicSchemaWithIDsParser();
+        assertThatThrownBy(() -> logicSchemaWithIDsParser.parse(schemaString));
     }
 
     @Test
-    public void should_containPredicate_whenPredicateAppearsInConstraint() {
+    void should_containPredicate_whenPredicateAppearsInConstraint() {
         String schemaString = "@1 :- p()";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -76,7 +74,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containPredicate_whenPredicateAppearsInConstraint_withNonZeroArity() {
+    void should_containPredicate_whenPredicateAppearsInConstraint_withNonZeroArity() {
         String schemaString = "@1 :- p(x, y)";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -86,7 +84,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containConstraint_whenConstraintIsDefined() {
+    void should_containConstraint_whenConstraintIsDefined() {
         String schemaString = "@1 :- p()";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -102,7 +100,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containConstraint_whenConstraintIsDefined_withOrdinaryLiteral_withNonZeroArity() {
+    void should_containConstraint_whenConstraintIsDefined_withOrdinaryLiteral_withNonZeroArity() {
         String schemaString = "@1 :- p(x, y)";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -118,7 +116,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containDerivationRule_whenDerivationRuleIsDefined_withOrdinaryLiteral_withNonZeroArity() {
+    void should_containDerivationRule_whenDerivationRuleIsDefined_withOrdinaryLiteral_withNonZeroArity() {
         String schemaString = "q(x) :- p(x, y)";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -132,7 +130,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containBodyWithSeveralLiterals_whenBodyIsDefined_withSeveralLiterals() {
+    void should_containBodyWithSeveralLiterals_whenBodyIsDefined_withSeveralLiterals() {
         String schemaString = "q(x) :- p(x, y), r(y)";
 
         LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -147,7 +145,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_containTwoDerivationRules_whenTwoDerivationRuleAreDefined_forTheSamePredicate() {
+    void should_containTwoDerivationRules_whenTwoDerivationRuleAreDefined_forTheSamePredicate() {
         String schemaString = """
                 q(x) :- p(x, y)
                 q(x) :- r(x)
@@ -169,7 +167,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_parseWholeSchema_whenDefiningSchema_withSeveralLogicConstraints_andSeveralDerivationRules() {
+    void should_parseWholeSchema_whenDefiningSchema_withSeveralLogicConstraints_andSeveralDerivationRules() {
         String schemaString = """
                             @1 :- WorksIn(E, D), not(Emp(E))
                             @2 :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
@@ -191,7 +189,7 @@ public class LogicSchemaParserTest {
     }
 
     @Test
-    public void should_parseOnlyNewSchema_whenInvokingParserTwice() {
+    void should_parseOnlyNewSchema_whenInvokingParserTwice() {
         //Arrange
         String schemaString1 = "P(x) :- Q(x, y)";
         LogicSchemaWithIDsParser logicSchemaWithIDsParser = new LogicSchemaWithIDsParser();
@@ -207,7 +205,7 @@ public class LogicSchemaParserTest {
     class BooleanBuiltInLiteralTest {
         @ParameterizedTest
         @MethodSource("booleanValues")
-        public void should_containBooleanBuiltInLiteral_whenBodyContainsBooleanString(String booleanString, boolean booleanValue) {
+        void should_containBooleanBuiltInLiteral_whenBodyContainsBooleanString(String booleanString, boolean booleanValue) {
             String schemaString = "@1 :- " + booleanString + "()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -231,7 +229,7 @@ public class LogicSchemaParserTest {
     class CustomBuiltInLiteralTest {
 
         @Test
-        public void should_containCustomBuiltInLiteral_whenConfiguringCustomBuiltInPredicates() {
+        void should_containCustomBuiltInLiteral_whenConfiguringCustomBuiltInPredicates() {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
@@ -246,7 +244,7 @@ public class LogicSchemaParserTest {
         }
 
         @Test
-        public void should_notContainCustomBuiltInLiteral_whenNotConfiguringCustomBuiltInPredicates() {
+        void should_notContainCustomBuiltInLiteral_whenNotConfiguringCustomBuiltInPredicates() {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
@@ -271,7 +269,7 @@ public class LogicSchemaParserTest {
                 "1.0e-10", "1.0e10", "1.0e+10",
                 "1.0E-10", "1.0E10", "1.0E+10"
         })
-        public void should_parseConstant_whenTermIsNumber(String numberString) {
+        void should_parseConstant_whenTermIsNumber(String numberString) {
             String schemaString = "@1 :- P(" + numberString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -283,7 +281,7 @@ public class LogicSchemaParserTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"''", "'1'", "'a'", "'abc'", "'Escape \\' test'", "'Hello \n World'"})
-        public void should_parseConstant_whenTermIsSingleQuotes(String constantString) {
+        void should_parseConstant_whenTermIsSingleQuotes(String constantString) {
             String schemaString = "@1 :- P(" + constantString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -295,7 +293,7 @@ public class LogicSchemaParserTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"\"\"", "\"1\"", "\"a\"", "\"abc\"", "\"Escape \\\" test\"", "\"Hello \n World\""})
-        public void should_parseConstant_whenTermIsDoubleQuotes(String constantString) {
+        void should_parseConstant_whenTermIsDoubleQuotes(String constantString) {
             String schemaString = "@1 :- P(" + constantString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser().parse(schemaString);
@@ -306,7 +304,7 @@ public class LogicSchemaParserTest {
         }
 
         @Test
-        public void should_parseConstant_whenTermIsID_andCriteriaMakesItConstant() {
+        void should_parseConstant_whenTermIsID_andCriteriaMakesItConstant() {
             String schemaString = "@1 :- P(A)";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
@@ -319,7 +317,7 @@ public class LogicSchemaParserTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"a", "a'", "a123"})
-        public void should_parseVariable_whenTermIsID_andCriteriaMakesItVariable(String variableString) {
+        void should_parseVariable_whenTermIsID_andCriteriaMakesItVariable(String variableString) {
             String schemaString = "@1 :- P(" + variableString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),

@@ -22,7 +22,7 @@ public class EGD extends Dependency {
      */
     private final EqualityComparisonBuiltInLiteral head;
 
-    protected EGD(List<Literal> body, EqualityComparisonBuiltInLiteral head) {
+    public EGD(List<Literal> body, EqualityComparisonBuiltInLiteral head) {
         super(body);
         if (Objects.isNull(head)) throw new IllegalArgumentException("Head cannot be null");
         this.head = head;

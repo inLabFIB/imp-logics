@@ -7,10 +7,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class NormalClauseSpecTest {
+class NormalClauseTest {
 
     @Test
-    public void should_beAbleToCreateANormalClauseSpec() {
+    void should_beAbleToCreateANormalClauseSpec() {
         OrdinaryLiteralSpec ordinaryLiteralSpec = new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true);
         BodySpec bodySpec = new BodySpec(List.of(ordinaryLiteralSpec));
         NormalClauseSpec normalClauseSpec = new NormalClauseSpec(bodySpec) {
@@ -20,7 +20,7 @@ public class NormalClauseSpecTest {
     }
 
     @Test
-    public void should_throwException_when_bodySpecIsNull() {
+    void should_throwException_when_bodySpecIsNull() {
         assertThatThrownBy(() -> new NormalClauseSpec(null) {
         }).isInstanceOf(IllegalArgumentException.class);
     }

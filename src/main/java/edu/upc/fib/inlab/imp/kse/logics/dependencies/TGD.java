@@ -1,8 +1,14 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Atom;
+import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableAtomList;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
+import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +26,7 @@ public class TGD extends Dependency {
      */
     private final ImmutableAtomList head;
 
-    protected TGD(List<Literal> body, List<Atom> head) {
+    public TGD(List<Literal> body, List<Atom> head) {
         super(body);
         if (Objects.isNull(head)) throw new IllegalArgumentException("Head cannot be null");
         if (head.isEmpty()) throw new IllegalArgumentException("Head cannot be empty");

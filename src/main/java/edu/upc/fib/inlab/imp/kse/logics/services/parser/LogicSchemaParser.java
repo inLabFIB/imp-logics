@@ -51,6 +51,5 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
             throw new RuntimeException("line " + line + ":" + charPositionInLine + " " + msg);
         }
-
     }
 }

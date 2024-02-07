@@ -20,10 +20,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class LogicSchemaBuilderTest {
+class LogicSchemaBuilderTest {
 
     @Test
-    public void should_addPredicates_whenAddingSeveralPredicates_withNoDerivationRules() {
+    void should_addPredicates_whenAddingSeveralPredicates_withNoDerivationRules() {
         LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("arity2", 2)
                 .addPredicate("arity3", 3)
@@ -37,7 +37,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_notAddDerivedPredicate_whenAddingSeveralPredicateWithSameNameAndArity() {
+    void should_notAddDerivedPredicate_whenAddingSeveralPredicateWithSameNameAndArity() {
         LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("p", 2)
                 .addPredicate("p", 2)
@@ -51,7 +51,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_throwsRepeatedPredicateName_whenAddingPredicateWithSameNameAndDiferentArity() {
+    void should_throwsRepeatedPredicateName_whenAddingPredicateWithSameNameAndDiferentArity() {
         assertThatThrownBy(() -> LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("p", 2)
                 .addPredicate("p", 3)
@@ -59,7 +59,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addDerivedPredicate_whenAddingDerivationRuleSpecification() {
+    void should_addDerivedPredicate_whenAddingDerivationRuleSpecification() {
         DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -78,7 +78,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addDerivationRuleAndPredicates_whenAddDerivationRuleSpecWithNotExistentPredicates() {
+    void should_addDerivationRuleAndPredicates_whenAddDerivationRuleSpecWithNotExistentPredicates() {
         DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpecBuilder()
                 .addHead("P", "x", "y")
                 .addOrdinaryLiteral("Q", "x", "y")
@@ -107,7 +107,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
+    void should_throwRepeatedConstraintID_whenAddingLogicConstraintSpecWithRepeatedId() {
         TermTypeCriteria termTypeCriteria = new AllVariableTermTypeCriteria();
         LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder(termTypeCriteria)
                 .addConstraintId("1")
@@ -121,7 +121,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
+    void should_addLogicConstraint_whenAddingLogicConstraintSpec() {
         LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
@@ -139,7 +139,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
+    void should_addPredicatesInLogicSchema_whenAddingLogicConstraintSpec_withPredicatesNotExplicitlyDefined() {
         LogicConstraintWithIDSpec logicConstraintSpec = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P", "x", "y")
@@ -160,7 +160,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_createSchema_whenDefiningSchema() {
+    void should_createSchema_whenDefiningSchema() {
 //            :- WorksIn(E, D), not(Emp(E))
 //            :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
 //            :- Dept(D), not(MinOneSpecialEmployee(D))
@@ -215,7 +215,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addDifferentConstraintIDs_whenDefiningLogicConstraints_withoutIDs() {
+    void should_addDifferentConstraintIDs_whenDefiningLogicConstraints_withoutIDs() {
         LogicConstraintWithoutIDSpec logicConstraintSpec1 = new LogicConstraintWithoutIDSpecBuilder()
                 .addOrdinaryLiteral("P")
                 .build();
@@ -237,7 +237,7 @@ public class LogicSchemaBuilderTest {
     }
 
     @Test
-    public void should_addNormalClauseWithBuiltIn_whenSpecContainsBuiltIn() {
+    void should_addNormalClauseWithBuiltIn_whenSpecContainsBuiltIn() {
         LogicConstraintWithIDSpec logicConstraintSpec1 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("P")

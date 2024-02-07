@@ -17,10 +17,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LogicSchemaFactoryTest {
+class LogicSchemaFactoryTest {
 
     @Test
-    public void should_createSchema_whenDefiningSchema() {
+    void should_createSchema_whenDefiningSchema() {
 //            :- WorksIn(E, D), not(Emp(E))
 //            :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
 //            :- Dept(D), not(MinOneSpecialEmployee(D))
@@ -77,7 +77,7 @@ public class LogicSchemaFactoryTest {
     }
 
     @Test
-    public void should_createDifferentSchema_whenReusingTheSameFactory_withDifferentSpec() {
+    void should_createDifferentSchema_whenReusingTheSameFactory_withDifferentSpec() {
         //Arrange
         LogicSchemaSpec<LogicConstraintWithIDSpec> logicSchemaSpec1 = new LogicSchemaSpec<>();
         logicSchemaSpec1.addPredicateSpecs(new PredicateSpec("P", 2));
@@ -93,7 +93,6 @@ public class LogicSchemaFactoryTest {
 
         //Assert
         LogicSchemaAssert.assertThat(logicSchema2).containsExactlyThesePredicateNames("Q");
-
     }
 
 }
