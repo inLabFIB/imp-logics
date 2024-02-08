@@ -15,10 +15,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class TGDTest {
 
-    private final List<Literal> defaultBody = List.of(LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x")));
+    private final List<Literal> trueBooleanBuiltInLiteralBody = List.of(
+            new BooleanBuiltInLiteral(true)
+    );
+
+    private final List<Atom> singleAtomHead = List.of(
+            AtomMother.createAtom("head_predicate")
+    );
 
     @Nested
     class CreationTests {
+
+        private final List<Literal> defaultBody = List.of(
+                LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x"))
+        );
 
         @Test
         void should_throwException_whenCreatingATGD_withNullHead() {
@@ -40,101 +50,133 @@ class TGDTest {
             assertThat(dependency.getHead()).isUnmodifiable();
         }
 
-
+        private static List<Atom> createMutableAtomList(Atom... atoms) {
+            return new LinkedList<>(List.of(atoms));
+        }
     }
 
     @Nested
-    class existentialAndUniversalVariablesTest {
+    class VariableTypesTests {
 
-        @Test
-        void getUniversalVariablesFromDefaultBody() {
-            Atom atom = AtomMother.createAtom("P");
-            Set<Variable> universalVars = new TGD(defaultBody, createMutableAtomList(atom)).getUniversalVariables();
-            assertThat(universalVars).isNotEmpty()
-                    .contains(new Variable("x"));
+        @Nested
+        class UniversalVariableTests {
+            /**
+             * Test case: <code>p(x) -> p()</code>
+             */
+            @Test
+            void should_getUniversalVariables() {
+                List<Literal> body = List.of(LiteralMother.createOrdinaryLiteral("P", "x"));
+                List<Atom> head = List.of(AtomMother.createAtom("P"));
+
+                Set<Variable> universalVars = new TGD(body, head).getUniversalVariables();
+
+                assertThat(universalVars)
+                        .isNotEmpty()
+                        .contains(new Variable("x"));
+            }
+
+            @Test
+            void should_getUniversalVariables_fromBody_withSeveralLiterals() {
+                List<Literal> body = List.of(
+                        LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x")),
+                        LiteralMother.createOrdinaryLiteralWithVariableNames("Q", List.of("x")),
+                        LiteralMother.createOrdinaryLiteralWithVariableNames("T", List.of("y"))
+                );
+                List<Atom> head = List.of(AtomMother.createAtom("P"));
+
+                Set<Variable> universalVars = new TGD(body, head).getUniversalVariables();
+
+                assertThat(universalVars)
+                        .hasSize(2)
+                        .contains(new Variable("x"))
+                        .contains(new Variable("y"));
+            }
+
+            @Test
+            void should_returnEmptySet_whenGettingUniversalVariables_fromBody_withOnlyConstants() {
+                List<Literal> body = List.of(
+                        LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
+                        LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
+                        LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
+                );
+                List<Atom> head = List.of(AtomMother.createAtom("P"));
+
+                Set<Variable> universalVars = new TGD(body, head).getUniversalVariables();
+
+                assertThat(universalVars).isEmpty();
+            }
         }
 
-        @Test
-        void getUniversalVariablesFromBodyWithSeveralLiterals() {
-            List<Literal> body = List.of(
-                    LiteralMother.createOrdinaryLiteralWithVariableNames("P", List.of("x")),
-                    LiteralMother.createOrdinaryLiteralWithVariableNames("Q", List.of("x")),
-                    LiteralMother.createOrdinaryLiteralWithVariableNames("T", List.of("y"))
-            );
-            Atom atom = AtomMother.createAtom("P");
-            Set<Variable> universalVars = new TGD(body, createMutableAtomList(atom)).getUniversalVariables();
-            assertThat(universalVars).isNotEmpty()
-                    .hasSize(2)
-                    .contains(new Variable("x"))
-                    .contains(new Variable("y"));
-        }
+        @Nested
+        class ExistentialVariablesTest {
+            @Test
+            void getExistentialVariablesFromTrivialHead() {
+                List<Atom> head = List.of(AtomMother.createAtom("P"));
 
-        @Test
-        void getUniversalVariablesFromBodyWithOnlyConstants() {
-            List<Literal> body = List.of(
-                    LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
-                    LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
-                    LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
-            );
-            Atom atom = AtomMother.createAtom("P");
-            Set<Variable> universalVars = new TGD(body, createMutableAtomList(atom)).getUniversalVariables();
-            assertThat(universalVars).isEmpty();
-        }
+                Set<Variable> existentialVars = new TGD(trueBooleanBuiltInLiteralBody, head).getExistentialVariables();
 
-        @Test
-        void getExistentialVariablesFromTrivialHead() {
-            Atom atom = AtomMother.createAtom("P");
-            Set<Variable> existentialVars = new TGD(defaultBody, createMutableAtomList(atom)).getExistentialVariables();
-            assertThat(existentialVars).isEmpty();
-        }
+                assertThat(existentialVars).isEmpty();
+            }
 
-        @Test
-        void getExistentialVariablesFromHeadWihtExistentialAndUniversalVariables() {
-            Atom atom = AtomMother.createAtom("P", "x" , "y");
-            Set<Variable> existentialVars = new TGD(defaultBody, createMutableAtomList(atom)).getExistentialVariables();
-            assertThat(existentialVars).isNotEmpty()
-                    .contains(new Variable("y"))
-                    .doesNotContain(new Variable("x"));
-        }
+            @Test
+            void getExistentialVariablesFromHeadWithExistentialAndUniversalVariables() {
+                List<Literal> body = List.of(LiteralMother.createOrdinaryLiteral("P", "x"));
+                List<Atom> head = List.of(AtomMother.createAtom("P", "x", "y"));
 
-        @Test
-        void getExistentialVariablesFromHeadWihtExistentialVariableAndConstant() {
-            Atom atom = AtomMother.createAtom("P", "y" , "4");
-            Set<Variable> existentialVars = new TGD(defaultBody, createMutableAtomList(atom)).getExistentialVariables();
-            assertThat(existentialVars).isNotEmpty()
-                    .contains(new Variable("y"))
-                    .doesNotContain(new Variable("4"));
-        }
+                Set<Variable> existentialVars = new TGD(body, head).getExistentialVariables();
 
+                assertThat(existentialVars)
+                        .isNotEmpty()
+                        .contains(new Variable("y"))
+                        .doesNotContain(new Variable("x"));
+            }
+
+            @Test
+            void getExistentialVariablesFromHeadWithExistentialVariableAndConstant() {
+                List<Atom> head = List.of(AtomMother.createAtom("P", "y", "4"));
+
+                Set<Variable> existentialVars = new TGD(trueBooleanBuiltInLiteralBody, head).getExistentialVariables();
+
+                assertThat(existentialVars)
+                        .isNotEmpty()
+                        .contains(new Variable("y"))
+                        .doesNotContain(new Variable("4"));
+            }
+        }
     }
 
     @Nested
     class LinearTGDCheckTests {
 
         @Test
-        void linearTGDShouldBeDetected_CheckShouldReturnTrue() {
-            Atom atom = AtomMother.createAtom("P", "x");
-            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isLinear()).isTrue();
+        void shouldReturnTrue_whenCheckingIfLinear_withTGDWithASingleBodyLiteral() {
+            List<Literal> singleLiteralBody = List.of(LiteralMother.createOrdinaryLiteral("P"));
+
+            boolean isLinear = new TGD(singleLiteralBody, singleAtomHead).isLinear();
+
+            assertThat(isLinear).isTrue();
         }
 
         @Test
-        void nonLinearTGDShouldBeDetected_CheckShouldReturnFalse() {
-            List<Literal> body = List.of(
+        void shouldReturnFalse_whenCheckingIfLinear_withTGDWithMultipleLiteralsInBody() {
+            List<Literal> multipleLiteralBody = List.of(
                     LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
                     LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
                     LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
             );
-            Atom atom = AtomMother.createAtom("P");
+            List<Atom> head = List.of(AtomMother.createAtom("P"));
 
-            assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
+            boolean isLinear = new TGD(multipleLiteralBody, head).isLinear();
+
+            assertThat(isLinear).isFalse();
         }
 
         @Test
         void linearTGDShouldAlwaysBeGuardedAsWell() {
-            Atom atom = AtomMother.createAtom("P", "x");
+            List<Atom> head = List.of(AtomMother.createAtom("P", "x"));
 
-            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isLinear()).isTrue();
-            assertThat(new TGD(defaultBody, createMutableAtomList(atom)).isGuarded()).isTrue();
+            assertThat(new TGD(trueBooleanBuiltInLiteralBody, head).isLinear()).isTrue();
+            assertThat(new TGD(trueBooleanBuiltInLiteralBody, head).isGuarded()).isTrue();
         }
     }
 
@@ -154,9 +196,9 @@ class TGDTest {
                             new Variable("z")
                     ))
             );
-            Atom atom = AtomMother.createAtom("P", "z", "x", "w");
+            List<Atom> head = List.of(AtomMother.createAtom("P", "z", "x", "w"));
 
-            assertThat(new TGD(body,createMutableAtomList(atom)).isGuarded()).isTrue();
+            assertThat(new TGD(body, head).isGuarded()).isTrue();
         }
 
         @Test
@@ -171,21 +213,22 @@ class TGDTest {
                             new Variable("z")
                     ))
             );
-            Atom atom = AtomMother.createAtom("R", "x", "z");
+            List<Atom> head = List.of(AtomMother.createAtom("R", "x", "z"));
 
-            assertThat(new TGD(body,createMutableAtomList(atom)).isGuarded()).isFalse();
+            assertThat(new TGD(body, head).isGuarded()).isFalse();
         }
 
-        @Test //És aquest el comportament que desitgem? Segons la formalització del paper sembla que si.
+        @Test
+            //És aquest el comportament que desitgem? Segons la formalització del paper sembla que si.
         void checkingGuardednessWhenNoVariablesArePresent_CheckShouldReturnTrue() {
             List<Literal> body = List.of(
                     LiteralMother.createOrdinaryLiteral("P", List.of(new Constant("1"))),
                     LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("2"))),
                     LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("3")))
             );
-            Atom atom = AtomMother.createAtom("P");
+            List<Atom> head = List.of(AtomMother.createAtom("P"));
 
-            assertThat(new TGD(body, createMutableAtomList(atom)).isGuarded()).isTrue();
+            assertThat(new TGD(body, head).isGuarded()).isTrue();
         }
 
         @Test
@@ -195,16 +238,10 @@ class TGDTest {
                     LiteralMother.createOrdinaryLiteral("Q", List.of(new Constant("x"))),
                     LiteralMother.createOrdinaryLiteral("T", List.of(new Constant("x")))
             );
-            Atom atom = AtomMother.createAtom("P");
+            List<Atom> head = List.of(AtomMother.createAtom("P"));
 
-            assertThat(new TGD(body, createMutableAtomList(atom)).isGuarded()).isTrue();
-            assertThat(new TGD(body, createMutableAtomList(atom)).isLinear()).isFalse();
+            assertThat(new TGD(body, head).isGuarded()).isTrue();
+            assertThat(new TGD(body, head).isLinear()).isFalse();
         }
-
     }
-
-    private static List<Atom> createMutableAtomList(Atom... atoms) {
-        return new LinkedList<>(List.of(atoms));
-    }
-
 }

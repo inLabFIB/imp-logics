@@ -56,13 +56,10 @@ public class TGD extends Dependency {
                 .collect(Collectors.toSet());
     }
 
-    @Override
     public boolean isLinear() {
         return getBody().size() == 1;
     }
 
-
-    @Override
     public boolean isGuarded() {
         Set<Variable> uVars = getUniversalVariables();
         for (Literal l: getBody()) {

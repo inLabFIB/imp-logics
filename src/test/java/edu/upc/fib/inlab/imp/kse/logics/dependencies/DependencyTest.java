@@ -29,16 +29,6 @@ class DependencyTest {
         public Set<Variable> getExistentialVariables() {
             return null;
         }
-
-        @Override
-        public boolean isLinear() {
-            return false;
-        }
-
-        @Override
-        public boolean isGuarded() {
-            return false;
-        }
     }
 
     @Test
