@@ -58,7 +58,7 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
         TermSpec leftTermSpec = visitTerm(ctx.term(0));
         TermSpec rightTermSpec = visitTerm(ctx.term(1));
         List<TermSpec> termSpecList = List.of(leftTermSpec, rightTermSpec);
-        return new BuiltInLiteralSpec("=", termSpecList);
+        return new BuiltInLiteralSpec(ctx.EQ().getText(), termSpecList);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
         TermSpec leftTermSpec = visitTerm(ctx.term(0));
         TermSpec rightTermSpec = visitTerm(ctx.term(1));
         List<TermSpec> termSpecList = List.of(leftTermSpec, rightTermSpec);
-        return new BuiltInLiteralSpec(ctx.OPERATOR().getText(), termSpecList);
+        return new BuiltInLiteralSpec(ctx.operator().getText(), termSpecList);
     }
 
     @Override

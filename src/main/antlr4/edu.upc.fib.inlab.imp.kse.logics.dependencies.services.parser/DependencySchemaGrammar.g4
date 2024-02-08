@@ -15,7 +15,14 @@ tokens {
 
 NOT:            'not';
 BOOLEAN:        'TRUE' | 'FALSE';
-OPERATOR:       '='|'<>'|'<'|'>'|'<='|'>=';
+
+EQ:             '=';
+NEQ:            '<>';
+LT:             '<';
+LTE:            '<=';
+GT:             '>';
+GTE:            '>=';
+
 STRING:         SINGLE_QUOTE | DOUBLE_QUOTE;
 NUMBER:         DECIMAL | FLOAT | REAL;
 ALPHANUMERIC_WITH_PRIMA: ALPHANUMERIC [']* {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(DependencySchemaGrammarParser.BUILTIN_PREDICATE);};
@@ -41,14 +48,15 @@ prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
 line: (COMMENT | dependency | derivationRule);
 dependency: tgd | egd;
 tgd: body DEPENDENCY tgd_head;
-tgd_head: positiveAtom (COMMA positiveAtom)*;
 egd: body DEPENDENCY egd_head;
-egd_head: term '=' term;
+tgd_head: positiveAtom (COMMA positiveAtom)*;
+egd_head: term EQ term;
 derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;
 literal: builtInLiteral | ordinaryLiteral;
 builtInLiteral: comparisonBuiltInLiteral | booleanBuiltInLiteral | customBuiltInLiteral;
-comparisonBuiltInLiteral: term OPERATOR term;
+comparisonBuiltInLiteral: term operator term;
+operator: EQ | NEQ | LT | LTE | GT | GTE;
 booleanBuiltInLiteral: BOOLEAN OPENPAR CLOSEPAR;
 customBuiltInLiteral: BUILTIN_PREDICATE OPENPAR termsList CLOSEPAR;
 ordinaryLiteral: positiveAtom | negatedAtom;

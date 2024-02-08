@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies.assertions;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
@@ -12,6 +13,7 @@ import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEqu
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.IterableAssert;
 
 import java.util.Optional;
 import java.util.Set;
@@ -37,6 +39,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         return this;
     }
 
+    @SuppressWarnings("unused")
     public DependencySchemaAssert containsExactlyThesePredicateNames(String... predicateNames) {
         Assertions.assertThat(actual.getAllPredicates())
                 .map(Predicate::getName)
@@ -44,8 +47,17 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         return this;
     }
 
-    public DependencySchemaAssert hasDependencySize(int size) {
-        Assertions.assertThat(actual.getDependencies()).hasSize(size);
+    public IterableAssert<Dependency> dependencies() {
+        return new IterableAssert<>(actual.getDependencies());
+    }
+
+    public DependencySchemaAssert hasPredicates(int expectedPredicatesCount) {
+        Assertions.assertThat(actual.getAllPredicates()).hasSize(expectedPredicatesCount);
+        return this;
+    }
+
+    public DependencySchemaAssert hasDependencies(int expectedDependencyCount) {
+        Assertions.assertThat(actual.getDependencies()).hasSize(expectedDependencyCount);
         return this;
     }
 
@@ -56,6 +68,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         return this;
     }
 
+    @SuppressWarnings("unused")
     private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
         return logicConstraintIsContainedInList(constraint, constraintSet, analyzer);
     }
@@ -85,7 +98,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
      * @param expectedSchema not null
      * @return this assert
      */
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     public DependencySchemaAssert assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
         for (Predicate actualPredicate : actual.getAllPredicates()) {
             try {
@@ -166,5 +179,4 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
         return this;
     }
-
 }
