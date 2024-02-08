@@ -3,15 +3,12 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LiteralPosition;
-import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
-import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismComparator;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.isomorphism.IsomorphismOptions;
 import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.InstanceOfAssertFactories;
 
 import java.util.Arrays;
 import java.util.List;
@@ -164,7 +161,6 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                         .asOrdinaryLiteral()
                         .isPositive(isPositive)
                         .hasPredicate(predicateName, variableNames.length)
-
         );
         return this;
     }
@@ -176,10 +172,8 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                         .containsVariables(leftVariableName, rightVariableName)
                         .asComparisonBuiltInLiteral()
                         .hasComparisonOperation(comparisonOperator)
-
         );
         return this;
-
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -187,28 +181,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         Assertions.assertThat(actual)
                 .withFailMessage("Expecting to have some element at index %d", index)
                 .hasSizeGreaterThan(index);
-
-        Literal expectedLiteral = LiteralParser.parseLiteral(expectedLiteralString);
-        Literal actualLiteral = actual.get(index);
-
-        if (expectedLiteral instanceof OrdinaryLiteral expectedOL) {
-            Assertions.assertThat(actualLiteral)
-                    .asInstanceOf(InstanceOfAssertFactories.type(OrdinaryLiteral.class))
-                    .satisfies(
-                            ol -> OrdinaryLiteralAssert.assertThat(ol)
-                                    .hasPredicateName(expectedOL.getAtom().getPredicateName())
-                                    .hasTerms(expectedOL.getAtom().getTerms())
-                    );
-        } else {
-        } //Todo: implement this!!!
-
-//        else if (expectedLiteral instanceof BuiltInLiteral expectedBIL) {
-//            Assertions.assertThat(actualLiteral)
-//                    .asInstanceOf(InstanceOfAssertFactories.type(BuiltInLiteral.class))
-//                    .has
-//
-//            throw new RuntimeException("Not implemented yet!");
-//        }
+        LiteralAssert.assertThat(actual.get(index)).correspondsTo(expectedLiteralString);
         return this;
     }
 
@@ -266,6 +239,5 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     protected ImmutableLiteralsListAssert newAbstractIterableAssert(Iterable<? extends Literal> iterable) {
         return assertThat(new ImmutableLiteralsList(newArrayList(iterable)));
     }
-
 
 }

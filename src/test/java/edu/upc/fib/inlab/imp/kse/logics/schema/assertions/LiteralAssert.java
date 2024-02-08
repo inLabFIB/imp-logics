@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
@@ -31,9 +32,22 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         } else if (actual instanceof BooleanBuiltInLiteral actualBoolBIL) {
             Assertions.assertThat(spec).isInstanceOf(BuiltInLiteralSpec.class);
             BuiltInLiteralAssert.assertThat(actualBoolBIL).correspondsSpec((BuiltInLiteralSpec) spec);
-        } else {
-            throw new RuntimeException("Unrecognized literal " + actual.getClass().getName());
-        }
+        } else throw new RuntimeException("Unrecognized literal " + actual.getClass().getName());
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public LiteralAssert correspondsTo(String expectedLiteralString) {
+        Literal expectedLiteral = LiteralParser.parseLiteral(expectedLiteralString);
+        if (expectedLiteral instanceof OrdinaryLiteral) {
+            Assertions.assertThat(actual)
+                    .asInstanceOf(LogicInstanceOfAssertFactories.ORDINARY_LITERAL)
+                    .correspondsTo(expectedLiteralString);
+        } else if (expectedLiteral instanceof BuiltInLiteral) {
+            Assertions.assertThat(actual)
+                    .asInstanceOf(LogicInstanceOfAssertFactories.BUILT_IN_LITERAL)
+                    .correspondsTo(expectedLiteralString);
+        } else throw new RuntimeException("Unknown Literal type.");
         return this;
     }
 
@@ -47,8 +61,9 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         return new OrdinaryLiteralAssert((OrdinaryLiteral) actual).as(info.description());
     }
 
-    public LiteralAssert isComparisonBuiltInLiteral() {
-        Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
+    @SuppressWarnings("UnusedReturnValue")
+    public LiteralAssert isBuiltInLiteral() {
+        objects.assertIsInstanceOf(info, actual, BuiltInLiteral.class);
         return this;
     }
 
@@ -56,6 +71,11 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
     public BuiltInLiteralAssert asBuiltInLiteral() {
         objects.assertIsInstanceOf(info, actual, BuiltInLiteral.class);
         return new BuiltInLiteralAssert((BuiltInLiteral) actual).as(info.description());
+    }
+
+    public LiteralAssert isComparisonBuiltInLiteral() {
+        Assertions.assertThat(actual).isInstanceOf(ComparisonBuiltInLiteral.class);
+        return this;
     }
 
     public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
@@ -112,5 +132,4 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         Assertions.assertThat(actual.isGround()).as("Literal " + actual + " should be ground").isTrue();
         return this;
     }
-
 }

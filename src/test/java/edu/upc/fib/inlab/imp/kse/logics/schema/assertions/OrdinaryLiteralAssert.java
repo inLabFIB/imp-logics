@@ -1,9 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
-import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Predicate;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.TermSpec;
 import org.assertj.core.api.AbstractAssert;
@@ -29,6 +27,19 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
             TermSpec termSpec = spec.getTermSpecList().get(i);
             TermAssert.assertThat(actualTerm).correspondsSpec(termSpec);
         }
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public OrdinaryLiteralAssert correspondsTo(String expectedLiteralString) {
+        Literal expectedLiteral = LiteralParser.parseLiteral(expectedLiteralString);
+        LiteralAssert.assertThat(expectedLiteral).isOrdinaryLiteral();
+        OrdinaryLiteral expectedOrdinaryLiteral = (OrdinaryLiteral) expectedLiteral;
+
+        assertThat(actual)
+                .hasPredicateName(expectedOrdinaryLiteral.getAtom().getPredicateName())
+                .hasTerms(expectedOrdinaryLiteral.getAtom().getTerms());
+
         return this;
     }
 
