@@ -31,7 +31,10 @@ public class LiteralFactory {
             checkNumberOfTerms(bilSpec, 2);
             Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(0));
             Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(1));
-            return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperatorOpt.get());
+            ComparisonOperator comparisonOperator = comparisonOperatorOpt.get();
+            if (comparisonOperator.equals(ComparisonOperator.EQUALS))
+                return new EqualityComparisonBuiltInLiteral(leftTerm, rightTerm);
+            return new ComparisonBuiltInLiteral(leftTerm, rightTerm, comparisonOperator);
         }
 
         Optional<Boolean> booleanValue = BooleanBuiltInLiteral.fromOperator(operator);

@@ -66,19 +66,19 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         Assertions.assertThat(actual.getOperationName()).isEqualTo(operationName);
         return this;
     }
-
     @SuppressWarnings("unused")
     public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
         objects.assertIsInstanceOf(info, actual, ComparisonBuiltInLiteral.class);
         return new ComparisonBuiltInLiteralAssert((ComparisonBuiltInLiteral) actual).as(info.description());
     }
-    //TODO: move to LiteralAssert or make BuiltInLiteralAssert an extension of LiteralAssert
 
+    //TODO: move to LiteralAssert or make BuiltInLiteralAssert an extension of LiteralAssert
     @SuppressWarnings("UnusedReturnValue")
     public BuiltInLiteralAssert hasNoTerms() {
         Assertions.assertThat(actual.getTerms()).isEmpty();
         return this;
     }
+
     //TODO: move to LiteralAssert or make BuiltInLiteralAssert an extension of LiteralAssert
 
     public BuiltInLiteralAssert hasVariable(int i, String varName) {

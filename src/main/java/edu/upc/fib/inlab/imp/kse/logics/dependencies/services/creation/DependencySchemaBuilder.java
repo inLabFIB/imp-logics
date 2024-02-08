@@ -21,11 +21,13 @@ public class DependencySchemaBuilder {
     private final Set<Dependency> dependencies = new HashSet<>();
     private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
 
+    @SuppressWarnings("UnusedReturnValue")
     public DependencySchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {
         Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public DependencySchemaBuilder addPredicate(String predicateName, int arity) {
         addPredicateIfAbsent(predicateName, arity);
         return this;
@@ -68,6 +70,7 @@ public class DependencySchemaBuilder {
         return new Query(headTerms, body);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     @SafeVarargs
     public final DependencySchemaBuilder addDependency(DependencySpec... dependencySpecs) {
         return addDependency(Arrays.stream(dependencySpecs).toList());
@@ -93,8 +96,8 @@ public class DependencySchemaBuilder {
             ImmutableAtomList head = new ImmutableAtomList(atomList);
             dependencies.add(new TGD(body, head));
         } else if (dependencySpec instanceof EGDSpec egdSpec) {
-            ImmutableLiteralsList head = buildBody(List.of(egdSpec.getHead()));
-            dependencies.add(new EGD(body, (EqualityComparisonBuiltInLiteral) head.get(0)));
+            EqualityComparisonBuiltInLiteral head = (EqualityComparisonBuiltInLiteral) (new LiteralFactory(predicatesByName)).buildBuiltInLiteral(egdSpec.getHead());
+            dependencies.add(new EGD(body, head));
         } else throw new RuntimeException("Unknown Dependency type");
     }
 

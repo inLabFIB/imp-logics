@@ -24,6 +24,7 @@ public class TGDAssert extends AbstractAssert<TGDAssert, TGD> {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public TGDAssert hasAtom(int index, String atomString) {
         Assertions.assertThat(actual.getHead())
                 .withFailMessage("Expecting to have some element at index %d", index)

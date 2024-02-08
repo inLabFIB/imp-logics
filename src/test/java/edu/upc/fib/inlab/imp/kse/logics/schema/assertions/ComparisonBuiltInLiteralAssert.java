@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ComparisonBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.EqualityComparisonBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.schema.utils.LiteralParser;
@@ -39,6 +40,11 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
                 .hasComparisonOperation(expectedComparisonBuiltInLiteral.getOperationName())
                 .hasLeftTerm(expectedComparisonBuiltInLiteral.getTerms().get(0))
                 .hasRightTerm(expectedComparisonBuiltInLiteral.getTerms().get(1));
+        return this;
+    }
+
+    public ComparisonBuiltInLiteralAssert isEquality() {
+        objects.assertIsInstanceOf(info, actual, EqualityComparisonBuiltInLiteral.class);
         return this;
     }
 
