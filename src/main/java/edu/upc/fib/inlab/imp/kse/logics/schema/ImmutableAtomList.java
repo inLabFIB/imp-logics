@@ -1,5 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema;
 
+import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
+
 import java.util.*;
 
 /**
@@ -150,5 +152,9 @@ public class ImmutableAtomList implements List<Atom> {
     @Override
     public int hashCode() {
         return Objects.hash(atomList);
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

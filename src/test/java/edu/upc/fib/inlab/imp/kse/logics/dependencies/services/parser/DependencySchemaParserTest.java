@@ -95,7 +95,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(1)
                     .hasLiteral(0, "q()");
@@ -111,7 +111,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(4)
                     .hasLiteral(0, "q(x)")
@@ -130,7 +130,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(2)
                     .hasLiteral(0, "q()")
@@ -148,7 +148,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(2)
                     .hasLiteral(0, "q(a,b)")
@@ -199,7 +199,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(1)
                     .hasLiteral(0, "q(x,y)");
@@ -214,7 +214,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(4)
                     .hasLiteral(0, "q(x,y)")
@@ -259,7 +259,7 @@ class DependencySchemaParserTest {
 
             assertThat(dependencySchema).hasDependencies(1);
 
-            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            Dependency dependency = dependencySchema.getAllDependencies().stream().toList().get(0);
             assertThat(dependency).body()
                     .hasSize(1)
                     .hasLiteral(0, "x=y");

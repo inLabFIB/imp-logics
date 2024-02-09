@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Atom;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableAtomList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
@@ -71,4 +72,10 @@ public class TGD extends Dependency {
 
     //get guard??
     ///get side atoms??
+
+    @Override
+    public <T> T accept(DependencySchemaVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
 }

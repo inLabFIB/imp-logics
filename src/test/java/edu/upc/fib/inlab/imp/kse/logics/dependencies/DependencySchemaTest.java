@@ -116,7 +116,7 @@ class DependencySchemaTest {
         void should_retrieveEmptySet_whenNoDependencyIsPresent() {
             DependencySchema dependencySchema = new DependencySchema(Set.of(), Set.of());
 
-            Assertions.assertThat(dependencySchema.getDependencies()).isEmpty();
+            Assertions.assertThat(dependencySchema.getAllDependencies()).isEmpty();
         }
 
         @Test
@@ -128,7 +128,7 @@ class DependencySchemaTest {
             );
             DependencySchema dependencySchema = new DependencySchema(Set.of(P), Set.of(dependency));
 
-            Assertions.assertThat(dependencySchema.getDependencies())
+            Assertions.assertThat(dependencySchema.getAllDependencies())
                     .containsExactlyInAnyOrder(dependency);
         }
     }
@@ -212,8 +212,8 @@ class DependencySchemaTest {
                     p() -> q()
                     r() -> s(), t()
                     """);
-            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(0)).isLinear()).isTrue();
-            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(1)).isLinear()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(0)).isLinear()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(1)).isLinear()).isTrue();
 
             boolean isLinear = dependencySchema.isLinear();
 
@@ -263,8 +263,8 @@ class DependencySchemaTest {
                     p() -> q()
                     r(x,y), s(x) -> t(x,w)
                     """);
-            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(0)).isGuarded()).isTrue();
-            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(1)).isGuarded()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(0)).isGuarded()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(1)).isGuarded()).isTrue();
 
             boolean isGuarded = dependencySchema.isGuarded();
 

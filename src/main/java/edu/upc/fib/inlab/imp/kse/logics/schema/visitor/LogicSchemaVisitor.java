@@ -33,4 +33,6 @@ public interface LogicSchemaVisitor<T> {
     T visit(Variable variable);
 
     T visit(Constant constant);
+
+    T visit(ImmutableAtomList atoms);
 }

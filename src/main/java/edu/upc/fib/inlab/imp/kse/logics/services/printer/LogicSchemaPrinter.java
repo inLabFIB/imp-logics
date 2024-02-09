@@ -6,6 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 import java.util.stream.Collectors;
 
 public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
+
     private static final String CONSTRAINT_ID_PREFIX = "@";
     public static final String NORMAL_CLAUSE_SEPARATOR = ":-";
     public static final String COMMA_SEPARATOR = ",";
@@ -125,6 +126,13 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     @Override
     public String visit(Constant constant) {
         return constant.getName();
+    }
+
+    @Override
+    public String visit(ImmutableAtomList atoms) {
+        return atoms.stream().map(atom ->
+                atom.accept(this)
+        ).collect(Collectors.joining(COMMA_SEPARATOR + " "));
     }
 
     @Override

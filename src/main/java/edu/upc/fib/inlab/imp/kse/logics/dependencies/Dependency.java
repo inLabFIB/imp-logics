@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
@@ -34,4 +35,5 @@ public abstract class Dependency {
 
     public abstract Set<Variable> getExistentialVariables();
 
+    public abstract <T> T accept(DependencySchemaVisitor<T> visitor);
 }

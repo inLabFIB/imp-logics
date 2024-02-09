@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.EqualityComparisonBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
@@ -42,6 +43,11 @@ public class EGD extends Dependency {
     @Override
     public Set<Variable> getExistentialVariables() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public <T> T accept(DependencySchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
 }

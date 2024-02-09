@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LiteralMother;
@@ -27,6 +28,11 @@ class DependencyTest {
 
         @Override
         public Set<Variable> getExistentialVariables() {
+            return null;
+        }
+
+        @Override
+        public <T> T accept(DependencySchemaVisitor<T> visitor) {
             return null;
         }
     }

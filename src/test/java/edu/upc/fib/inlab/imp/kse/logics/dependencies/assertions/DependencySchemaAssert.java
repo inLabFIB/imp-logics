@@ -48,7 +48,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     public IterableAssert<Dependency> dependencies() {
-        return new IterableAssert<>(actual.getDependencies());
+        return new IterableAssert<>(actual.getAllDependencies());
     }
 
     public DependencySchemaAssert hasPredicates(int expectedPredicatesCount) {
@@ -57,7 +57,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     public DependencySchemaAssert hasDependencies(int expectedDependencyCount) {
-        Assertions.assertThat(actual.getDependencies()).hasSize(expectedDependencyCount);
+        Assertions.assertThat(actual.getAllDependencies()).hasSize(expectedDependencyCount);
         return this;
     }
 

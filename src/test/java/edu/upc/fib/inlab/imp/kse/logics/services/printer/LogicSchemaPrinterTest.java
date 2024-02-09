@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LogicSchemaPrinterTest {
+class LogicSchemaPrinterTest {
 
     @Nested
     class ConstraintPrintingTests {
@@ -22,8 +22,7 @@ public class LogicSchemaPrinterTest {
             String schemaString = "@1 :- WorksIn(E, D), not(Emp(E))";
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
 
-            LogicSchemaPrinter printer = new LogicSchemaPrinter();
-            String result = printer.print(logicSchema);
+            String result = new LogicSchemaPrinter().print(logicSchema);
 
             assertThat(result).isEqualToIgnoringWhitespace(schemaString);
         }
@@ -79,7 +78,7 @@ public class LogicSchemaPrinterTest {
     }
 
     @Test
-    public void should_printLogicSchema() {
+    void should_printLogicSchema() {
         String schemaString = """
                 @1 :- WorksIn(E, D), not(Emp(E))
                 @2 :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
@@ -103,7 +102,7 @@ public class LogicSchemaPrinterTest {
     class BuiltInLiteralPrintingTests {
 
         @Test
-        public void should_printLogicSchema_whenContainsDiferentBuiltInLiterals() {
+        void should_printLogicSchema_whenContainsDifferentBuiltInLiterals() {
             String schemaString = """
                     @1 :- 1<2, TRUE(), FALSE(), 1<>2, customBuiltIn(x)
                     """;
