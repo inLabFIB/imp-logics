@@ -30,9 +30,18 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         return this;
     }
 
-    @SuppressWarnings("unused")
+    public PredicateAssert isDerived() {
+        return isDerived(true);
+    }
+
     public PredicateAssert isDerived(boolean expected) {
         Assertions.assertThat(actual.isDerived()).isEqualTo(expected);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public PredicateAssert hasDerivationRules(int expectedDerivationRulesCount) {
+        Assertions.assertThat(actual.getDerivationRules()).hasSize(expectedDerivationRulesCount);
         return this;
     }
 
@@ -137,6 +146,5 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         }
         return this;
     }
-
 
 }

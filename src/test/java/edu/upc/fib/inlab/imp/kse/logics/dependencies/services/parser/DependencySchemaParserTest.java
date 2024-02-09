@@ -2,17 +2,17 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencies.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.OrdinaryLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
+import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.DerivationRuleAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions;
+import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.PredicateAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.services.parser.LogicSchemaWithIDsParser;
-import org.junit.jupiter.api.Disabled;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.exceptions.ParserCanceledException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -105,6 +105,25 @@ class DependencySchemaParserTest {
         }
 
         @Test
+        void shouldContainTGD_whenParsingSchema_withDifferentLiteralsTypes() {
+            String schemaString = "q(x), x=1, x<2, TRUE() -> p()";
+            DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+            assertThat(dependencySchema).hasDependencies(1);
+
+            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            assertThat(dependency).body()
+                    .hasSize(4)
+                    .hasLiteral(0, "q(x)")
+                    .hasLiteral(1, "x=1")
+                    .hasLiteral(2, "x<2")
+                    .hasLiteral(3, "TRUE()");
+            assertThat(dependency).asTGD()
+                    .headOfSize(1)
+                    .hasAtom(0, "p()");
+        }
+
+        @Test
         void shouldContainTGD_whenParsingSchema_withMultipleElementsInHeadAndBody() {
             String schemaString = "q(), q() -> p(), p()";
             DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
@@ -189,6 +208,24 @@ class DependencySchemaParserTest {
         }
 
         @Test
+        void should_containEGD_whenParsingSchema_withDifferentLiteralTypes() {
+            String schemaString = "q(x,y), x=1, x<2, TRUE() -> x=y";
+            DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+            assertThat(dependencySchema).hasDependencies(1);
+
+            Dependency dependency = dependencySchema.getDependencies().stream().toList().get(0);
+            assertThat(dependency).body()
+                    .hasSize(4)
+                    .hasLiteral(0, "q(x,y)")
+                    .hasLiteral(1, "x=1")
+                    .hasLiteral(2, "x<2")
+                    .hasLiteral(3, "TRUE()");
+            assertThat(dependency).asEGD()
+                    .hasEquality("x=y");
+        }
+
+        @Test
         void should_containEGD_whenParsingSchema_with2EGDs() {
             String schemaString = """
                     q(x,y) -> x=y
@@ -230,15 +267,14 @@ class DependencySchemaParserTest {
                     .hasEquality("y=x");
         }
 
-        @Disabled("ANTLR fixes this single-extra-token problems")
         @Test
         void should_throwException_whenEGDHasTwoEqualitiesInHead() {
             String schemaString = "q(x,y) -> x=y, x=y";
 
             DependencySchemaParser dependencySchemaParser = new DependencySchemaParser();
-            assertThatThrownBy(() -> dependencySchemaParser.parse(schemaString));
+            assertThatThrownBy(() -> dependencySchemaParser.parse(schemaString))
+                    .isInstanceOf(ParserCanceledException.class);
         }
-
     }
 
     @Test
@@ -270,8 +306,66 @@ class DependencySchemaParserTest {
                 });
     }
 
-    //TODO: with derived predicates
+    @Test
+    void should_containDifferentDependencies_whenParsingSchema_withDerivedLiterals() {
+        String schemaString = """
+                works(p,c) -> salary(v,c)
+                            
+                works(p,c) :- persona(p), company(c)
+                salary(v,c) :- v > 0
+                salary(v,c) :- v < 1000000
+                """;
 
+        DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+        assertThat(dependencySchema)
+                .hasDependencies(1)
+                .dependencies()
+                .anySatisfy(dependency -> {
+                    assertThat(dependency).body()
+                            .hasSize(1)
+                            .hasLiteral(0, "works(p,c)");
+                    assertThat(dependency).asTGD()
+                            .headOfSize(1)
+                            .hasAtom(0, "salary(v,c)");
+                });
+
+        Set<Predicate> derivedPredicates = dependencySchema.getAllDerivedPredicates();
+        Assertions.assertThat(derivedPredicates)
+                .hasSize(2)
+                .anySatisfy(derivedPredicate -> {
+                    PredicateAssert.assertThat(derivedPredicate)
+                            .hasName("works")
+                            .hasArity(2)
+                            .isDerived()
+                            .hasDerivationRules(1);
+
+                    DerivationRule derivationRule = derivedPredicate.getFirstDerivationRule();
+                    DerivationRuleAssert.assertThat(derivationRule)
+                            .body()
+                            .hasSize(2)
+                            .hasLiteral(0, "persona(p)")
+                            .hasLiteral(1, "company(c)");
+                })
+                .anySatisfy(derivedPredicate -> {
+                    PredicateAssert.assertThat(derivedPredicate)
+                            .hasName("salary")
+                            .hasArity(2)
+                            .isDerived()
+                            .hasDerivationRules(2);
+
+                    DerivationRule derivationRule1 = derivedPredicate.getDerivationRules().get(0);
+                    DerivationRuleAssert.assertThat(derivationRule1)
+                            .body()
+                            .hasSize(1)
+                            .hasLiteral(0, "v > 0");
+                    DerivationRule derivationRule2 = derivedPredicate.getDerivationRules().get(1);
+                    DerivationRuleAssert.assertThat(derivationRule2)
+                            .body()
+                            .hasSize(1)
+                            .hasLiteral(0, "v < 1000000");
+                });
+    }
 
     //TODO: duplicated code from LogicSchema grammar and parser
 
@@ -402,5 +496,4 @@ class DependencySchemaParserTest {
             LiteralAssert.assertThat(ordinaryLiteral).hasVariable(0, variableString);
         }
     }
-
 }

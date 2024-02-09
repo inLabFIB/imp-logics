@@ -14,6 +14,10 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
         super(actual, selfType);
     }
 
+    public ImmutableLiteralsListAssert body() {
+        return ImmutableLiteralsListAssert.assertThat(actual.getBody());
+    }
+
     public NormalClauseAssert<T> hasBodySize(int size) {
         Assertions.assertThat(actual.getBody()).hasSize(size);
         return this;
@@ -47,7 +51,6 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                         .containsVariables(leftVariable, rightVariable)
                         .asComparisonBuiltInLiteral()
                         .hasComparisonOperation(comparisonOperator)
-
         );
         return this;
     }
@@ -61,7 +64,6 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                                 BuiltInLiteralAssert.assertThat(l)
                                         .hasOperationName(BooleanBuiltInLiteral.fromValue(booleanValue))
                         )
-
         );
         return this;
     }
@@ -75,7 +77,6 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                                 BuiltInLiteralAssert.assertThat(l)
                                         .hasOperationName(operationName)
                         )
-
         );
         return this;
     }

@@ -62,5 +62,4 @@ public class DerivationRuleAssert extends NormalClauseAssert<DerivationRule> {
         return this;
     }
 
-
 }

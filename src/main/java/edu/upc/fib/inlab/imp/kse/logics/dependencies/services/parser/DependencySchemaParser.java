@@ -35,14 +35,15 @@ public class DependencySchemaParser {
         CharStream input = CharStreams.fromString(schemaString);
         DependencySchemaGrammarLexer lexer = new DependencySchemaGrammarLexer(input, builtInPredicateNameChecker);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(new LexerErrorListener());
+        lexer.addErrorListener(new ErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         DependencySchemaGrammarParser parser = new DependencySchemaGrammarParser(tokens);
+        parser.addErrorListener(new ErrorListener());
         DependencySchemaGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
     }
 
-    private static class LexerErrorListener extends BaseErrorListener {
+    private static class ErrorListener extends BaseErrorListener {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
             throw new ParserCanceledException("line " + line + ":" + charPositionInLine + " " + msg);

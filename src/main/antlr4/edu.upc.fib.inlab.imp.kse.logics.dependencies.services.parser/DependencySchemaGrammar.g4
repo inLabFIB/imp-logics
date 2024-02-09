@@ -44,7 +44,7 @@ fragment ALPHANUMERIC:  [a-zA-Z0-9_$?:]+;
 fragment SINGLE_QUOTE:  '\'' (~'\'' | '\\\'')* '\'';
 fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
-prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
+prog: NEWLINE* line? (NEWLINE+ line)*  NEWLINE* EOF;
 line: (COMMENT | dependency | derivationRule);
 dependency: tgd | egd;
 tgd: body DEPENDENCY tgd_head;
