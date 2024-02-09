@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.mothers.DependencySchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateIsNotDerived;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateNotExists;
@@ -165,7 +166,7 @@ class DependencySchemaTest {
     }
 
     @Nested
-    class IsEmpty {
+    class EmptinessTests {
         @Test
         void should_beEmpty_whenDependencySchemaIsEmpty() {
             DependencySchema dependencySchema = new DependencySchema(Collections.emptySet(), Collections.emptySet());
@@ -190,6 +191,107 @@ class DependencySchemaTest {
                     ))
             );
             Assertions.assertThat(dependencySchema.isEmpty()).isFalse();
+        }
+    }
+
+    @Nested
+    class LinearTests {
+
+        @Test
+        void shouldReturnTrue_whenCheckingIfLinear_withEmptySchema() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildEmptyDependencySchema();
+
+            boolean isLinear = dependencySchema.isLinear();
+
+            Assertions.assertThat(isLinear).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCheckingIfLinear_withSchemaWithLinearTGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p() -> q()
+                    r() -> s(), t()
+                    """);
+            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(0)).isLinear()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(1)).isLinear()).isTrue();
+
+            boolean isLinear = dependencySchema.isLinear();
+
+            Assertions.assertThat(isLinear).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckingIfLinear_withSchemaWithNonLinearTGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p(), q() -> r()
+                    p() -> r()
+                    """);
+
+            boolean isLinear = dependencySchema.isLinear();
+
+            Assertions.assertThat(isLinear).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckingIfLinear_withSchemaWithEGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p() -> r()
+                    s(x) -> x = y
+                    """);
+
+            boolean isLinear = dependencySchema.isLinear();
+
+            Assertions.assertThat(isLinear).isFalse();
+        }
+    }
+
+    @Nested
+    class GuardedTests {
+
+        @Test
+        void shouldReturnTrue_whenCheckingIfGuarded_withEmptySchema() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildEmptyDependencySchema();
+
+            boolean isGuarded = dependencySchema.isGuarded();
+
+            Assertions.assertThat(isGuarded).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCheckingIfGuarded_withSchemaWithLinearTGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p() -> q()
+                    r(x,y), s(x) -> t(x,w)
+                    """);
+            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(0)).isGuarded()).isTrue();
+            Assertions.assertThat(((TGD) dependencySchema.getDependencies().stream().toList().get(1)).isGuarded()).isTrue();
+
+            boolean isGuarded = dependencySchema.isGuarded();
+
+            Assertions.assertThat(isGuarded).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckingIfGuarded_withSchemaWithNonLinearTGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p(x), q(y) -> r(s)
+                    """);
+
+            boolean isGuarded = dependencySchema.isGuarded();
+
+            Assertions.assertThat(isGuarded).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckingIfGuarded_withSchemaWithEGDs() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p(x) -> r(x)
+                    s(x) -> x = y
+                    """);
+
+            boolean isGuarded = dependencySchema.isGuarded();
+
+            Assertions.assertThat(isGuarded).isFalse();
         }
     }
 }

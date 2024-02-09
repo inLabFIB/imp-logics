@@ -48,11 +48,12 @@ public class TGD extends Dependency {
 
     @Override
     public Set<Variable> getExistentialVariables() {
+        Set<Variable> universalVariables = getUniversalVariables();
         return getHead().stream()
                 .flatMap(a -> a.getTerms().stream())
                 .filter(Variable.class::isInstance)
                 .map(t -> (Variable) t)
-                .filter(t -> !getUniversalVariables().contains(t))
+                .filter(t -> !universalVariables.contains(t))
                 .collect(Collectors.toSet());
     }
 
@@ -67,4 +68,7 @@ public class TGD extends Dependency {
         }
         return false;
     }
+
+    //get guard??
+    ///get side atoms??
 }

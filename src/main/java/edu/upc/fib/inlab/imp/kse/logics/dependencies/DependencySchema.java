@@ -112,6 +112,25 @@ public class DependencySchema {
         return predicatesByName.isEmpty() && dependencies.isEmpty();
     }
 
+    public boolean isLinear() {
+        return this.dependencies.stream()
+                .map(d -> {
+                    if (d instanceof TGD tgd) return tgd.isLinear();
+                    else return false;
+                })
+                .reduce(true, (a, b) -> a && b);
+    }
+
+    public boolean isGuarded() {
+        return this.dependencies.stream()
+                .map(d -> {
+                    if (d instanceof TGD tgd) return tgd.isGuarded();
+                    else return false;
+                })
+                .reduce(true, (a, b) -> a && b);
+    }
+
+
     //TODO: IMPR-189 Implement sticky check
     public boolean isSticky() {
         return false;
