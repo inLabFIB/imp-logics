@@ -3,7 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencies.mothers;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.parser.DependencySchemaParser;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class DependencySchemaMother {
 
@@ -12,6 +12,6 @@ public class DependencySchemaMother {
     }
 
     public static DependencySchema buildEmptyDependencySchema() {
-        return new DependencySchema(new HashSet<>(), new HashSet<>());
+        return new DependencySchema(new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 }

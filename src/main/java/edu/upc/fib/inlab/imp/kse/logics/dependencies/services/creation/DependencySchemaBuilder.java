@@ -18,7 +18,7 @@ import java.util.*;
 //TODO: document
 public class DependencySchemaBuilder {
 
-    private final Set<Dependency> dependencies = new HashSet<>();
+    private final Set<Dependency> dependencies = new LinkedHashSet<>();
     private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
 
     @SuppressWarnings("UnusedReturnValue")

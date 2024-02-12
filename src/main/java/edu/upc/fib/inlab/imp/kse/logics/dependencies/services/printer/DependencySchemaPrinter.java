@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.EGD;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.TGD;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
+import edu.upc.fib.inlab.imp.kse.logics.schema.BuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableAtomList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.services.printer.LogicSchemaPrinter;
@@ -46,6 +47,10 @@ public class DependencySchemaPrinter implements DependencySchemaVisitor<String> 
 
     @Override
     public String visit(EGD egd) {
-        return null;
+        ImmutableLiteralsList body = egd.getBody();
+        BuiltInLiteral head = egd.getHead();
+        return body.accept(logicSchemaPrinter)
+                + " " + DEPENDENCY + " " +
+                head.accept(logicSchemaPrinter);
     }
 }

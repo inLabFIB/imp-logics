@@ -25,7 +25,7 @@ public class DependencySchema {
      * </ul>
      */
     private final Map<String, Predicate> predicatesByName = new HashMap<>();
-    private final Set<Dependency> dependencies = new HashSet<>();
+    private final Set<Dependency> dependencies = new LinkedHashSet<>();
 
     public DependencySchema(Set<Predicate> predicates, Set<Dependency> dependencies) {
         predicates.forEach(predicate -> {
@@ -113,7 +113,7 @@ public class DependencySchema {
     }
 
     public Set<Dependency> getAllDependencies() {
-        return new HashSet<>(dependencies);
+        return new LinkedHashSet<>(dependencies);
     }
 
     public <T> T accept(DependencySchemaVisitor<T> visitor) {
