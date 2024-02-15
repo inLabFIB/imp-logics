@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.mothers.TGDMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Atom;
 import edu.upc.fib.inlab.imp.kse.logics.schema.BooleanBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
@@ -143,7 +144,35 @@ class TGDTest {
                         .contains(new Variable("y"));
             }
         }
+
+        @Nested
+        class FrontierVariablesTest {
+            @Test
+            void shouldReturnFrontierVariables_whenTGDHasOneHeadAtom() {
+                TGD tgd = TGDMother.createTGD("P(u1, u2, f1, f2), Q(u2, u3, f2, f3) -> R(f1, f2, f3, e1)");
+                Set<Variable> frontierVars = tgd.getFrontierVariables();
+
+                assertThat(frontierVars)
+                        .hasSize(3)
+                        .contains(new Variable("f1"))
+                        .contains(new Variable("f2"))
+                        .contains(new Variable("f3"));
+            }
+
+            @Test
+            void shouldReturnFrontierVariables_whenTGDHasSeveralHeadAtoms() {
+                TGD tgd = TGDMother.createTGD("P(u1, u2, f1, f2), Q(u2, u3, f2, f3) -> R1(f1, e1), R2(f2, f3)");
+                Set<Variable> frontierVars = tgd.getFrontierVariables();
+
+                assertThat(frontierVars)
+                        .hasSize(3)
+                        .contains(new Variable("f1"))
+                        .contains(new Variable("f2"))
+                        .contains(new Variable("f3"));
+            }
+        }
     }
+
 
     @Nested
     class LinearTGDCheckTests {

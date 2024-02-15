@@ -6,10 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableAtomList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +55,19 @@ public class TGD extends Dependency {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * @return those variables that appear both, in the head and the body of the TGD
+     */
+    public Set<Variable> getFrontierVariables() {
+        Set<Variable> result = new LinkedHashSet<>();
+        for (Atom headAtom : head) {
+            Set<Variable> headVariables = headAtom.getVariables();
+            headVariables.retainAll(getUniversalVariables());
+            result.addAll(headVariables);
+        }
+        return result;
+    }
+
     public boolean isLinear() {
         return getBody().size() == 1;
     }
@@ -69,13 +79,12 @@ public class TGD extends Dependency {
         }
         return false;
     }
-
     //get guard??
+
     ///get side atoms??
 
     @Override
     public <T> T accept(DependencySchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
-
 }

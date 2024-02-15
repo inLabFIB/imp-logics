@@ -152,4 +152,108 @@ public class DependencySchema {
     public boolean isWeaklyGuarded() {
         return false;
     }
+
+    /**
+     * This method implements the affected positions definition
+     * given in IEEE Symposion on Logic in Computer Science 2010
+     * "Datalog+/-: A Family of Logical Knowledge Representation
+     * and Query Languages for New Applications" by Cali, et al.
+     *
+     * @return those predicate positions that might contain null values
+     * when chasing the schema dependencies.
+     */
+    public Set<PredicatePosition> computeAffectedPositions() {
+        Set<PredicatePosition> positionsWithExistsVars = computePositionsWithExistentialVars();
+        return computeAffectedPositions(positionsWithExistsVars);
+    }
+
+    private Set<PredicatePosition> computePositionsWithExistentialVars() {
+        Set<PredicatePosition> result = new HashSet<>();
+        for (Dependency dependency : this.dependencies) {
+            if (dependency instanceof TGD tgd) {
+                Set<Variable> existentialVariables = tgd.getExistentialVariables();
+                if (existentialVariables.isEmpty()) continue;
+
+                for (Atom headAtom : tgd.getHead()) {
+                    for (int position = 0; position < headAtom.getPredicate().getArity(); ++position) {
+                        Term term = headAtom.getTerms().get(position);
+                        if (existentialVariables.contains(term)) {
+                            result.add(new PredicatePosition(headAtom.getPredicate(), position));
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * This method computes the affected positions of this schema by
+     * saturating the set of affectedPositions.
+     * That is, it recursively keeps adding predicatePositions to
+     * affectedPositions until no more predicatePositions can be
+     * added. When no more predicatePositions can be added, the algorithm
+     * finishes
+     *
+     * @param affectedPositions not null
+     * @return the set of affected positions given the initial set of affected positions
+     */
+    private Set<PredicatePosition> computeAffectedPositions(Set<PredicatePosition> affectedPositions) {
+        Set<PredicatePosition> newAffectedPositions = new HashSet<>(affectedPositions);
+        for (Dependency dependency : this.dependencies) {
+            if (dependency instanceof TGD tgd) {
+                Set<Variable> frontierVariables = tgd.getFrontierVariables();
+                for (Variable variable : frontierVariables) {
+                    Set<PredicatePosition> bodyPositions = computePredicatePositionsWithVar(tgd.getBody(), variable);
+                    if (affectedPositions.containsAll(bodyPositions)) {
+                        newAffectedPositions.addAll(computePredicatePositionsWithVar(tgd.getHead(), variable));
+                    }
+                }
+            }
+        }
+        if (!affectedPositions.containsAll(newAffectedPositions)) return computeAffectedPositions(newAffectedPositions);
+        else return newAffectedPositions;
+    }
+
+    //TODO: maybe move this method?
+
+    /**
+     * @param atoms    not null
+     * @param variable not null
+     * @return a set of PredicatePositions appearing in body that contains the given variable
+     */
+    private static Set<PredicatePosition> computePredicatePositionsWithVar(ImmutableAtomList atoms, Variable variable) {
+        Set<PredicatePosition> result = new LinkedHashSet<>();
+        for (Atom atom : atoms) {
+            for (int position = 0; position < atom.getPredicate().getArity(); ++position) {
+                Term termInPosition = atom.getTerms().get(position);
+                if (termInPosition.equals(variable)) {
+                    result.add(new PredicatePosition(atom.getPredicate(), position));
+                }
+            }
+        }
+        return result;
+    }
+
+    //TODO: maybe move this method?
+
+    /**
+     * @param literals not null
+     * @param variable not null
+     * @return a set of PredicatePositions appearing in literals that contains the given variable
+     */
+    private static Set<PredicatePosition> computePredicatePositionsWithVar(ImmutableLiteralsList literals, Variable variable) {
+        Set<PredicatePosition> result = new LinkedHashSet<>();
+        for (Literal lit : literals) {
+            if (lit instanceof OrdinaryLiteral oLit) {
+                for (int position = 0; position < oLit.getArity(); ++position) {
+                    Term termInPosition = oLit.getTerms().get(position);
+                    if (termInPosition.equals(variable)) {
+                        result.add(new PredicatePosition(oLit.getPredicate(), position));
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

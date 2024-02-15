@@ -294,4 +294,73 @@ class DependencySchemaTest {
             Assertions.assertThat(isGuarded).isFalse();
         }
     }
+
+    @Nested
+    class WeaklyGuardedTests {
+        @Nested
+        class AffectedPositionsTests {
+
+            @Test
+            void shouldReturnPredicatePosition_whenItContainsExistentialVariable() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, y)
+                        """);
+
+                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+
+                Assertions.assertThat(affectedPositions)
+                        .hasSize(1)
+                        .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1);
+            }
+
+            @Test
+            void shouldReturnPredicatePosition_whenItContainsUniversalVar_butPropagatesExistentialVars() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, y)
+                        r(x, y) -> q(y)
+                        """);
+
+                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+
+                Assertions.assertThat(affectedPositions)
+                        .hasSize(2)
+                        .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1)
+                        .anyMatch(p -> p.getPredicateName().equals("q") && p.position() == 0);
+            }
+
+            @Test
+            void shouldNotReturnPredicatePosition_whenPropagatesExistentialVars_butJoinsNonAffectedPositions() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, y)
+                        r(x, y), s(y) -> q(y)
+                        """);
+
+                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+
+                Assertions.assertThat(affectedPositions)
+                        .hasSize(1)
+                        .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1);
+            }
+
+            @Test
+            void shouldReturnPredicatePosition_whenPropagatingThroughSeveralRules() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, y)
+                        p(x) -> s(x, y)
+                        r(x, y), s(x,y) -> q(y)
+                        q(y) -> t(y, u)
+                        """);
+
+                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+
+                Assertions.assertThat(affectedPositions)
+                        .hasSize(5)
+                        .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1)
+                        .anyMatch(p -> p.getPredicateName().equals("s") && p.position() == 1)
+                        .anyMatch(p -> p.getPredicateName().equals("q") && p.position() == 0)
+                        .anyMatch(p -> p.getPredicateName().equals("t") && p.position() == 0)
+                        .anyMatch(p -> p.getPredicateName().equals("t") && p.position() == 1);
+            }
+        }
+    }
 }
