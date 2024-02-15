@@ -47,6 +47,25 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
     /**
+     * @param variable not null
+     * @return a set of PredicatePositions appearing in literals that contains the given variable
+     */
+    public Set<PredicatePosition> getPredicatePositionsWithVar(Variable variable) {
+        Set<PredicatePosition> result = new LinkedHashSet<>();
+        for (Literal lit : literalList) {
+            if (lit instanceof OrdinaryLiteral oLit) {
+                for (int position = 0; position < oLit.getArity(); ++position) {
+                    Term termInPosition = oLit.getTerms().get(position);
+                    if (termInPosition.equals(variable)) {
+                        result.add(new PredicatePosition(oLit.getPredicate(), position));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Sort literals in next order: positive literals, negative literals, built-in literals
      *
      * @return a new sorted list of literals

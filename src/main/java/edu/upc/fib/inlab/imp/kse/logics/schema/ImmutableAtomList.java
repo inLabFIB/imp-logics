@@ -27,6 +27,23 @@ public class ImmutableAtomList implements List<Atom> {
         this(Arrays.stream(atoms).toList());
     }
 
+    /**
+     * @param variable not null
+     * @return a set of PredicatePositions appearing in body that contains the given variable
+     */
+    public Set<PredicatePosition> getPredicatePositionsWithVar(Variable variable) {
+        Set<PredicatePosition> result = new LinkedHashSet<>();
+        for (Atom atom : atomList) {
+            for (int position = 0; position < atom.getPredicate().getArity(); ++position) {
+                Term termInPosition = atom.getTerms().get(position);
+                if (termInPosition.equals(variable)) {
+                    result.add(new PredicatePosition(atom.getPredicate(), position));
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public int size() {
         return atomList.size();

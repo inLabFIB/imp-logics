@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class ImmutableLiteralsListTest {
+class ImmutableLiteralsListTest {
 
     @Nested
     class CreateImmutableLiteralsList {
@@ -410,6 +410,22 @@ public class ImmutableLiteralsListTest {
                         .isIsomorphicTo(expectedLiteralsList2);
             }
         }
+    }
+
+    @Test
+    void should_ReturnPredicatePositions_ofGivenVariable() {
+        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
+        );
+
+        Set<PredicatePosition> occupiedPositions = literalsList.getPredicatePositionsWithVar(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(5)
+                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("A") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
     }
 
     @Nested

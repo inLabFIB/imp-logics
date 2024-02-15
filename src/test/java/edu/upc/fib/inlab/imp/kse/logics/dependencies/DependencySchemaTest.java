@@ -11,6 +11,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableAtomListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.QueryMother;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -306,7 +307,7 @@ class DependencySchemaTest {
                         p(x) -> r(x, y)
                         """);
 
-                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+                Set<PredicatePosition> affectedPositions = dependencySchema.getAffectedPositions();
 
                 Assertions.assertThat(affectedPositions)
                         .hasSize(1)
@@ -320,7 +321,7 @@ class DependencySchemaTest {
                         r(x, y) -> q(y)
                         """);
 
-                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+                Set<PredicatePosition> affectedPositions = dependencySchema.getAffectedPositions();
 
                 Assertions.assertThat(affectedPositions)
                         .hasSize(2)
@@ -335,11 +336,28 @@ class DependencySchemaTest {
                         r(x, y), s(y) -> q(y)
                         """);
 
-                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+                Set<PredicatePosition> affectedPositions = dependencySchema.getAffectedPositions();
 
                 Assertions.assertThat(affectedPositions)
                         .hasSize(1)
                         .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1);
+            }
+
+            @Test
+            void shouldReturnPredicatePosition_whenExistentialVariable_AppearsTwice_inAffectedPositions() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, y)
+                        t() -> s(y)
+                        r(x, y), s(y) -> q(y)
+                        """);
+
+                Set<PredicatePosition> affectedPositions = dependencySchema.getAffectedPositions();
+
+                Assertions.assertThat(affectedPositions)
+                        .hasSize(3)
+                        .anyMatch(p -> p.getPredicateName().equals("r") && p.position() == 1)
+                        .anyMatch(p -> p.getPredicateName().equals("s") && p.position() == 0)
+                        .anyMatch(p -> p.getPredicateName().equals("q") && p.position() == 0);
             }
 
             @Test
@@ -351,7 +369,7 @@ class DependencySchemaTest {
                         q(y) -> t(y, u)
                         """);
 
-                Set<PredicatePosition> affectedPositions = dependencySchema.computeAffectedPositions();
+                Set<PredicatePosition> affectedPositions = dependencySchema.getAffectedPositions();
 
                 Assertions.assertThat(affectedPositions)
                         .hasSize(5)
@@ -362,5 +380,62 @@ class DependencySchemaTest {
                         .anyMatch(p -> p.getPredicateName().equals("t") && p.position() == 1);
             }
         }
+
+        @Disabled("WIP - IMPL-588")
+        @Nested
+        class WeaklyGuardedTGDTests {
+
+            @Test
+            void shouldReturnWeaklyGuarded_whenTGDIsGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p() -> q()
+                        r(x,y), s(x) -> t(x,w)
+                        """);
+                List<TGD> tgds = dependencySchema.getAllTGDs();
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(1));
+
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
+
+            //TODO: add more tests
+
+        }
+
+        @Disabled("WIP - IMPL-588")
+        @Test
+        void shouldReturnWeaklyGuarded_whenDependenciesAreGuarded() {
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p() -> q()
+                    r(x,y), s(x) -> t(x,w)
+                    """);
+
+            boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
+
+            Assertions.assertThat(isWeaklyGuarded).isTrue();
+        }
+
+        @Disabled("WIP - IMPL-588")
+        @Test
+        void shouldReturnWeaklyGuarded_whenAllDependenciesAreWeaklyGuarded() {
+            //TODO: finish dependency schema
+            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                    p(x,y), q(y, z) -> r1(y, w1)
+                    p(x,y), q(y, z) -> r2(y, w2)
+                    r1(y, w1), t(w1, u), r2(y,w2) -> s1()
+                    r1(y, w1), t(w1, u) -> s1()
+                    """);
+
+            boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
+            Assertions.assertThat(isWeaklyGuarded).isTrue();
+        }
+
+        @Disabled("WIP - IMPL-588")
+        @Test
+        void shouldReturnNotWeaklyGuarded_whenSomeDependencyIsNotWeaklyGuarded() {
+
+        }
+
+        //TODO: write more tests
     }
 }

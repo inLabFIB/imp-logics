@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,5 +109,21 @@ class ImmutableAtomListTest {
                     )
             );
         }
+    }
+
+
+    @Test
+    void should_ReturnPredicatePositions_ofGivenVariable() {
+        ImmutableAtomList atomList = ImmutableAtomListMother.create(
+                "P(x), Q(y,x), R(x,x)"
+        );
+
+        Set<PredicatePosition> occupiedPositions = atomList.getPredicatePositionsWithVar(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(4)
+                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
     }
 }
