@@ -191,7 +191,7 @@ public class DependencySchema {
             for (Atom headAtom : tgd.getHead()) {
                 for (int position = 0; position < headAtom.getPredicate().getArity(); ++position) {
                     Term term = headAtom.getTerms().get(position);
-                    if (existentialVariables.contains(term)) {
+                    if (term instanceof Variable variable && existentialVariables.contains(variable)) {
                         result.add(new PredicatePosition(headAtom.getPredicate(), position));
                     }
                 }
