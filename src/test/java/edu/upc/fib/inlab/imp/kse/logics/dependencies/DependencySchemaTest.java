@@ -382,16 +382,36 @@ class DependencySchemaTest {
 
         @Nested
         class WeaklyGuardedTGDTests {
+            @Test
+            void shouldReturnWeaklyGuarded_whenAffectedPositionsIsEmpty() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("r(x,y), s(u, v) -> t(x)");
+                TGD tgd = dependencySchema.getAllTGDs().get(0);
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgd, Set.of());
+
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnWeaklyGuarded_whenTGDIsGuardedButHaveNoUniversalVariable() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("p() -> r(x)");
+                TGD tgd = dependencySchema.getAllTGDs().get(0);
+                Predicate rPredicate = dependencySchema.getPredicateByName("r");
+                Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(rPredicate, 0));
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgd, affectedPositions);
+
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
 
             @Test
             void shouldReturnWeaklyGuarded_whenTGDIsGuarded() {
-                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        p() -> q()
-                        r(x,y), s(x) -> t(x,w)
-                        """);
-                List<TGD> tgds = dependencySchema.getAllTGDs();
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("r(x,y), s(x) -> t(x,w)");
+                TGD tgd = dependencySchema.getAllTGDs().get(0);
+                Predicate tPredicate = dependencySchema.getPredicateByName("t");
+                Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(tPredicate, 1));
 
-                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(1));
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgd, affectedPositions);
 
                 Assertions.assertThat(isWeaklyGuarded).isTrue();
             }
@@ -399,13 +419,17 @@ class DependencySchemaTest {
             @Test
             void shouldReturnWeaklyGuarded_whenTGDIsWeaklyGuarded() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        p(x) -> r(x, a)
-                        p(x) -> s(x, a)
                         r(x,a), s(y,a) -> t(a)
                         """);
-                List<TGD> tgds = dependencySchema.getAllTGDs();
+                TGD tgd = dependencySchema.getAllTGDs().get(0);
+                Predicate sPredicate = dependencySchema.getPredicateByName("s");
+                Predicate rPredicate = dependencySchema.getPredicateByName("r");
 
-                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(2));
+                Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(sPredicate, 1),
+                        new PredicatePosition(rPredicate, 1));
+
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgd, affectedPositions);
 
                 Assertions.assertThat(isWeaklyGuarded).isTrue();
             }
@@ -413,14 +437,17 @@ class DependencySchemaTest {
             @Test
             void shouldReturnNonWeaklyGuarded_whenTGDIsNotWeaklyGuarded() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        p(x) -> r(x, a)
-                        p(x) -> s(x, a)
-                        r(x,a), s(y,a) -> t(a)
-                        r(x,a1), s(y,a2) -> t(a2)
+                        r(x,a1), s(y,a2) -> t(a)
                         """);
-                List<TGD> tgds = dependencySchema.getAllTGDs();
+                TGD tgd = dependencySchema.getAllTGDs().get(0);
+                Predicate sPredicate = dependencySchema.getPredicateByName("s");
+                Predicate rPredicate = dependencySchema.getPredicateByName("r");
 
-                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(3));
+                Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(sPredicate, 1),
+                        new PredicatePosition(rPredicate, 1));
+
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgd, affectedPositions);
 
                 Assertions.assertThat(isWeaklyGuarded).isFalse();
             }

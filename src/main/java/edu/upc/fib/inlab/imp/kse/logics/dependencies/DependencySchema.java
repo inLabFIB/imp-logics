@@ -228,12 +228,13 @@ public class DependencySchema {
         else return newAffectedPositions;
     }
 
-    boolean isWeaklyGuarded(TGD tgd) {
-        Set<PredicatePosition> affectedPositions = this.getAffectedPositions();
-        return isWeaklyGuarded(tgd, affectedPositions);
-    }
-
-    private boolean isWeaklyGuarded(TGD tgd, Set<PredicatePosition> affectedPositions) {
+    /**
+     *
+     * @param tgd not null
+     * @param affectedPositions not null, might be empty
+     * @return whether the given tgd is weakly acyclic according to the given set of affected positions
+     */
+    boolean isWeaklyGuarded(TGD tgd, Set<PredicatePosition> affectedPositions) {
         Set<Variable> universalVars = tgd.getUniversalVariables();
         List<Variable> affectedVars = universalVars.stream().filter(u ->
                         affectedPositions.containsAll(tgd.getBody().getPredicatePositionsWithVar(u)))
