@@ -11,7 +11,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableAtomListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.QueryMother;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -381,7 +380,6 @@ class DependencySchemaTest {
             }
         }
 
-        @Disabled("WIP - IMPL-588")
         @Nested
         class WeaklyGuardedTGDTests {
 
@@ -398,44 +396,87 @@ class DependencySchemaTest {
                 Assertions.assertThat(isWeaklyGuarded).isTrue();
             }
 
-            //TODO: add more tests
+            @Test
+            void shouldReturnWeaklyGuarded_whenTGDIsWeaklyGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, a)
+                        p(x) -> s(x, a)
+                        r(x,a), s(y,a) -> t(a)
+                        """);
+                List<TGD> tgds = dependencySchema.getAllTGDs();
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(2));
+
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnNonWeaklyGuarded_whenTGDIsNotWeaklyGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x, a)
+                        p(x) -> s(x, a)
+                        r(x,a), s(y,a) -> t(a)
+                        r(x,a1), s(y,a2) -> t(a2)
+                        """);
+                List<TGD> tgds = dependencySchema.getAllTGDs();
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded(tgds.get(3));
+
+                Assertions.assertThat(isWeaklyGuarded).isFalse();
+            }
 
         }
 
-        @Disabled("WIP - IMPL-588")
-        @Test
-        void shouldReturnWeaklyGuarded_whenDependenciesAreGuarded() {
-            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+        @Nested
+        class WeaklyGuardedSchemaTests {
+            @Test
+            void shouldReturnTrue_whenCheckingIfWeaklyGuarded_withEmptySchema() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildEmptyDependencySchema();
+
+                boolean isGuarded = dependencySchema.isWeaklyGuarded();
+
+                Assertions.assertThat(isGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnWeaklyGuarded_whenDependenciesAreGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
                     p() -> q()
                     r(x,y), s(x) -> t(x,w)
                     """);
 
-            boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
 
-            Assertions.assertThat(isWeaklyGuarded).isTrue();
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnWeaklyGuarded_whenAllDependenciesAreWeaklyGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x,a)
+                        p(x) -> s(x,a)
+                        r(x,a), s(y,a) -> t(a)
+                        """);
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
+                Assertions.assertThat(isWeaklyGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnNotWeaklyGuarded_whenSomeDependencyIsNotWeaklyGuarded() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p(x) -> r(x,a)
+                        p(x) -> s(x,a)
+                        r(x,a), s(y,a) -> t(a)
+                        r(x,a1), s(y,a2) -> t(a1)
+                        """);
+
+                boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
+                Assertions.assertThat(isWeaklyGuarded).isFalse();
+            }
         }
 
-        @Disabled("WIP - IMPL-588")
-        @Test
-        void shouldReturnWeaklyGuarded_whenAllDependenciesAreWeaklyGuarded() {
-            //TODO: finish dependency schema
-            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y), q(y, z) -> r1(y, w1)
-                    p(x,y), q(y, z) -> r2(y, w2)
-                    r1(y, w1), t(w1, u), r2(y,w2) -> s1()
-                    r1(y, w1), t(w1, u) -> s1()
-                    """);
 
-            boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
-            Assertions.assertThat(isWeaklyGuarded).isTrue();
-        }
 
-        @Disabled("WIP - IMPL-588")
-        @Test
-        void shouldReturnNotWeaklyGuarded_whenSomeDependencyIsNotWeaklyGuarded() {
-
-        }
-
-        //TODO: write more tests
     }
 }

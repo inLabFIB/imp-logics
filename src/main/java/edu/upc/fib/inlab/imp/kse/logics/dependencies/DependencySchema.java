@@ -157,10 +157,15 @@ public class DependencySchema {
         return false;
     }
 
-    //TODO: IMPR-188 Implement weakly guarded check
 
     public boolean isWeaklyGuarded() {
-        return false;
+        Set<PredicatePosition> affectedPositions = this.getAffectedPositions();
+        for (TGD tgd : this.getAllTGDs()) {
+            if (!isWeaklyGuarded(tgd, affectedPositions)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -179,17 +184,15 @@ public class DependencySchema {
 
     private Set<PredicatePosition> getPositionsWithExistentialVars() {
         Set<PredicatePosition> result = new HashSet<>();
-        for (Dependency dependency : this.dependencies) {
-            if (dependency instanceof TGD tgd) {
-                Set<Variable> existentialVariables = tgd.getExistentialVariables();
-                if (existentialVariables.isEmpty()) continue;
+        for (TGD tgd : getAllTGDs()) {
+            Set<Variable> existentialVariables = tgd.getExistentialVariables();
+            if (existentialVariables.isEmpty()) continue;
 
-                for (Atom headAtom : tgd.getHead()) {
-                    for (int position = 0; position < headAtom.getPredicate().getArity(); ++position) {
-                        Term term = headAtom.getTerms().get(position);
-                        if (existentialVariables.contains(term)) {
-                            result.add(new PredicatePosition(headAtom.getPredicate(), position));
-                        }
+            for (Atom headAtom : tgd.getHead()) {
+                for (int position = 0; position < headAtom.getPredicate().getArity(); ++position) {
+                    Term term = headAtom.getTerms().get(position);
+                    if (existentialVariables.contains(term)) {
+                        result.add(new PredicatePosition(headAtom.getPredicate(), position));
                     }
                 }
             }
@@ -226,6 +229,24 @@ public class DependencySchema {
     }
 
     boolean isWeaklyGuarded(TGD tgd) {
+        Set<PredicatePosition> affectedPositions = this.getAffectedPositions();
+        return isWeaklyGuarded(tgd, affectedPositions);
+    }
+
+    private boolean isWeaklyGuarded(TGD tgd, Set<PredicatePosition> affectedPositions) {
+        Set<Variable> universalVars = tgd.getUniversalVariables();
+        List<Variable> affectedVars = universalVars.stream().filter(u ->
+                        affectedPositions.containsAll(tgd.getBody().getPredicatePositionsWithVar(u)))
+                .toList();
+
+        //Searching the guard
+        for (Literal lit : tgd.getBody()) {
+            if (lit instanceof OrdinaryLiteral &&
+                    lit.getTerms().containsAll(affectedVars)) {
+                return true;
+            }
+        }
+
         return false;
     }
 }
