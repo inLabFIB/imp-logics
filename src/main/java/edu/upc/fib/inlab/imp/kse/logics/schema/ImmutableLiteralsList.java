@@ -66,6 +66,23 @@ public class ImmutableLiteralsList implements List<Literal> {
     }
 
     /**
+     * @param variable not null
+     * @return a set of LiteralPositions appearing in literals that contains the given variable
+     */
+    public Set<LiteralPosition> getLiteralPositionWithVariable(Variable variable) {
+        Set<LiteralPosition> result = new LinkedHashSet<>();
+        for (Literal lit : literalList) {
+            for (int position = 0; position < lit.getArity(); ++position) {
+                Term termInPosition = lit.getTerms().get(position);
+                if (termInPosition.equals(variable)) {
+                    result.add(new LiteralPosition(lit, position));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Sort literals in next order: positive literals, negative literals, built-in literals
      *
      * @return a new sorted list of literals
@@ -473,4 +490,6 @@ public class ImmutableLiteralsList implements List<Literal> {
     public int hashCode() {
         return Objects.hash(literalList);
     }
+
+
 }

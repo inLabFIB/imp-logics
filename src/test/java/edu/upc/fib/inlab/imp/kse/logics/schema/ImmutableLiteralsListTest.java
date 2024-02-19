@@ -428,6 +428,28 @@ class ImmutableLiteralsListTest {
                 .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
     }
 
+    @Test
+    void should_ReturnLiteralPositions_ofGivenVariable() {
+        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
+        );
+        Literal p = literalsList.get(0);
+        Literal a = literalsList.get(1);
+        Literal diff = literalsList.get(2);
+        Literal q = literalsList.get(3);
+        Literal r = literalsList.get(4);
+
+        Set<LiteralPosition> occupiedPositions = literalsList.getLiteralPositionWithVariable(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(6)
+                .anyMatch(litPos -> litPos.literal() == p && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == a && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == diff && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == q && litPos.position() == 1)
+                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 1);
+    }
+
     @Nested
     class EqualsTest {
 

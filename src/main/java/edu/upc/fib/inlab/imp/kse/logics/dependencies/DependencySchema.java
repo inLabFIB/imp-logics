@@ -152,8 +152,24 @@ public class DependencySchema {
                 .reduce(true, (a, b) -> a && b);
     }
 
-    //TODO: IMPR-189 Implement sticky check
     public boolean isSticky() {
+        Set<LiteralPosition> stickyMarking = StickyMarkingAnalyzer.getStickyMarking(getAllTGDs());
+
+        for (TGD tgd : this.getAllTGDs()) {
+            if (hasVariableAppearingTwiceInMarkedPositions(tgd, stickyMarking)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean hasVariableAppearingTwiceInMarkedPositions(TGD tgd, Set<LiteralPosition> finalMarking) {
+        for (Variable variable : tgd.getUniversalVariables()) {
+            Set<LiteralPosition> positionsWithVar = tgd.getBody().getLiteralPositionWithVariable(variable);
+            positionsWithVar.retainAll(finalMarking);
+            if (positionsWithVar.size() > 1) return true;
+        }
         return false;
     }
 
@@ -229,8 +245,7 @@ public class DependencySchema {
     }
 
     /**
-     *
-     * @param tgd not null
+     * @param tgd               not null
      * @param affectedPositions not null, might be empty
      * @return whether the given tgd is weakly acyclic according to the given set of affected positions
      */
@@ -250,4 +265,5 @@ public class DependencySchema {
 
         return false;
     }
+
 }
