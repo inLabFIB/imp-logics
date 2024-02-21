@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.StickyMarkingAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateIsNotDerived;
@@ -125,6 +126,14 @@ public class DependencySchema {
         }
         return result;
     }
+
+    public List<EGD> getAllEGDs() {
+        return dependencies.stream()
+                .filter(EGD.class::isInstance)
+                .map(d -> (EGD) d)
+                .toList();
+    }
+
 
     public <T> T accept(DependencySchemaVisitor<T> visitor) {
         return visitor.visit(this);

@@ -4,6 +4,8 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencies.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.EGD;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.TGD;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.EGDAnalysis;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.FunctionalDependencyWithEGDs;
 
 public class DependencySchemaAssertions {
 
@@ -21,6 +23,14 @@ public class DependencySchemaAssertions {
 
     public static EGDAssert assertThat(EGD actual) {
         return EGDAssert.assertThat(actual);
+    }
+
+    public static EGDAnalysisAssert assertThat(EGDAnalysis actual) {
+        return EGDAnalysisAssert.assertThat(actual);
+    }
+
+    public static EGDFunctionalDependencyAssert assertThat(FunctionalDependencyWithEGDs actual) {
+        return EGDFunctionalDependencyAssert.assertThat(actual);
     }
 
 }

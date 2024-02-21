@@ -1,9 +1,11 @@
-package edu.upc.fib.inlab.imp.kse.logics.dependencies;
+package edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.TGD;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -19,6 +21,7 @@ public class StickyMarkingAnalyzer {
      * @return the set of marked LiteralPositions according to the stickiness marking
      */
     public static Set<LiteralPosition> getStickyMarking(List<TGD> tgds) {
+        if (Objects.isNull(tgds)) throw new IllegalArgumentException("List of tgds cannot be null");
         return getStickyMarkingPropagation(getInitialStickyMarking(tgds), tgds);
     }
 
