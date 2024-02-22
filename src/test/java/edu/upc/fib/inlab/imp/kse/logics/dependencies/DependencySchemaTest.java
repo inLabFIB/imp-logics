@@ -237,7 +237,7 @@ class DependencySchemaTest {
         }
 
         @Nested
-        class ConflictingEGDsTest {
+        class SchemaWithEGDsTest {
             @Test
             void shouldReturnTrue_whenEGDsAreNonConflicting_withLinearTGDs() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
@@ -311,6 +311,33 @@ class DependencySchemaTest {
             boolean isGuarded = dependencySchema.isGuarded();
 
             Assertions.assertThat(isGuarded).isFalse();
+        }
+
+        @Nested
+        class SchemaWithEGDsTest {
+            @Test
+            void shouldReturnTrue_whenEGDsAreNonConflicting_withGuardedTGDs() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                        Person(name, age), Person(name, age2) -> age = age2
+                        """);
+
+                boolean isGuarded = dependencySchema.isGuarded();
+
+                Assertions.assertThat(isGuarded).isTrue();
+            }
+
+            @Test
+            void shouldReturnFalse_whenEGDsAreConflicting_withGuardedTGDs() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                        Child(name, age), Person(name, age2) -> age = age2
+                        """);
+
+                boolean isGuarded = dependencySchema.isGuarded();
+
+                Assertions.assertThat(isGuarded).isFalse();
+            }
         }
     }
 

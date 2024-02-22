@@ -153,12 +153,9 @@ public class DependencySchema {
     }
 
     public boolean isGuarded() {
-        return this.dependencies.stream()
-                .map(d -> {
-                    if (d instanceof TGD tgd) return tgd.isGuarded();
-                    else return false;
-                })
-                .reduce(true, (a, b) -> a && b);
+        if (!this.areEGDsNonConflictingWithTGDs()) return false;
+
+        return this.getAllTGDs().stream().allMatch(TGD::isGuarded);
     }
 
     public boolean isSticky() {
