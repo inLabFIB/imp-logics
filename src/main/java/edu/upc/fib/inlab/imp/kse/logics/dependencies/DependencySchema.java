@@ -181,6 +181,8 @@ public class DependencySchema {
 
 
     public boolean isWeaklyGuarded() {
+        if (!this.areEGDsNonConflictingWithTGDs()) return false;
+
         Set<PredicatePosition> affectedPositions = this.getAffectedPositions();
         for (TGD tgd : this.getAllTGDs()) {
             if (!isWeaklyGuarded(tgd, affectedPositions)) {

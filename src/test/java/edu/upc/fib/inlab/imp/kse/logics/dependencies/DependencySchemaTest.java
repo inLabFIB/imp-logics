@@ -547,6 +547,33 @@ class DependencySchemaTest {
                 boolean isWeaklyGuarded = dependencySchema.isWeaklyGuarded();
                 Assertions.assertThat(isWeaklyGuarded).isFalse();
             }
+
+            @Nested
+            class SchemaWithEGDsTest {
+                @Test
+                void shouldReturnTrue_whenEGDsAreNonConflicting_withWeaklyGuardedTGDs() {
+                    DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                            WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                            Person(name, age), Person(name, age2) -> age = age2
+                            """);
+
+                    boolean isGuarded = dependencySchema.isWeaklyGuarded();
+
+                    Assertions.assertThat(isGuarded).isTrue();
+                }
+
+                @Test
+                void shouldReturnFalse_whenEGDsAreConflicting_withWeaklyGuardedTGDs() {
+                    DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                            WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                            Child(name, age), Person(name, age2) -> age = age2
+                            """);
+
+                    boolean isGuarded = dependencySchema.isWeaklyGuarded();
+
+                    Assertions.assertThat(isGuarded).isFalse();
+                }
+            }
         }
 
 
