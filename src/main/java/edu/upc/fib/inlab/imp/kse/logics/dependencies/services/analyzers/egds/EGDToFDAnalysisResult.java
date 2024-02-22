@@ -6,6 +6,14 @@ import java.util.List;
 
 public record EGDToFDAnalysisResult(List<FunctionalDependencyWithEGDs> functionalDependenciesEGDs,
                                     List<EGD> nonFunctionalDependencyEGDs) {
+    public List<FunctionalDependency> getFunctionalDependencies() {
+        return functionalDependenciesEGDs.stream().map(FunctionalDependencyWithEGDs::functionalDependency).toList();
+    }
+
+    public boolean allEGDsDefinesKeyDependencies() {
+        return nonFunctionalDependencyEGDs.isEmpty() &&
+                functionalDependenciesEGDs.stream().allMatch(fd -> fd.functionalDependency().isKeyDependency());
+    }
 }
 
 

@@ -13,10 +13,14 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.QueryMother;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.PredicateAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -232,16 +236,31 @@ class DependencySchemaTest {
             Assertions.assertThat(isLinear).isFalse();
         }
 
-        @Test
-        void shouldReturnFalse_whenCheckingIfLinear_withSchemaWithEGDs() {
-            DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p() -> r()
-                    s(x) -> x = y
-                    """);
+        @Nested
+        class ConflictingEGDsTest {
+            @Test
+            void shouldReturnTrue_whenEGDsAreNonConflicting_withLinearTGDs() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        WorksIn(name, dept) -> Person(name, age)
+                        Person(name, age), Person(name, age2) -> age = age2
+                        """);
 
-            boolean isLinear = dependencySchema.isLinear();
+                boolean isLinear = dependencySchema.isLinear();
 
-            Assertions.assertThat(isLinear).isFalse();
+                Assertions.assertThat(isLinear).isTrue();
+            }
+
+            @Test
+            void shouldReturnFalse_whenEGDsAreConflicting_withLinterTGDs() {
+                DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                        p() -> r()
+                        s(x) -> x = y
+                        """);
+
+                boolean isLinear = dependencySchema.isLinear();
+
+                Assertions.assertThat(isLinear).isFalse();
+            }
         }
     }
 
@@ -548,5 +567,52 @@ class DependencySchemaTest {
         }
 
 
+    }
+
+    @Nested
+    class NonConflictingEGDTests {
+        @Test
+        void shouldIdentifyAsSeparable_whenEGDsAreKeyDependencies_notConflictingWithTGDs() {
+            DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
+                    WorksIn(name, dept) -> Person(name, age)
+                    Person(name, age), Person(name, age2) -> age=age2
+                    """);
+
+            boolean separable = schema.areEGDsNonConflictingWithTGDs();
+
+            Assertions.assertThat(separable).isTrue();
+        }
+
+        private static Stream<Arguments> provideConflictingSchema() {
+            return Stream.of(
+                    Arguments.of("EGD is conflicting KeyDependency",
+                            """
+                                        Child(name, age) -> Person(name, age)
+                                        Person(name, age), Person(name, age2) -> age=age2
+                                    """),
+                    Arguments.of("EGD is not Functional Dependency",
+                            """
+                                    WorksIn(name, dept) -> Person(name, age)
+                                    Person(name, age), Child(name, age2) -> age=age2
+                                            """
+                    ),
+                    Arguments.of("EGD is Functional Dependency but not Key Dependency",
+                            """
+                                     WorksIn(name, dept) -> Person(name, city, state)
+                                    Person(name, city, state), Person(name2, city, state2) -> state=state2
+                                                    """
+                    )
+            );
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("provideConflictingSchema")
+        void shouldIdentifyAsNonSeparable_whenEGDsAreConflictingWithTGDs(@SuppressWarnings("unused") String title, String schemaString) {
+            DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaString);
+
+            boolean separable = schema.areEGDsNonConflictingWithTGDs();
+
+            Assertions.assertThat(separable).isFalse();
+        }
     }
 }

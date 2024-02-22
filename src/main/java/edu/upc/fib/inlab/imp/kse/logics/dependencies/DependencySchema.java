@@ -1,6 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.StickyMarkingAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.EGDToFDAnalysisResult;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.EGDToFDAnalyzer;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.NonConflictingFDsAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.PredicateIsNotDerived;
@@ -144,12 +147,9 @@ public class DependencySchema {
     }
 
     public boolean isLinear() {
-        return this.dependencies.stream()
-                .map(d -> {
-                    if (d instanceof TGD tgd) return tgd.isLinear();
-                    else return false;
-                })
-                .reduce(true, (a, b) -> a && b);
+        if (!this.areEGDsNonConflictingWithTGDs()) return false;
+
+        return this.getAllTGDs().stream().allMatch(TGD::isLinear);
     }
 
     public boolean isGuarded() {
@@ -275,4 +275,18 @@ public class DependencySchema {
         return false;
     }
 
+    /**
+     * Method responsible to check if the set of EGDs is non-conflicting from the set of TGDs according to
+     * the paper "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for
+     * New Applications" published in 2010 25th Annual IEEE Symposium on Logic in Computer Science
+     *
+     * @return whether the egds of this schema are non-conflicting with the TGDs
+     */
+    public boolean areEGDsNonConflictingWithTGDs() {
+        EGDToFDAnalysisResult egdToFDAnalysisResult = new EGDToFDAnalyzer().analyze(getAllEGDs());
+
+        if (egdToFDAnalysisResult.allEGDsDefinesKeyDependencies()) {
+            return new NonConflictingFDsAnalyzer().isNonConflicting(getAllTGDs(), egdToFDAnalysisResult.getFunctionalDependencies());
+        } else return false;
+    }
 }

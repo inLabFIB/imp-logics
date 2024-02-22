@@ -48,6 +48,15 @@ public class NonConflictingFDsAnalyzer {
         return false;
     }
 
+    /**
+     * @param tgds not null
+     * @param fds  not null
+     * @return whether all TGD of the given list is non-conflicting with all FD of the given list
+     */
+    public boolean isNonConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
+        return !isConflicting(tgds, fds);
+    }
+
     private boolean containsRepeatedExistentialVariable(TGD tgd) {
         Set<Variable> existentialVars = tgd.getExistentialVariables();
         for (Variable existVar : existentialVars) {
@@ -109,4 +118,6 @@ public class NonConflictingFDsAnalyzer {
         Set<Variable> existentialVarsSet = new HashSet<>(existentialVarsList);
         return existentialVarsSet.size() < existentialVarsList.size();
     }
+
+
 }
