@@ -159,6 +159,8 @@ public class DependencySchema {
     }
 
     public boolean isSticky() {
+        if (!this.areEGDsNonConflictingWithTGDs()) return false;
+
         Set<LiteralPosition> stickyMarking = StickyMarkingAnalyzer.getStickyMarking(getAllTGDs());
 
         for (TGD tgd : this.getAllTGDs()) {

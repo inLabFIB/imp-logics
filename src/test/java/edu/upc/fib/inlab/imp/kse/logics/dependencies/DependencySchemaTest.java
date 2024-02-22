@@ -618,6 +618,33 @@ class DependencySchemaTest {
 
                 Assertions.assertThat(isSticky).isFalse();
             }
+
+            @Nested
+            class SchemaWithEGDsTest {
+                @Test
+                void shouldReturnTrue_whenEGDsAreNonConflicting_withStickyTGDs() {
+                    DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                            p(x,y) -> p(y,z)
+                            p(a, b), p(a, b2) -> b = b2
+                            """);
+
+                    boolean isGuarded = dependencySchema.isSticky();
+
+                    Assertions.assertThat(isGuarded).isTrue();
+                }
+
+                @Test
+                void shouldReturnFalse_whenEGDsAreConflicting_withStickyTGDs() {
+                    DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
+                            p(x,y) -> p(y,z)
+                            p(a, b), q(a, b2) -> b = b2
+                            """);
+
+                    boolean isGuarded = dependencySchema.isSticky();
+
+                    Assertions.assertThat(isGuarded).isFalse();
+                }
+            }
         }
 
 
