@@ -29,16 +29,16 @@ public final class FunctionalDependency {
 
     private static void checkArgsInvariants(Predicate predicate, Set<Integer> keyPositions, Set<Integer> determinedPositions) {
         int arity = predicate.getArity();
-        if (keyPositions.stream().allMatch(kp -> positionOutOfRange(kp, arity)))
+        if (keyPositions.stream().anyMatch(kp -> positionOutOfRange(kp, arity)))
             throw new IllegalArgumentException("KeyPositions " + keyPositions + " should be between 0 and " + arity);
-        if (determinedPositions.stream().allMatch(dp -> positionOutOfRange(dp, arity)))
+        if (determinedPositions.stream().anyMatch(dp -> positionOutOfRange(dp, arity)))
             throw new IllegalArgumentException("DeterminedPositions " + determinedPositions + " should be between 0 and " + arity);
         if (!Collections.disjoint(keyPositions, determinedPositions))
             throw new IllegalArgumentException("KeyPositions" + keyPositions + " should be disjoint with determinedPositions " + determinedPositions);
     }
 
     private static boolean positionOutOfRange(Integer position, int arity) {
-        return position < 0 && position >= arity;
+        return position < 0 || position >= arity;
     }
 
     public String getPredicateName() {

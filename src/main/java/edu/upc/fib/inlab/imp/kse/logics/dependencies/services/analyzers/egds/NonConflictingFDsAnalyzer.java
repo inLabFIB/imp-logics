@@ -30,6 +30,24 @@ public class NonConflictingFDsAnalyzer {
         return false;
     }
 
+    /**
+     * @param tgds not null
+     * @param fds  not null
+     * @return whether some TGD of the given list is conflicting with some FD of the given list
+     */
+    public boolean isConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
+        if (Objects.isNull(tgds)) throw new IllegalArgumentException("TGDs cannot be null");
+        if (Objects.isNull(fds)) throw new IllegalArgumentException("Functional Dependency cannot be null");
+
+        for (TGD tgd : tgds) {
+            for (FunctionalDependency fd : fds) {
+                if (isConflicting(tgd, fd)) return true;
+            }
+        }
+
+        return false;
+    }
+
     private boolean containsRepeatedExistentialVariable(TGD tgd) {
         Set<Variable> existentialVars = tgd.getExistentialVariables();
         for (Variable existVar : existentialVars) {
