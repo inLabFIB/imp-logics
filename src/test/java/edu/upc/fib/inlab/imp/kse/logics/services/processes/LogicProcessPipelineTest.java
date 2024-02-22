@@ -23,13 +23,13 @@ class LogicProcessPipelineTest {
     class InputValidationTests {
 
         @Test
-        public void should_ThrowException_when_processPipelineIsNull() {
+        void should_ThrowException_when_processPipelineIsNull() {
             assertThatThrownBy(() -> new LogicProcessPipeline(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_ThrowException_when_processPipelineContainsNull() {
+        void should_ThrowException_when_processPipelineContainsNull() {
             List<LogicProcess> processes = new LinkedList<>();
             processes.add(null);
             assertThatThrownBy(() -> new LogicProcessPipeline(processes))
@@ -37,7 +37,7 @@ class LogicProcessPipelineTest {
         }
 
         @Test
-        public void should_ThrowException_when_inputSchemaIsNull() {
+        void should_ThrowException_when_inputSchemaIsNull() {
             LogicProcessPipeline pipeline = new LogicProcessPipeline(List.of());
             assertThatThrownBy(() -> pipeline.execute(null))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -45,7 +45,7 @@ class LogicProcessPipelineTest {
     }
 
     @Test
-    public void should_returnInputLogicSchema_when_processPipelineIsEmpty() {
+    void should_returnInputLogicSchema_when_processPipelineIsEmpty() {
         List<LogicProcess> logicProcesses = List.of();
 
         LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
@@ -58,7 +58,7 @@ class LogicProcessPipelineTest {
 
 
     @Test
-    public void should_returnLogicSchemaExpected_when_processPipelineContainsOneProcess() {
+    void should_returnLogicSchemaExpected_when_processPipelineContainsOneProcess() {
         List<LogicProcess> logicProcesses = new LinkedList<>();
 
         LogicSchema schema = LogicSchemaMother.createEmptySchema();
@@ -75,7 +75,7 @@ class LogicProcessPipelineTest {
 
     @ParameterizedTest(name = "should execute {0} transformation process")
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
-    public void should_executeNTransformation_processPipelineContainsNProcess(int numberOfProcesses) {
+    void should_executeNTransformation_processPipelineContainsNProcess(int numberOfProcesses) {
 
         LogicSchema schema = LogicSchemaMother.createEmptySchema();
 
@@ -92,7 +92,7 @@ class LogicProcessPipelineTest {
 
     private static LogicProcess mockLogicProcess(LogicSchema inputSchema, LogicSchema outputSchema) {
         LogicProcess mock = mock(LogicProcess.class);
-        when(mock.execute(eq(inputSchema))).thenReturn(outputSchema);
+        when(mock.execute(inputSchema)).thenReturn(outputSchema);
         return mock;
     }
 

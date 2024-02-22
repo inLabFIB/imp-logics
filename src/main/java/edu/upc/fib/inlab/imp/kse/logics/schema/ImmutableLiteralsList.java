@@ -88,7 +88,7 @@ public class ImmutableLiteralsList implements List<Literal> {
      * @return a new sorted list of literals
      * @deprecated Use {@link #sortLiterals(Comparator)} instead
      */
-    @Deprecated()
+    @Deprecated(forRemoval = true)
     public ImmutableLiteralsList getSorted() {
         return sortLiterals(new LiteralComparator());
     }
@@ -136,7 +136,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean add(Literal literal) {
         throw new UnsupportedOperationException();
@@ -145,7 +145,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean remove(Object o) {
         throw new UnsupportedOperationException();
@@ -159,7 +159,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean addAll(Collection<? extends Literal> c) {
         throw new UnsupportedOperationException();
@@ -168,7 +168,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean addAll(int index, Collection<? extends Literal> c) {
         throw new UnsupportedOperationException();
@@ -177,7 +177,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException();
@@ -186,7 +186,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
@@ -195,7 +195,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public void clear() {
         throw new UnsupportedOperationException();
@@ -209,7 +209,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public Literal set(int index, Literal element) {
         throw new UnsupportedOperationException();
@@ -218,7 +218,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public void add(int index, Literal element) {
         throw new UnsupportedOperationException();
@@ -227,7 +227,7 @@ public class ImmutableLiteralsList implements List<Literal> {
     /**
      * @deprecated Unsupported operation.
      */
-    @Deprecated
+    @Deprecated(forRemoval = false)
     @Override
     public Literal remove(int index) {
         throw new UnsupportedOperationException();
@@ -326,9 +326,8 @@ public class ImmutableLiteralsList implements List<Literal> {
                 literals.addAll(nextLiterals);
                 result.add(new ImmutableLiteralsList(literals));
                 return result;
-            }
-            if (ordinaryLiteral.isNegative() && unfoldNegatedLiterals) {
-                //Here the literal is derived, negated, and we want to apply the negtion extension
+            } else if (ordinaryLiteral.isNegative() && unfoldNegatedLiterals) {
+                //Here the literal is derived, negated, and we want to apply the negation extension
                 //TODO: this case does not store traceability, right now
                 for (ImmutableLiteralsList unfoldedLiterals : ordinaryLiteral.unfold(unfoldNegatedLiterals)) {
                     result.add(combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal));
@@ -342,23 +341,7 @@ public class ImmutableLiteralsList implements List<Literal> {
                     DerivationRule derivationRule = ordinaryLiteral.getPredicate().getDerivationRules().get(derivationRuleIndex);
                     ImmutableLiteralsList unfoldedLiterals = ordinaryLiteral.unfold(derivationRuleIndex);
                     ImmutableLiteralsList unfoldedLiteralsAvoidingClash = combineLiteralsAvoidingClash(previousLiterals, unfoldedLiterals, nextLiterals, literal);
-
-                    //ADDING TRACEABILITY of positions
-                    Map<LiteralPosition, LiteralPosition> literalPositionMap = new HashMap<>();
-                    for (int literalIndex = 0; literalIndex < derivationRule.getBody().size(); ++literalIndex) {
-                        Literal unfoldedLiteral = unfoldedLiterals.get(literalIndex);
-                        Literal literalFromRule = derivationRule.getBody().get(literalIndex);
-                        for (int termIndex = 0; termIndex < unfoldedLiteral.getArity(); ++termIndex) {
-                            //Checking whether the term from the original rule is a head variable.
-                            //If this is the case, we are propagating a literalPosition
-                            Term termFromRule = literalFromRule.getTerms().get(termIndex);
-                            if (termFromRule instanceof Variable && derivationRule.getHeadTerms().contains(termFromRule)) {
-                                int positionInHead = derivationRule.getHeadTerms().indexOf(termFromRule);
-                                literalPositionMap.put(new LiteralPosition(unfoldedLiteral, termIndex),
-                                        new LiteralPosition(literal, positionInHead));
-                            }
-                        }
-                    }
+                    Map<LiteralPosition, LiteralPosition> literalPositionMap = addTraceabilityOfPositions(derivationRule, unfoldedLiterals, literal);
                     result.add(new ImmutableLiteralsList(unfoldedLiteralsAvoidingClash, unfoldedLiteralsAvoidingClash.originalLiteralMap, literalPositionMap));
                 }
                 return result;
@@ -466,6 +449,26 @@ public class ImmutableLiteralsList implements List<Literal> {
                 });
         potentiallyClashingVariables.removeAll(sharedVariables);
         return potentiallyClashingVariables;
+    }
+
+
+    private static Map<LiteralPosition, LiteralPosition> addTraceabilityOfPositions(DerivationRule derivationRule, ImmutableLiteralsList unfoldedLiterals, Literal literal) {
+        Map<LiteralPosition, LiteralPosition> literalPositionMap = new HashMap<>();
+        for (int literalIndex = 0; literalIndex < derivationRule.getBody().size(); ++literalIndex) {
+            Literal unfoldedLiteral = unfoldedLiterals.get(literalIndex);
+            Literal literalFromRule = derivationRule.getBody().get(literalIndex);
+            for (int termIndex = 0; termIndex < unfoldedLiteral.getArity(); ++termIndex) {
+                //Checking whether the term from the original rule is a head variable.
+                //If this is the case, we are propagating a literalPosition
+                Term termFromRule = literalFromRule.getTerms().get(termIndex);
+                if (termFromRule instanceof Variable && derivationRule.getHeadTerms().contains(termFromRule)) {
+                    int positionInHead = derivationRule.getHeadTerms().indexOf(termFromRule);
+                    literalPositionMap.put(new LiteralPosition(unfoldedLiteral, termIndex),
+                            new LiteralPosition(literal, positionInHead));
+                }
+            }
+        }
+        return literalPositionMap;
     }
 
     @Override

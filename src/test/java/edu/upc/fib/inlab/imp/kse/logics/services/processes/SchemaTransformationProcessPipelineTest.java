@@ -13,18 +13,18 @@ import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.Sch
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class SchemaTransformationProcessPipelineTest {
+class SchemaTransformationProcessPipelineTest {
 
     @Nested
     class InputValidationTests {
         @Test
-        public void should_throwException_when_SchemaTransformationProcessListIsNull() {
+        void should_throwException_when_SchemaTransformationProcessListIsNull() {
             assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_throwException_when_SchemaTransformationProcessContainsNull() {
+        void should_throwException_when_SchemaTransformationProcessContainsNull() {
             List<SchemaTransformationProcess> processList = new LinkedList<>();
             processList.add(null);
             assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(processList))
@@ -32,7 +32,7 @@ public class SchemaTransformationProcessPipelineTest {
         }
 
         @Test
-        public void should_throwException_when_inputLogicSchemaIsNull() {
+        void should_throwException_when_inputLogicSchemaIsNull() {
             SchemaTransformationProcessPipeline pipeline = new SchemaTransformationProcessPipeline(List.of());
             assertThatThrownBy(() -> pipeline.executeTransformation(null))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -41,7 +41,7 @@ public class SchemaTransformationProcessPipelineTest {
 
 
     @Test
-    public void should_invokeTheServiceInInputOrder() {
+    void should_invokeTheServiceInInputOrder() {
         LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
         LogicSchema unfoldedSchema = LogicSchemaMother.createEmptySchema();
         SchemaTransformationProcess process1 = mockProcess(new SchemaUnfolder(), inputSchema, unfoldedSchema);
@@ -77,7 +77,7 @@ public class SchemaTransformationProcessPipelineTest {
     @Nested
     class TraceabilityTests {
         @Test
-        public void should_returnOriginalConstraintID_when_pipelineCreatesSeveralConstraints() {
+        void should_returnOriginalConstraintID_when_pipelineCreatesSeveralConstraints() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)
@@ -95,7 +95,7 @@ public class SchemaTransformationProcessPipelineTest {
         }
 
         @Test
-        public void should_returnOriginalConstraintID_when_processionCreatesOneConstraint() {
+        void should_returnOriginalConstraintID_when_processionCreatesOneConstraint() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)

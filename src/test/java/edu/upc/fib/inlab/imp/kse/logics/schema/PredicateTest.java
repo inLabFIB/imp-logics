@@ -13,48 +13,48 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class PredicateTest {
+class PredicateTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_WithNullName() {
+    void should_ThrowException_WhenCreatingPredicate_WithNullName() {
         assertThatThrownBy(() -> new Predicate(null, 1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_WithEmptyName() {
+    void should_ThrowException_WhenCreatingPredicate_WithEmptyName() {
         assertThatThrownBy(() -> new Predicate("", 1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2})
-    public void should_CreatePredicate_WhenUsingPositiveOrZeroArity(int arity) {
+    void should_CreatePredicate_WhenUsingPositiveOrZeroArity(int arity) {
         assertThatNoException().isThrownBy(() -> new Predicate("name", arity));
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_withNegativeArity() {
+    void should_ThrowException_WhenCreatingPredicate_withNegativeArity() {
         assertThatThrownBy(() -> new Predicate("name", -1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_WithNullDefinitionRules() {
+    void should_ThrowException_WhenCreatingPredicate_WithNullDefinitionRules() {
         assertThatThrownBy(() -> new Predicate("p", 1, null)).isInstanceOf(
                 IllegalArgumentException.class
         );
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_WithEmptyDefinitionRules() {
+    void should_ThrowException_WhenCreatingPredicate_WithEmptyDefinitionRules() {
         assertThatThrownBy(() -> new Predicate("p", 1, List.of())).isInstanceOf(
                 IllegalArgumentException.class
         );
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingPredicate_WithQueriesNotMatchInArity() {
+    void should_ThrowException_WhenCreatingPredicate_WithQueriesNotMatchInArity() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         assertThatThrownBy(() -> new Predicate("p", 0, List.of(definitionRule))).isInstanceOf(
                 ArityMismatch.class
@@ -62,7 +62,7 @@ public class PredicateTest {
     }
 
     @Test
-    public void should_MakeDefinitionRulesImmutable_WhenCreatingPredicate() {
+    void should_MakeDefinitionRulesImmutable_WhenCreatingPredicate() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         List<Query> definitionRules = new LinkedList<>();
         definitionRules.add(definitionRule);
@@ -71,7 +71,7 @@ public class PredicateTest {
     }
 
     @Test
-    public void should_ReturnOneDerivationRule_ForEachDefinedQuery() {
+    void should_ReturnOneDerivationRule_ForEachDefinedQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         Query definitionRule2 = QueryMother.createTrivialQuery(1, "q");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule1, definitionRule2));
@@ -79,35 +79,35 @@ public class PredicateTest {
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithThisPredicateInHead() {
+    void should_ReturnDerivationRule_WithThisPredicateInHead() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule1));
         assertThat(predicate.getFirstDerivationRule().getHead().getPredicate()).isSameAs(predicate);
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
+    void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
         assertThat(predicate.getFirstDerivationRule().getHeadTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
+    void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
         assertThat(predicate.getFirstDerivationRule().getBody()).containsExactlyElementsOf(definitionRule.getBody());
     }
 
     @Test
-    public void should_ReturnDerived_WhenPredicateHasDerivationRule() {
+    void should_ReturnDerived_WhenPredicateHasDerivationRule() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         Predicate predicate = new Predicate("p", 1, List.of(definitionRule));
         assertThat(predicate.isDerived()).isTrue();
     }
 
     @Test
-    public void should_ReturnNotDerived_WhenPredicateHasNoDerivationRule() {
+    void should_ReturnNotDerived_WhenPredicateHasNoDerivationRule() {
         Predicate predicate = new Predicate("p", 1);
         assertThat(predicate.isDerived()).isFalse();
     }

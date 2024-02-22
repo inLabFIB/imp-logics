@@ -11,10 +11,10 @@ import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.Sch
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class PredicateCleanerTest {
+class PredicateCleanerTest {
 
     @Test
-    public void should_throwException_when_logicSchemaIsNull() {
+    void should_throwException_when_logicSchemaIsNull() {
         PredicateCleaner predicateCleaner = new PredicateCleaner();
 
         assertThatThrownBy(() -> predicateCleaner.clean(null))
@@ -23,7 +23,7 @@ public class PredicateCleanerTest {
     }
 
     @Test
-    public void should_cleanLogicSchema_when_ItContainsPredicatesNotUsed() {
+    void should_cleanLogicSchema_when_ItContainsPredicatesNotUsed() {
         PredicateSpec unusedPredicateSpec = new PredicateSpec("Z", 2);
 
         LogicSchema logicSchema = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
@@ -37,7 +37,7 @@ public class PredicateCleanerTest {
     }
 
     @Test
-    public void should_cleanLogicSchema_when_ItContainsDerivationRulesNotUsed() {
+    void should_cleanLogicSchema_when_ItContainsDerivationRulesNotUsed() {
         String schemaString = """
                 @1 :- A(x), B(x), C(x)
                 D(x) :- A(x), B(x), C(x)
@@ -53,7 +53,7 @@ public class PredicateCleanerTest {
     }
 
     @Test
-    public void should_cleanLogicSchema_when_ItContainsNestedDerivationRules() {
+    void should_cleanLogicSchema_when_ItContainsNestedDerivationRules() {
         String schemaString = """
                 @1 :- A(x), B(x), C(x)
                 C(x) :- D(x)
@@ -71,7 +71,7 @@ public class PredicateCleanerTest {
     }
 
     @Test
-    public void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
+    void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
         LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                 @1 :- P(x)
                 @2 :- Q(x)

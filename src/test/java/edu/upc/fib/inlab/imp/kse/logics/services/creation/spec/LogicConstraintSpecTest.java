@@ -7,10 +7,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class LogicConstraintSpecTest {
+class LogicConstraintSpecTest {
 
     @Test
-    public void should_beAbleToCreateALogicConstraintSpec() {
+    void should_beAbleToCreateALogicConstraintSpec() {
         BodySpec bodySpec = new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)));
         LogicConstraintSpec logicConstraintSpec = new LogicConstraintSpec(bodySpec) {
         };
@@ -19,14 +19,14 @@ public class LogicConstraintSpecTest {
     }
 
     @Test
-    public void should_throwException_when_bodySpecIsNull() {
+    void should_throwException_when_bodySpecIsNull() {
         assertThatThrownBy(() -> new LogicConstraintSpec((BodySpec) null) {
         })
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_when_listSpecIsNull() {
+    void should_throwException_when_listSpecIsNull() {
         assertThatThrownBy(() -> new LogicConstraintSpec((List<LiteralSpec>) null) {
         })
                 .isInstanceOf(IllegalArgumentException.class);

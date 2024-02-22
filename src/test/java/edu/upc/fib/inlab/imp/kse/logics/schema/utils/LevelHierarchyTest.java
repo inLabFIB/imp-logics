@@ -67,13 +67,13 @@ class LevelHierarchyTest {
     }
 
     @Test
-    public void should_returnTheNumberOfLevels() {
+    void should_returnTheNumberOfLevels() {
         LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
         assertThat(levelHierarchy.getNumberOfLevels()).isEqualTo(2);
     }
 
     @Test
-    public void should_returnLevel() {
+    void should_returnLevel() {
         LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
 
         Level level = levelHierarchy.getLevel(0);
@@ -84,7 +84,7 @@ class LevelHierarchyTest {
     @Nested
     class ReturnLevelIndexTests {
         @Test
-        public void should_throwException_whenPredicateIsNull() {
+        void should_throwException_whenPredicateIsNull() {
             LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
 
             assertThatThrownBy(() -> levelHierarchy.getLevelIndexOfPredicate(null))
@@ -92,7 +92,7 @@ class LevelHierarchyTest {
         }
 
         @Test
-        public void should_returnLevelIndexOfPredicate() {
+        void should_returnLevelIndexOfPredicate() {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
@@ -100,11 +100,11 @@ class LevelHierarchyTest {
 
             int index = levelHierarchy.getLevelIndexOfPredicate(predicateP);
 
-            assertThat(index).isEqualTo(0);
+            assertThat(index).isZero();
         }
 
         @Test
-        public void should_throwException_whenTryingToReturnLevelIndex_OfNotContainedPredicate() {
+        void should_throwException_whenTryingToReturnLevelIndex_OfNotContainedPredicate() {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
@@ -122,7 +122,7 @@ class LevelHierarchyTest {
     class ReturnLevelTests {
 
         @Test
-        public void should_throwException_whenPredicateIsNull() {
+        void should_throwException_whenPredicateIsNull() {
             LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
 
             assertThatThrownBy(() -> levelHierarchy.getLevelOfPredicate(null))
@@ -130,7 +130,7 @@ class LevelHierarchyTest {
         }
 
         @Test
-        public void should_returnLevelOfPredicate() {
+        void should_returnLevelOfPredicate() {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
@@ -142,7 +142,7 @@ class LevelHierarchyTest {
         }
 
         @Test
-        public void should_throwException_whenTryingToReturnLevel_OfNotContainedPredicate() {
+        void should_throwException_whenTryingToReturnLevel_OfNotContainedPredicate() {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));

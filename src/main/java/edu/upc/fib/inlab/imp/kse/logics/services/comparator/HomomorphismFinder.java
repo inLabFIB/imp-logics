@@ -127,8 +127,8 @@ public class HomomorphismFinder {
     private void checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(List<Literal> literals) {
         if (nonNull(derivedOrdinaryLiteralHomomorphismCriteria)) return;
         if (literals.stream()
-                .filter(l -> l instanceof OrdinaryLiteral)
-                .map(l -> (OrdinaryLiteral) l)
+                .filter(OrdinaryLiteral.class::isInstance)
+                .map(OrdinaryLiteral.class::cast)
                 .anyMatch(OrdinaryLiteral::isDerived)) throw new DerivedLiteralInHomomorphismCheck();
     }
 

@@ -15,13 +15,14 @@ import java.util.stream.Stream;
 import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class EqualityReplacerTest {
+class EqualityReplacerTest {
 
     @Nested
     class InputValidationTests {
         @Test
-        public void should_throwException_whenExecuteWithNullSchema() {
-            assertThatThrownBy(() -> new EqualityReplacer().executeTransformation(null))
+        void should_throwException_whenExecuteWithNullSchema() {
+            EqualityReplacer equalityReplacer = new EqualityReplacer();
+            assertThatThrownBy(() -> equalityReplacer.executeTransformation(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -29,7 +30,7 @@ public class EqualityReplacerTest {
     @Nested
     class EqualityReplacerTests {
 
-        public static Stream<Arguments> provideLogicConstraintWithEqualityLiterals() {
+        static Stream<Arguments> provideLogicConstraintWithEqualityLiterals() {
             return Stream.of(
                     Arguments.of(
                             "@1 :- R(x, y), x=1",
@@ -70,7 +71,7 @@ public class EqualityReplacerTest {
             );
         }
 
-        public static Stream<Arguments> provideDerivationRulesWithEqualityLiterals() {
+        static Stream<Arguments> provideDerivationRulesWithEqualityLiterals() {
             return Stream.of(
                     Arguments.of(
                             "P(x) :- R(x, y), x=1",
@@ -113,7 +114,7 @@ public class EqualityReplacerTest {
 
         @ParameterizedTest
         @MethodSource("provideLogicConstraintWithEqualityLiterals")
-        public void should_replaceEquality_inLogicConstraints(String logicConstraintString, String expectedLogicConstraintString) {
+        void should_replaceEquality_inLogicConstraints(String logicConstraintString, String expectedLogicConstraintString) {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(logicConstraintString);
 
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
@@ -127,7 +128,7 @@ public class EqualityReplacerTest {
 
         @ParameterizedTest
         @MethodSource("provideDerivationRulesWithEqualityLiterals")
-        public void should_replaceEquality_inDerivationRules(String logicConstraintString, String expectedLogicConstraintString) {
+        void should_replaceEquality_inDerivationRules(String logicConstraintString, String expectedLogicConstraintString) {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(logicConstraintString);
 
             SchemaTransformation schemaTransformation = new EqualityReplacer().executeTransformation(logicSchema);
@@ -145,7 +146,7 @@ public class EqualityReplacerTest {
 
 
         @Test
-        public void should_maintainConstraintID_when_executeEqualityReplacer() {
+        void should_maintainConstraintID_when_executeEqualityReplacer() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)

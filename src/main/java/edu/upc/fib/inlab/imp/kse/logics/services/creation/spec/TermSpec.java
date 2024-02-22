@@ -8,7 +8,7 @@ import java.util.Objects;
 public abstract class TermSpec implements LogicElementSpec {
     private final String name;
 
-    public TermSpec(String name) {
+    protected TermSpec(String name) {
         if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
         this.name = name;
     }

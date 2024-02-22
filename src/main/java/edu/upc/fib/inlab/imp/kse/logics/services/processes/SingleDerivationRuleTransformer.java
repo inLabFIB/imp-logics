@@ -193,8 +193,8 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         if (predicate.getDerivationRules().size() == 1) {
             DerivationRule dr = predicate.getFirstDerivationRule();
             isSimple = dr.getBody().stream()
-                    .filter(l -> l instanceof OrdinaryLiteral)
-                    .map(l -> (OrdinaryLiteral) l)
+                    .filter(OrdinaryLiteral.class::isInstance)
+                    .map(OrdinaryLiteral.class::cast)
                     .noneMatch(ol -> ol.isPositive() && predicateTransformMap.get(ol.getAtom().getPredicateName()).size() > 1);
         }
         return isSimple;

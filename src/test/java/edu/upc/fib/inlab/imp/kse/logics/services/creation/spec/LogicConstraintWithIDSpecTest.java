@@ -21,7 +21,9 @@ class LogicConstraintWithIDSpecTest {
 
     @Test
     void should_throwException_when_idIsNull() {
-        assertThatThrownBy(() -> new LogicConstraintWithIDSpec(null, new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))) {
+        String constraintId = null;
+        BodySpec body = new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)));
+        assertThatThrownBy(() -> new LogicConstraintWithIDSpec(constraintId, body) {
         })
                 .isInstanceOf(IllegalArgumentException.class);
     }

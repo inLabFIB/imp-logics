@@ -5,7 +5,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.TermMother;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.SubstitutionBuilder;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.SubstitutionException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,53 +17,55 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class SubstitutionTest {
 
     @Test
-    public void should_containAllMappings_whenCopyingSubstitution() {
+    void should_containAllMappings_whenCopyingSubstitution() {
         Substitution originalSubstitution = new Substitution();
         originalSubstitution.addMapping(new Variable("x"), new Variable("y"));
 
         Substitution copiedSubstitution = new Substitution(originalSubstitution);
 
-        SubstitutionAssert.assertThat(copiedSubstitution).hasSize(1);
-        SubstitutionAssert.assertThat(copiedSubstitution).mapsToVariable("x", "y");
+        assertThat(copiedSubstitution)
+                .hasSize(1)
+                .mapsToVariable("x", "y");
     }
 
     @Test
-    public void should_throwException_whenCopyingNullSubstitution() {
+    void should_throwException_whenCopyingNullSubstitution() {
         assertThatThrownBy(() -> new Substitution(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_whenCreatingSubstitution_withNullDomainTerms() {
+    void should_throwException_whenCreatingSubstitution_withNullDomainTerms() {
         assertThatThrownBy(() -> new Substitution(null, List.of()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_whenCreatingSubstitution_withNullRangeTerms() {
+    void should_throwException_whenCreatingSubstitution_withNullRangeTerms() {
         assertThatThrownBy(() -> new Substitution(List.of(), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_createEmptySubstitution_whenCreationSubstitution_withEmptyDomainTerms_andEmptyRangeTerms() {
+    void should_createEmptySubstitution_whenCreationSubstitution_withEmptyDomainTerms_andEmptyRangeTerms() {
         Substitution substitution = new Substitution(List.of(), List.of());
-        SubstitutionAssert.assertThat(substitution).isEmpty();
+        assertThat(substitution).isEmpty();
     }
 
     @ParameterizedTest(name = "{index} {3}")
     @MethodSource("provideCompatibleDomainTermsAndRangeTerms")
-    public void should_createSubstitution_whenUsingCompatibleTermsList(List<Term> domainTerms, List<Term> rangeTerms, Map<Variable, Term> expected, String message) {
-        SubstitutionAssert.assertThat(new Substitution(domainTerms, rangeTerms)).describedAs(message).encodesMapping(expected);
+    void should_createSubstitution_whenUsingCompatibleTermsList(List<Term> domainTerms, List<Term> rangeTerms, Map<Variable, Term> expected, String message) {
+        assertThat(new Substitution(domainTerms, rangeTerms)).describedAs(message).encodesMapping(expected);
     }
 
-    public static Stream<Arguments> provideCompatibleDomainTermsAndRangeTerms() {
+    static Stream<Arguments> provideCompatibleDomainTermsAndRangeTerms() {
         return Stream.of(
                 Arguments.of(
                         TermMother.createTerms("x", "y"),
@@ -100,11 +101,11 @@ class SubstitutionTest {
 
     @ParameterizedTest(name = "{index} {2}")
     @MethodSource("provideIncompatibleDomainTermsAndRangeTerms")
-    public void should_throwException_whenUsingIncompatibleTermsList(List<Term> domainTerms, List<Term> rangeTerms, String message) {
+    void should_throwException_whenUsingIncompatibleTermsList(List<Term> domainTerms, List<Term> rangeTerms, String message) {
         assertThatThrownBy(() -> new Substitution(domainTerms, rangeTerms)).describedAs(message).isInstanceOf(SubstitutionException.class);
     }
 
-    public static Stream<Arguments> provideIncompatibleDomainTermsAndRangeTerms() {
+    static Stream<Arguments> provideIncompatibleDomainTermsAndRangeTerms() {
         return Stream.of(
                 Arguments.of(
                         TermMother.createTerms("x", "x"),
@@ -127,48 +128,51 @@ class SubstitutionTest {
     }
 
     @Test
-    public void should_containAllMappings_whenAddingMappings() {
+    void should_containAllMappings_whenAddingMappings() {
         Substitution substitution = new Substitution();
         substitution.addMapping(new Variable("x"), new Variable("y"));
         substitution.addMapping(new Variable("y"), new Variable("z"));
 
-        SubstitutionAssert.assertThat(substitution).hasSize(2);
-        SubstitutionAssert.assertThat(substitution).mapsToVariable("x", "y");
-        SubstitutionAssert.assertThat(substitution).mapsToVariable("y", "z");
+        assertThat(substitution)
+                .hasSize(2)
+                .mapsToVariable("x", "y")
+                .mapsToVariable("y", "z");
     }
 
     @Test
-    public void should_throwException_whenUnifyingSubstitution_withNullSubstitution() {
+    void should_throwException_whenUnifyingSubstitution_withNullSubstitution() {
         Substitution substitution = new Substitution();
         assertThatThrownBy(() -> substitution.union(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_unifySubstitutions_whenBothSubstitutionsDoNotShareDomainVariables() {
+    void should_unifySubstitutions_whenBothSubstitutionsDoNotShareDomainVariables() {
         // {x->a} {y->b} OK {x->a, y->b}
         Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
         Substitution substitution2 = new SubstitutionBuilder().addMapping("y", "b").build();
 
         Substitution union = substitution1.union(substitution2);
-        SubstitutionAssert.assertThat(union).hasSize(2);
-        SubstitutionAssert.assertThat(union).mapsToVariable("x", "a");
-        SubstitutionAssert.assertThat(union).mapsToVariable("y", "b");
+        assertThat(union)
+                .hasSize(2)
+                .mapsToVariable("x", "a")
+                .mapsToVariable("y", "b");
     }
 
     @Test
-    public void should_unifySubstitutions_whenBothSubstitutionsAreIdentical() {
+    void should_unifySubstitutions_whenBothSubstitutionsAreIdentical() {
         // {x->a} {x->a} OK {x->a}
         Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
         Substitution substitution2 = new SubstitutionBuilder().addMapping("x", "a").build();
 
         Substitution union = substitution1.union(substitution2);
-        SubstitutionAssert.assertThat(union).hasSize(1);
-        SubstitutionAssert.assertThat(union).mapsToVariable("x", "a");
+        assertThat(union)
+                .hasSize(1)
+                .mapsToVariable("x", "a");
     }
 
     @Test
-    public void should_throwException_whenBothSubstitutionsShareDomainVariable() {
+    void should_throwException_whenBothSubstitutionsShareDomainVariable() {
         // {x->a} {x->b} Not Ok
         Substitution substitution1 = new SubstitutionBuilder().addMapping("x", "a").build();
         Substitution substitution2 = new SubstitutionBuilder().addMapping("x", "b").build();
@@ -178,31 +182,32 @@ class SubstitutionTest {
     }
 
     @Test
-    public void should_throwException_whenAddingMapping_withNullDomainVariable() {
+    void should_throwException_whenAddingMapping_withNullDomainVariable() {
         Substitution substitution = new Substitution();
         assertThatThrownBy(() -> substitution.addMapping(null, new Variable("x")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_whenAddingMapping_withNullRangeTerm() {
+    void should_throwException_whenAddingMapping_withNullRangeTerm() {
         Substitution substitution = new Substitution();
         assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_containMapping_whenAddingMapping() {
+    void should_containMapping_whenAddingMapping() {
         // {} add {x->1} OK
         Substitution substitution = new Substitution();
         substitution.addMapping(new Variable("x"), new Constant("1"));
 
-        SubstitutionAssert.assertThat(substitution).hasSize(1);
-        SubstitutionAssert.assertThat(substitution).mapsToConstant("x", "1");
+        assertThat(substitution)
+                .hasSize(1)
+                .mapsToConstant("x", "1");
     }
 
     @Test
-    public void should_throwException_whenAddingMapping_withAlreadyMappedDomainVariable() {
+    void should_throwException_whenAddingMapping_withAlreadyMappedDomainVariable() {
         // {x -> 1} add {x -> 2} no ok
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "1").build();
         assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), new Constant("2")))
@@ -210,17 +215,18 @@ class SubstitutionTest {
     }
 
     @Test
-    public void should_notAddMapping_whenAddingMapping_withExistingDomainVariableAndSameRangeTerm() {
+    void should_notAddMapping_whenAddingMapping_withExistingDomainVariableAndSameRangeTerm() {
         // {x -> 1} add {x -> 1} ok
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "1").build();
         substitution.addMapping(new Variable("x"), new Constant("1"));
 
-        SubstitutionAssert.assertThat(substitution).hasSize(1);
-        SubstitutionAssert.assertThat(substitution).mapsToConstant("x", "1");
+        assertThat(substitution)
+                .hasSize(1)
+                .mapsToConstant("x", "1");
     }
 
     @Test
-    public void should_throwException_whenAddingMapping_withExistingDomainVariable_mappedToDifferentTermKind_withSameName() {
+    void should_throwException_whenAddingMapping_withExistingDomainVariable_mappedToDifferentTermKind_withSameName() {
         // {x -> Var(a)} add {x -> Const(a)} not ok
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "a").build();
         assertThatThrownBy(() -> substitution.addMapping(new Variable("x"), new Constant("a")))
@@ -228,26 +234,26 @@ class SubstitutionTest {
     }
 
     @Test
-    public void should_throwException_whenGettingNullTerm() {
+    void should_throwException_whenGettingNullTerm() {
         Substitution substitution = new Substitution();
         assertThatThrownBy(() -> substitution.getTerm(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_returnEmptyOptional_whenGettingTerm_withUnmappedVariable() {
+    void should_returnEmptyOptional_whenGettingTerm_withUnmappedVariable() {
         Substitution substitution = new Substitution();
         assertThat(substitution.getTerm(new Variable("x"))).isNotPresent();
     }
 
     @Test
-    public void should_returnMappedTerm_whenGettingTerm_withMappedVariable() {
+    void should_returnMappedTerm_whenGettingTerm_withMappedVariable() {
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "a").build();
         assertThat(substitution.getTerm(new Variable("x"))).isPresent().contains(new Variable("a"));
     }
 
     @Test
-    public void should_returnUsedVariables() {
+    void should_returnUsedVariables() {
         Substitution substitution = new SubstitutionBuilder().addMapping("x", "y").build();
 
         Set<Variable> usedVariables = substitution.getUsedVariables();
@@ -259,14 +265,14 @@ class SubstitutionTest {
     @Nested
     class IsIdentityTests {
         @Test
-        public void should_returnTrue_whenSubstitutionIsEmpty() {
+        void should_returnTrue_whenSubstitutionIsEmpty() {
             Substitution originalSubstitution = new Substitution();
 
             assertThat(originalSubstitution.isIdentity()).isTrue();
         }
 
         @Test
-        public void should_returnTrue_whenSubstitutionIsNonEmptyIdentity() {
+        void should_returnTrue_whenSubstitutionIsNonEmptyIdentity() {
             Substitution originalSubstitution = new Substitution();
             Variable b = new Variable("b");
             Variable anotherB = new Variable("b");
@@ -276,7 +282,7 @@ class SubstitutionTest {
         }
 
         @Test
-        public void should_returnFalse_whenSubstitutionIsNotIdentity() {
+        void should_returnFalse_whenSubstitutionIsNotIdentity() {
             Substitution originalSubstitution = new Substitution();
             Variable b = new Variable("b");
             Variable anotherB = new Variable("b");

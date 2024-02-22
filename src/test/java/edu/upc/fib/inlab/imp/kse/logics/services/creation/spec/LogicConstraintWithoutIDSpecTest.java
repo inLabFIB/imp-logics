@@ -7,10 +7,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class LogicConstraintWithoutIDSpecTest {
+class LogicConstraintWithoutIDSpecTest {
 
     @Test
-    public void should_beAbleToCreateALogicConstraintWithoutIDSpec() {
+    void should_beAbleToCreateALogicConstraintWithoutIDSpec() {
         BodySpec bodySpec = new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)));
         LogicConstraintWithoutIDSpec logicConstraintWithoutIDSpec = new LogicConstraintWithoutIDSpec(bodySpec) {
         };
@@ -19,14 +19,14 @@ public class LogicConstraintWithoutIDSpecTest {
     }
 
     @Test
-    public void should_throwException_when_bodySpecIsNull() {
+    void should_throwException_when_bodySpecIsNull() {
         assertThatThrownBy(() -> new LogicConstraintWithoutIDSpec((BodySpec) null) {
         })
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_when_listSpecIsNull() {
+    void should_throwException_when_listSpecIsNull() {
         assertThatThrownBy(() -> new LogicConstraintWithoutIDSpec((List<LiteralSpec>) null) {
         })
                 .isInstanceOf(IllegalArgumentException.class);

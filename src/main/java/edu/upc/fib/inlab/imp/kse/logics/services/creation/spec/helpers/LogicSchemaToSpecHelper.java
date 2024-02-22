@@ -4,9 +4,12 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LogicSchemaToSpecHelper {
+
+    private LogicSchemaToSpecHelper() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static List<DerivationRuleSpec> buildDerivationRuleSpecs(List<DerivationRule> usedDerivationRules) {
         return usedDerivationRules.stream()
@@ -66,7 +69,7 @@ public class LogicSchemaToSpecHelper {
             } else if (t instanceof Variable) {
                 return new VariableSpec(t.getName());
             } else throw new RuntimeException("Unknown term type: " + t.getClass().getName());
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     public static BodySpec buildBodySpec(List<Literal> body) {
@@ -78,7 +81,7 @@ public class LogicSchemaToSpecHelper {
                         return buildBuiltInLiteralSpec(comparisonBuiltInLiteral);
                     } else throw new RuntimeException("Unknown literal type: " + l.getClass().getName());
                 })
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     public static OrdinaryLiteralSpec buildOrdinaryLiteralSpec(OrdinaryLiteral ordinaryLiteral) {
@@ -96,10 +99,10 @@ public class LogicSchemaToSpecHelper {
     }
 
     public static LiteralSpec buildLiteralSpec(Literal literal) {
-        if (literal instanceof OrdinaryLiteral)
-            return LogicSchemaToSpecHelper.buildOrdinaryLiteralSpec((OrdinaryLiteral) literal);
-        if (literal instanceof BuiltInLiteral)
-            return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec((BuiltInLiteral) literal);
+        if (literal instanceof OrdinaryLiteral ol)
+            return LogicSchemaToSpecHelper.buildOrdinaryLiteralSpec(ol);
+        if (literal instanceof BuiltInLiteral bl)
+            return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(bl);
         throw new IllegalArgumentException("Literal type not supported");
     }
 

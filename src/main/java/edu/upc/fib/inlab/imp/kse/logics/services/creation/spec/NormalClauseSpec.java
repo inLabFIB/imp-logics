@@ -9,7 +9,7 @@ import java.util.Objects;
 public abstract class NormalClauseSpec {
     private final BodySpec body;
 
-    public NormalClauseSpec(BodySpec bodySpec) {
+    protected NormalClauseSpec(BodySpec bodySpec) {
         if (Objects.isNull(bodySpec)) throw new IllegalArgumentException("Body cannot be null");
         body = bodySpec;
     }

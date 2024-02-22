@@ -8,8 +8,12 @@ public class PredicateSuffixNamer {
     private static final String PRIMA_CHAR = "'";
     private static final Pattern SUFFIX_PRIME_PATTERN = Pattern.compile("(?<primaSuffix>'*)$");
 
+    private PredicateSuffixNamer() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String concatSuffix(String predicateName, String suffix) {
-        String predicateNameWithoutSuffix = predicateName.replaceAll(PRIMA_CHAR, "");
+        String predicateNameWithoutSuffix = predicateName.replace(PRIMA_CHAR, "");
         Matcher matcher = SUFFIX_PRIME_PATTERN.matcher(predicateName);
         String primaSuffix = matcher.find() ? matcher.group("primaSuffix") : "";
         return predicateNameWithoutSuffix + SUFFIX_SEPARATOR + suffix + primaSuffix;

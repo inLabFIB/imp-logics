@@ -18,11 +18,12 @@ public class NewFreshVariableFactory {
         if (Objects.isNull(variableNamePrefix)) throw new IllegalArgumentException("VariableNamePrefix cannot be null");
         if (Objects.isNull(usedVariables)) throw new IllegalArgumentException("UsedVariables cannot be empty");
 
-        String proposedNewVariableName = variableNamePrefix;
-        while (usedVariables.contains(new Variable(proposedNewVariableName))) {
-            proposedNewVariableName = proposedNewVariableName + "'";
+        StringBuilder newVariableNameBuilder = new StringBuilder();
+        newVariableNameBuilder.append(variableNamePrefix);
+        while (usedVariables.contains(new Variable(newVariableNameBuilder.toString()))) {
+            newVariableNameBuilder.append("'");
         }
-        return new Variable(proposedNewVariableName);
+        return new Variable(newVariableNameBuilder.toString());
     }
 
     @SuppressWarnings("unused")

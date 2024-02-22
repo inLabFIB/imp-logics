@@ -15,6 +15,10 @@ import java.util.List;
  */
 public class TermSpecToTermFactory {
 
+    private TermSpecToTermFactory() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static ImmutableTermList buildTerms(List<TermSpec> termSpecList) {
         List<Term> terms = termSpecList.stream()
                 .map(TermSpecToTermFactory::buildTerm)

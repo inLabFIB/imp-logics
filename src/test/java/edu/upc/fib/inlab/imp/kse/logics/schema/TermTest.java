@@ -88,13 +88,13 @@ class TermTest {
     @Nested
     class IsVariableTests {
         @Test
-        public void should_returnTrue_whenItIsVariable() {
+        void should_returnTrue_whenItIsVariable() {
             Term term = new Variable("v");
             assertThat(term.isVariable()).isTrue();
         }
 
         @Test
-        public void should_returnFalse_whenIsConstant() {
+        void should_returnFalse_whenIsConstant() {
             Term term = new Constant("X");
             assertThat(term.isVariable()).isFalse();
         }

@@ -11,6 +11,7 @@ public class LogicSchemaWithIDsGrammarToSpecVisitor extends LogicSchemaGrammarTo
         super(stringToTermSpecFactory);
     }
 
+    @Override
     public LogicConstraintWithIDSpec visitConstraint(LogicSchemaGrammarParser.ConstraintContext ctx) {
         if (ctx.CONSTRAINTID() != null) {
             BodySpec body = createBody(ctx.body());

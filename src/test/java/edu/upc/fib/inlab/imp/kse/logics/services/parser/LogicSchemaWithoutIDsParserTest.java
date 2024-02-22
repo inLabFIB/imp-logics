@@ -12,10 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-public class LogicSchemaWithoutIDsParserTest {
+class LogicSchemaWithoutIDsParserTest {
 
     @Test
-    public void should_throwsException_whenParsingConstraint_WithoutConstraintId() {
+    void should_throwsException_whenParsingConstraint_WithoutConstraintId() {
         String schemaString = " :- p()";
 
         LogicSchema logicSchema = new LogicSchemaWithoutIDsParser().parse(schemaString);
@@ -25,15 +25,16 @@ public class LogicSchemaWithoutIDsParserTest {
     }
 
     @Test
-    public void should_containLogicConstraintWithID_whenParsingConstraint() {
+    void should_containLogicConstraintWithID_whenParsingConstraint() {
         String schemaString = "@100 :- p()";
 
-        assertThatThrownBy(() -> new LogicSchemaWithoutIDsParser().parse(schemaString))
+        LogicSchemaWithoutIDsParser parser = new LogicSchemaWithoutIDsParser();
+        assertThatThrownBy(() -> parser.parse(schemaString))
                 .isInstanceOf(NotExpectingConstraintID.class);
     }
 
     @Test
-    public void should_parseWholeSchema_whenDefiningSchema_withSeveralLogicConstraints_andSeveralDerivationRules() {
+    void should_parseWholeSchema_whenDefiningSchema_withSeveralLogicConstraints_andSeveralDerivationRules() {
         String schemaString = """
                             :- WorksIn(E, D), not(Emp(E))
                             :- WorksIn(E, D), Manages(E, D), CrucialDept(D)

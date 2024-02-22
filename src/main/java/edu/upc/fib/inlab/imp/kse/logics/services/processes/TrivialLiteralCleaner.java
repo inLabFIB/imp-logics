@@ -218,10 +218,8 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
         if (literal instanceof BooleanBuiltInLiteral booleanBuiltInLiteral) {
             return booleanBuiltInLiteral.isTrue();
         }
-        if (literal instanceof ComparisonBuiltInLiteral cBil) {
-            if (cBil.getOperator().equals(ComparisonOperator.EQUALS)) {
-                return cBil.getRightTerm().equals(cBil.getLeftTerm());
-            }
+        if (literal instanceof ComparisonBuiltInLiteral cBil && cBil.getOperator().equals(ComparisonOperator.EQUALS)) {
+            return cBil.getOperator().equals(ComparisonOperator.EQUALS) && cBil.getRightTerm().equals(cBil.getLeftTerm());
         }
         if (literal instanceof OrdinaryLiteral ordinaryLiteral && ordinaryLiteral.isDerived()) {
             if (ordinaryLiteral.isPositive()) {

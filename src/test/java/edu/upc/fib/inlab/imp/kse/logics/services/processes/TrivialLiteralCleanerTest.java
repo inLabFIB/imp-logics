@@ -18,7 +18,7 @@ import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAsse
 import static edu.upc.fib.inlab.imp.kse.logics.services.processes.assertions.SchemaTransformationAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class TrivialLiteralCleanerTest {
+class TrivialLiteralCleanerTest {
 
     @Nested
     class InputValidation {
@@ -44,7 +44,7 @@ public class TrivialLiteralCleanerTest {
     class Traceability {
 
         @Test
-        public void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
+        void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                          @1 :- P(X), TRUE()
                          P(x) :- Q(x), TRUE()
@@ -62,7 +62,7 @@ public class TrivialLiteralCleanerTest {
     class Process {
 
         @Test
-        public void should_canExecuteProcess() {
+        void should_canExecuteProcess() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                          @1 :- P(X), TRUE()
                          P(x) :- Q(x), TRUE()
@@ -85,7 +85,7 @@ public class TrivialLiteralCleanerTest {
     @Nested
     class BooleanBuiltinLiteralsCase {
 
-        public static Stream<Arguments> provideLogicConstraintsAndBooleanBuiltinLiterals() {
+        static Stream<Arguments> provideLogicConstraintsAndBooleanBuiltinLiterals() {
 
             return Stream.of(
                     Arguments.of(
@@ -114,7 +114,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicConstraintsAndBooleanBuiltinLiterals")
-        public void should_clean_when_schemaContainsLogicConstraintsAndBooleanBuiltinLiterals(
+        void should_clean_when_schemaContainsLogicConstraintsAndBooleanBuiltinLiterals(
                 String schemaString,
                 String expectedSchemaString,
                 List<PredicateSpec> expectedPredicateSpecs
@@ -130,7 +130,7 @@ public class TrivialLiteralCleanerTest {
                     .isIsomorphicTo(expectedLogicSchema);
         }
 
-        public static Stream<Arguments> provideDerivationRulesAndBooleanBuiltinLiterals() {
+        static Stream<Arguments> provideDerivationRulesAndBooleanBuiltinLiterals() {
 
             return Stream.of(
                     Arguments.of(
@@ -158,7 +158,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideDerivationRulesAndBooleanBuiltinLiterals")
-        public void should_clean_when_schemaContainsDerivationRulesAndBooleanBuiltinLiterals(
+        void should_clean_when_schemaContainsDerivationRulesAndBooleanBuiltinLiterals(
                 String schemaString,
                 String expectedSchemaString,
                 List<PredicateSpec> expectedPredicateSpecs
@@ -175,7 +175,7 @@ public class TrivialLiteralCleanerTest {
         }
 
 
-        public static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals() {
+        static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals() {
             return Stream.of(
                     Arguments.of(
                             """
@@ -203,7 +203,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideDerivationRulesWithBuiltinLiterals")
-        public void should_clean_when_schemaContainsSeveralDerivationRulesWithBuiltinLiterals(
+        void should_clean_when_schemaContainsSeveralDerivationRulesWithBuiltinLiterals(
                 String schemaString,
                 String expectedSchemaString,
                 List<PredicateSpec> expectedPredicateSpecs
@@ -219,7 +219,7 @@ public class TrivialLiteralCleanerTest {
                     .isIsomorphicTo(expectedLogicSchema);
         }
 
-        public static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads() {
+        static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads() {
             return Stream.of(
                     Arguments.of(
                             """
@@ -309,7 +309,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads")
-        public void should_clean_when_schemaContainsDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads(
+        void should_clean_when_schemaContainsDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads(
                 String schemaString,
                 String expectedSchemaString,
                 List<PredicateSpec> expectedPredicateSpecs
@@ -325,7 +325,7 @@ public class TrivialLiteralCleanerTest {
                     .isIsomorphicTo(expectedLogicSchema);
         }
 
-        public static Stream<Arguments> provideLogicSchemas() {
+        static Stream<Arguments> provideLogicSchemas() {
             return Stream.of(
                     Arguments.of(
                             """
@@ -370,7 +370,7 @@ public class TrivialLiteralCleanerTest {
                     .isIsomorphicTo(expectedLogicSchema);
         }
 
-        public static Stream<Arguments> provideLogicSchemasWithNegation() {
+        static Stream<Arguments> provideLogicSchemasWithNegation() {
             return Stream.of(
                     Arguments.of(
                             """
@@ -425,7 +425,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithNegation")
-        public void should_clean_when_schemaIncludesNegatedDerivedLiterals(String inputSchema,
+        void should_clean_when_schemaIncludesNegatedDerivedLiterals(String inputSchema,
                                                                            String expectedSchema,
                                                                            List<PredicateSpec> additionalExpectedPredicates) {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
@@ -444,7 +444,7 @@ public class TrivialLiteralCleanerTest {
     @Nested
     class ComparisonBuiltinLiteralsCase {
 
-        public static Stream<Arguments> provideLogicSchemasWithTrueEqualityGroundLiterals() {
+        static Stream<Arguments> provideLogicSchemasWithTrueEqualityGroundLiterals() {
             return Stream.of(
                     Arguments.of(
                             "@1 :- A(x), 1=1",
@@ -489,7 +489,7 @@ public class TrivialLiteralCleanerTest {
             );
         }
 
-        public static Stream<Arguments> provideLogicSchemasWithFalseEqualityGroundLiterals() {
+        static Stream<Arguments> provideLogicSchemasWithFalseEqualityGroundLiterals() {
             return Stream.of(
 
                     Arguments.of(
@@ -556,7 +556,7 @@ public class TrivialLiteralCleanerTest {
             );
         }
 
-        public static Stream<Arguments> provideLogicSchemasWithEqualityNonGroundLiterals() {
+        static Stream<Arguments> provideLogicSchemasWithEqualityNonGroundLiterals() {
             return Stream.of(
 
                     Arguments.of(
@@ -569,7 +569,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithTrueEqualityGroundLiterals")
-        public void should_clean_when_schemaIncludesTrueEqualityGroundLiterals(
+        void should_clean_when_schemaIncludesTrueEqualityGroundLiterals(
                 String inputSchema,
                 String expectedSchema,
                 List<PredicateSpec> additionalExpectedPredicates
@@ -588,7 +588,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithFalseEqualityGroundLiterals")
-        public void should_clean_when_schemaIncludesFalseEqualityGroundLiterals(
+        void should_clean_when_schemaIncludesFalseEqualityGroundLiterals(
                 String inputSchema,
                 String expectedSchema,
                 List<PredicateSpec> additionalExpectedPredicates
@@ -606,7 +606,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithEqualityNonGroundLiterals")
-        public void should_clean_when_schemaIncludesEqualityNonGroundLiterals(
+        void should_clean_when_schemaIncludesEqualityNonGroundLiterals(
                 String inputSchema,
                 String expectedSchema,
                 List<PredicateSpec> additionalExpectedPredicates
@@ -627,7 +627,7 @@ public class TrivialLiteralCleanerTest {
     @Nested
     class IntegrationTest {
 
-        public static Stream<Arguments> provideLogicSchemasWithIntegrationCases() {
+        static Stream<Arguments> provideLogicSchemasWithIntegrationCases() {
             return Stream.of(
                     Arguments.of(
                             """
@@ -645,7 +645,7 @@ public class TrivialLiteralCleanerTest {
 
         @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithIntegrationCases")
-        public void should_clean_when_schemaWithIntegrationCases(
+        void should_clean_when_schemaWithIntegrationCases(
                 String inputSchema,
                 String expectedSchema,
                 List<PredicateSpec> additionalExpectedPredicates

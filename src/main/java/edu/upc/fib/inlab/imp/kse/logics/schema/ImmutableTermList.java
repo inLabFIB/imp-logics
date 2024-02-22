@@ -58,13 +58,19 @@ public class ImmutableTermList implements List<Term> {
         return termsList.toArray(a);
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean add(Term term) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean remove(Object o) {
         throw new UnsupportedOperationException();
@@ -75,31 +81,46 @@ public class ImmutableTermList implements List<Term> {
         return new LinkedHashSet<>(termsList).containsAll(c);
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean addAll(Collection<? extends Term> c) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean addAll(int index, Collection<? extends Term> c) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public void clear() {
         throw new UnsupportedOperationException();
@@ -110,19 +131,28 @@ public class ImmutableTermList implements List<Term> {
         return termsList.get(index);
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public Term set(int index, Term element) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public void add(int index, Term element) {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
+    /**
+     * @deprecated This operation is not supported
+     */
+    @Deprecated(forRemoval = false)
     @Override
     public Term remove(int index) {
         throw new UnsupportedOperationException();

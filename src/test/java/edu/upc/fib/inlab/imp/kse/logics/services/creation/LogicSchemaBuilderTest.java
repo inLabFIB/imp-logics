@@ -4,8 +4,6 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.schema.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.DerivationRuleAssert;
-import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicConstraintAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.RepeatedConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.schema.exceptions.RepeatedPredicateName;
@@ -17,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -52,10 +51,10 @@ class LogicSchemaBuilderTest {
 
     @Test
     void should_throwsRepeatedPredicateName_whenAddingPredicateWithSameNameAndDiferentArity() {
-        assertThatThrownBy(() -> LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
-                .addPredicate("p", 2)
-                .addPredicate("p", 3)
-        ).isInstanceOf(RepeatedPredicateName.class);
+        LogicSchemaBuilder<LogicConstraintWithoutIDSpec> builder = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
+                .addPredicate("p", 2);
+        assertThatThrownBy(() -> builder.addPredicate("p", 3))
+                .isInstanceOf(RepeatedPredicateName.class);
     }
 
     @Test
@@ -74,7 +73,7 @@ class LogicSchemaBuilderTest {
         assertThat(logicSchema.getPredicateByName("P").isDerived()).isTrue();
         List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("P");
         assertThat(derivationRules).hasSize(1);
-        DerivationRuleAssert.assertThat(derivationRules.get(0)).correspondsSpec(derivationRuleSpec);
+        assertThat(derivationRules.get(0)).correspondsSpec(derivationRuleSpec);
     }
 
     @Test
@@ -103,7 +102,7 @@ class LogicSchemaBuilderTest {
         );
         List<DerivationRule> derivationRules = logicSchema.getDerivationRulesByPredicateName("P");
         assertThat(derivationRules).hasSize(1);
-        DerivationRuleAssert.assertThat(derivationRules.get(0)).correspondsSpec(derivationRuleSpec);
+        assertThat(derivationRules.get(0)).correspondsSpec(derivationRuleSpec);
     }
 
     @Test
@@ -115,9 +114,10 @@ class LogicSchemaBuilderTest {
                 .addOrdinaryLiteral("Q", "x", "y")
                 .build();
 
-        assertThatThrownBy(() -> LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
-                .addLogicConstraint(logicConstraintSpec)
-                .addLogicConstraint(logicConstraintSpec)).isInstanceOf(RepeatedConstraintID.class);
+        LogicSchemaBuilder<LogicConstraintWithIDSpec> builder = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
+                .addLogicConstraint(logicConstraintSpec);
+        assertThatThrownBy(() -> builder.addLogicConstraint(logicConstraintSpec))
+                .isInstanceOf(RepeatedConstraintID.class);
     }
 
     @Test
@@ -134,7 +134,7 @@ class LogicSchemaBuilderTest {
 
         assertThat(logicSchema.getAllLogicConstraints()).hasSize(1);
         assertThat(logicSchema.getAllLogicConstraints()).first().satisfies(
-                lc -> LogicConstraintAssert.assertThat(lc).correspondsSpecWithId(logicConstraintSpec)
+                lc -> assertThat(lc).correspondsSpecWithId(logicConstraintSpec)
         );
     }
 
@@ -231,9 +231,9 @@ class LogicSchemaBuilderTest {
         LogicSchemaAssert.assertThat(logicSchema).containsExactlyTheseConstraintIDs("1", "2");
 
         LogicConstraint logicConstraint1 = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
-        LogicConstraintAssert.assertThat(logicConstraint1).containsOrdinaryLiteral("P");
+        assertThat(logicConstraint1).containsOrdinaryLiteral("P");
         LogicConstraint logicConstraint2 = logicSchema.getLogicConstraintByID(new ConstraintID("2"));
-        LogicConstraintAssert.assertThat(logicConstraint2).containsOrdinaryLiteral("R");
+        assertThat(logicConstraint2).containsOrdinaryLiteral("R");
     }
 
     @Test
@@ -249,8 +249,9 @@ class LogicSchemaBuilderTest {
                 .build();
 
         LogicConstraint logicConstraint1 = logicSchema.getLogicConstraintByID(new ConstraintID("1"));
-        LogicConstraintAssert.assertThat(logicConstraint1).containsOrdinaryLiteral("P");
-        LogicConstraintAssert.assertThat(logicConstraint1).containsComparisonBuiltInLiteral("<", "a", "b");
+        assertThat(logicConstraint1)
+                .containsOrdinaryLiteral("P")
+                .containsComparisonBuiltInLiteral("<", "a", "b");
     }
 
 

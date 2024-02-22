@@ -17,6 +17,4 @@ public abstract class LogicSchemaTransformationProcess implements LogicProcess, 
         }
     }
 
-    @Override
-    public abstract SchemaTransformation executeTransformation(LogicSchema logicSchema);
 }

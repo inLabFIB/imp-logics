@@ -6,7 +6,6 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.LogicSchemaToSpecHelper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for recursively unfolding the positive derived literals of a logic schema.
@@ -156,7 +155,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
         return unfoldedBodySpecs.stream()
                 .map(bs -> new DerivationRuleSpec(predicateName, termSpecs, bs))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<BodySpec> computeUnfoldedBodySpec(ImmutableLiteralsList body) {

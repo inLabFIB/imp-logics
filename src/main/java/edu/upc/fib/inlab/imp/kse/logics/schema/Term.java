@@ -20,7 +20,7 @@ public abstract class Term {
      */
     private final String name;
 
-    public Term(String name) {
+    protected Term(String name) {
         if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         this.name = name;

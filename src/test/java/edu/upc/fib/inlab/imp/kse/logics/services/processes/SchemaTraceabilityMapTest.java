@@ -11,14 +11,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class SchemaTraceabilityMapTest {
+class SchemaTraceabilityMapTest {
 
     @Nested
     class JoinMapTests {
         @Nested
         class InputValidation {
             @Test
-            public void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
+            void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
                 SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
                         .createEmptyMap();
                 assertThatThrownBy(() -> emptyMap.joinMap(null))
@@ -27,7 +27,7 @@ public class SchemaTraceabilityMapTest {
         }
 
         @Test
-        public void should_returnNewMap_whenJoiningMaps() {
+        void should_returnNewMap_whenJoiningMaps() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
                     .create(Map.of("1_1_1", "1_1"));
             SchemaTraceabilityMap oldMap = SchemaTraceabilityMapMother
@@ -41,7 +41,7 @@ public class SchemaTraceabilityMapTest {
         }
 
         @Test
-        public void should_returnOriginalOfOriginalConstraint_whenJoiningMaps() {
+        void should_returnOriginalOfOriginalConstraint_whenJoiningMaps() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
                     .create(Map.of("1_1_1", "1_1"));
             SchemaTraceabilityMap oldMap = SchemaTraceabilityMapMother
@@ -55,7 +55,7 @@ public class SchemaTraceabilityMapTest {
         }
 
         @Test
-        public void should_throwException_whenNewMapDoNotJoinOldMap() {
+        void should_throwException_whenNewMapDoNotJoinOldMap() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
                     .create(Map.of("1_1_1", "1_1", "2_1_1", "2_1"));
             SchemaTraceabilityMap oldMap = SchemaTraceabilityMapMother
@@ -66,7 +66,7 @@ public class SchemaTraceabilityMapTest {
         }
 
         @Test
-        public void should_notThrowException_whenOldMapDoNotJoinNewMap() {
+        void should_notThrowException_whenOldMapDoNotJoinNewMap() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
                     .create(Map.of("1_1_1", "1_1"));
             SchemaTraceabilityMap oldMap = SchemaTraceabilityMapMother

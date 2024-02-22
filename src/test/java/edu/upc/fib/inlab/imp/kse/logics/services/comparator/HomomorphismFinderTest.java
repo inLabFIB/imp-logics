@@ -1,14 +1,10 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
-import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.DerivationRuleMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.LogicConstraintMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -26,43 +23,52 @@ class HomomorphismFinderTest {
         @Nested
         class ParameterCorrectness {
             @Test
-            public void should_throwException_whenDomainLiteralsList_isNull() {
+            void should_throwException_whenDomainLiteralsList_isNull() {
+                List<Literal> domainLiterals = null;
+                List<Literal> rangeLiterals = List.of();
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(null, List.of()))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            public void should_throwException_whenRangeLiteralsList_isNull() {
+            void should_throwException_whenRangeLiteralsList_isNull() {
+                List<Literal> rangeLiterals = null;
+                List<Literal> domainLiterals = List.of();
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), null))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            public void should_throwException_whenInitialSubstitution_isNull() {
+            void should_throwException_whenInitialSubstitution_isNull() {
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), List.of(), null))
+                List<Literal> domainLiterals = List.of();
+                List<Literal> rangeLiterals = List.of();
+                Substitution initialSubstitution = null;
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals, initialSubstitution))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
+            void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
                 ImmutableLiteralsList domainLiteralList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
                         "R(x, y) :- T(x, y)");
+                List<Literal> rangeLiterals = List.of();
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiteralList, List.of()))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiteralList, rangeLiterals))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
 
             @Test
-            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
+            void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
+                List<Literal> domainLiterals = List.of();
                 ImmutableLiteralsList rangeLiteralsList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
                         "R(x, y) :- T(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
-                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(List.of(), rangeLiteralsList))
+                assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiteralsList))
                         .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
             }
 
@@ -72,7 +78,7 @@ class HomomorphismFinderTest {
         @Nested
         class FindHomomorphism {
             @Test
-            public void should_notFindHomomorphism_whenLiteralsListIsNotSameUpToRenaming() {
+            void should_notFindHomomorphism_whenLiteralsListIsNotSameUpToRenaming() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), not(S(x))");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create(" R(a, b), not(S(b))");
 
@@ -82,7 +88,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListIsSubsumedUpToRenaming() {
+            void should_findHomomorphism_whenLiteralsListIsSubsumedUpToRenaming() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x, y) :- R(x, y), not(S(x))");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(a, b) :- R(a, b), not(S(a)), T(a)");
 
@@ -90,13 +96,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution)
+                assertThat(substitution)
                         .mapsToVariable("x", "a")
                         .mapsToVariable("y", "b");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenLiteralsListIsTheSameUpToRenaming_butLiteralsSignDoNotCoincide() {
+            void should_notFindHomomorphism_whenLiteralsListIsTheSameUpToRenaming_butLiteralsSignDoNotCoincide() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), S(x)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(a, b) :- R(x, y), not(S(x))");
 
@@ -107,7 +113,7 @@ class HomomorphismFinderTest {
 
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListRangeHasRepeatedLiterals() {
+            void should_findHomomorphism_whenLiteralsListRangeHasRepeatedLiterals() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), S(x)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), R(c, d), S(c)");
 
@@ -115,13 +121,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution)
+                assertThat(substitution)
                         .mapsToVariable("x", "c")
                         .mapsToVariable("y", "d");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenDomainLiteralsListUsesConstants() {
+            void should_notFindHomomorphism_whenDomainLiteralsListUsesConstants() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(1, 2), S(1)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), R(c, d), S(c)");
 
@@ -131,7 +137,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListRangeUsesConstants() {
+            void should_findHomomorphism_whenLiteralsListRangeUsesConstants() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(a, b), S(a)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(1, 2), S(1)");
 
@@ -139,12 +145,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToConstant("a", "1");
-                SubstitutionAssert.assertThat(substitution).mapsToConstant("b", "2");
+                assertThat(substitution)
+                        .mapsToConstant("a", "1")
+                        .mapsToConstant("b", "2");
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListRangeRepeatsVariables() {
+            void should_findHomomorphism_whenLiteralsListRangeRepeatsVariables() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(a, b), S(a)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(x, x), S(x)");
 
@@ -152,12 +159,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("a", "x");
-                SubstitutionAssert.assertThat(substitution).mapsToVariable("b", "x");
+                assertThat(substitution)
+                        .mapsToVariable("a", "x")
+                        .mapsToVariable("b", "x");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenDomainLiteralsListRepeatsVariables() {
+            void should_notFindHomomorphism_whenDomainLiteralsListRepeatsVariables() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create(" R(a, a)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(x, y)");
 
@@ -167,7 +175,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals() {
+            void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), a > b");
 
@@ -175,12 +183,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("y", "b");
+                assertThat(homomorphism)
+                        .mapsToVariable("x", "a")
+                        .mapsToVariable("y", "b");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenDomainLiteralsListHasBuiltIn_notInRange() {
+            void should_notFindHomomorphism_whenDomainLiteralsListHasBuiltIn_notInRange() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), a >= b");
 
@@ -190,7 +199,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheOperationAndTerms() {
+            void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheOperationAndTerms() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("R(x, y), x > y");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("R(a, b), b < a");
 
@@ -198,12 +207,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainList, rangeList);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("y", "b");
+                assertThat(homomorphism)
+                        .mapsToVariable("x", "a")
+                        .mapsToVariable("y", "b");
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheTermsOfEqualities() {
+            void should_findHomomorphism_whenLiteralsListIncludesBuiltInLiterals_InvertingTheTermsOfEqualities() {
                 ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create("1 = y, T(x, b)");
                 ImmutableLiteralsList rangeLiterals = ImmutableLiteralsListMother.create("T(x, b), y = 1");
 
@@ -213,7 +223,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_findHomomorphism_whenLiteralsListIncludesEqualities_ThatCreatesSeveralPossibleHomomorphism() {
+            void should_findHomomorphism_whenLiteralsListIncludesEqualities_ThatCreatesSeveralPossibleHomomorphism() {
                 ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("z = x, T(x, y)");
                 ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("T(x, y), x = z");
 
@@ -225,7 +235,7 @@ class HomomorphismFinderTest {
             @Nested
             class SameNameDerivationRuleCriteria {
                 @Test
-                public void should_findHomomorphism_whenUsingSameName() {
+                void should_findHomomorphism_whenUsingSameName() {
                     ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
                     ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
 
@@ -235,7 +245,7 @@ class HomomorphismFinderTest {
                 }
 
                 @Test
-                public void should_notFindHomomorphism_whenUsingSameName_butDifferentPolarity() {
+                void should_notFindHomomorphism_whenUsingSameName_butDifferentPolarity() {
                     ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived(x)", "Derived(x) :- Q(x)");
                     ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), not(Derived(x))", "Derived(x) :- Q(x)");
 
@@ -245,7 +255,7 @@ class HomomorphismFinderTest {
                 }
 
                 @Test
-                public void should_notFindHomomorphism_whenUsingDifferentNames() {
+                void should_notFindHomomorphism_whenUsingDifferentNames() {
                     ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Derived1(x)", "Derived1(x) :- Q(x)");
                     ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Derived2(x)", "Derived2(x) :- Q(x)");
 
@@ -255,7 +265,7 @@ class HomomorphismFinderTest {
                 }
 
                 @Test
-                public void should_findHomomorphism_whenGivingInitialCompatibleHomomorphism() {
+                void should_findHomomorphism_whenGivingInitialCompatibleHomomorphism() {
                     ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
                     ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
 
@@ -267,7 +277,7 @@ class HomomorphismFinderTest {
                 }
 
                 @Test
-                public void should_notFindHomomorphism_whenGivingInitialIncompatibleHomomorphism() {
+                void should_notFindHomomorphism_whenGivingInitialIncompatibleHomomorphism() {
                     ImmutableLiteralsList domainList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
                     ImmutableLiteralsList rangeList = ImmutableLiteralsListMother.create("P(x), Q(x, y)");
 
@@ -287,7 +297,7 @@ class HomomorphismFinderTest {
         @Nested
         class ParameterCorrectness {
             @Test
-            public void should_throwException_whenDomainRule_isNull() {
+            void should_throwException_whenDomainRule_isNull() {
                 LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithoutID(":- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
@@ -296,7 +306,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_throwException_whenRangeRule_isNull() {
+            void should_throwException_whenRangeRule_isNull() {
                 LogicConstraint baseLogicConstraint = LogicConstraintMother.createWithoutID(":- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
@@ -305,7 +315,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
+            void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
                           :- R(x, y), S(x)
                           R(x, y) :- T(x, y)
@@ -318,7 +328,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
+            void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
                         :- R(x, y)
                         """);
@@ -336,7 +346,7 @@ class HomomorphismFinderTest {
         @Nested
         class FindHomomorphism {
             @Test
-            public void should_findHomomorphism_whenLogicConstraintsAreTheSame_evenWithDifferentConstraintID() {
+            void should_findHomomorphism_whenLogicConstraintsAreTheSame_evenWithDifferentConstraintID() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
                         @1 :- R(x, y), not(S(x))
                         """);
@@ -348,13 +358,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(homomorphism)
+                assertThat(homomorphism)
                         .mapsToVariable("x", "x")
                         .mapsToVariable("y", "y");
             }
 
             @Test
-            public void should_findHomomorphism_whenLogicConstraintsAreTheSameUpToRenamingVariables_evenWithDifferentConstraintID() {
+            void should_findHomomorphism_whenLogicConstraintsAreTheSameUpToRenamingVariables_evenWithDifferentConstraintID() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
                         @1 :- R(x, y), not(S(x))
                         """);
@@ -366,12 +376,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution homomorphism = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("x", "a");
-                SubstitutionAssert.assertThat(homomorphism).mapsToVariable("y", "b");
+                assertThat(homomorphism)
+                        .mapsToVariable("x", "a")
+                        .mapsToVariable("y", "b");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenLogicConstraintsAreNotTheSameUpToRenamingVariables() {
+            void should_notFindHomomorphism_whenLogicConstraintsAreNotTheSameUpToRenamingVariables() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
                         :- R(x, y), not(S(x))
                         """);
@@ -392,7 +403,7 @@ class HomomorphismFinderTest {
         @Nested
         class ParameterCorrectness {
             @Test
-            public void should_throwException_whenDomainRule_isNull() {
+            void should_throwException_whenDomainRule_isNull() {
                 DerivationRule rangeRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
@@ -401,7 +412,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_throwException_whenRangeRule_isNull() {
+            void should_throwException_whenRangeRule_isNull() {
                 DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
@@ -411,7 +422,7 @@ class HomomorphismFinderTest {
 
 
             @Test
-            public void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
+            void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
                 DerivationRule domainDerivationRule = DerivationRuleMother.create("""
                         P() :- R(x, y), S(x)
                         R(x, y) :- T(x, y)
@@ -424,7 +435,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
+            void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
                 DerivationRule domainRule = DerivationRuleMother.create("P() :- R(x, y), S(x)");
                 DerivationRule rangeRule = DerivationRuleMother.create(
                         """
@@ -442,7 +453,7 @@ class HomomorphismFinderTest {
         @Nested
         class FindHomomorphism {
             @Test
-            public void should_findHomomorphism_whenDerivationRulesAreTheSame() {
+            void should_findHomomorphism_whenDerivationRulesAreTheSame() {
                 DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
                 DerivationRule rangeRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
 
@@ -450,13 +461,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution)
+                assertThat(substitution)
                         .mapsToVariable("x", "x")
                         .mapsToVariable("y", "y");
             }
 
             @Test
-            public void should_findHomomorphism_whenDerivationRulesAreTheSameUpToRenaming() {
+            void should_findHomomorphism_whenDerivationRulesAreTheSameUpToRenaming() {
                 DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
                 DerivationRule rangeRule = DerivationRuleMother.create("P(a, b) :- R(a, b), not(S(a))");
 
@@ -464,13 +475,13 @@ class HomomorphismFinderTest {
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainRule, rangeRule);
                 assertThat(homomorphismOpt).isPresent();
                 Substitution substitution = homomorphismOpt.get();
-                SubstitutionAssert.assertThat(substitution)
+                assertThat(substitution)
                         .mapsToVariable("x", "a")
                         .mapsToVariable("y", "b");
             }
 
             @Test
-            public void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadSizeDoNotCoincide() {
+            void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadSizeDoNotCoincide() {
                 DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
                 DerivationRule rangeRule = DerivationRuleMother.create("P(x) :- R(x, y), not(S(x))");
 
@@ -481,7 +492,7 @@ class HomomorphismFinderTest {
             }
 
             @Test
-            public void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadTermsDoNotCoincide() {
+            void should_notFindHomomorphism_whenDerivationRuleIsTheSameUpToRenaming_butHeadTermsDoNotCoincide() {
                 DerivationRule domainRule = DerivationRuleMother.create("P(x, y) :- R(x, y), not(S(x))");
                 DerivationRule rangeRule = DerivationRuleMother.create("P(y, x) :- R(x, y), not(S(x))");
 

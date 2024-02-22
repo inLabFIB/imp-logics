@@ -13,12 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-public class LogicConstraintTest {
+class LogicConstraintTest {
 
     @Test
-    public void should_ThrowIllegalArgumentException_WhenCreatingLogicConstraint_WithNullId() {
+    void should_ThrowIllegalArgumentException_WhenCreatingLogicConstraint_WithNullId() {
         Literal literal = LiteralMother.createOrdinaryLiteralWithVariableNames("p", List.of("x"));
-        assertThatThrownBy(() -> new LogicConstraint(null, List.of(literal)))
+        ConstraintID constraintID = null;
+        List<Literal> body = List.of(literal);
+        assertThatThrownBy(() -> new LogicConstraint(constraintID, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -33,7 +35,7 @@ public class LogicConstraintTest {
                 ":- not(Q(x, 1)), P(x)",
                 ":- P()",
         })
-        public void should_ReturnTrue_WhenCallingIsSafe_WithSafeLogicConstraint(String logicConstraintString) {
+        void should_ReturnTrue_WhenCallingIsSafe_WithSafeLogicConstraint(String logicConstraintString) {
             LogicConstraint logicConstraint = LogicConstraintMother.createWithoutID(logicConstraintString);
             assertThat(logicConstraint.isSafe()).isTrue();
         }
@@ -45,8 +47,7 @@ public class LogicConstraintTest {
                 ":- x=y",
                 ":- not(P(x))",
         })
-
-        public void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeLogicConstraint(String logicConstraintString) {
+        void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeLogicConstraint(String logicConstraintString) {
             LogicConstraint logicConstraint = LogicConstraintMother.createWithoutID(logicConstraintString);
             assertThat(logicConstraint.isSafe()).isFalse();
 

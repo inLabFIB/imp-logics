@@ -6,10 +6,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class BuiltInLiteralSpecTest {
+class BuiltInLiteralSpecTest {
 
     @Test
-    public void should_beAbleToCreateABuiltInLiteralSpec() {
+    void should_beAbleToCreateABuiltInLiteralSpec() {
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", List.of(new ConstantSpec("a")));
 
         assertThat(builtInLiteralSpec.getOperator()).isEqualTo("=");
@@ -17,19 +17,20 @@ public class BuiltInLiteralSpecTest {
     }
 
     @Test
-    public void should_throwException_when_operatorIsNull() {
-        assertThatThrownBy(() -> new BuiltInLiteralSpec(null, List.of(new ConstantSpec("a"))))
+    void should_throwException_when_operatorIsNull() {
+        List<TermSpec> terms = List.of(new ConstantSpec("a"));
+        assertThatThrownBy(() -> new BuiltInLiteralSpec(null, terms))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_throwException_when_termSpecsListIsNull() {
+    void should_throwException_when_termSpecsListIsNull() {
         assertThatThrownBy(() -> new BuiltInLiteralSpec("=", null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_notThrowAnyException_when_termSpecsListIsEmpty() {
+    void should_notThrowAnyException_when_termSpecsListIsEmpty() {
         assertThatCode(() -> new BuiltInLiteralSpec("f", List.of()))
                 .doesNotThrowAnyException();
     }

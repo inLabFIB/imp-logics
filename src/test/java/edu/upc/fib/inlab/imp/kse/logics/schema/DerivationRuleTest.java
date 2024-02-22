@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DerivationRuleTest {
+class DerivationRuleTest {
 
     @Nested
     class UniversalAndExistencialVariables {
-        public static Stream<Arguments> provideDerivationRulesWithUniversalVariables() {
+        static Stream<Arguments> provideDerivationRulesWithUniversalVariables() {
             return Stream.of(
                     Arguments.of(
                             "A(x) :- B(x), C(x, y)",
@@ -47,7 +47,7 @@ public class DerivationRuleTest {
 
         @ParameterizedTest
         @MethodSource("provideDerivationRulesWithUniversalVariables")
-        public void should_returnUniversalVariables_whenDerivationRuleHasUniversalVariables(String derivationRuleString, Set<Variable> expectedUniversalVariables) {
+        void should_returnUniversalVariables_whenDerivationRuleHasUniversalVariables(String derivationRuleString, Set<Variable> expectedUniversalVariables) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
 
             Set<Variable> universalVariables = derivationRule.getUniversalVariables();
@@ -56,7 +56,7 @@ public class DerivationRuleTest {
         }
 
 
-        public static Stream<Arguments> provideDerivationRulesWithExistencialVariables() {
+        static Stream<Arguments> provideDerivationRulesWithExistencialVariables() {
             return Stream.of(
                     Arguments.of(
                             "A(x) :- B(x), C(x, y)",
@@ -75,7 +75,7 @@ public class DerivationRuleTest {
 
         @ParameterizedTest
         @MethodSource("provideDerivationRulesWithExistencialVariables")
-        public void should_returnExistencialVariables_whenDerivationRuleHasExistencialVariables(String derivationRuleString, Set<Variable> expectedExistencialVariables) {
+        void should_returnExistencialVariables_whenDerivationRuleHasExistencialVariables(String derivationRuleString, Set<Variable> expectedExistencialVariables) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
 
             Set<Variable> universalVariables = derivationRule.getExistentialVariables();
@@ -95,7 +95,7 @@ public class DerivationRuleTest {
                 "P(x) :- R(x, y), not(Q(1))",
                 "P(x) :- R(x), x = 1",
         })
-        public void should_ReturnTrue_WhenCallingIsSafe_WithSafeDerivationRule(String derivationRuleString) {
+        void should_ReturnTrue_WhenCallingIsSafe_WithSafeDerivationRule(String derivationRuleString) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
             assertThat(derivationRule.isSafe()).isTrue();
         }
@@ -108,7 +108,7 @@ public class DerivationRuleTest {
                 "P(x) :- x = x",
                 "P(1) :- x = x",
         })
-        public void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeDerivationRule(String derivationRuleString) {
+        void should_ReturnFalse_WhenCallingIsSafe_WithUnsafeDerivationRule(String derivationRuleString) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
             assertThat(derivationRule.isSafe()).isFalse();
         }

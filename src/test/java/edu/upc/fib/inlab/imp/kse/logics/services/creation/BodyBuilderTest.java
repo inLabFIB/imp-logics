@@ -24,10 +24,10 @@ import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAsse
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-public class BodyBuilderTest {
+class BodyBuilderTest {
 
     @Test
-    public void should_addOrdinaryLiteral_whenAddingOrdinaryLiteralSpec() {
+    void should_addOrdinaryLiteral_whenAddingOrdinaryLiteralSpec() {
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         OrdinaryLiteralSpec literalSpec = new OrdinaryLiteralSpec("P", termFactory.createTermSpecs("x", "y"), true);
 
@@ -44,7 +44,7 @@ public class BodyBuilderTest {
     }
 
     @Test
-    public void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithComparisonOperator() {
+    void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithComparisonOperator() {
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
@@ -60,7 +60,7 @@ public class BodyBuilderTest {
     }
 
     @Test
-    public void should_ThrowException_whenAddingBuiltInLiteralSpec_WithComparisonOperator_AndWrongNumberOfTerms() {
+    void should_ThrowException_whenAddingBuiltInLiteralSpec_WithComparisonOperator_AndWrongNumberOfTerms() {
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y", "z");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("=", termSpecList);
@@ -72,7 +72,7 @@ public class BodyBuilderTest {
     }
 
     @Test
-    public void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithUnrecognizedOperator() {
+    void should_addComparisonBuiltInLiteral_whenAddingBuiltInLiteralSpec_WithUnrecognizedOperator() {
         StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
         List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
         BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("ANYEQ", termSpecList);
@@ -91,7 +91,7 @@ public class BodyBuilderTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"TRUE", "FALSE"})
-        public void should_throwException_when_booleanBuiltInLiteralSpecContainsTerms(String booleanOperator) {
+        void should_throwException_when_booleanBuiltInLiteralSpecContainsTerms(String booleanOperator) {
             StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
             List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec(booleanOperator, termSpecList);
@@ -105,7 +105,7 @@ public class BodyBuilderTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"TRUE", "FALSE"})
-        public void should_createBooleanBuiltIn_when_booleanBuiltInLiteralSpecContainsTerms(String booleanOperator) {
+        void should_createBooleanBuiltIn_when_booleanBuiltInLiteralSpecContainsTerms(String booleanOperator) {
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec(booleanOperator, Collections.emptyList());
 
             ImmutableLiteralsList body = new BodyBuilder(new LiteralFactory(Collections.emptyMap()))
@@ -128,7 +128,7 @@ public class BodyBuilderTest {
     class CustomBuiltInLiteralCreation {
 
         @Test
-        public void should_createCustomBuiltInLiteral_whenOperationNameIsNotTrueNorFalse() {
+        void should_createCustomBuiltInLiteral_whenOperationNameIsNotTrueNorFalse() {
             StringToTermSpecFactory termFactory = new StringToTermSpecFactory();
             List<TermSpec> termSpecList = termFactory.createTermSpecs("x", "y");
             BuiltInLiteralSpec builtInLiteralSpec = new BuiltInLiteralSpec("customBuiltInLiteral", termSpecList);

@@ -6,11 +6,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class OrdinaryLiteralSpecTest {
+class OrdinaryLiteralSpecTest {
 
 
     @Test
-    public void should_beAbleToCreateAnOrdinaryLiteralSpec() {
+    void should_beAbleToCreateAnOrdinaryLiteralSpec() {
         List<TermSpec> termList = List.of(new TermSpec("a") {
         });
 
@@ -22,7 +22,7 @@ public class OrdinaryLiteralSpecTest {
     }
 
     @Test
-    public void should_throwException_when_predicateNameIsNull() {
+    void should_throwException_when_predicateNameIsNull() {
         List<TermSpec> termList = List.of(new TermSpec("a") {
         });
 
@@ -31,13 +31,13 @@ public class OrdinaryLiteralSpecTest {
     }
 
     @Test
-    public void should_throwException_when_termsListIsNull() {
+    void should_throwException_when_termsListIsNull() {
         assertThatThrownBy(() -> new OrdinaryLiteralSpec("a", null, true))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void should_notThrowException_when_termsListIsEmpty() {
+    void should_notThrowException_when_termsListIsEmpty() {
         assertThatCode(() -> new OrdinaryLiteralSpec("a", List.of(), true))
                 .doesNotThrowAnyException();
     }

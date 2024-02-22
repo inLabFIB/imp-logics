@@ -16,10 +16,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LiteralTest {
+class LiteralTest {
 
     @Test
-    public void should_ReturnUsedVariables() {
+    void should_ReturnUsedVariables() {
         Literal literal = LiteralMother.createOrdinaryLiteral("P", "x", "1", "y");
 
         Set<Variable> usedVariables = literal.getUsedVariables();
@@ -30,13 +30,13 @@ public class LiteralTest {
     }
 
     @Test
-    public void should_returnCanBeNegated_ifBuildNegationIsImplemented() {
+    void should_returnCanBeNegated_ifBuildNegationIsImplemented() {
         Literal literal = createLiteralWithBuildNegatedLiteralFunction();
         assertThat(literal.canBeNegated()).isTrue();
     }
 
     @Test
-    public void should_returnCannotBeNegated_ifBuildNegationIsNotImplemented() {
+    void should_returnCannotBeNegated_ifBuildNegationIsNotImplemented() {
         Literal literal = createLiteralWithoutBuildNegatedLiteralFunction();
         assertThat(literal.canBeNegated()).isFalse();
     }
@@ -44,7 +44,7 @@ public class LiteralTest {
 
     @ParameterizedTest
     @MethodSource("providedTermsAndArity")
-    public void should_returnArity_whenLiteralContainTerms(List<String> terms, int expectedArity) {
+    void should_returnArity_whenLiteralContainTerms(List<String> terms, int expectedArity) {
         Literal literal = LiteralMother.createOrdinaryLiteralWithVariableNames("P", terms);
 
         int arity = literal.getArity();
@@ -54,7 +54,7 @@ public class LiteralTest {
                 .isEqualTo(expectedArity);
     }
 
-    public static Stream<Arguments> providedTermsAndArity() {
+    static Stream<Arguments> providedTermsAndArity() {
         return Stream.of(
                 Arguments.of(List.of("x", "y", "z"), 3),
                 Arguments.of(List.of("x", "y"), 2),

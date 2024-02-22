@@ -8,8 +8,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class LogicSchemaTransformationProcessTest {
 
     @Test
-    public void should_throwException_whenExecuteWithNullSchema() {
-        assertThatThrownBy(() -> new DummyProcess().execute(null))
+    void should_throwException_whenExecuteWithNullSchema() {
+        DummyProcess dummyProcess = new DummyProcess();
+        LogicSchema logicSchema = null;
+        assertThatThrownBy(() -> dummyProcess.execute(logicSchema))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

@@ -16,14 +16,16 @@ class SchemaUnfolderTest {
     @Nested
     class InputValidationTests {
         @Test
-        public void should_throwException_whenMultipleStrategyIsNull() {
+        void should_throwException_whenMultipleStrategyIsNull() {
             assertThatThrownBy(() -> new SchemaUnfolder(null, false))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_throwException_whenSchemaIsNull() {
-            assertThatThrownBy(() -> new SchemaUnfolder().unfold(null))
+        void should_throwException_whenSchemaIsNull() {
+            SchemaUnfolder schemaUnfolder = new SchemaUnfolder();
+            LogicSchema schema = null;
+            assertThatThrownBy(() -> schemaUnfolder.unfold(schema))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -31,7 +33,7 @@ class SchemaUnfolderTest {
     @Nested
     class UnfoldingTests {
         @Test
-        public void should_returnEmptySchema_whenSchemaIsEmpty() {
+        void should_returnEmptySchema_whenSchemaIsEmpty() {
             LogicSchema emptySchema = LogicSchemaMother.createEmptySchema();
 
             LogicSchema unfoldedEmptySchema = new SchemaUnfolder().unfold(emptySchema);
@@ -40,7 +42,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_maintainDerivationRules_whenDerivationRuleNotUsedInConstraint() {
+        void should_maintainDerivationRules_whenDerivationRuleNotUsedInConstraint() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)
@@ -62,7 +64,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_unfoldDerivationRule_whenDerivationRuleHasDerivedLiterals() {
+        void should_unfoldDerivationRule_whenDerivationRuleHasDerivedLiterals() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 P(x, y) :- R(x, y), S(y)
@@ -84,7 +86,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_unfoldLogicConstraint_whenLogicConstraintHasDerivedLiterals() {
+        void should_unfoldLogicConstraint_whenLogicConstraintHasDerivedLiterals() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)
@@ -106,7 +108,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_notUnfoldLogicConstraint_whenDerivedLiteralIsNegated() {
+        void should_notUnfoldLogicConstraint_whenDerivedLiteralIsNegated() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- not(R(x, y)), S(x,y)
@@ -128,7 +130,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_unfoldRecursively_whenDerivedLiteralsDependsOnDerivedLiterals() {
+        void should_unfoldRecursively_whenDerivedLiteralsDependsOnDerivedLiterals() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y), y < 5
@@ -152,7 +154,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_createMoreThanOneNormalClause_whenDerivedLiteralHasSeveralDerivationRules() {
+        void should_createMoreThanOneNormalClause_whenDerivedLiteralHasSeveralDerivationRules() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)
@@ -185,7 +187,7 @@ class SchemaUnfolderTest {
         @Nested
         class UnfoldingWithConstantsInHeadTests {
             @Test
-            public void should_obtainOneDerivationRule_whenThereIsOneDerivationRule() {
+            void should_obtainOneDerivationRule_whenThereIsOneDerivationRule() {
                 LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     P(x, y) :- R(x, y), S(y)
@@ -207,7 +209,7 @@ class SchemaUnfolderTest {
             }
 
             @Test
-            public void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules() {
+            void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules() {
                 LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     P(x, y) :- R(x, y), S(y)
@@ -232,7 +234,7 @@ class SchemaUnfolderTest {
             }
 
             @Test
-            public void should_obtainOneDerivationRuleWithContradiction_whenThereIsOneDerivationRule_NotMatchingConstants() {
+            void should_obtainOneDerivationRuleWithContradiction_whenThereIsOneDerivationRule_NotMatchingConstants() {
                 LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     P(x, y) :- R(x, 2), S(y)
@@ -254,7 +256,7 @@ class SchemaUnfolderTest {
             }
 
             @Test
-            public void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules_WithOnlyOneConstantsMatch() {
+            void should_obtainTwoDerivationRules_whenThereAreTwoDerivationRules_WithOnlyOneConstantsMatch() {
                 LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     P(x, y) :- R(x, 1), S(y)
@@ -282,7 +284,7 @@ class SchemaUnfolderTest {
         @Nested
         class UnfoldingWithRepeatedVariablesInHeadTests {
             @Test
-            public void should_unfold_whenFindingRepeatedVariablesInHead() {
+            void should_unfold_whenFindingRepeatedVariablesInHead() {
                 LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     @1 :- R(x, y, z), S(x,z)
@@ -307,7 +309,7 @@ class SchemaUnfolderTest {
         @Nested
         class UnfoldingNegatedLiterals {
             @Test
-            public void should_unfoldNegatedLiterals_whenUsingNegationExtendedParameter() {
+            void should_unfoldNegatedLiterals_whenUsingNegationExtendedParameter() {
                 LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     @1 :- R(x, y, z), not(S(x,z))
@@ -329,7 +331,7 @@ class SchemaUnfolderTest {
             }
 
             @Test
-            public void should_unfoldNegatedLiterals_withMoreThanOneDefinition_whenUsingNegationExtendedParameter() {
+            void should_unfoldNegatedLiterals_withMoreThanOneDefinition_whenUsingNegationExtendedParameter() {
                 LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     @1 :- R(x, y, z), not(S(x,z))
@@ -357,7 +359,7 @@ class SchemaUnfolderTest {
             }
 
             @Test
-            public void should_unfoldNegatedLiterals_withMoreThanOneDefinitionWithOnlyOneLiteral_whenUsingNegationExtendedParameter() {
+            void should_unfoldNegatedLiterals_withMoreThanOneDefinitionWithOnlyOneLiteral_whenUsingNegationExtendedParameter() {
                 LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(
                         """
                                     @1 :- R(x, y, z), not(S(x,z))
@@ -388,7 +390,7 @@ class SchemaUnfolderTest {
     class TraceabilityMapTest {
 
         @Test
-        public void should_returnOriginalConstraintID_when_unfoldingCreatesSeveralConstraints() {
+        void should_returnOriginalConstraintID_when_unfoldingCreatesSeveralConstraints() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)
@@ -405,7 +407,7 @@ class SchemaUnfolderTest {
         }
 
         @Test
-        public void should_returnOriginalConstraintID_when_unfoldingCreatesOneConstraint() {
+        void should_returnOriginalConstraintID_when_unfoldingCreatesOneConstraint() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
                     """
                                 @1 :- R(x, y), S(y)

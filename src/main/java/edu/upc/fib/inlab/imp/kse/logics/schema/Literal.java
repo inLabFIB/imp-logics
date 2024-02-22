@@ -12,6 +12,7 @@ import java.util.Set;
  * That is, literals should not be reused among several NormalClauses.
  */
 public abstract class Literal {
+
     public abstract ImmutableTermList getTerms();
 
     public int getArity() {

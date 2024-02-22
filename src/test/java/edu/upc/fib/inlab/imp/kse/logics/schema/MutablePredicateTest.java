@@ -10,17 +10,17 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class MutablePredicateTest {
+class MutablePredicateTest {
 
     @Test
-    public void should_ThrowException_WhenCreatingMutablePredicate_WithNullDefinitionRules() {
+    void should_ThrowException_WhenCreatingMutablePredicate_WithNullDefinitionRules() {
         assertThatThrownBy(() -> new MutablePredicate("p", 1, null)).isInstanceOf(
                 IllegalArgumentException.class
         );
     }
 
     @Test
-    public void should_ThrowException_WhenCreatingMutablePredicate_WithQueriesNotMatchInArity() {
+    void should_ThrowException_WhenCreatingMutablePredicate_WithQueriesNotMatchInArity() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         assertThatThrownBy(() -> new MutablePredicate("p", 0, List.of(definitionRule))).isInstanceOf(
                 ArityMismatch.class
@@ -28,13 +28,13 @@ public class MutablePredicateTest {
     }
 
     @Test
-    public void should_createMutablePredicate_WithEmptyDefinitionRules() {
+    void should_createMutablePredicate_WithEmptyDefinitionRules() {
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         assertThat(mutablePredicate.getDerivationRules()).isEmpty();
     }
 
     @Test
-    public void should_MakeDefinitionRulesImmutable_WhenCreatingMutablePredicate() {
+    void should_MakeDefinitionRulesImmutable_WhenCreatingMutablePredicate() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         List<Query> definitionRules = new LinkedList<>();
         definitionRules.add(definitionRule);
@@ -43,7 +43,7 @@ public class MutablePredicateTest {
     }
 
     @Test
-    public void should_ReturnDefinitionRulesImmutable_WhenAddDefinitionRule() {
+    void should_ReturnDefinitionRulesImmutable_WhenAddDefinitionRule() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         List<Query> definitionRules = new LinkedList<>();
         definitionRules.add(definitionRule1);
@@ -57,7 +57,7 @@ public class MutablePredicateTest {
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithThisPredicateInHead_WhenAddDefinitionRule() {
+    void should_ReturnDerivationRule_WithThisPredicateInHead_WhenAddDefinitionRule() {
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         mutablePredicate.addDerivationRule(definitionRule);
@@ -66,7 +66,7 @@ public class MutablePredicateTest {
 
 
     @Test
-    public void should_ReturnOneDerivationRule_ForEachDefinedQuery() {
+    void should_ReturnOneDerivationRule_ForEachDefinedQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         Query definitionRule2 = QueryMother.createTrivialQuery(1, "q");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule1, definitionRule2));
@@ -74,35 +74,35 @@ public class MutablePredicateTest {
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithThisPredicateInHead() {
+    void should_ReturnDerivationRule_WithThisPredicateInHead() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule1));
         assertThat(mutablePredicate.getFirstDerivationRule().getHead().getPredicate()).isSameAs(mutablePredicate);
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
+    void should_ReturnDerivationRule_WithTheHeadTermsDefinedInTheQuery() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule));
         assertThat(mutablePredicate.getFirstDerivationRule().getHeadTerms()).containsExactlyElementsOf(definitionRule.getHeadTerms());
     }
 
     @Test
-    public void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
+    void should_ReturnDerivationRule_WithTheBodyLiteralsDefinedInTheQuery() {
         Query definitionRule1 = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule1));
         assertThat(mutablePredicate.getFirstDerivationRule().getBody()).containsExactlyElementsOf(definitionRule1.getBody());
     }
 
     @Test
-    public void should_BeDerived_WhenMutablePredicateHaveDerivationRules() {
+    void should_BeDerived_WhenMutablePredicateHaveDerivationRules() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1, List.of(definitionRule));
         assertThat(mutablePredicate.isDerived()).isTrue();
     }
 
     @Test
-    public void should_NotBeDerived_WhenMutablePredicateHaveNotDerivationRules() {
+    void should_NotBeDerived_WhenMutablePredicateHaveNotDerivationRules() {
         MutablePredicate mutablePredicate = new MutablePredicate("p", 1);
         assertThat(mutablePredicate.isDerived()).isFalse();
     }

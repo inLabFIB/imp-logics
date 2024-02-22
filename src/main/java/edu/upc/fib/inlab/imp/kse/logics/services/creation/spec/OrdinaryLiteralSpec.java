@@ -8,7 +8,7 @@ import static java.util.Objects.isNull;
 /**
  * Specification of an ordinary literal.
  */
-public class OrdinaryLiteralSpec extends LiteralSpec {
+public class OrdinaryLiteralSpec implements LiteralSpec {
     private final String predicateName;
     private final List<TermSpec> termsList;
     private final boolean isPositive;

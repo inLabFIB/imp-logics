@@ -23,31 +23,41 @@ class DerivationRuleSpecTest {
 
     @Test
     void should_throwException_when_predicateNameIsNull() {
-        assertThatThrownBy(() -> new DerivationRuleSpec(null, List.of(new ConstantSpec("a")), new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))))
+        List<TermSpec> head = List.of(new ConstantSpec("head"));
+        BodySpec body = new BodySpec(List.of(new OrdinaryLiteralSpec("head", head, true)));
+        assertThatThrownBy(() -> new DerivationRuleSpec(null, head, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void should_throwException_when_termSpecListIsNull() {
-        assertThatThrownBy(() -> new DerivationRuleSpec("a", null, new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))))
+        List<TermSpec> head = null;
+        BodySpec body = new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)));
+        assertThatThrownBy(() -> new DerivationRuleSpec("a", head, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void should_notThrowException_when_termSpecListIsEmpty() {
-        assertThatCode(() -> new DerivationRuleSpec("a", List.of(), new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)))))
+        List<TermSpec> head = List.of();
+        BodySpec body = new BodySpec(List.of(new OrdinaryLiteralSpec("a", List.of(new ConstantSpec("a")), true)));
+        assertThatCode(() -> new DerivationRuleSpec("a", head, body))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void should_throwException_when_bodySpecIsNull() {
-        assertThatThrownBy(() -> new DerivationRuleSpec("a", List.of(new ConstantSpec("a")), (BodySpec) null))
+        List<TermSpec> head = List.of(new ConstantSpec("a"));
+        BodySpec body = null;
+        assertThatThrownBy(() -> new DerivationRuleSpec("a", head, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void should_throwException_when_listSpecIsNull() {
-        assertThatThrownBy(() -> new DerivationRuleSpec("a", List.of(new ConstantSpec("a")), (List<LiteralSpec>) null))
+        List<TermSpec> head = List.of(new ConstantSpec("a"));
+        List<LiteralSpec> body = null;
+        assertThatThrownBy(() -> new DerivationRuleSpec("a", head, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

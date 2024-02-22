@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
+import edu.upc.fib.inlab.imp.kse.logics.services.parser.exceptions.ParserCanceledException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,7 +61,8 @@ class LogicSchemaParserTest {
                 """;
 
         LogicSchemaWithIDsParser logicSchemaWithIDsParser = new LogicSchemaWithIDsParser();
-        assertThatThrownBy(() -> logicSchemaWithIDsParser.parse(schemaString));
+        assertThatThrownBy(() -> logicSchemaWithIDsParser.parse(schemaString))
+                .isInstanceOf(ParserCanceledException.class);
     }
 
     @Test

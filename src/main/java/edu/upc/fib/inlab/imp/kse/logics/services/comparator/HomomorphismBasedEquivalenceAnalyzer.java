@@ -66,8 +66,8 @@ public class HomomorphismBasedEquivalenceAnalyzer implements LogicEquivalenceAna
         return query.isConjunctiveQuery();
     }
 
-    private boolean existHomomorphism(List<Literal> first, List<Literal> second) {
-        return homomorphismFinder.findHomomorphism(first, second).isPresent();
+    private boolean existHomomorphism(List<Literal> literalList1, List<Literal> literalList2) {
+        return homomorphismFinder.findHomomorphism(literalList1, literalList2).isPresent();
     }
 
     /**
@@ -86,8 +86,8 @@ public class HomomorphismBasedEquivalenceAnalyzer implements LogicEquivalenceAna
         }
     }
 
-    private boolean existHomomorphism(LogicConstraint first, LogicConstraint second) {
-        return homomorphismFinder.findHomomorphism(first, second).isPresent();
+    private boolean existHomomorphism(LogicConstraint lc1, LogicConstraint lc2) {
+        return homomorphismFinder.findHomomorphism(lc1, lc2).isPresent();
     }
 
     /**
@@ -106,8 +106,8 @@ public class HomomorphismBasedEquivalenceAnalyzer implements LogicEquivalenceAna
         }
     }
 
-    private boolean existHomomorphism(DerivationRule first, DerivationRule second) {
-        return homomorphismFinder.findHomomorphism(first, second).isPresent();
+    private boolean existHomomorphism(DerivationRule dr1, DerivationRule dr2) {
+        return homomorphismFinder.findHomomorphism(dr1, dr2).isPresent();
     }
 
 }

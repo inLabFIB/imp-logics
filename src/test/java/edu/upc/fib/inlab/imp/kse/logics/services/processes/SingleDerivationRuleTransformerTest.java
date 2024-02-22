@@ -332,7 +332,7 @@ class SingleDerivationRuleTransformerTest {
     class Traceability {
 
         @Test
-        public void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
+        void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                          @1 :- T(x, y), P(x)
                          P(x) :- R(x, y)
@@ -348,7 +348,7 @@ class SingleDerivationRuleTransformerTest {
         }
 
         @Test
-        public void should_maintainTraceabilityMap_when_transformLogicSchemaDoesNotCreateSeveralConstraints() {
+        void should_maintainTraceabilityMap_when_transformLogicSchemaDoesNotCreateSeveralConstraints() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
                          @1 :- T(x, y), P(x)
                     """);

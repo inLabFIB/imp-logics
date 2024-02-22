@@ -12,7 +12,7 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
 
     protected LogicSchemaSpec<T> logicSchemaSpec;
 
-    public LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
+    protected LogicSchemaGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
     }
 

@@ -20,7 +20,7 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
     protected final StringToTermSpecFactory stringToTermSpecFactory;
     protected final List<LiteralSpec> bodySpec = new LinkedList<>();
 
-    public NormalClauseSpecBuilder(TermTypeCriteria termTypeCriteria) {
+    protected NormalClauseSpecBuilder(TermTypeCriteria termTypeCriteria) {
         this.stringToTermSpecFactory = new StringToTermSpecFactory(termTypeCriteria);
     }
 

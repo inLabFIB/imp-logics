@@ -16,14 +16,14 @@ class LevelTest {
     @Nested
     class CreationTests {
         @Test
-        public void should_createEmptyLevel() {
+        void should_createEmptyLevel() {
             Level level = new Level(Set.of());
 
             assertThat(level).isEmpty();
         }
 
         @Test
-        public void should_createLevel_withPredicates() {
+        void should_createLevel_withPredicates() {
             Level level = new Level(Set.of(
                     new Predicate("P", 0),
                     new Predicate("Q", 1)
@@ -33,13 +33,13 @@ class LevelTest {
         }
 
         @Test
-        public void should_throwException_whenCreatingNullLevel() {
+        void should_throwException_whenCreatingNullLevel() {
             assertThatThrownBy(() -> new Level(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_throwException_whenCreatingLevelWithNullPredicate() {
+        void should_throwException_whenCreatingLevelWithNullPredicate() {
             Set<Predicate> predicates = new HashSet<>();
             predicates.add(null);
             assertThatThrownBy(() -> new Level(predicates))

@@ -15,31 +15,31 @@ import static edu.upc.fib.inlab.imp.kse.logics.schema.assertions.LogicSchemaAsse
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class ComparisonBuiltInLiteralTest {
+class ComparisonBuiltInLiteralTest {
 
     @Nested
     class CreationTests {
         @Test
-        public void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullLeftTerm() {
+        void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullLeftTerm() {
             assertThatThrownBy(() -> new ComparisonBuiltInLiteral(null, new Constant("1"), ComparisonOperator.EQUALS))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullRightTerm() {
+        void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullRightTerm() {
             assertThatThrownBy(() -> new ComparisonBuiltInLiteral(new Constant("1"), null, ComparisonOperator.EQUALS))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        public void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullOperator() {
+        void should_ThrowException_WhenCreatingBuiltInLiteral_WithNullOperator() {
             assertThatThrownBy(() -> new ComparisonBuiltInLiteral(new Constant("1"), new Constant("1"), null))
                     .isInstanceOf(IllegalArgumentException.class);
 
         }
 
         @Test
-        public void should_NotThrowException_WhenCreatingBuiltInLiteral_WithCorrectParameters() {
+        void should_NotThrowException_WhenCreatingBuiltInLiteral_WithCorrectParameters() {
             assertThatNoException()
                     .isThrownBy(() -> new ComparisonBuiltInLiteral(new Constant("1"), new Constant("1"), ComparisonOperator.EQUALS));
 
@@ -49,7 +49,7 @@ public class ComparisonBuiltInLiteralTest {
     @Nested
     class ApplySubstitution {
         @Test
-        public void should_ReturnNewComparisonBuiltInLiteral_WithSubstitutedTerms_WhenApplyingSubstitution() {
+        void should_ReturnNewComparisonBuiltInLiteral_WithSubstitutedTerms_WhenApplyingSubstitution() {
             ComparisonBuiltInLiteral builtInLiteral = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("y"), ComparisonOperator.LESS_THAN);
             Substitution substitution = new SubstitutionBuilder()
                     .addMapping("x", "a")
@@ -68,7 +68,7 @@ public class ComparisonBuiltInLiteralTest {
     @Nested
     class BuildNegatedLiteralTest {
 
-        public static Stream<Arguments> provideOperatorsAndItsNegation() {
+        static Stream<Arguments> provideOperatorsAndItsNegation() {
             return Stream.of(
                     Arguments.of(ComparisonOperator.LESS_THAN, ComparisonOperator.GREATER_OR_EQUALS),
                     Arguments.of(ComparisonOperator.LESS_OR_EQUALS, ComparisonOperator.GREATER_THAN),
@@ -81,7 +81,7 @@ public class ComparisonBuiltInLiteralTest {
 
         @ParameterizedTest
         @MethodSource("provideOperatorsAndItsNegation")
-        public void should_ReturnNewNegatedComparison(ComparisonOperator operator, ComparisonOperator negatedOperator) {
+        void should_ReturnNewNegatedComparison(ComparisonOperator operator, ComparisonOperator negatedOperator) {
             Term leftTerm = new Variable("x");
             Term rightTerm = new Variable("y");
             ComparisonBuiltInLiteral col = new ComparisonBuiltInLiteral(leftTerm, rightTerm, operator);

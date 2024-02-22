@@ -317,11 +317,12 @@ public class IsomorphismComparator {
     }
 
     private static Optional<Predicate> updatePredicateMap(Literal literal1, Literal literal2, PredicateMap predicateMap) {
-        if (literal1 instanceof OrdinaryLiteral ol1 && literal2 instanceof OrdinaryLiteral ol2) {
-            if (ol1.isDerived()) {
-                predicateMap.put(ol1.getPredicate(), ol2.getPredicate());
-                return Optional.of(ol1.getPredicate());
-            }
+        if (literal1 instanceof OrdinaryLiteral ol1
+                && literal2 instanceof OrdinaryLiteral ol2
+                && ol1.isDerived()
+        ) {
+            predicateMap.put(ol1.getPredicate(), ol2.getPredicate());
+            return Optional.of(ol1.getPredicate());
         }
         return Optional.empty();
     }
@@ -419,7 +420,7 @@ public class IsomorphismComparator {
             return findTermMapForLiterals(ol1, ol2, predicateMap, termMap).stream().toList();
         } else if (l1 instanceof BuiltInLiteral bl1 && l2 instanceof BuiltInLiteral bl2) {
             return findTermMapForLiterals(bl1, bl2, termMap);
-        } else if (!l1.getClass().getName().equals(l2.getClass().getName())) {
+        } else if (!l1.getClass().isAssignableFrom(l2.getClass())) {
             return List.of();
         } else {
             throw new RuntimeException("To be implemented");
@@ -464,7 +465,7 @@ public class IsomorphismComparator {
             return findTermMapForLiterals(bbl1, bbl2, termMap).stream().toList();
         } else if (bl1 instanceof CustomBuiltInLiteral cbl1 && bl2 instanceof CustomBuiltInLiteral cbl2) {
             return findTermMapForLiterals(cbl1, cbl2, termMap).stream().toList();
-        } else if (!bl1.getClass().getName().equals(bl2.getClass().getName())) {
+        } else if (!bl1.getClass().isAssignableFrom(bl2.getClass())) {
             return List.of();
         } else {
             throw new RuntimeException("To be implemented");
@@ -529,12 +530,12 @@ public class IsomorphismComparator {
         return allContainedIn(basePredicates2, basePredicates1) && allContainedIn(basePredicates1, basePredicates2);
     }
 
-    private boolean allContainedIn(List<Predicate> basePredicates1, List<Predicate> basePredicates2) {
-        return basePredicates2.stream().allMatch(p -> anyMatchPredicate(basePredicates1, p));
+    private boolean allContainedIn(List<Predicate> predicateList1, List<Predicate> predicateList2) {
+        return predicateList2.stream().allMatch(p -> anyMatchPredicate(predicateList1, p));
     }
 
-    private boolean anyMatchPredicate(List<Predicate> basePredicates, Predicate predicate) {
-        return basePredicates.stream().anyMatch(otherPredicate -> PredicateComparator.hasSameNameAndArityAs(predicate, otherPredicate));
+    private boolean anyMatchPredicate(List<Predicate> predicateList, Predicate predicate) {
+        return predicateList.stream().anyMatch(otherPredicate -> PredicateComparator.hasSameNameAndArityAs(predicate, otherPredicate));
     }
 
     private boolean areNormalClausesIsomorphic(LogicSchema schema1, LogicSchema schema2) {

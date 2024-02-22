@@ -3,7 +3,6 @@ package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,12 +11,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ExtendedHomomorphismFinderTest {
+class ExtendedHomomorphismFinderTest {
 
     @Test
-    public void should_findHomomorphism_whenDomainDerivedLiteralDerivationRule_IsHomomorphicToRangeDerivedLiteralDerivationRule() {
+    void should_findHomomorphism_whenDomainDerivedLiteralDerivationRule_IsHomomorphicToRangeDerivedLiteralDerivationRule() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived(x)",
                 "Derived(x) :- Q(x,x)"
@@ -31,11 +31,11 @@ public class ExtendedHomomorphismFinderTest {
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isPresent();
-        SubstitutionAssert.assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
+        assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
     }
 
     @Test
-    public void should_findHomomorphism_whenDomainDerived_hasDifferentName_thanRangeDerivedLiteral() {
+    void should_findHomomorphism_whenDomainDerived_hasDifferentName_thanRangeDerivedLiteral() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived1(x)",
                 "Derived1(x) :- Q(x,x)"
@@ -49,19 +49,19 @@ public class ExtendedHomomorphismFinderTest {
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isPresent();
-        SubstitutionAssert.assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
+        assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
     }
 
     @ParameterizedTest
     @MethodSource("provideLogicSchemasBaseFails")
-    public void should_notFindHomomorphism_whenDomainBaseLiteral_hasDifferentPredicateName_thanRangeBaseLiteral(ImmutableLiteralsList domainLiterals, ImmutableLiteralsList rangeLiterals) {
+    void should_notFindHomomorphism_whenDomainBaseLiteral_hasDifferentPredicateName_thanRangeBaseLiteral(ImmutableLiteralsList domainLiterals, ImmutableLiteralsList rangeLiterals) {
         ExtendedHomomorphismFinder extendedHomomorphismFinder = new ExtendedHomomorphismFinder();
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isNotPresent();
     }
 
-    public static Stream<Arguments> provideLogicSchemasBaseFails() {
+    static Stream<Arguments> provideLogicSchemasBaseFails() {
         return Stream.of(
                 Arguments.of(ImmutableLiteralsListMother.create("Base(x)"),
                         ImmutableLiteralsListMother.create("BaseFail(a)")),
@@ -80,7 +80,7 @@ public class ExtendedHomomorphismFinderTest {
     }
 
     @Test
-    public void should_findHomomorphism_whenRangeDerivationRule_usesVariablesAppearingInMainRule() {
+    void should_findHomomorphism_whenRangeDerivationRule_usesVariablesAppearingInMainRule() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived(x, y)",
                 "Derived(x, y) :- Q(x,y)"
@@ -94,12 +94,12 @@ public class ExtendedHomomorphismFinderTest {
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isPresent();
-        SubstitutionAssert.assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
-        SubstitutionAssert.assertThat(substitutionOpt.get()).mapsToVariable("y", "b");
+        assertThat(substitutionOpt.get()).mapsToVariable("x", "a");
+        assertThat(substitutionOpt.get()).mapsToVariable("y", "b");
     }
 
     @Test
-    public void should_notFindHomomorphism_whenDomainDerivationRule_isDifferentThanRangeDerivationRule() {
+    void should_notFindHomomorphism_whenDomainDerivationRule_isDifferentThanRangeDerivationRule() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived(x, y)",
                 "Derived(x, y) :- Q(x,y)"
@@ -116,7 +116,7 @@ public class ExtendedHomomorphismFinderTest {
     }
 
     @Test
-    public void should_findHomomorphism_whenDomainHasSeveralDerivationRules_includedInRange() {
+    void should_findHomomorphism_whenDomainHasSeveralDerivationRules_includedInRange() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived(x, y)",
                 """
@@ -137,13 +137,13 @@ public class ExtendedHomomorphismFinderTest {
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isPresent();
-        SubstitutionAssert.assertThat(substitutionOpt.get())
+        assertThat(substitutionOpt.get())
                 .mapsToVariable("x", "a")
                 .mapsToVariable("y", "b");
     }
 
     @Test
-    public void should_notFindHomomorphism_whenDomainHasSomeDerivationRules_notIncludedInRange() {
+    void should_notFindHomomorphism_whenDomainHasSomeDerivationRules_notIncludedInRange() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
                 "Base(x), Derived(x, y)",
                 """
