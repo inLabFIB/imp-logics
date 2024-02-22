@@ -21,8 +21,8 @@ class EGDDependencyAnalyzerTest {
     void shouldIdentifyFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, String entity, List<Integer> keyPositions, List<Integer> determinedPositions) {
         DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
 
-        EGDAnalyzer analyzer = new EGDAnalyzer();
-        EGDAnalysis result = analyzer.analyze(schema.getAllEGDs());
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
         assertThat(result.functionalDependenciesEGDs()).anySatisfy(
                 fd -> assertThat(fd)
                         //TODO: .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1))
@@ -36,8 +36,8 @@ class EGDDependencyAnalyzerTest {
     void shouldIdentifyNonFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, List<Integer> egdIndexes) {
         DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
 
-        EGDAnalyzer analyzer = new EGDAnalyzer();
-        EGDAnalysis result = analyzer.analyze(schema.getAllEGDs());
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
         List<EGD> indexedEGDList = schema.getAllEGDs().stream()
                 .filter(egd -> egdIndexes.contains(schema.getAllEGDs().indexOf(egd)))
                 .toList();
@@ -52,8 +52,8 @@ class EGDDependencyAnalyzerTest {
                         Child(name, age), Person(name, age2, weight) -> age = age2
                         P(x, y, z), P(x, y2, z2) -> y=y2
                 """);
-        EGDAnalyzer analyzer = new EGDAnalyzer();
-        EGDAnalysis result = analyzer.analyze(schema.getAllEGDs());
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
 
         assertThat(result.functionalDependenciesEGDs())
                 .anySatisfy(
@@ -81,8 +81,8 @@ class EGDDependencyAnalyzerTest {
                         Person(name, age, weight), Person(name, age2, weight2) -> weight=weight2
                         Person(name, age, weight), Person(name, age2, weight3) -> weight=weight3
                 """);
-        EGDAnalyzer analyzer = new EGDAnalyzer();
-        EGDAnalysis result = analyzer.analyze(schema.getAllEGDs());
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
 
         assertThat(result.functionalDependenciesEGDs()).anySatisfy(
                 fd -> assertThat(fd)

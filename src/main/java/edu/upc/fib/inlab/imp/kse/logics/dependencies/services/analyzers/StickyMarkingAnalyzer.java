@@ -11,6 +11,8 @@ import java.util.Set;
 /**
  * This class is the responsible to make the marking of literal positions of the TGDs
  * according to the 2010 25th Annual IEEE Symposium on Logic in Computer Science paper
+ * "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for
+ * New Applications"
  */
 public class StickyMarkingAnalyzer {
     private StickyMarkingAnalyzer() {

@@ -1,21 +1,21 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencies.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.EGD;
-import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.EGDAnalysis;
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.services.analyzers.egds.EGDToFDAnalysisResult;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
 import java.util.List;
 import java.util.Set;
 
-public class EGDAnalysisAssert extends AbstractAssert<EGDAnalysisAssert, EGDAnalysis> {
+public class EGDAnalysisAssert extends AbstractAssert<EGDAnalysisAssert, EGDToFDAnalysisResult> {
 
-    public EGDAnalysisAssert(EGDAnalysis egdAnalysis) {
-        super(egdAnalysis, EGDAnalysisAssert.class);
+    public EGDAnalysisAssert(EGDToFDAnalysisResult egdToFDAnalysisResult) {
+        super(egdToFDAnalysisResult, EGDAnalysisAssert.class);
     }
 
 
-    public static EGDAnalysisAssert assertThat(EGDAnalysis actual) {
+    public static EGDAnalysisAssert assertThat(EGDToFDAnalysisResult actual) {
         return new EGDAnalysisAssert(actual);
     }
 

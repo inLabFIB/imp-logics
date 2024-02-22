@@ -6,9 +6,9 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class EGDAnalyzer {
+public class EGDToFDAnalyzer {
 
-    public EGDAnalysis analyze(List<EGD> egdList) {
+    public EGDToFDAnalysisResult analyze(List<EGD> egdList) {
         List<FunctionalDependencyWithEGDs> functionalDependenciesEGDs = new ArrayList<>();
         List<EGD> nonFunctionalDependenciesEGDs = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class EGDAnalyzer {
             } else nonFunctionalDependenciesEGDs.add(egd);
         }
 
-        return new EGDAnalysis(functionalDependenciesEGDs, nonFunctionalDependenciesEGDs);
+        return new EGDToFDAnalysisResult(functionalDependenciesEGDs, nonFunctionalDependenciesEGDs);
     }
 
     private FunctionalDependencyWithEGDs createNewFunctionalDependency(EGD egd) {
