@@ -8,6 +8,8 @@ import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.AllVariab
 import edu.upc.fib.inlab.imp.kse.logics.services.creation.spec.helpers.TermTypeCriteria;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TermMother {

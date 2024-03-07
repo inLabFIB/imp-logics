@@ -24,10 +24,7 @@ public class Query {
     private final ImmutableTermList headTerms;
     private final ImmutableLiteralsList body;
 
-    public Query(List<Term> headTerms, List<Literal> body) {
-        if (Objects.isNull(headTerms)) throw new IllegalArgumentException("Head terms cannot be null");
-        if (Objects.isNull(body)) throw new IllegalArgumentException("Body cannot be null");
-        if (body.isEmpty()) throw new IllegalArgumentException("Body cannot be empty");
+    Query(List<Term> headTerms, List<Literal> body) {
         this.headTerms = new ImmutableTermList(headTerms);
         this.body = new ImmutableLiteralsList(body);
     }
@@ -41,6 +38,6 @@ public class Query {
     }
 
     public boolean isConjunctiveQuery() {
-        return body.stream().allMatch(l -> l instanceof OrdinaryLiteral ol && ol.isPositive() && ol.isBase());
+        return false;
     }
 }

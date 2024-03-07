@@ -1,9 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.services.comparator;
 
-import edu.upc.fib.inlab.imp.kse.logics.schema.DerivationRule;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Query;
+import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +59,7 @@ public class HomomorphismBasedEquivalenceAnalyzer implements LogicEquivalenceAna
     }
 
     private static boolean isConjunctiveQuery(List<Literal> literals) {
-        Query query = new Query(Collections.emptyList(), literals);
+        Query query = QueryFactory.createQuery(Collections.emptyList(), literals);
         return query.isConjunctiveQuery();
     }
 

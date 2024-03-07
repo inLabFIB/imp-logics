@@ -67,7 +67,7 @@ public class DependencySchemaBuilder {
     private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
         ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
         ImmutableLiteralsList body = buildBody(bodySpec);
-        return new Query(headTerms, body);
+        return QueryFactory.createQuery(headTerms, body);
     }
 
     @SuppressWarnings("UnusedReturnValue")

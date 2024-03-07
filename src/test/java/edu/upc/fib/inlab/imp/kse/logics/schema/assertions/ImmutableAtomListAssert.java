@@ -36,4 +36,14 @@ public class ImmutableAtomListAssert extends AbstractListAssert<ImmutableAtomLis
         Assertions.assertThat(actual.get(index)).isEqualTo(atom);
         return this;
     }
+
+    public ImmutableAtomListAssert containsAtomWithPredicateName(Atom expectedAtom) {
+        Assertions.assertThat(actual).anySatisfy(
+                atom -> AtomAssert.assertThat(atom)
+                        .hasPredicateName(expectedAtom.getPredicateName())
+                        .hasTerms(expectedAtom.getTerms())
+        );
+        return this;
+    }
+
 }

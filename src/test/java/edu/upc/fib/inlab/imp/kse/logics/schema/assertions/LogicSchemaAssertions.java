@@ -26,6 +26,10 @@ public class LogicSchemaAssertions {
         return ImmutableTermListAssert.assertThat(actual);
     }
 
+    public static ImmutableAtomListAssert assertThat(ImmutableAtomList actual) {
+        return ImmutableAtomListAssert.assertThat(actual);
+    }
+
     public static LevelAssert assertThat(Level actual) {
         return LevelAssert.assertThat(actual);
     }
