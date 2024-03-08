@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.schema.mothers;
 
+import edu.upc.fib.inlab.imp.kse.logics.dependencies.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 
 import java.util.List;
@@ -37,6 +38,16 @@ public class LiteralMother {
     }
 
     public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, String predicateName, String... termNames) {
+        return createOrdinaryLiteral(schema, true, predicateName, termNames);
+    }
+
+    public static OrdinaryLiteral createOrdinaryLiteral(DependencySchema schema, boolean isPositive, String predicateName, String... termNames) {
+        Predicate predicateFromSchema = schema.getPredicateByName(predicateName);
+        return new OrdinaryLiteral(new Atom(predicateFromSchema, TermMother.createTerms(termNames)), isPositive);
+    }
+
+    @SuppressWarnings("unused")
+    public static OrdinaryLiteral createOrdinaryLiteral(DependencySchema schema, String predicateName, String... termNames) {
         return createOrdinaryLiteral(schema, true, predicateName, termNames);
     }
 
