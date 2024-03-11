@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.schema;
 import edu.upc.fib.inlab.imp.kse.logics.schema.visitor.LogicSchemaVisitor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * An immutable list of atoms
@@ -173,5 +174,12 @@ public class ImmutableAtomList implements List<Atom> {
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return atomList.stream()
+                .map(Atom::toString)
+                .collect(Collectors.joining(", "));
     }
 }

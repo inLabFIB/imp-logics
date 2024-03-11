@@ -87,4 +87,9 @@ public class TGD extends Dependency {
     public <T> T accept(DependencySchemaVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return getBody().toString() + " -> " + head.toString();
+    }
 }

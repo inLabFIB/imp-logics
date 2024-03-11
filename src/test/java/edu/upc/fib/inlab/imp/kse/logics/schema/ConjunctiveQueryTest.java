@@ -20,9 +20,9 @@ class ConjunctiveQueryTest {
         ConjunctiveQuery query = QueryMother.createConjunctiveQuery("P(x), Q(x)");
         assertThat(query.getBodyAtoms())
                 .hasSize(2)
-                .containsAtomWithPredicateName(
+                .containsAtomByPredicateName(
                         AtomMother.createAtom("P", "x"))
-                .containsAtomWithPredicateName(
+                .containsAtomByPredicateName(
                         AtomMother.createAtom("Q", "x")
                 );
     }

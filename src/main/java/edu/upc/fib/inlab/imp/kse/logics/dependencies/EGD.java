@@ -50,4 +50,9 @@ public class EGD extends Dependency {
         return visitor.visit(this);
     }
 
+    @Override
+    public String toString() {
+        return getBody().toString() + " -> " + head.toString();
+    }
+
 }

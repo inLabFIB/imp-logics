@@ -36,4 +36,5 @@ public abstract class Dependency {
     public abstract Set<Variable> getExistentialVariables();
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);
+
 }

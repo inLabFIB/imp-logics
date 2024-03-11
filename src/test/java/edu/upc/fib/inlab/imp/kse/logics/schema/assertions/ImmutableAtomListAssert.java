@@ -37,11 +37,19 @@ public class ImmutableAtomListAssert extends AbstractListAssert<ImmutableAtomLis
         return this;
     }
 
-    public ImmutableAtomListAssert containsAtomWithPredicateName(Atom expectedAtom) {
+    public ImmutableAtomListAssert containsAtomByPredicateName(Atom expectedAtom) {
         Assertions.assertThat(actual).anySatisfy(
                 atom -> AtomAssert.assertThat(atom)
                         .hasPredicateName(expectedAtom.getPredicateName())
                         .hasTerms(expectedAtom.getTerms())
+        );
+        return this;
+    }
+
+    public ImmutableAtomListAssert containsAtomsByPredicateName(ImmutableAtomList expectedAtoms) {
+        Assertions.assertThat(actual).allSatisfy(
+                atom -> assertThat(expectedAtoms)
+                        .containsAtomByPredicateName(atom)
         );
         return this;
     }
