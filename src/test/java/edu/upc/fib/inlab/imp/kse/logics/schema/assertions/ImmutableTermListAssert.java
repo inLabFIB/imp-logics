@@ -2,6 +2,9 @@ package edu.upc.fib.inlab.imp.kse.logics.schema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.schema.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Term;
+import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.assertions.SubstitutionAssert;
+import edu.upc.fib.inlab.imp.kse.logics.services.comparator.exceptions.SubstitutionException;
 import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
 
@@ -41,5 +44,24 @@ public class ImmutableTermListAssert extends AbstractListAssert<ImmutableTermLis
     @Override
     protected ImmutableTermListAssert newAbstractIterableAssert(Iterable<? extends Term> iterable) {
         return assertThat(new ImmutableTermList(newArrayList(iterable)));
+    }
+
+    /**
+     * Checks whether the actual terms list is isomorphic to the input terms list.
+     * That is, whether they are the same list up to renaming variables.
+     *
+     * @param expectedTermsList not null, might be empty
+     * @return this assert
+     */
+    public ImmutableTermListAssert isIsomorphicTo(ImmutableTermList expectedTermsList) {
+        try {
+            Substitution substitution = new Substitution(actual, expectedTermsList);
+            SubstitutionAssert.assertThat(substitution).mapsToDifferentVariables(actual.getUsedVariables());
+        } catch (SubstitutionException subsExc){
+            failure(subsExc.getMessage());
+        }
+
+        return this;
+
     }
 }

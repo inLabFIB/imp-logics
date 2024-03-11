@@ -212,4 +212,11 @@ public class ImmutableTermList implements List<Term> {
     public int hashCode() {
         return Objects.hash(termsList);
     }
+
+    @Override
+    public String toString() {
+        return "ImmutableTermList{" +
+                "termsList=" + termsList +
+                '}';
+    }
 }

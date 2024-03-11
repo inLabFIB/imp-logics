@@ -11,6 +11,8 @@ import org.assertj.core.api.Assertions;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Substitution> {
     protected SubstitutionAssert(Substitution substitution) {
@@ -60,6 +62,27 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
             } else throw new RuntimeException("Unrecognized term type: " + expectedImage.getClass().getName());
         }
         SubstitutionAssert.assertThat(actual).hasSize(expected.size());
+        return this;
+    }
+
+    /**
+     * Checks whether the actual substitution replaces each variable of the input to a different variable.
+     * The check fails if some variable from the input is not mapped to any term, or if some variable of the
+     * input is mapped to a constant.
+     *
+     * @param variables non null set of variables, might be empty
+     * @return this assert
+     */
+    public SubstitutionAssert mapsToDifferentVariables(Set<Variable> variables) {
+        Set<Term> rangeTerms = variables.stream()
+                .map(actual::getTerm)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+        Assertions.assertThat(rangeTerms)
+                .hasSize(variables.size())
+                .allMatch(Term::isVariable);
+
         return this;
     }
 }
