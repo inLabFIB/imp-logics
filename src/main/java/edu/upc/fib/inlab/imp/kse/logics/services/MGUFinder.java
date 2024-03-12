@@ -3,10 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.services;
 import edu.upc.fib.inlab.imp.kse.logics.schema.*;
 import edu.upc.fib.inlab.imp.kse.logics.schema.operations.Substitution;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class with static functions to find Most General Unifier between
@@ -23,19 +20,20 @@ public class MGUFinder {
         return getLiteralsMGU(Arrays.stream(literals).toList());
     }
 
-    public static Optional<Substitution> getLiteralsMGU(List<Literal> literals) {
+    public static Optional<Substitution> getLiteralsMGU(Collection<Literal> literals) {
         if(literals.isEmpty()) return Optional.of(new Substitution());
         else if (literals.size()==1){
-            Literal literal = literals.get(0);
+            Literal literal = literals.iterator().next();
             return Optional.of(new Substitution(literal.getTerms(), literal.getTerms()));
         }
         else {
-            Literal lit1 = literals.get(0);
-            Literal lit2 = literals.get(1);
+            Iterator<Literal> literalIterator = literals.iterator();
+            Literal lit1 = literalIterator.next();
+            Literal lit2 = literalIterator.next();
             Optional<Substitution> result = getMGU(lit1, lit2);
 
-            for (int index = 2; index < literals.size() && result.isPresent(); ++index) {
-                Literal otherLiteral = literals.get(index);
+            while (literalIterator.hasNext() && result.isPresent()) {
+                Literal otherLiteral = literalIterator.next();
                 if (!schemaIsUnifiable(lit1, otherLiteral)) return Optional.empty();
                 addTermsIfNotMapped(result.get(), otherLiteral.getUsedVariables());
                 result = getMGURecursive(result.get(), lit1.getTerms(), otherLiteral.getTerms());
@@ -66,7 +64,7 @@ public class MGUFinder {
         return getMGURecursive(substitution, lit1.getTerms(), lit2.getTerms());
     }
 
-    public static boolean areLiteralsUnifiable(List<Literal> literals) {
+    public static boolean areLiteralsUnifiable(Collection<Literal> literals) {
         return getLiteralsMGU(literals).isPresent();
     }
 
@@ -104,20 +102,21 @@ public class MGUFinder {
      * @param atoms not null
      * @return a Maximum General Unifier substitution between actual and atom2, if it exists
      */
-    public static Optional<Substitution> getAtomsMGU(List<Atom> atoms){
+    public static Optional<Substitution> getAtomsMGU(Collection<Atom> atoms) {
         if(atoms.isEmpty()) return Optional.of(new Substitution());
         else if (atoms.size()==1){
-            Atom atom = atoms.get(0);
+            Atom atom = atoms.iterator().next();
             return Optional.of(new Substitution(atom.getTerms(), atom.getTerms()));
         }
         else {
-            Atom atom1 = atoms.get(0);
-            Atom atom2 = atoms.get(1);
+            Iterator<Atom> atomIterator = atoms.iterator();
+            Atom atom1 = atomIterator.next();
+            Atom atom2 = atomIterator.next();
             Predicate predicate = atom1.getPredicate();
             Optional<Substitution> result = getMGU(atom1, atom2);
 
-            for (int index = 2; index < atoms.size() && result.isPresent(); ++index) {
-                Atom otherAtom = atoms.get(index);
+            while (atomIterator.hasNext() && result.isPresent()) {
+                Atom otherAtom = atomIterator.next();
                 if (!predicate.equals(otherAtom.getPredicate())) return Optional.empty();
                 addTermsIfNotMapped(result.get(), otherAtom.getVariables());
                 result = getMGURecursive(result.get(), atom1.getTerms(), otherAtom.getTerms());
@@ -192,6 +191,7 @@ public class MGUFinder {
      * the corresponding substitution to unify term1 with term2.
      */
     private static Optional<Substitution> unifyTerms(Substitution subs, Term term1, Term term2) {
+        if (bothAreMappedToSameConstant(subs, term1, term2)) return Optional.of(subs);
         if(bothAreMappedToDifferentConstants(subs, term1, term2)) return Optional.empty();
         else if(firstIsMappedToVarAndSecondToConstant(subs, term1, term2)){
             return Optional.of(newSubstitutionFromFirstToSecondImage(subs, (Variable) term1, term2));
@@ -231,6 +231,12 @@ public class MGUFinder {
         Term image1 = term1.applySubstitution(subs);
         Term image2 = term2.applySubstitution(subs);
         return image1.isVariable() && image2.isConstant();
+    }
+
+    private static boolean bothAreMappedToSameConstant(Substitution subs, Term term1, Term term2) {
+        Term image1 = term1.applySubstitution(subs);
+        Term image2 = term2.applySubstitution(subs);
+        return image1.isConstant() && image2.isConstant() && image1.getName().equals(image2.getName());
     }
 
     private static boolean bothAreMappedToDifferentConstants(Substitution subs, Term term1, Term term2) {

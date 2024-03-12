@@ -81,7 +81,17 @@ class MGUFinderTest {
 
             private static Stream<Arguments> provideUnifiableTermsLists() {
                 return Stream.of(
-                        Arguments.of("Terms containing constants",
+                        Arguments.of("Terms containing equal constants",
+                                TermMother.createTerms("x", "1"),
+                                TermMother.createTerms("a", "1"),
+                                TermMother.createTerms("x", "1")
+                        ),
+                        Arguments.of("Terms containing variable unifiable with constants, twice",
+                                TermMother.createTerms("x", "x", "y"),
+                                TermMother.createTerms("1", "1", "z"),
+                                TermMother.createTerms("1", "1", "a")
+                        ),
+                        Arguments.of("Terms containing variables unifiable with constants",
                                 TermMother.createTerms("x", "y"),
                                 TermMother.createTerms("a", "1"),
                                 TermMother.createTerms("xa", "1")
