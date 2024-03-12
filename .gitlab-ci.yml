@@ -34,7 +34,7 @@ deploy:release:
     - master
     - develop
   script:
-    - mvn deploy -DskipTests -U $MAVEN_CLI_OPTS -P inlab
+    - mvn clean deploy -DskipTests -U $MAVEN_CLI_OPTS -P inlab
   artifacts:
     paths:
       - target/*.jar
