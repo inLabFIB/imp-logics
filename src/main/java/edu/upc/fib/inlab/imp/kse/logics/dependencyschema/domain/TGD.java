@@ -62,10 +62,14 @@ public class TGD extends Dependency {
     }
 
     public boolean isLinear() {
+        if (containsBuiltInOrNegatedLiteralInBody())
+            throw new UnsupportedOperationException("Linearity check not implemented yet when body contains built-in or negated literals");
         return getBody().size() == 1;
     }
 
     public boolean isGuarded() {
+        if (containsBuiltInOrNegatedLiteralInBody())
+            throw new UnsupportedOperationException("Guardedness check not implemented yet when body contains built-in or negated literals");
         Set<Variable> uVars = getUniversalVariables();
         for (Literal l: getBody()) {
             if (new HashSet<>(l.getTerms()).containsAll(uVars)) return true;
@@ -75,6 +79,7 @@ public class TGD extends Dependency {
     //get guard??
 
     ///get side atoms??
+
 
     @Override
     public <T> T accept(DependencySchemaVisitor<T> visitor) {

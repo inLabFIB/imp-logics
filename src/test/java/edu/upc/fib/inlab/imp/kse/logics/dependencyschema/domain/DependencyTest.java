@@ -1,9 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.visitor.DependencySchemaVisitor;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.mothers.DependencyMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LiteralMother;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -56,8 +58,32 @@ class DependencyTest {
         assertThat(dependency.getBody()).isUnmodifiable();
     }
 
+    @Nested
+    class DetectingNegatedOrBuiltInLiteralInBody {
+        @Test
+        void should_returnTrue_whenBodyContainsNegatedLiteral() {
+            Dependency dependency = DependencyMother.buildDependency("A(x), not(B(x)) -> C(x)");
+            boolean result = dependency.containsBuiltInOrNegatedLiteralInBody();
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void should_returnTrue_whenBodyContainsBuiltInLiteral() {
+            Dependency dependency = DependencyMother.buildDependency("A(x, y), x < y -> C(x)");
+            boolean result = dependency.containsBuiltInOrNegatedLiteralInBody();
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void should_returnFalse_whenBodyIsComposedOfOrdinaryPositiveLiterals() {
+            Dependency dependency = DependencyMother.buildDependency("A(x), B(x, y) -> C(x)");
+            boolean result = dependency.containsBuiltInOrNegatedLiteralInBody();
+            assertThat(result).isFalse();
+        }
+
+    }
+
     private static List<Literal> createMutableLiteralList(Literal... literals) {
         return new LinkedList<>(List.of(literals));
     }
-
 }

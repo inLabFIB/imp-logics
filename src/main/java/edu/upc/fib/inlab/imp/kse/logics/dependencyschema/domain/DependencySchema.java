@@ -147,18 +147,27 @@ public class DependencySchema {
     }
 
     public boolean isLinear() {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody()) {
+            throw new UnsupportedOperationException("Linear analysis does not currently support negated nor built-in literals");
+        }
         if (!this.areEGDsNonConflictingWithTGDs()) return false;
 
         return this.getAllTGDs().stream().allMatch(TGD::isLinear);
     }
 
     public boolean isGuarded() {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody()) {
+            throw new UnsupportedOperationException("Guarded analysis does not currently support negated nor built-in literals");
+        }
         if (!this.areEGDsNonConflictingWithTGDs()) return false;
 
         return this.getAllTGDs().stream().allMatch(TGD::isGuarded);
     }
 
     public boolean isSticky() {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody()) {
+            throw new UnsupportedOperationException("Sticky analysis does not currently support negated nor built-in literals");
+        }
         if (!this.areEGDsNonConflictingWithTGDs()) return false;
 
         Set<LiteralPosition> stickyMarking = StickyMarkingAnalyzer.getStickyMarking(getAllTGDs());
@@ -183,6 +192,9 @@ public class DependencySchema {
 
 
     public boolean isWeaklyGuarded() {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody()) {
+            throw new UnsupportedOperationException("Weakly guarded analysis does not currently support negated nor built-in literals");
+        }
         if (!this.areEGDsNonConflictingWithTGDs()) return false;
 
         Set<PredicatePosition> affectedPositions = this.getAffectedPositions();
@@ -192,6 +204,10 @@ public class DependencySchema {
             }
         }
         return true;
+    }
+
+    private boolean someDependencyContainsBuiltInOrNegatedLiteralInBody() {
+        return this.getAllDependencies().stream().anyMatch(Dependency::containsBuiltInOrNegatedLiteralInBody);
     }
 
     /**

@@ -1,9 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.visitor.DependencySchemaVisitor;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableLiteralsList;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +36,12 @@ public abstract class Dependency {
                 .filter(Variable.class::isInstance)
                 .map(t -> (Variable) t)
                 .collect(Collectors.toSet());
+    }
+
+    boolean containsBuiltInOrNegatedLiteralInBody() {
+        return this.getBody().stream().anyMatch(lit ->
+                (lit instanceof OrdinaryLiteral oLit && oLit.isNegative()) ||
+                        (lit instanceof BuiltInLiteral));
     }
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);
