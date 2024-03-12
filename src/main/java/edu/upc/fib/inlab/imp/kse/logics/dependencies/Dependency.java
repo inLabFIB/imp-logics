@@ -8,6 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Dependency {
 
@@ -31,9 +32,13 @@ public abstract class Dependency {
         return body;
     }
 
-    public abstract Set<Variable> getUniversalVariables();
-
-    public abstract Set<Variable> getExistentialVariables();
+    public Set<Variable> getUniversalVariables() {
+        return getBody().stream()
+                .flatMap(l -> l.getTerms().stream())
+                .filter(Variable.class::isInstance)
+                .map(t -> (Variable) t)
+                .collect(Collectors.toSet());
+    }
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);
 

@@ -3,12 +3,9 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencies;
 import edu.upc.fib.inlab.imp.kse.logics.dependencies.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.schema.EqualityComparisonBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.schema.Literal;
-import edu.upc.fib.inlab.imp.kse.logics.schema.Variable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Equality-Generating Dependency
@@ -31,18 +28,6 @@ public class EGD extends Dependency {
 
     public EqualityComparisonBuiltInLiteral getHead() {
         return head;
-    }
-
-    //TODO: IMPR-195 Implement getU/EVariables methods
-    @Override
-    public Set<Variable> getUniversalVariables() {
-        return Collections.emptySet();
-    }
-
-    //TODO: IMPR-195 Implement getU/EVariables methods
-    @Override
-    public Set<Variable> getExistentialVariables() {
-        return Collections.emptySet();
     }
 
     @Override

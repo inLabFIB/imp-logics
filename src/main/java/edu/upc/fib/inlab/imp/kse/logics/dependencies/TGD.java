@@ -35,16 +35,9 @@ public class TGD extends Dependency {
         return head;
     }
 
-    @Override
-    public Set<Variable> getUniversalVariables() {
-        return getBody().stream()
-                .flatMap(l -> l.getTerms().stream())
-                .filter(Variable.class::isInstance)
-                .map(t -> (Variable) t)
-                .collect(Collectors.toSet());
-    }
 
-    @Override
+
+
     public Set<Variable> getExistentialVariables() {
         Set<Variable> universalVariables = getUniversalVariables();
         return getHead().stream()

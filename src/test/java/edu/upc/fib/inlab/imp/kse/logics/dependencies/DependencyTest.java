@@ -26,7 +26,6 @@ class DependencyTest {
             return null;
         }
 
-        @Override
         public Set<Variable> getExistentialVariables() {
             return null;
         }
