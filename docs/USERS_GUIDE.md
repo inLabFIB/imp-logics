@@ -2,7 +2,11 @@
 
 IMP logics is the implementation of the metamodel of Datalog extended with negation and built-in literals. This
 manual assumes that the user is comfortable with the traditional logic concepts of Term, Variable, Constant,
-Atom, Literal, OrdinaryLiteral, Built-in-Literal, NormalClause, LogicConstraint, and DerivationRule.
+Atom, Literal, OrdinaryLiteral, Built-in-Literal, NormalClause, LogicConstraint, and DerivationRule. IMP logics also
+offers
+an implementation of the metamodel of DependencySchemas, which can be used to define Datalog+/- programs. On the
+following,
+we pay special attention on the Datalog part.
 
 By contract, almost all IMP Logics entities are immutable. For instance, if we have the literal "Emp(x)" and apply a
 substitution to obtain "Emp(John)", we are obtaining a new object "Emp(John)", rather than modifying the original "Emp(

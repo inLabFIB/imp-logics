@@ -4,15 +4,23 @@
 
 The code is organized as follows:
 
-- `logics.schema`: contains the entities that represents the logic objects
-- `logics.services`: contains the services that operates over such entities:
-  - `logics.services.creation`: contains the services related to creating a logic schema
-  - `logics.services.parser`: contains the service of parsing
-  - `logics.services.comparator`: contains the service for analyzing the equivalence between two normal clauses
-  - `logic.services.normalizer`: contains some services for applying usefull equivalent transformations in logic
+- `dependencyschema.domain`: contains the entities that represents the logic objects of a dependency schema.
+- `dependencyschema.services`: contains the services that operates over such entities:
+  - `logicschema.services.creation`: contains the services related to creating a logic schema
+  - `logicschema.services.parser`: contains the service of parsing
+  - `logicschema.services.printer`: contains the service of printing
+  - `logicschema.services.analyzer`: contains some services for applying usefull analysis over dependency schemas.
+    schemas (e.g. unfolding).
+- `logicschema.domain`: contains the entities that represents the logic objects of a Datalog program
+- `logicschema.services`: contains the services that operates over such entities:
+  - `logicschema.services.creation`: contains the services related to creating a logic schema
+  - `logicschema.services.parser`: contains the service of parsing
+  - `logicschema.services.printer`: contains the service of printing
+  - `logicschema.services.comparator`: contains the service for analyzing the equivalence between two normal clauses
+  - `logicschema.services.processes`: contains some services for applying usefull equivalent transformations in logic
     schemas (e.g. unfolding).
 
-We expect this project to grow with new services to be written in the `logics.services` package.
+On the following, we pay special attention to the LogicSchema part of the library.
 
 ## Guidance for creating a LogicSchema
 
