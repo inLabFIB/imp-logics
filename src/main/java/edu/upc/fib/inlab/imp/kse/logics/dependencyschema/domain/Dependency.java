@@ -38,10 +38,10 @@ public abstract class Dependency {
                 .collect(Collectors.toSet());
     }
 
-    boolean containsBuiltInOrNegatedLiteralInBody() {
+    public boolean containsBuiltInOrNegatedLiteralInBody() {
         return this.getBody().stream().anyMatch(lit ->
                 (lit instanceof OrdinaryLiteral oLit && oLit.isNegative()) ||
-                        (lit instanceof BuiltInLiteral));
+                (lit instanceof BuiltInLiteral));
     }
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);

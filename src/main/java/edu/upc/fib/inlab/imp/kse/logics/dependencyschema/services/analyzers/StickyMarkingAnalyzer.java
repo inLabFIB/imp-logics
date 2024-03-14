@@ -16,6 +16,7 @@ import java.util.Set;
  */
 public class StickyMarkingAnalyzer {
     private StickyMarkingAnalyzer() {
+        throw new IllegalStateException("Utility class");
     }
 
     /**
