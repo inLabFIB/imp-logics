@@ -11,16 +11,14 @@ import java.util.List;
 
 /**
  * <p> Specification of a whole dependency schema, that is, a specification of a set of predicates,
- * dependencies, and derivation rules. </p>
+ * dependencies. </p>
  */
 public class DependencySchemaSpec implements LogicElementSpec {
     private final List<PredicateSpec> predicateSpecList;
-    private final List<DerivationRuleSpec> derivationRuleSpecList;
     private final List<DependencySpec> dependencySpecList;
 
     public DependencySchemaSpec() {
         predicateSpecList = new LinkedList<>();
-        derivationRuleSpecList = new LinkedList<>();
         dependencySpecList = new LinkedList<>();
     }
 
@@ -30,14 +28,6 @@ public class DependencySchemaSpec implements LogicElementSpec {
 
     public void addPredicateSpecs(List<PredicateSpec> predicateSpecs) {
         this.predicateSpecList.addAll(predicateSpecs);
-    }
-
-    public void addDerivationRuleSpecs(DerivationRuleSpec... derivationRuleSpecs) {
-        this.derivationRuleSpecList.addAll(Arrays.asList(derivationRuleSpecs));
-    }
-
-    public void addDerivationRuleSpecs(List<DerivationRuleSpec> derivationRuleSpecs) {
-        this.derivationRuleSpecList.addAll(derivationRuleSpecs);
     }
 
     @SafeVarargs
@@ -51,10 +41,6 @@ public class DependencySchemaSpec implements LogicElementSpec {
 
     public List<PredicateSpec> getPredicateSpecList() {
         return Collections.unmodifiableList(predicateSpecList);
-    }
-
-    public List<DerivationRuleSpec> getDerivationRuleSpecList() {
-        return Collections.unmodifiableList(derivationRuleSpecList);
     }
 
     public List<DependencySpec> getDependencySpecList() {

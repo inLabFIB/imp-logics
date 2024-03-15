@@ -70,16 +70,6 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
         return new BodySpec(literals);
     }
 
-    @Override
-    public DerivationRuleSpec visitDerivationRule(DependencySchemaGrammarParser.DerivationRuleContext ctx) {
-        String predicateName = ctx.atom().predicate().getText();
-        List<TermSpec> headTermsSpec = createTermsList(ctx.atom().termsList());
-        BodySpec body = this.visitBody(ctx.body());
-        DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpec(predicateName, headTermsSpec, body);
-        dependencySchemaSpec.addDerivationRuleSpecs(derivationRuleSpec);
-        return derivationRuleSpec;
-    }
-
     private List<TermSpec> createTermsList(DependencySchemaGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
         for (DependencySchemaGrammarParser.TermContext termContext : ctx.term()) {

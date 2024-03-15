@@ -45,13 +45,12 @@ fragment SINGLE_QUOTE:  '\'' (~'\'' | '\\\'')* '\'';
 fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
 prog: NEWLINE* line? (NEWLINE+ line)*  NEWLINE* EOF;
-line: (COMMENT | dependency | derivationRule);
+line: (COMMENT | dependency);
 dependency: tgd | egd;
 tgd: body DEPENDENCY tgd_head;
 egd: body DEPENDENCY egd_head;
 tgd_head: positiveAtom (COMMA positiveAtom)*;
 egd_head: term EQ term;
-derivationRule: atom ARROW body;
 body: literal (COMMA literal)*;
 literal: builtInLiteral | ordinaryLiteral;
 builtInLiteral: comparisonBuiltInLiteral | booleanBuiltInLiteral | customBuiltInLiteral;

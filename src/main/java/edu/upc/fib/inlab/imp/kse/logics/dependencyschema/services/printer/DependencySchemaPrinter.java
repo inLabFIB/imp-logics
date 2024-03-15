@@ -29,10 +29,6 @@ public class DependencySchemaPrinter implements DependencySchemaVisitor<String> 
             resultBuilder.append(dependency.accept(this));
             resultBuilder.append("\n");
         });
-        dependencySchema.getAllDerivationRules().forEach(derivationRule -> {
-            resultBuilder.append(derivationRule.accept(logicSchemaPrinter));
-            resultBuilder.append("\n");
-        });
         return resultBuilder.toString();
     }
 

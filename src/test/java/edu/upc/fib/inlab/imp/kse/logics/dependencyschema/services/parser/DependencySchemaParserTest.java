@@ -306,67 +306,6 @@ class DependencySchemaParserTest {
                 });
     }
 
-    @Test
-    void should_containDifferentDependencies_whenParsingSchema_withDerivedLiterals() {
-        String schemaString = """
-                works(p,c) -> salary(v,c)
-                            
-                works(p,c) :- persona(p), company(c)
-                salary(v,c) :- v > 0
-                salary(v,c) :- v < 1000000
-                """;
-
-        DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
-
-        assertThat(dependencySchema)
-                .hasDependencies(1)
-                .dependencies()
-                .anySatisfy(dependency -> {
-                    assertThat(dependency).body()
-                            .hasSize(1)
-                            .hasLiteral(0, "works(p,c)");
-                    assertThat(dependency).asTGD()
-                            .headOfSize(1)
-                            .hasAtom(0, "salary(v,c)");
-                });
-
-        Set<Predicate> derivedPredicates = dependencySchema.getAllDerivedPredicates();
-        Assertions.assertThat(derivedPredicates)
-                .hasSize(2)
-                .anySatisfy(derivedPredicate -> {
-                    PredicateAssert.assertThat(derivedPredicate)
-                            .hasName("works")
-                            .hasArity(2)
-                            .isDerived()
-                            .hasDerivationRules(1);
-
-                    DerivationRule derivationRule = derivedPredicate.getFirstDerivationRule();
-                    DerivationRuleAssert.assertThat(derivationRule)
-                            .body()
-                            .hasSize(2)
-                            .hasLiteral(0, "persona(p)")
-                            .hasLiteral(1, "company(c)");
-                })
-                .anySatisfy(derivedPredicate -> {
-                    PredicateAssert.assertThat(derivedPredicate)
-                            .hasName("salary")
-                            .hasArity(2)
-                            .isDerived()
-                            .hasDerivationRules(2);
-
-                    DerivationRule derivationRule1 = derivedPredicate.getDerivationRules().get(0);
-                    DerivationRuleAssert.assertThat(derivationRule1)
-                            .body()
-                            .hasSize(1)
-                            .hasLiteral(0, "v > 0");
-                    DerivationRule derivationRule2 = derivedPredicate.getDerivationRules().get(1);
-                    DerivationRuleAssert.assertThat(derivationRule2)
-                            .body()
-                            .hasSize(1)
-                            .hasLiteral(0, "v < 1000000");
-                });
-    }
-
     //TODO: duplicated code from LogicSchema grammar and parser
 
     @Nested

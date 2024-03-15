@@ -21,7 +21,6 @@ public class DependencySchema {
      *     <li>We cannot have two predicates with the same name</li>
      *     <li>All predicates used in the dependencies appear in the predicates set</li>
      *     <li>All dependencies are defined through predicates of the dependencySchema</li>
-     *     <li>All derivation rules defining predicates are included in this dependencySchema</li>
      * </ul>
      */
     private final Map<String, Predicate> predicatesByName = new HashMap<>();
@@ -97,19 +96,6 @@ public class DependencySchema {
         if (predicate.isDerived()) {
             return predicate.getDerivationRules();
         } else throw new PredicateIsNotDerived(derivedPredicateName);
-    }
-
-    public Set<DerivationRule> getAllDerivationRules() {
-        return predicatesByName.values().stream()
-                .filter(Predicate::isDerived)
-                .flatMap(p -> p.getDerivationRules().stream())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    public Set<Predicate> getAllDerivedPredicates() {
-        return predicatesByName.values().stream()
-                .filter(Predicate::isDerived)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Dependency> getAllDependencies() {

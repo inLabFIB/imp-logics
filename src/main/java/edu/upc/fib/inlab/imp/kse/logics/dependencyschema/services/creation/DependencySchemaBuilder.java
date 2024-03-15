@@ -45,25 +45,6 @@ public class DependencySchemaBuilder {
         }
     }
 
-    public DependencySchemaBuilder addDerivationRule(DerivationRuleSpec... drs) {
-        Arrays.stream(drs).forEach(this::addDerivationRule);
-        return this;
-    }
-
-    public DependencySchemaBuilder addDerivationRule(Collection<DerivationRuleSpec> derivationRules) {
-        derivationRules.forEach(this::addDerivationRule);
-        return this;
-    }
-
-    private void addDerivationRule(DerivationRuleSpec drs) {
-        predicatesByName.putIfAbsent(
-                drs.getPredicateName(),
-                new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
-        Query query = buildQuery(drs.getTermSpecList(), drs.getBody());
-        MutablePredicate mutablePredicate = predicatesByName.get(drs.getPredicateName());
-        mutablePredicate.addDerivationRule(query);
-    }
-
     private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
         ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
         ImmutableLiteralsList body = buildBody(bodySpec);
@@ -122,11 +103,6 @@ public class DependencySchemaBuilder {
                 new LinkedHashSet<>(this.predicatesByName.values()),
                 new LinkedHashSet<>(this.dependencies)
         );
-    }
-
-    public DependencySchemaBuilder addAllDerivationRules(List<DerivationRuleSpec> newRules) {
-        newRules.forEach(this::addDerivationRule);
-        return this;
     }
 
     public DependencySchemaBuilder addAllDependencies(List<DependencySpec> newDependencies) {

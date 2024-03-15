@@ -13,7 +13,6 @@ public class DependencySchemaFactory {
     public static DependencySchema createDependencySchema(DependencySchemaSpec dependencySchemaSpec) {
         DependencySchemaBuilder dependencySchemaBuilder = new DependencySchemaBuilder();
         dependencySchemaSpec.getPredicateSpecList().forEach(predicateSpec -> dependencySchemaBuilder.addPredicate(predicateSpec.name(), predicateSpec.arity()));
-        dependencySchemaSpec.getDerivationRuleSpecList().forEach(dependencySchemaBuilder::addDerivationRule);
         dependencySchemaSpec.getDependencySpecList().forEach(dependencySchemaBuilder::addDependency);
         return dependencySchemaBuilder.build();
     }
