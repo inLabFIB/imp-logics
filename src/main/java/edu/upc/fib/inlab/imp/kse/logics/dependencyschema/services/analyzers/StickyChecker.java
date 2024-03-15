@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.TGD;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers.egds.NonConflictingEGDsAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LiteralPosition;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
 
@@ -18,7 +19,7 @@ public class StickyChecker extends DatalogPlusMinusLanguageChecker {
         if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
             throw new UnsupportedOperationException("Sticky analysis does not currently support negated nor built-in literals");
         }
-        if (!areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
+        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
 
         Set<LiteralPosition> stickyMarking = StickyMarkingAnalyzer.getStickyMarking(dependencySchema.getAllTGDs());
 

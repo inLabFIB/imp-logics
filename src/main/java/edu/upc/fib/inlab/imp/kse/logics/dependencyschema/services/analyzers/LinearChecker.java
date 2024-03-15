@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.TGD;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers.egds.NonConflictingEGDsAnalyzer;
 
 public class LinearChecker extends DatalogPlusMinusLanguageChecker {
 
@@ -14,7 +15,7 @@ public class LinearChecker extends DatalogPlusMinusLanguageChecker {
         if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
             throw new UnsupportedOperationException("Linear analysis does not currently support negated nor built-in literals");
         }
-        if (!areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
+        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
 
         return dependencySchema.getAllTGDs().stream().allMatch(TGD::isLinear);
     }
