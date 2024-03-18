@@ -83,7 +83,6 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
         return new OrdinaryLiteralSpec(predicateName, termSpecList, false);
     }
 
-
     @Override
     public TermSpec visitTerm(LogicSchemaGrammarParser.TermContext ctx) {
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
