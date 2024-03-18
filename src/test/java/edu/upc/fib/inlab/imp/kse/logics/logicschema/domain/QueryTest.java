@@ -15,7 +15,7 @@ public class QueryTest {
 
         @Test
         void should_ReturnTrue_When_QueryIsConjunctive_withoutTerms() {
-            Query query = QueryMother.createConjunctiveQuery( "P(x), Q(x)");
+            Query query = QueryMother.createBooleanConjunctiveQuery("P(x), Q(x)");
             assertThat(query.isConjunctiveQuery()).isTrue();
         }
 
