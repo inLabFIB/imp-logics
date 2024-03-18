@@ -4,15 +4,14 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicConstraint;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.OrdinaryLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.LogicSchemaWithIDsParser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,6 +26,52 @@ import static edu.upc.fib.inlab.imp.kse.logics.dependencyschema.assertions.Depen
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DependencySchemaParserTest {
+
+    @Nested
+    class ParsingWithAlreadyExistingRelationalSchema {
+
+        @Test
+        void shouldNotCreateNewPredicates_whenExistingRelationalSchemaIsPassed() {
+            String schemaString = "q() -> p()";
+            DependencySchemaParser parser = new DependencySchemaParser();
+            DependencySchema dependencySchema1 = parser.parse(schemaString);
+            Set<Predicate> relationalSchema1 = dependencySchema1.getAllPredicates();
+
+            DependencySchema dependencySchema2 =parser.parse(schemaString, relationalSchema1);
+            Set<Predicate> relationalSchema2 = dependencySchema2.getAllPredicates();
+
+            Assertions.assertThat(relationalSchema1).containsExactlyInAnyOrderElementsOf(relationalSchema2);
+        }
+
+        @Test
+        void shouldThrowException_whenUsingAlreadyExistentPredicatesButWithDifferentArity() {
+            String schemaString1 = "q() -> p()";
+            DependencySchemaParser parser = new DependencySchemaParser();
+            DependencySchema dependencySchema1 = parser.parse(schemaString1);
+            Set<Predicate> relationalSchema1 = dependencySchema1.getAllPredicates();
+
+            String schemaString2 = "q(x) -> p(x)";
+            Assertions.assertThatThrownBy(() -> parser.parse(schemaString2, relationalSchema1))
+                    .isInstanceOf(RepeatedPredicateName.class);
+        }
+
+        @Test
+        void shouldAddNewPredicates_whenExistingRelationalSchemaIsPassed_andNewPredicatesUsed() {
+            String schemaString1 = "q() -> p()";
+            DependencySchemaParser parser = new DependencySchemaParser();
+            DependencySchema dependencySchema1 = parser.parse(schemaString1);
+            Set<Predicate> relationalSchema1 = dependencySchema1.getAllPredicates();
+
+            String schemaString2 = "r() -> s()";
+            DependencySchema dependencySchema2 =parser.parse(schemaString2, relationalSchema1);
+            Set<Predicate> relationalSchema2 = dependencySchema2.getAllPredicates();
+
+            Assertions.assertThat(relationalSchema2)
+                    .hasSize(4)
+                    .containsOnlyOnceElementsOf(relationalSchema1);
+        }
+
+    }
 
     @Nested
     class PredicateContainmentTests {

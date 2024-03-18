@@ -26,7 +26,6 @@ public class LogicSchemaFactory<T extends LogicConstraintSpec> {
 
     public static LogicSchemaFactory<LogicConstraintWithoutIDSpec> defaultLogicSchemaWithoutIDsFactory() {
         return new LogicSchemaFactory<>(new IncrementalConstraintIDGenerator());
-
     }
 
     public LogicSchemaFactory(ConstraintIDGenerator<T> constraintIDGenerator) {
@@ -34,10 +33,10 @@ public class LogicSchemaFactory<T extends LogicConstraintSpec> {
     }
 
     public LogicSchema createLogicSchema(LogicSchemaSpec<T> logicSchemaSpec) {
-        LogicSchemaBuilder<T> logicSchemaBuilder = new LogicSchemaBuilder<>(constraintIDGenerator);
-        logicSchemaSpec.getPredicateSpecList().forEach(predicateSpec -> logicSchemaBuilder.addPredicate(predicateSpec.name(), predicateSpec.arity()));
-        logicSchemaSpec.getDerivationRuleSpecList().forEach(logicSchemaBuilder::addDerivationRule);
-        logicSchemaSpec.getLogicConstraintSpecList().forEach(logicSchemaBuilder::addLogicConstraint);
-        return logicSchemaBuilder.build();
+        return new LogicSchemaBuilder<>(constraintIDGenerator)
+                .addAllPredicates(logicSchemaSpec.getPredicateSpecList())
+                .addAllDerivationRules(logicSchemaSpec.getDerivationRuleSpecList())
+                .addAllLogicConstraints(logicSchemaSpec.getLogicConstraintSpecList())
+                .build();
     }
 }

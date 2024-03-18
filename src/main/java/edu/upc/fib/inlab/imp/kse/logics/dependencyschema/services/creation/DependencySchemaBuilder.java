@@ -15,11 +15,22 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
 import java.util.*;
 
-//TODO: document
+/**
+ * Builder that creates a DependencySchema given progressive info of a DependencySchema.
+ */
 public class DependencySchemaBuilder {
 
+    private final Map<String, Predicate> predicatesByName = new HashMap<>();
+
     private final Set<Dependency> dependencies = new LinkedHashSet<>();
-    private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
+
+    public DependencySchemaBuilder() {
+        this(Set.of());
+    }
+
+    public DependencySchemaBuilder(Set<Predicate> relationalSchema) {
+        for (Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
+    }
 
     @SuppressWarnings("UnusedReturnValue")
     public DependencySchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {

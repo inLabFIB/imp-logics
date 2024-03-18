@@ -2,8 +2,13 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.DependencySchemaSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 
-//TODO: document
+import java.util.Set;
+
+/**
+ * Factory that creates a DependencySchema given a DependencySchemaSpec. It uses the DependencySchemaBuilder class.
+ */
 public class DependencySchemaFactory {
 
     private DependencySchemaFactory() {
@@ -11,9 +16,16 @@ public class DependencySchemaFactory {
     }
 
     public static DependencySchema createDependencySchema(DependencySchemaSpec dependencySchemaSpec) {
-        DependencySchemaBuilder dependencySchemaBuilder = new DependencySchemaBuilder();
-        dependencySchemaSpec.getPredicateSpecList().forEach(predicateSpec -> dependencySchemaBuilder.addPredicate(predicateSpec.name(), predicateSpec.arity()));
-        dependencySchemaSpec.getDependencySpecList().forEach(dependencySchemaBuilder::addDependency);
-        return dependencySchemaBuilder.build();
+        return new DependencySchemaBuilder()
+                .addAllPredicates(dependencySchemaSpec.getPredicateSpecList())
+                .addAllDependencies(dependencySchemaSpec.getDependencySpecList())
+                .build();
+    }
+
+    public static DependencySchema createDependencySchema(DependencySchemaSpec dependencySchemaSpec,
+                                                          Set<Predicate> relationalSchema) {
+        return new DependencySchemaBuilder(relationalSchema)
+                .addAllDependencies(dependencySchemaSpec.getDependencySpecList())
+                .build();
     }
 }
