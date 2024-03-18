@@ -10,13 +10,13 @@ class ConjunctiveQueryTest {
 
     @Test
     void isConjunctiveQuery() {
-        ConjunctiveQuery query = QueryMother.createConjunctiveQuery("P(x), Q(x)");
+        ConjunctiveQuery query = QueryMother.createBooleanConjunctiveQuery("P(x), Q(x)");
         assertThat(query.isConjunctiveQuery()).isTrue();
     }
 
     @Test
     void bodyAtoms() {
-        ConjunctiveQuery query = QueryMother.createConjunctiveQuery("P(x), Q(x)");
+        ConjunctiveQuery query = QueryMother.createBooleanConjunctiveQuery("P(x), Q(x)");
         assertThat(query.getBodyAtoms())
                 .hasSize(2)
                 .containsAtomByPredicateName(
@@ -28,7 +28,7 @@ class ConjunctiveQueryTest {
 
     @Test
     void sizeHeadTerms() {
-        ConjunctiveQuery query = QueryMother.createConjunctiveQuery("P(x), Q(x)");
+        ConjunctiveQuery query = QueryMother.createBooleanConjunctiveQuery("P(x), Q(x)");
         assertThat(query.getHeadTerms()).hasSize(0);
     }
 
