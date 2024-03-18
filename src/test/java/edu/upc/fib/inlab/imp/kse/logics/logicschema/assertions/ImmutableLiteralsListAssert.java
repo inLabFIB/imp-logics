@@ -144,6 +144,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
     }
 
     /* CONTAINMENT ASSERTS */
+    //TODO: should we deprecate this method and directly use containsLiteral?
     public ImmutableLiteralsListAssert containsOrdinaryLiteral(String predicateName, String... variableNames) {
         Assertions.assertThat(actual).anySatisfy(
                 lit -> LiteralAssert.assertThat(lit)
@@ -182,6 +183,12 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                 .withFailMessage("Expecting to have some element at index %d", index)
                 .hasSizeGreaterThan(index);
         LiteralAssert.assertThat(actual.get(index)).correspondsTo(expectedLiteralString);
+        return this;
+    }
+
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
+    public ImmutableLiteralsListAssert hasLiteral(String expectedLiteralString) {
+        assertThat(this.actual).anySatisfy(lit -> LiteralAssert.assertThat(lit).correspondsTo(expectedLiteralString));
         return this;
     }
 

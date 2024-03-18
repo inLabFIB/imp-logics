@@ -38,4 +38,15 @@ public class TGDAssert extends AbstractAssert<TGDAssert, TGD> {
                 .hasTerms(expectedAtom.getTerms());
         return this;
     }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public TGDAssert hasAtom(String atomString) {
+        Atom expectedAtom = ((OrdinaryLiteral) LiteralParser.parseLiteral(atomString)).getAtom();
+
+        Assertions.assertThat(actual.getHead())
+                .anySatisfy(atom -> AtomAssert.assertThat(atom)
+                        .hasPredicateName(expectedAtom.getPredicate().getName())
+                        .hasTerms(expectedAtom.getTerms()));
+        return this;
+    }
 }

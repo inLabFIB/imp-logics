@@ -2,17 +2,17 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.DerivationRuleAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.PredicateAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicConstraint;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.OrdinaryLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.LogicSchemaWithIDsParser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -117,10 +117,10 @@ class DependencySchemaParserTest {
                     .hasLiteral(0, "q(x)")
                     .hasLiteral(1, "x=1")
                     .hasLiteral(2, "x<2")
-                    .hasLiteral(3, "TRUE()");
+                    .hasLiteral("TRUE()");
             assertThat(dependency).asTGD()
                     .headOfSize(1)
-                    .hasAtom(0, "p()");
+                    .hasAtom("p()");
         }
 
         @Test
