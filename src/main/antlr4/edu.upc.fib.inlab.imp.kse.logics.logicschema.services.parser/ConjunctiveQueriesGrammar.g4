@@ -31,7 +31,7 @@ fragment DOUBLE_QUOTE:  '"' (~'"' | '\\"')* '"';
 
 prog: NEWLINE* line? (NEWLINE+ line)* NEWLINE*;
 line: (COMMENT | conjunctiveQuery);
-conjunctiveQuery: atom LEFT_ARROW body;
+conjunctiveQuery: OPENPAR termsList CLOSEPAR LEFT_ARROW body;
 body: literal (COMMA literal)*;
 literal: ordinaryLiteral;
 ordinaryLiteral: positiveAtom;

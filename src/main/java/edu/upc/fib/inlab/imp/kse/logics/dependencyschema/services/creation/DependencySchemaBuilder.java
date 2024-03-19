@@ -10,8 +10,10 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LiteralFactory;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.TermSpecToTermFactory;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.PredicateSpec;
 
 import java.util.*;
 
@@ -54,12 +56,6 @@ public class DependencySchemaBuilder {
                 && predicatesByName.get(predicateName).getArity() != arity) {
             throw new RepeatedPredicateName(predicateName);
         }
-    }
-
-    private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
-        ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
-        ImmutableLiteralsList body = buildBody(bodySpec);
-        return QueryFactory.createQuery(headTerms, body);
     }
 
     @SuppressWarnings("UnusedReturnValue")

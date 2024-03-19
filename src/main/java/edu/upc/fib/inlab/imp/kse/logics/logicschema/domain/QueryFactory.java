@@ -8,6 +8,7 @@ public class QueryFactory {
     private QueryFactory() {
         throw new IllegalStateException("Utility class");
     }
+
     public static ConjunctiveQuery createConjunctiveQuery(List<Term> headTerms, List<Literal> body) {
         return new ConjunctiveQuery(headTerms, body);
     }

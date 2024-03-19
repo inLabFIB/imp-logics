@@ -12,7 +12,7 @@ public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVi
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
 
-    private Set<ConjunctiveQuerySpec> result;
+    private Set<ConjunctiveQuerySpec> queries;
 
     public QueriesGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
@@ -20,15 +20,33 @@ public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVi
 
     @Override
     public Set<ConjunctiveQuerySpec> visitProg(ConjunctiveQueriesGrammarParser.ProgContext ctx) {
-        result = new HashSet<>();
+        queries = new HashSet<>();
         visitChildren(ctx);
-        return result;
+        return queries;
     }
 
     @Override
     public ConjunctiveQuerySpec visitConjunctiveQuery(ConjunctiveQueriesGrammarParser.ConjunctiveQueryContext ctx) {
-        //TODO:!!!
-        return null;
+        List<TermSpec> headTerms = createTermsList(ctx.termsList());
+        BodySpec body = createBody(ctx.body());
+        ConjunctiveQuerySpec parsedConjunctiveQuerySpec = new ConjunctiveQuerySpec(headTerms, body);
+        queries.add(parsedConjunctiveQuerySpec);
+        return parsedConjunctiveQuerySpec;
+    }
+
+    protected BodySpec createBody(ConjunctiveQueriesGrammarParser.BodyContext ctx) {
+        List<LiteralSpec> literals = new LinkedList<>();
+        for (ConjunctiveQueriesGrammarParser.LiteralContext litContext : ctx.literal()) {
+            literals.add((LiteralSpec) this.visitLiteral(litContext));
+        }
+        return new BodySpec(literals);
+    }
+
+    @Override
+    public OrdinaryLiteralSpec visitPositiveAtom(ConjunctiveQueriesGrammarParser.PositiveAtomContext ctx) {
+        String predicateName = ctx.atom().predicate().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
+        return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
     }
 
     private List<TermSpec> createTermsList(ConjunctiveQueriesGrammarParser.TermsListContext ctx) {
@@ -37,13 +55,6 @@ public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVi
             termSpecList.add(this.visitTerm(termContext));
         }
         return termSpecList;
-    }
-
-    @Override
-    public OrdinaryLiteralSpec visitPositiveAtom(ConjunctiveQueriesGrammarParser.PositiveAtomContext ctx) {
-        String predicateName = ctx.atom().predicate().getText();
-        List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
-        return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
     }
 
     @Override

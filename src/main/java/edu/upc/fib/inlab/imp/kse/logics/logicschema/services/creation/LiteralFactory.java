@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+//TODO: add documentation
 public class LiteralFactory {
 
     private final Map<String, Predicate> predicatesByName;

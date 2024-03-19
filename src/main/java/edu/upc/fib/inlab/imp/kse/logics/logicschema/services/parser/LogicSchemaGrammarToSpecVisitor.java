@@ -23,14 +23,6 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
         return logicSchemaSpec;
     }
 
-    protected BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
-        List<LiteralSpec> literals = new LinkedList<>();
-        for (LogicSchemaGrammarParser.LiteralContext litContext : ctx.literal()) {
-            literals.add((LiteralSpec) this.visitLiteral(litContext));
-        }
-        return new BodySpec(literals);
-    }
-
     @Override
     public DerivationRuleSpec visitDerivationRule(LogicSchemaGrammarParser.DerivationRuleContext ctx) {
         String predicateName = ctx.atom().predicate().getText();
@@ -39,6 +31,14 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
         DerivationRuleSpec derivationRuleSpec = new DerivationRuleSpec(predicateName, headTermsSpec, body);
         logicSchemaSpec.addDerivationRuleSpecs(derivationRuleSpec);
         return derivationRuleSpec;
+    }
+
+    protected BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
+        List<LiteralSpec> literals = new LinkedList<>();
+        for (LogicSchemaGrammarParser.LiteralContext litContext : ctx.literal()) {
+            literals.add((LiteralSpec) this.visitLiteral(litContext));
+        }
+        return new BodySpec(literals);
     }
 
     private List<TermSpec> createTermsList(LogicSchemaGrammarParser.TermsListContext ctx) {
