@@ -8,7 +8,9 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * Class to recognize whether two list of literals (or derivation rules, or logic constraints) are isomorphic.
+ * Class to recognize whether two list of literals (or derivation rules, or logic constraints, or queries) are
+ * isomorphic.
+ * <p>
  * Two list of literals are isomorphic, iff they have a bijective map respecting:
  * - kind of literal (OrdinaryLiterals can only be mapped to OrdinaryLiterals, the same with BuiltInLiterals, etc).
  * - Polarity of mapped ordinary literals
@@ -175,6 +177,20 @@ public class IsomorphismComparator {
     }
 
     /**
+     * @param query1 not null
+     * @param query2 not null
+     * @return whether there is an isomorphism between query1 and query2
+     */
+    public boolean areIsomorphic(Query query1, Query query2) {
+        ImmutableTermList head1 = query1.getHeadTerms();
+        ImmutableTermList head2 = query2.getHeadTerms();
+        Optional<TermMap> termMap = computeTermMap(head1, head2);
+        return termMap
+                .filter(map -> areIsomorphic(query1.getBody(), query2.getBody(), new PredicateMap(), new LiteralMap(), map, () -> true))
+                .isPresent();
+    }
+
+    /**
      * Check whether two logic schemas are isomorphic
      *
      * @param schema1 a logic schema
@@ -330,8 +346,7 @@ public class IsomorphismComparator {
     /**
      * @param p1 not null
      * @param p2 not null
-     * @return whether there is an isomorphism between the derivation rules of ol1, and the derivationRules of ol2,
-     * satisfying the given predicateName, and remaining job.
+     * @return whether there is an isomorphism between p1 and p2
      */
     public boolean areIsomorphic(Predicate p1, Predicate p2) {
         if (Objects.isNull(p1)) throw new IllegalArgumentException("p1 cannot be null");

@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.QueryAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.QueryMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,13 @@ public class QueryTest {
         void should_ReturnFalse_When_QueryContainsDerivedLiteral() {
             Query query = QueryMother.createQuery(List.of("x"), "P(x), R(x)", "R(x) :- Q(x)");
             assertThat(query.isConjunctiveQuery()).isFalse();
+        }
+
+        @Test
+        void test() {
+            Query query1 = QueryMother.createQuery(List.of("x"), "P(x), R(x)", "R(x) :- Q(x)");
+            Query query2 = QueryMother.createQuery(List.of("y"), "P(y), R(y)", "R(y) :- Q(y)");
+            QueryAssert.assertThat(query1).isIsomorphicTo(query2);
         }
     }
 

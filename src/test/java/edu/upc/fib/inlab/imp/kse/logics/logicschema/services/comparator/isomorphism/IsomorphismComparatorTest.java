@@ -947,4 +947,136 @@ class IsomorphismComparatorTest {
             );
         }
     }
+
+    @Nested
+    class QueryIsIsomorphismTest {
+
+        @Nested
+        class NotPermittingAnyChange {
+            @Test
+            void should_returnTrue_whenQueriesAreIdentical() {
+                Query query1 = QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q(x, y)");
+                Query query2 = QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q(x, y)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).isTrue();
+            }
+
+            @Test
+            void should_returnFalse_whenQueriesRetrieveDifferentTerms() {
+                Query query1 = QueryMother.createQuery(List.of("x"), "P(x, y), Q(x, y)");
+                Query query2 = QueryMother.createQuery(List.of("y"), "P(x, y), Q(x, y)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).isFalse();
+            }
+
+            @Test
+            void should_returnFalse_whenQueriesDoNotRetrieveTheSameNumberOfTerms() {
+                Query query1 = QueryMother.createQuery(List.of("x", "x"), "P(x, y), Q(x, y)");
+                Query query2 = QueryMother.createQuery(List.of("x"), "P(x, y), Q(x, y)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).isFalse();
+            }
+
+            @Test
+            void should_returnFalse_whenQueryBodiesContainDifferentLiterals() {
+                Query query1 = QueryMother.createQuery(List.of("x", "y"), "P(x, y)");
+                Query query2 = QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q(x, y)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).isFalse();
+            }
+
+            @Test
+            void should_returnFalse_whenQueryBodiesContainDifferentLiterals_evenIfIdentical() {
+                Query query1 = QueryMother.createQuery(List.of("x", "y"), "P(x, y)");
+                Query query2 = QueryMother.createQuery(List.of("x", "y"), "P(x, y), P(x, y)");
+
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).isFalse();
+            }
+        }
+
+        @Nested
+        class PermittingAllChanges {
+
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideNonIsomorphicQueriesUpToAllPossibleChanges")
+            void should_returnFalse_whenQueriesAreNotIsomorphicUpToAllChanges(String name, Query query1, Query query2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).describedAs(name).isFalse();
+            }
+
+            private static Stream<Arguments> provideNonIsomorphicQueriesUpToAllPossibleChanges() {
+
+                return Stream.of(
+                        Arguments.of(
+                                "Return terms is in different position",
+                                QueryMother.createQuery(List.of("x"), "P(x, y)"),
+                                QueryMother.createQuery(List.of("x"), "P(y, x)")
+                        ),
+                        Arguments.of(
+                                "Second query has more literals",
+                                QueryMother.createQuery(List.of("x", "y"), "P(x, y)"),
+                                QueryMother.createQuery(List.of("a", "b"), "P(a, b), Q(a, b)")
+                        ),
+                        Arguments.of(
+                                "Second query repeats variable names",
+                                QueryMother.createQuery(List.of("x"), "Q(x, y)"),
+                                QueryMother.createQuery(List.of("a"), "Q(a, a)")
+                        ),
+                        Arguments.of(
+                                "First query repeats variable names",
+                                QueryMother.createQuery(List.of("a"), "Q(a, a)"),
+                                QueryMother.createQuery(List.of("x"), "Q(x, y)")
+                        ),
+                        Arguments.of(
+                                "Second query has a derivation rule not isomorphic",
+                                QueryMother.createQuery(List.of("a"), "Q1(a, b)", "Q1(a,b) :- T(a,b)"),
+                                QueryMother.createQuery(List.of("a"), "Q2(a, b)", "Q2(a,b) :- T(a,b), T(b,a)")
+                        )
+                );
+
+            }
+
+
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideIsomorphicQueriesUpToAllPossibleChanges")
+            void should_returnTrue_whenQueriesAreIsomorphicUpToPermittedChanges(String name, Query query1, Query query2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).describedAs(name).isTrue();
+            }
+
+            private static Stream<Arguments> provideIsomorphicQueriesUpToAllPossibleChanges() {
+
+                return Stream.of(
+                        Arguments.of(
+                                "Changing variable names",
+                                QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q(x, y)"),
+                                QueryMother.createQuery(List.of("a", "b"), "P(a, b), Q(a, b)")
+                        ),
+                        Arguments.of(
+                                "Changing literals order names",
+                                QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q(x, y)"),
+                                QueryMother.createQuery(List.of("x", "y"), "Q(x, y), P(x, y)")
+                        ),
+                        Arguments.of(
+                                "Changing derived predicate names",
+                                QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q1(x, y)", "Q1(x, y) :- T(x, y)"),
+                                QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q2(x, y)", "Q2(x, y) :- T(x, y)")
+                        )
+                );
+            }
+        }
+    }
+
 }

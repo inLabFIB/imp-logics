@@ -64,4 +64,8 @@ public class LogicSchemaAssertions {
         return TermAssert.assertThat(actual);
     }
 
+    public static QueryAssert assertThat(Query actual) {
+        return QueryAssert.assertThat(actual);
+    }
+
 }
