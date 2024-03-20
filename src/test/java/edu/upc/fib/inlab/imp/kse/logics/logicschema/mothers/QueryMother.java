@@ -38,6 +38,10 @@ public class QueryMother {
         return QueryFactory.createQuery(headTerms, immutableLiteralsList);
     }
 
+    public static Query createBooleanQuery(String queryString) {
+        return createQuery(List.of(), queryString);
+    }
+
     public static ConjunctiveQuery createConjunctiveQuery(List<String> termsString, String queryString) {
         ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString);
         List<Term> headTerms = TermMother.createTerms(termsString);
@@ -71,5 +75,4 @@ public class QueryMother {
         }
         return QueryFactory.createConjunctiveQuery(TermMother.createTerms(termsString), literals);
     }
-
 }
