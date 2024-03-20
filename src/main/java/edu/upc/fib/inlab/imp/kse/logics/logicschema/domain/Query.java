@@ -39,4 +39,11 @@ public class Query {
     public boolean isConjunctiveQuery() {
         return false;
     }
+
+    public String toString() {
+        return "Query{" +
+                "headTerms=" + headTerms +
+                ", body=" + body +
+                "}";
+    }
 }

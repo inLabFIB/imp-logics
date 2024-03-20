@@ -3,12 +3,9 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVisitor {
+public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
 
@@ -19,10 +16,10 @@ public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVi
     }
 
     @Override
-    public Set<ConjunctiveQuerySpec> visitProg(ConjunctiveQueriesGrammarParser.ProgContext ctx) {
-        queries = new HashSet<>();
+    public ConjunctiveQuerySetSpec visitProg(ConjunctiveQueriesGrammarParser.ProgContext ctx) {
+        queries = new LinkedHashSet<>();
         visitChildren(ctx);
-        return queries;
+        return new ConjunctiveQuerySetSpec(queries);
     }
 
     @Override

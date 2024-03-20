@@ -4,6 +4,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConjunctiveQuery;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.QueryBuilder;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConjunctiveQuerySetSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConjunctiveQuerySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
@@ -27,20 +28,20 @@ public class ConjunctiveQueriesParser {
     }
 
     public Set<ConjunctiveQuery> parse(String queriesString) {
-        Set<ConjunctiveQuerySpec> queriesSpecs = parseToSpec(queriesString);
-        return queriesSpecs.stream()
+        ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
+        return queriesSpecs.conjunctiveQuerySpecSet().stream()
                 .map(querySpec -> new QueryBuilder().buildQuery(querySpec))
                 .collect(Collectors.toSet());
     }
 
     public Set<ConjunctiveQuery> parse(String queriesString, Set<Predicate> relationalSchema) {
-        Set<ConjunctiveQuerySpec> queriesSpecs = parseToSpec(queriesString);
-        return queriesSpecs.stream()
+        ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
+        return queriesSpecs.conjunctiveQuerySpecSet().stream()
                 .map(querySpec -> new QueryBuilder(relationalSchema).buildQuery(querySpec))
                 .collect(Collectors.toSet());
     }
 
-    public Set<ConjunctiveQuerySpec> parseToSpec(String queriesString) {
+    public ConjunctiveQuerySetSpec parseToSpec(String queriesString) {
         CharStream input = CharStreams.fromString(queriesString);
         ConjunctiveQueriesGrammarLexer lexer = new ConjunctiveQueriesGrammarLexer(input);
         lexer.removeErrorListeners();
