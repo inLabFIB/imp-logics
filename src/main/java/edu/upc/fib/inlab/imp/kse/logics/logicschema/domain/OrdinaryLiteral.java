@@ -137,6 +137,13 @@ public class OrdinaryLiteral extends Literal {
 
 
     /**
+     * @return whether the Atom of this literal is recursive, or not
+     */
+    public boolean isRecursive() {
+        return atom.isRecursive();
+    }
+
+    /**
      * @param derivationRuleIndex derivation rule to use for the unfolding
      * @return the corresponding derivation rule applying a substitution that unifies the rule head with this terms
      */

@@ -1,7 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatch;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.QueryMother;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -112,4 +114,65 @@ class PredicateTest {
         assertThat(predicate.isDerived()).isFalse();
     }
 
+    @Nested
+    class IsRecursive {
+        @Test
+        void should_returnFalse_whenPredicateIsBase() {
+            Predicate predicate = new Predicate("P", 2);
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isFalse();
+        }
+
+        @Test
+        void should_returnFalse_whenPredicateIsDerived_andNotRecursive() {
+            Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P", "P(x) :- R(x, y)");
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isFalse();
+        }
+
+        @Test
+        void should_returnFalse_whenPredicateIsDerived_definedOverDerivedPredicates_butNotRecursive() {
+            Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
+                    """
+                            P(x) :- R(x, y)
+                            R(x, y) :- S(x, y)
+                            """);
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isFalse();
+        }
+
+        @Test
+        void should_returnFalse_whenPredicateIsDerived_definedOverRecurisvePredicates() {
+            Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
+                    """
+                            P(x) :- R(x, y)
+                            R(x, y) :- R(x, z), R(z, y)
+                            """);
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isFalse();
+        }
+
+        @Test
+        void should_returTrue_whenPredicateIsDirectlyRecursive() {
+            Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
+                    """
+                            P(x) :- P(y)
+                            """);
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isTrue();
+        }
+
+        @Test
+        void should_returTrue_whenPredicateIsRecursiveThroughSeveralRules() {
+            Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
+                    """
+                            P(x) :- R(y)
+                            P(x) :- Rec(y)
+                            R(y) :- S(y)
+                            Rec(y) :- P(y)
+                            """);
+            boolean isRecursive = predicate.isRecursive();
+            assertThat(isRecursive).isTrue();
+        }
+    }
 }

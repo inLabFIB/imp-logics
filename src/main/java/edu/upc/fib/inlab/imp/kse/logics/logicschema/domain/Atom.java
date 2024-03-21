@@ -205,6 +205,13 @@ public class Atom {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    /**
+     * @return whether the Predicate of this atom is recursive, or not
+     */
+    public boolean isRecursive() {
+        return predicate.isRecursive();
+    }
+
     private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {
     }
 }

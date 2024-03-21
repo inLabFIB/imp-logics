@@ -11,13 +11,15 @@ import java.util.Objects;
 /**
  * Representation of a logic predicate. E.g. Predicate "Emp" with arity 2.
  * A Predicate is a weak entity w.r.t. LogicSchema. That is:
- * - One Predicate can only belong to one LogicSchema
- * - A LogicSchema cannot contain two predicates with the same name
- * To instantiate a derived predicate, we use Queries, that is, a list of terms together a body
+ * <ul>
+ * <li> One Predicate can only belong to one LogicSchema </li>
+ * <li> A LogicSchema cannot contain two predicates with the same name </li>
+ * </ul>
+ * <p> To instantiate a derived predicate, we use Queries, that is, a list of terms together a body
  * For instance, if we have a mutable Predicate P, we can include some Queries to make it derived:
- * (x, y) :- R(x, y)
- * (x, w) :- S(x, w), T(w)
- * Do note that the queries do not require to include the predicate "P" on the head, since it would be redundant.
+ * <p> (x, y) :- R(x, y)
+ * <p> (x, w) :- S(x, w), T(w)
+ * <p> Do note that the queries do not require to include the predicate "P" on the head, since it would be redundant.
  */
 public class Predicate {
     /**
@@ -48,6 +50,53 @@ public class Predicate {
         checkQueries(definitionQueries);
         List<DerivationRule> derivationRuleList = createDerivationRules(definitionQueries);
         derivationRules.addAll(derivationRuleList);
+    }
+
+    /**
+     * A predicate is recursive if it is derived and it appears in the body of its derivation rules,
+     * or in the body of some derivation rule it depends on.
+     * E.g.:
+     * <p>R(x, y) :- R(x, z), R(z, y)
+     * <p>R(x, y) :- T(x, y)
+     * <p>P(x, y) :- R(x, z)
+     * <p>Q(x, y) :- S(x, y)
+     * <p>S(x, y) :- Q(x, y)
+     * <p> In this example, R, Q and S are recurisve predicate, but P and T are not.
+     *
+     * @return whether this predicate is recursive
+     */
+    public boolean isRecursive() {
+        return predicateAppearInDerivationRuleBody(new LinkedList<>(), this.getDerivationRules());
+    }
+
+    /**
+     * @param visitedDerivationRules not null, might be empty
+     * @param derivationRules        not null, might be empty
+     * @return whether this predicate appears in the given derivation rules, ignoring those appearing in visitedDerivationRules
+     */
+    private boolean predicateAppearInDerivationRuleBody(List<DerivationRule> visitedDerivationRules, List<DerivationRule> derivationRules) {
+        if (derivationRules.isEmpty()) return false;
+        DerivationRule rule = derivationRules.get(0);
+        List<DerivationRule> rulesStillToVisit = new LinkedList<>(derivationRules.subList(1, derivationRules.size()));
+        if (visitedDerivationRules.contains(rule))
+            return predicateAppearInDerivationRuleBody(visitedDerivationRules, rulesStillToVisit);
+        else {
+            visitedDerivationRules.add(rule);
+            if (predicateAppearInDerivationRuleBody(rule)) return true;
+            else {
+                for (Literal lit : rule.getBody()) {
+                    if (lit instanceof OrdinaryLiteral oLit) {
+                        rulesStillToVisit.addAll(oLit.getPredicate().getDerivationRules());
+                    }
+                }
+                return predicateAppearInDerivationRuleBody(visitedDerivationRules, rulesStillToVisit);
+            }
+        }
+
+    }
+
+    private boolean predicateAppearInDerivationRuleBody(DerivationRule rule) {
+        return rule.getBody().stream().anyMatch(l -> l instanceof OrdinaryLiteral oLit && oLit.getPredicate() == this);
     }
 
     private static void checkPredicateInfo(String name, int arity) {
