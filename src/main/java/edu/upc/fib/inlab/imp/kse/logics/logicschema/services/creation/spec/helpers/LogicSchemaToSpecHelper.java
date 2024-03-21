@@ -62,7 +62,7 @@ public class LogicSchemaToSpecHelper {
         return new PredicateSpec(predicate.getName(), predicate.getArity());
     }
 
-    public static List<TermSpec> buildTermsSpecs(ImmutableTermList terms) {
+    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
         return terms.stream().map(LogicSchemaToSpecHelper::buildTermSpec).toList();
     }
 

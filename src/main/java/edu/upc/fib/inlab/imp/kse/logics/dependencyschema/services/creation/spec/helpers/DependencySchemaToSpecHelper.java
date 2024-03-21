@@ -6,7 +6,10 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.EGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.HeadAtomsSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Atom;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.EqualityComparisonBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
@@ -21,7 +24,7 @@ public class DependencySchemaToSpecHelper {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<TermSpec> buildTermsSpecs(ImmutableTermList terms) {
+    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
         return LogicSchemaToSpecHelper.buildTermsSpecs(terms);
     }
 

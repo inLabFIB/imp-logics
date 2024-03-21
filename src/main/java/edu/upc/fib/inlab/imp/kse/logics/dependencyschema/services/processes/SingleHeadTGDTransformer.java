@@ -83,6 +83,10 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
                 .collect(Collectors.toSet());
     }
 
+    boolean containsOneHeadAtom(TGD tgd) {
+        return tgd.getHead().size() == 1;
+    }
+
     private String createNewAuxPredicateName(Set<String> usedPredicateNames) {
         String newAuxPredicate = AUX_PREDICATE_NAME + auxPredicateNameIndex++;
         while (usedPredicateNames.contains(newAuxPredicate)) {
@@ -91,12 +95,8 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
         return newAuxPredicate;
     }
 
-    public static boolean containsOneHeadAtom(TGD tgd) {
-        return tgd.getHead().size() == 1;
-    }
 
-
-    private Set<String> obtainPredicateNames(DependencySchema schema) {
+    static Set<String> obtainPredicateNames(DependencySchema schema) {
         return schema.getAllPredicates().stream().map(Predicate::getName).collect(Collectors.toSet());
     }
 }

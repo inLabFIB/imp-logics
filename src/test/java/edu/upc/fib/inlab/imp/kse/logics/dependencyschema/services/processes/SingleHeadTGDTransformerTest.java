@@ -119,7 +119,7 @@ class SingleHeadTGDTransformerTest {
                 .containsExactlyInAnyOrderElementsOf(expectedDependencies);
     }
 
-    private Comparator<TGD> tgdComparator() {
+    static Comparator<TGD> tgdComparator() {
         return (tgd1, tgd2) -> {
             try {
                 LogicSchemaAssertions.assertThat(tgd1.getHead())
@@ -141,7 +141,7 @@ class SingleHeadTGDTransformerTest {
         };
     }
 
-    private Comparator<Dependency> dependenciesComparator() {
+    static Comparator<Dependency> dependenciesComparator() {
         return (dep1, dep2) -> {
             if (dep1 instanceof TGD tgd1 && dep2 instanceof TGD tgd2) return tgdComparator().compare(tgd1, tgd2);
             else if (dep1 instanceof TGD || dep2 instanceof TGD) return -1;
