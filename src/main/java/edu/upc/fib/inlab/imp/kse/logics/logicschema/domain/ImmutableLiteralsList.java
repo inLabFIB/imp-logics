@@ -297,6 +297,33 @@ public class ImmutableLiteralsList implements List<Literal> {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    /**
+     * @return a list of ImmutableLiteralsList after recursively unfolding all the positive derived non-recursive literals, or itself
+     * if no unfolding can be applied
+     */
+    public List<ImmutableLiteralsList> unfoldRecursively() {
+        List<ImmutableLiteralsList> result = new LinkedList<>();
+
+        //Looking for a positive literal to unfold
+        Integer indexOfTheLiteralToUnfold = null;
+        for (int index = 0; index < literalList.size() && indexOfTheLiteralToUnfold == null; index++) {
+            Literal lit = literalList.get(index);
+            indexOfTheLiteralToUnfold =
+                    lit instanceof OrdinaryLiteral oLit && oLit.isDerived() && oLit.isPositive() && !oLit.isRecursive() ?
+                            index : null;
+        }
+
+        //Unfolding the found literal
+        if (Objects.nonNull(indexOfTheLiteralToUnfold)) {
+            List<ImmutableLiteralsList> listAfterOneUnfolding = this.unfold(indexOfTheLiteralToUnfold, false);
+            for (ImmutableLiteralsList literalsListAfterOneUnfolding : listAfterOneUnfolding) {
+                result.addAll(literalsListAfterOneUnfolding.unfoldRecursively());
+            }
+        } else result.add(this);
+
+        return result;
+    }
+
     public List<ImmutableLiteralsList> unfold(int index, boolean unfoldNegatedLiterals) {
         Literal literal = this.literalList.get(index);
         List<ImmutableLiteralsList> result = new LinkedList<>();

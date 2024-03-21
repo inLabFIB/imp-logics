@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LiteralPosition;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.LogicEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismComparator;
@@ -228,6 +229,17 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         Assertions.assertThat(haveIsomorphism)
                 .describedAs("Actual literal list: " + actual + " \n" +
                         "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
+        return this;
+    }
+
+
+    @SuppressWarnings("UnusedReturnValue")
+    public ImmutableLiteralsListAssert isIsomorphicTo(String expectedLiteralsListString) {
+        ImmutableLiteralsList expectedLiteralsList = ImmutableLiteralsListMother.create(expectedLiteralsListString);
+        boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expectedLiteralsList);
+        Assertions.assertThat(haveIsomorphism)
+                .describedAs("Actual literal list: " + actual + " \n" +
+                             "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
         return this;
     }
 

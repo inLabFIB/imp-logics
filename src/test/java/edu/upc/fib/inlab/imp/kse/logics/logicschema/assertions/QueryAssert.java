@@ -1,8 +1,13 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Query;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.QueryMother;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismComparator;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismOptions;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
+
+import java.util.List;
 
 public class QueryAssert extends AbstractAssert<QueryAssert, Query> {
 
@@ -49,9 +54,15 @@ public class QueryAssert extends AbstractAssert<QueryAssert, Query> {
     }
 
     public QueryAssert isIsomorphicTo(Query expected) {
-        ImmutableLiteralsListAssert.assertThat(expected.getBody())
-                .isIsomorphicTo(expected.getBody());
+        boolean result = new IsomorphismComparator(new IsomorphismOptions())
+                .areIsomorphic(actual, expected);
+        Assertions.assertThat(result).isTrue();
         return this;
+    }
+
+    public QueryAssert isIsomorphicTo(List<String> headTerms, String expectedString) {
+        Query expectedQuery = QueryMother.createQuery(headTerms, expectedString);
+        return isIsomorphicTo(expectedQuery);
     }
 
 }

@@ -410,6 +410,75 @@ class ImmutableLiteralsListTest {
                         .isIsomorphicTo(expectedLiteralsList2);
             }
         }
+
+        @Nested
+        class ResursiveUnfolding {
+            @Test
+            void should_returnSameList_ifAllPositiveLiteralsAreBase() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create("P(x), R(x), not(S(x)), x > 4");
+                List<ImmutableLiteralsList> unfolded = literalsList.unfoldRecursively();
+                assertThat(unfolded)
+                        .hasSize(1)
+                        .anySatisfy(list -> ImmutableLiteralsListAssert.assertThat(list).isIsomorphicTo(literalsList));
+            }
+
+            @Test
+            void should_unfoldPositiveDerivedLiterals() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), R(x), not(S(x)), x > 4",
+                        """
+                                    R(x) :- T(x, y)
+                                """
+                );
+                List<ImmutableLiteralsList> unfolded = literalsList.unfoldRecursively();
+                assertThat(unfolded)
+                        .hasSize(1)
+                        .anySatisfy(list -> ImmutableLiteralsListAssert.assertThat(list).isIsomorphicTo("P(x), T(x, y), not(S(x)), x > 4"));
+            }
+
+            @Test
+            void should_notUnfoldNegatedDerivedLiterals() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), not(R(x)), not(S(x)), x > 4",
+                        """
+                                    R(x) :- T(x, y)
+                                """
+                );
+                List<ImmutableLiteralsList> unfolded = literalsList.unfoldRecursively();
+                assertThat(unfolded)
+                        .hasSize(1)
+                        .anySatisfy(list -> ImmutableLiteralsListAssert.assertThat(list).isIsomorphicTo(literalsList));
+            }
+
+            @Test
+            void should_notUnfoldRecursivePositiveLiterals() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), R(x, y), not(S(x)), x > 4",
+                        """
+                                    R(x, y) :- R(x, z), R(z, y)
+                                """
+                );
+                List<ImmutableLiteralsList> unfolded = literalsList.unfoldRecursively();
+                assertThat(unfolded)
+                        .containsExactly(literalsList);
+            }
+
+            @Test
+            void should_unfoldPositiveDerivedLiteralsRecursively() {
+                ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                        "P(x), R(x, y), not(S(x)), x > 4",
+                        """
+                                    R(x, y) :- A(x, z), B(z, y)
+                                    R(x, y) :- C(x, z), D(z, y)
+                                """
+                );
+                List<ImmutableLiteralsList> unfolded = literalsList.unfoldRecursively();
+                assertThat(unfolded)
+                        .hasSize(2)
+                        .anySatisfy(list -> ImmutableLiteralsListAssert.assertThat(list).isIsomorphicTo("P(x), A(x, z), B(z, y), not(S(x)), x > 4"))
+                        .anySatisfy(list -> ImmutableLiteralsListAssert.assertThat(list).isIsomorphicTo("P(x), C(x, z), D(z, y), not(S(x)), x > 4"));
+            }
+        }
     }
 
     @Test
