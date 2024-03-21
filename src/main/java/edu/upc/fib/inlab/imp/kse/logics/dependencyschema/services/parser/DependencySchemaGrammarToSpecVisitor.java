@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.DependencySchemaSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.EGDSpec;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.HeadAtomsSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
@@ -29,7 +30,7 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
     @Override
     public TGDSpec visitTgd(DependencySchemaGrammarParser.TgdContext ctx) {
         BodySpec body = visitBody(ctx.body());
-        BodySpec head = visitTgd_head(ctx.tgd_head());
+        HeadAtomsSpec head = visitTgd_head(ctx.tgd_head());
         TGDSpec tgdSpec = new TGDSpec(body, head);
         dependencySchemaSpec.addDependencySpecs(tgdSpec);
         return tgdSpec;
@@ -45,12 +46,12 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
     }
 
     @Override
-    public BodySpec visitTgd_head(DependencySchemaGrammarParser.Tgd_headContext ctx) {
-        List<LiteralSpec> literals = new LinkedList<>();
+    public HeadAtomsSpec visitTgd_head(DependencySchemaGrammarParser.Tgd_headContext ctx) {
+        List<OrdinaryLiteralSpec> literals = new LinkedList<>();
         for (DependencySchemaGrammarParser.PositiveAtomContext atomContext : ctx.positiveAtom()) {
             literals.add(this.visitPositiveAtom(atomContext));
         }
-        return new BodySpec(literals);
+        return new HeadAtomsSpec(literals);
     }
 
     @Override

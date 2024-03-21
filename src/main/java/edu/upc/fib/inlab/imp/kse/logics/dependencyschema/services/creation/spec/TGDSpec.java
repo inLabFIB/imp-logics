@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,20 +12,20 @@ import java.util.Objects;
  */
 public class TGDSpec extends DependencySpec {
 
-    private final BodySpec headAtomSpecs;
+    private final HeadAtomsSpec headAtomSpecs;
 
-    public TGDSpec(BodySpec body, BodySpec headAtomsSpecs) {
+    public TGDSpec(BodySpec body, HeadAtomsSpec headAtomsSpecs) {
         super(body);
         if (Objects.isNull(headAtomsSpecs)) throw new IllegalArgumentException("Head terms cannot be null");
 
         this.headAtomSpecs = headAtomsSpecs;
     }
 
-    public TGDSpec(List<LiteralSpec> bodySpec, List<LiteralSpec> termSpecList) {
-        this(new BodySpec(bodySpec), new BodySpec(termSpecList));
+    public TGDSpec(List<LiteralSpec> bodySpec, List<OrdinaryLiteralSpec> termSpecList) {
+        this(new BodySpec(bodySpec), new HeadAtomsSpec(termSpecList));
     }
 
-    public BodySpec getHeadAtomSpecs() {
+    public HeadAtomsSpec getHeadAtomSpecs() {
         return headAtomSpecs;
     }
 }

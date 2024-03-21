@@ -21,6 +21,10 @@ public class OrdinaryLiteralSpec implements LiteralSpec {
         this.isPositive = isPositive;
     }
 
+    public OrdinaryLiteralSpec(String predicateName, List<TermSpec> termsList) {
+        this(predicateName, termsList, true);
+    }
+
     public String getPredicateName() {
         return predicateName;
     }

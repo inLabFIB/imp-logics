@@ -72,7 +72,7 @@ public class DependencySchemaBuilder {
     private void addDependency(DependencySpec dependencySpec) {
         ImmutableLiteralsList body = buildBody(dependencySpec.getBody());
         if (dependencySpec instanceof TGDSpec tgdSpec) {
-            List<LiteralSpec> castedList = tgdSpec.getHeadAtomSpecs().literals()
+            List<LiteralSpec> castedList = tgdSpec.getHeadAtomSpecs().atoms()
                     .stream()
                     .map(LiteralSpec.class::cast)
                     .toList();

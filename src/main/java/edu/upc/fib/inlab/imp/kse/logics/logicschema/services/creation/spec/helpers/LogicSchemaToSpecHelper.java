@@ -63,13 +63,15 @@ public class LogicSchemaToSpecHelper {
     }
 
     public static List<TermSpec> buildTermsSpecs(ImmutableTermList terms) {
-        return terms.stream().map(t -> {
-            if (t instanceof Constant) {
-                return new ConstantSpec(t.getName());
-            } else if (t instanceof Variable) {
-                return new VariableSpec(t.getName());
-            } else throw new RuntimeException("Unknown term type: " + t.getClass().getName());
-        }).toList();
+        return terms.stream().map(LogicSchemaToSpecHelper::buildTermSpec).toList();
+    }
+
+    public static TermSpec buildTermSpec(Term t) {
+        if (t instanceof Constant) {
+            return new ConstantSpec(t.getName());
+        } else if (t instanceof Variable) {
+            return new VariableSpec(t.getName());
+        } else throw new RuntimeException("Unknown term type: " + t.getClass().getName());
     }
 
     public static BodySpec buildBodySpec(List<Literal> body) {
