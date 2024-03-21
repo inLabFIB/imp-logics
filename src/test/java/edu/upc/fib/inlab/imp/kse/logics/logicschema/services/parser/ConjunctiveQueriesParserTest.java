@@ -10,6 +10,7 @@ import org.assertj.core.api.InstanceOfAssertFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions.assertThat;
@@ -28,7 +29,7 @@ class ConjunctiveQueriesParserTest {
 
             ConjunctiveQueriesParser parser = new ConjunctiveQueriesParser();
 
-            Set<ConjunctiveQuery> queries = parser.parse(queriesString);
+            List<ConjunctiveQuery> queries = parser.parse(queriesString);
 
             assertThat(queries)
                     .hasSize(1)
@@ -45,7 +46,7 @@ class ConjunctiveQueriesParserTest {
 
             ConjunctiveQueriesParser parser = new ConjunctiveQueriesParser();
 
-            Set<ConjunctiveQuery> queries = parser.parse(queriesString);
+            List<ConjunctiveQuery> queries = parser.parse(queriesString);
 
             assertThat(queries)
                     .hasSize(1)
@@ -70,7 +71,7 @@ class ConjunctiveQueriesParserTest {
 
             ConjunctiveQueriesParser parser = new ConjunctiveQueriesParser();
 
-            Set<ConjunctiveQuery> queries = parser.parse(queriesString);
+            List<ConjunctiveQuery> queries = parser.parse(queriesString);
 
             assertThat(queries)
                     .hasSize(2)
@@ -109,7 +110,7 @@ class ConjunctiveQueriesParserTest {
 
             String queryString = "() :- q(x)";
             ConjunctiveQueriesParser queryParser = new ConjunctiveQueriesParser();
-            Set<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
+            List<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
 
             Predicate expected = relationalSchema.stream().toList().get(0);
 
@@ -142,7 +143,7 @@ class ConjunctiveQueriesParserTest {
 
             String queryString = "() :- p(x)";
             ConjunctiveQueriesParser queryParser = new ConjunctiveQueriesParser();
-            Set<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
+            List<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
 
             Assertions.assertThat(queries).hasSize(1);
         }

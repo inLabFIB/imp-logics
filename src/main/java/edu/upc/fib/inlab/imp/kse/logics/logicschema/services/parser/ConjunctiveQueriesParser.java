@@ -5,15 +5,14 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConjunctiveQuery;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.QueryBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConjunctiveQuerySetSpec;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConjunctiveQuerySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.TermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
 import org.antlr.v4.runtime.*;
 
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ConjunctiveQueriesParser {
 
@@ -27,18 +26,18 @@ public class ConjunctiveQueriesParser {
         visitor = new QueriesGrammarToSpecVisitor(new StringToTermSpecFactory(termTypeCriteria));
     }
 
-    public Set<ConjunctiveQuery> parse(String queriesString) {
+    public List<ConjunctiveQuery> parse(String queriesString) {
         ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
         return queriesSpecs.conjunctiveQuerySpecSet().stream()
                 .map(querySpec -> new QueryBuilder().buildQuery(querySpec))
-                .collect(Collectors.toSet());
+                .toList();
     }
 
-    public Set<ConjunctiveQuery> parse(String queriesString, Set<Predicate> relationalSchema) {
+    public List<ConjunctiveQuery> parse(String queriesString, Set<Predicate> relationalSchema) {
         ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
         return queriesSpecs.conjunctiveQuerySpecSet().stream()
                 .map(querySpec -> new QueryBuilder(relationalSchema).buildQuery(querySpec))
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     public ConjunctiveQuerySetSpec parseToSpec(String queriesString) {
