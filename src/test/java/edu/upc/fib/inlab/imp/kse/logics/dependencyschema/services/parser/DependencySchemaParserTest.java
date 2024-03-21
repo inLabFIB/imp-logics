@@ -37,7 +37,7 @@ class DependencySchemaParserTest {
             DependencySchema dependencySchema1 = parser.parse(schemaString);
             Set<Predicate> relationalSchema1 = dependencySchema1.getAllPredicates();
 
-            DependencySchema dependencySchema2 =parser.parse(schemaString, relationalSchema1);
+            DependencySchema dependencySchema2 = parser.parse(schemaString, relationalSchema1);
             Set<Predicate> relationalSchema2 = dependencySchema2.getAllPredicates();
 
             Assertions.assertThat(relationalSchema1).containsExactlyInAnyOrderElementsOf(relationalSchema2);
@@ -63,7 +63,7 @@ class DependencySchemaParserTest {
             Set<Predicate> relationalSchema1 = dependencySchema1.getAllPredicates();
 
             String schemaString2 = "r() -> s()";
-            DependencySchema dependencySchema2 =parser.parse(schemaString2, relationalSchema1);
+            DependencySchema dependencySchema2 = parser.parse(schemaString2, relationalSchema1);
             Set<Predicate> relationalSchema2 = dependencySchema2.getAllPredicates();
 
             Assertions.assertThat(relationalSchema2)

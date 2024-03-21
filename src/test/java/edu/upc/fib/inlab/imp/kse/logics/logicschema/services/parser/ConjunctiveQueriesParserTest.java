@@ -1,10 +1,11 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.QueryAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConjunctiveQuery;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Query;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableAtomListMother;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithIDSpec;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -95,4 +96,56 @@ class ConjunctiveQueriesParserTest {
                     );
         }
     }
+
+    @Nested
+    class ParsingWithAlreadyExistingRelationalSchema {
+
+        @Test
+        void shouldNotCreateNewPredicates_whenExistingRelationalSchemaIsPassed() {
+            String logicSchemaString = "@1 :- q(x)";
+            LogicSchemaParser<LogicConstraintWithIDSpec> logicSchemaParser = new LogicSchemaWithIDsParser();
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+            Set<Predicate> relationalSchema = logicSchema.getAllPredicates();
+
+            String queryString = "() :- q(x)";
+            ConjunctiveQueriesParser queryParser = new ConjunctiveQueriesParser();
+            Set<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
+
+            Predicate expected = relationalSchema.stream().toList().get(0);
+
+            Assertions.assertThat(queries)
+                    .hasSize(1)
+                    .first(instanceOfQueryAssert)
+                    .satisfies(q -> Assertions.assertThat(((OrdinaryLiteral) q.getBody().get(0)).getPredicate()).isEqualTo(expected));
+        }
+
+        @Test
+        void shouldThrowException_whenUsingAlreadyExistentPredicatesButWithDifferentArity() {
+            String logicSchemaString = "@1 :- q(x)";
+            LogicSchemaParser<LogicConstraintWithIDSpec> logicSchemaParser = new LogicSchemaWithIDsParser();
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+            Set<Predicate> relationalSchema = logicSchema.getAllPredicates();
+
+            String queryString = "() :- q(x,y)";
+            ConjunctiveQueriesParser queryParser = new ConjunctiveQueriesParser();
+
+            Assertions.assertThatThrownBy(() -> queryParser.parse(queryString, relationalSchema))
+                    .isInstanceOf(RepeatedPredicateName.class);
+        }
+
+        @Test
+        void shouldAddNewPredicates_whenExistingRelationalSchemaIsPassed_andNewPredicatesUsed() {
+            String logicSchemaString = "@1 :- q(x)";
+            LogicSchemaParser<LogicConstraintWithIDSpec> logicSchemaParser = new LogicSchemaWithIDsParser();
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+            Set<Predicate> relationalSchema = logicSchema.getAllPredicates();
+
+            String queryString = "() :- p(x)";
+            ConjunctiveQueriesParser queryParser = new ConjunctiveQueriesParser();
+            Set<ConjunctiveQuery> queries = queryParser.parse(queryString, relationalSchema);
+
+            Assertions.assertThat(queries).hasSize(1);
+        }
+    }
+
 }
