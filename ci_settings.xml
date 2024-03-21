@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>inlab-maven-repository</id>
+            <username>${MAVEN_REPO_USER}</username>
+            <password>${MAVEN_REPO_PWD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>inlab</id>
+            <properties>
+                <altSnapshotDeploymentRepository>inlab-maven-repository::${MAVEN_REPO_SNAPSHOT}</altSnapshotDeploymentRepository>
+                <altReleaseDeploymentRepository>inlab-maven-repository::${MAVEN_REPO_RELEASE}</altReleaseDeploymentRepository>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>inlab-maven-repository-snapshots</id>
+                    <name>Internal Snapshots</name>
+                    <url>${MAVEN_REPO_SNAPSHOT}</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>inlab-maven-repository-releases</id>
+                    <name>Internal Releases</name>
+                    <url>${MAVEN_REPO_RELEASE}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>inlab</activeProfile>
+    </activeProfiles>
+</settings>
