@@ -1,54 +1,55 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConjunctiveQuery;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Query;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.QueryBuilder;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConjunctiveQuerySetSpec;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.QuerySetSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.TermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
 import org.antlr.v4.runtime.*;
 
+
 import java.util.List;
 import java.util.Set;
 
-public class ConjunctiveQueriesParser {
+public class QueryParser {
 
-    private final QueriesGrammarToSpecVisitor visitor;
+    private final QueryGrammarToSpecVisitor visitor;
 
-    public ConjunctiveQueriesParser() {
+    public QueryParser() {
         this(new AllVariableTermTypeCriteria());
     }
 
-    public ConjunctiveQueriesParser(TermTypeCriteria termTypeCriteria) {
-        visitor = new QueriesGrammarToSpecVisitor(new StringToTermSpecFactory(termTypeCriteria));
+    public QueryParser(TermTypeCriteria termTypeCriteria) {
+        visitor = new QueryGrammarToSpecVisitor(new StringToTermSpecFactory(termTypeCriteria));
     }
 
-    public List<ConjunctiveQuery> parse(String queriesString) {
-        ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
-        return queriesSpecs.conjunctiveQuerySpecSet().stream()
+    public List<Query> parse(String queriesString) {
+        QuerySetSpec queriesSpecs = parseToSpec(queriesString);
+        return queriesSpecs.querySpecSet().stream()
                 .map(querySpec -> new QueryBuilder().buildQuery(querySpec))
                 .toList();
     }
 
-    public List<ConjunctiveQuery> parse(String queriesString, Set<Predicate> relationalSchema) {
-        ConjunctiveQuerySetSpec queriesSpecs = parseToSpec(queriesString);
-        return queriesSpecs.conjunctiveQuerySpecSet().stream()
+    public List<Query> parse(String queriesString, Set<Predicate> relationalSchema) {
+        QuerySetSpec queriesSpecs = parseToSpec(queriesString);
+        return queriesSpecs.querySpecSet().stream()
                 .map(querySpec -> new QueryBuilder(relationalSchema).buildQuery(querySpec))
                 .toList();
     }
 
-    public ConjunctiveQuerySetSpec parseToSpec(String queriesString) {
+    public QuerySetSpec parseToSpec(String queriesString) {
         CharStream input = CharStreams.fromString(queriesString);
-        ConjunctiveQueriesGrammarLexer lexer = new ConjunctiveQueriesGrammarLexer(input);
+        QueryGrammarLexer lexer = new QueryGrammarLexer(input);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(new ConjunctiveQueriesParser.ErrorListener());
+        lexer.addErrorListener(new QueryParser.ErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        ConjunctiveQueriesGrammarParser parser = new ConjunctiveQueriesGrammarParser(tokens);
-        parser.addErrorListener(new ConjunctiveQueriesParser.ErrorListener());
-        ConjunctiveQueriesGrammarParser.ProgContext tree = parser.prog();
+        QueryGrammarParser parser = new QueryGrammarParser(tokens);
+        parser.addErrorListener(new QueryParser.ErrorListener());
+        QueryGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
     }
 

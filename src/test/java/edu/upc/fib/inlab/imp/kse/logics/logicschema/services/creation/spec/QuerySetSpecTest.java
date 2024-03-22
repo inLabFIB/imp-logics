@@ -7,19 +7,19 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ConjunctiveQuerySetSpecTest {
+class QuerySetSpecTest {
 
     @Test
 
     void should_throwException_when_setIsNull() {
-        assertThatThrownBy(() -> new ConjunctiveQuerySetSpec(null))
+        assertThatThrownBy(() -> new QuerySetSpec(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void should_throwException_when_setIsEmpty() {
-        Set<ConjunctiveQuerySpec> emptySet = Collections.emptySet();
-        assertThatThrownBy(() -> new ConjunctiveQuerySetSpec(emptySet))
+        Set<QuerySpec> emptySet = Collections.emptySet();
+        assertThatThrownBy(() -> new QuerySetSpec(emptySet))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

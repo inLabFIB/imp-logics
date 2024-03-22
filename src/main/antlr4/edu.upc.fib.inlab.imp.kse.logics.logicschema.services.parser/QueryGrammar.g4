@@ -1,4 +1,4 @@
-grammar ConjunctiveQueriesGrammar;
+grammar QueryGrammar;
 
 tokens {
   BUILTIN_PREDICATE

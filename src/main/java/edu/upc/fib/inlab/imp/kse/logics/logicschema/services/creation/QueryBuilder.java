@@ -30,8 +30,8 @@ public class QueryBuilder {
         return buildQuery(termSpecList, bodySpec.literals());
     }
 
-    public ConjunctiveQuery buildQuery(ConjunctiveQuerySpec queriesSpec) {
-        return (ConjunctiveQuery) buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
+    public Query buildQuery(QuerySpec queriesSpec) {
+        return buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {

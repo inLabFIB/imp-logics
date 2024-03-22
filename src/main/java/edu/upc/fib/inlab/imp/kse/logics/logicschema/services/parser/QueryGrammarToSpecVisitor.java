@@ -5,57 +5,57 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpe
 
 import java.util.*;
 
-public class QueriesGrammarToSpecVisitor extends ConjunctiveQueriesGrammarBaseVisitor<LogicElementSpec> {
+public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElementSpec> {
 
     private final StringToTermSpecFactory stringToTermSpecFactory;
 
-    private Set<ConjunctiveQuerySpec> queries;
+    private Set<QuerySpec> queries;
 
-    public QueriesGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
+    public QueryGrammarToSpecVisitor(StringToTermSpecFactory stringToTermSpecFactory) {
         this.stringToTermSpecFactory = stringToTermSpecFactory;
     }
 
     @Override
-    public ConjunctiveQuerySetSpec visitProg(ConjunctiveQueriesGrammarParser.ProgContext ctx) {
+    public QuerySetSpec visitProg(QueryGrammarParser.ProgContext ctx) {
         queries = new LinkedHashSet<>();
         visitChildren(ctx);
-        return new ConjunctiveQuerySetSpec(queries);
+        return new QuerySetSpec(queries);
     }
 
     @Override
-    public ConjunctiveQuerySpec visitConjunctiveQuery(ConjunctiveQueriesGrammarParser.ConjunctiveQueryContext ctx) {
+    public QuerySpec visitConjunctiveQuery(QueryGrammarParser.ConjunctiveQueryContext ctx) {
         List<TermSpec> headTerms = createTermsList(ctx.termsList());
         BodySpec body = createBody(ctx.body());
-        ConjunctiveQuerySpec parsedConjunctiveQuerySpec = new ConjunctiveQuerySpec(headTerms, body);
-        queries.add(parsedConjunctiveQuerySpec);
-        return parsedConjunctiveQuerySpec;
+        QuerySpec parsedQuerySpec = new QuerySpec(headTerms, body);
+        queries.add(parsedQuerySpec);
+        return parsedQuerySpec;
     }
 
-    protected BodySpec createBody(ConjunctiveQueriesGrammarParser.BodyContext ctx) {
+    protected BodySpec createBody(QueryGrammarParser.BodyContext ctx) {
         List<LiteralSpec> literals = new LinkedList<>();
-        for (ConjunctiveQueriesGrammarParser.LiteralContext litContext : ctx.literal()) {
+        for (QueryGrammarParser.LiteralContext litContext : ctx.literal()) {
             literals.add((LiteralSpec) this.visitLiteral(litContext));
         }
         return new BodySpec(literals);
     }
 
     @Override
-    public OrdinaryLiteralSpec visitPositiveAtom(ConjunctiveQueriesGrammarParser.PositiveAtomContext ctx) {
+    public OrdinaryLiteralSpec visitPositiveAtom(QueryGrammarParser.PositiveAtomContext ctx) {
         String predicateName = ctx.atom().predicate().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
         return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
     }
 
-    private List<TermSpec> createTermsList(ConjunctiveQueriesGrammarParser.TermsListContext ctx) {
+    private List<TermSpec> createTermsList(QueryGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
-        for (ConjunctiveQueriesGrammarParser.TermContext termContext : ctx.term()) {
+        for (QueryGrammarParser.TermContext termContext : ctx.term()) {
             termSpecList.add(this.visitTerm(termContext));
         }
         return termSpecList;
     }
 
     @Override
-    public TermSpec visitTerm(ConjunctiveQueriesGrammarParser.TermContext ctx) {
+    public TermSpec visitTerm(QueryGrammarParser.TermContext ctx) {
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
     }
 
