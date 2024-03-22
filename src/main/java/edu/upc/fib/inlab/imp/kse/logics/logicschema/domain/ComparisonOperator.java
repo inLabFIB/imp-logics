@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Implementation of binary arithmetic comparison operators such as <, or <=.
+ * {@code Implementation of binary arithmetic comparison operators such as <, or <=.}
  */
 public enum ComparisonOperator {
 

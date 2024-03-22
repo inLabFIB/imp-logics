@@ -32,8 +32,8 @@ import static java.util.Objects.nonNull;
  * <p>
  * It is worth to mention that the finder can find homomorphisms between built-in literals with their symmetric
  * comparison operations.
- * E.g. the finder can realize that "a < b" is homomorphic to "b > a".
- * However, do note that the finder will assert that there is no homomorphism from "P(x,x)" to "P(x, y), x=y".</p>
+ * {@code E.g. the finder can realize that "a < b" is homomorphic to "b > a".
+ * However, do note that the finder will assert that there is no homomorphism from "P(x,x)" to "P(x, y), x=y".}</p>
  */
 public class HomomorphismFinder {
     /*

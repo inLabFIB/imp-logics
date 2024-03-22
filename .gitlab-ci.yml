@@ -54,3 +54,16 @@ qa:sonarqube-check:
   allow_failure: true
   only:
     - develop
+
+pages:
+  stage: deploy
+  script:
+    - mvn javadoc:aggregate       # Generate Javadocs
+    - mkdir public                # GitLab Pages requires your site to be in a 'public' directory
+    - cp -r target/site/* public  # Copy site to the 'public' directory
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - develop

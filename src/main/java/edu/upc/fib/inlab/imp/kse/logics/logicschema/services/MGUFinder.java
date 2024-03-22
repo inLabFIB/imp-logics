@@ -10,7 +10,7 @@ import java.util.*;
  * literals, and atoms.
  * <p>
  * In the current version, two comparison built-in literals such as
- * "2 < a" and "a > 2" are considered to be non-unifiable since
+ * {@code "2 < a" and "a > 2"} are considered to be non-unifiable since
  * they are using different comparison built-in.
  *
  */

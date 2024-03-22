@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * Implementation of the logic ComparisonBuiltInLiteral.
- * E.g. "x < 4".
+ * {@code E.g. "x < 4".}
  */
 public class ComparisonBuiltInLiteral extends BuiltInLiteral {
 

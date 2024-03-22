@@ -116,7 +116,7 @@ public class LogicSchema {
     /**
      * A LevelHierarchy is a partition of the predicates of a schema into several levels,
      * where level 0 contains the base predicates, and each derived predicate from level i
-     * is defined through predicates from levels j < i.
+     * is defined through predicates from levels {@code j < i}.
      *
      * @return a LevelHierarchy for this schema
      */

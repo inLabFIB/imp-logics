@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * <p>A database is called hierarchical if its predicates can be partitioned into
  * levels so that the definitions of level 0 predicates consist solely of base predicates
- * and the bodies of the derived predicates of level j contain only level i predicates, where i < j. </p>
+ * and the bodies of the derived predicates of level j contain only level i predicates, where {@code i < j}. </p>
  */
 public class LevelHierarchy implements Iterable<Level> {
     private final List<Level> levels;

@@ -79,7 +79,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     /**
      * @param logicSchema not null
-     * @return a schema transformation where the final schema has the same (based & derived) predicates as the one given but unfolding
+     * @return a schema transformation where the final schema has the same (based and derived) predicates as the one given but unfolding
      * all the positive derived literals
      */
     @Override
@@ -89,7 +89,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     /**
      * @param schema not null
-     * @return a new schema with the same (based & derived) predicates as the one given but unfolding
+     * @return a new schema with the same (based and derived) predicates as the one given but unfolding
      * all the positive derived literals
      */
     public LogicSchema unfold(LogicSchema schema) {
