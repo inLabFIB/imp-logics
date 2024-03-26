@@ -1,10 +1,13 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithoutIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicSchemaSpec;
+
+import java.util.Set;
 
 /**
  * <p> Class responsible for creating a logic schema for a given logic schema specification.
@@ -33,7 +36,11 @@ public class LogicSchemaFactory<T extends LogicConstraintSpec> {
     }
 
     public LogicSchema createLogicSchema(LogicSchemaSpec<T> logicSchemaSpec) {
-        return new LogicSchemaBuilder<>(constraintIDGenerator)
+        return createLogicSchema(logicSchemaSpec, Set.of());
+    }
+
+    public LogicSchema createLogicSchema(LogicSchemaSpec<T> logicSchemaSpec, Set<Predicate> relationalSchema) {
+        return new LogicSchemaBuilder<>(constraintIDGenerator, relationalSchema)
                 .addAllPredicates(logicSchemaSpec.getPredicateSpecList())
                 .addAllDerivationRules(logicSchemaSpec.getDerivationRuleSpecList())
                 .addAllLogicConstraints(logicSchemaSpec.getLogicConstraintSpecList())

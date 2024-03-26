@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LogicSchemaFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicSchemaSpec;
@@ -31,9 +32,13 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
     protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
 
     public LogicSchema parse(String schemaString) {
+        return parse(schemaString, Set.of());
+    }
+
+    public LogicSchema parse(String schemaString, Set<Predicate> relationalSchema) {
         LogicSchemaSpec<T> logicSchemaSpec = parseToSpec(schemaString);
         LogicSchemaFactory<T> factory = createLogicSchemaFactory();
-        return factory.createLogicSchema(logicSchemaSpec);
+        return factory.createLogicSchema(logicSchemaSpec, relationalSchema);
     }
 
     public LogicSchemaSpec<T> parseToSpec(String schemaString) {

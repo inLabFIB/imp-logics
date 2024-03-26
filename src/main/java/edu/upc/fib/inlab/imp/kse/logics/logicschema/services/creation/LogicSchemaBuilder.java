@@ -20,7 +20,7 @@ import java.util.*;
 public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     private final Map<ConstraintID, LogicConstraint> logicConstraintById = new HashMap<>();
-    private final Map<String, MutablePredicate> predicatesByName = new HashMap<>();
+    private final Map<String, Predicate> predicatesByName = new HashMap<>();
     private final ConstraintIDGenerator<T> constraintIDGenerator;
 
 
@@ -34,6 +34,13 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
     public LogicSchemaBuilder(ConstraintIDGenerator<T> constraintIDGenerator) {
         this.constraintIDGenerator = constraintIDGenerator;
+    }
+
+    public LogicSchemaBuilder(ConstraintIDGenerator<T> constraintIDGenerator, Set<Predicate> predicates) {
+        this.constraintIDGenerator = constraintIDGenerator;
+        for (Predicate pred : predicates) {
+            this.predicatesByName.put(pred.getName(), pred);
+        }
     }
 
     public LogicSchemaBuilder<T> addPredicate(PredicateSpec... predicateSpecs) {
@@ -73,7 +80,7 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
                 drs.getPredicateName(),
                 new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
         Query query = buildQuery(drs.getTermSpecList(), drs.getBody());
-        MutablePredicate mutablePredicate = predicatesByName.get(drs.getPredicateName());
+        MutablePredicate mutablePredicate = (MutablePredicate) predicatesByName.get(drs.getPredicateName());
         mutablePredicate.addDerivationRule(query);
     }
 

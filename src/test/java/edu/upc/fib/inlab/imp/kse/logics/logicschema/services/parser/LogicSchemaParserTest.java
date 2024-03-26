@@ -2,9 +2,11 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -327,5 +329,55 @@ class LogicSchemaParserTest {
 
             LiteralAssert.assertThat(ordinaryLiteral).hasVariable(0, variableString);
         }
+    }
+
+    @Nested
+    class RelationalSchemaParsingTests {
+        @Test
+        void should_parseUsingGivenPredicates_whenPredicatesAreGiven() {
+            Predicate p = new Predicate("P", 1);
+            Predicate q = new Predicate("Q", 2);
+            Set<Predicate> relationalSchema = Set.of(p, q);
+            String schemaString1 = "@1 :- P(x), Q(x, y)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+            LogicSchema schema = logicSchemaParser.parse(schemaString1, relationalSchema);
+
+            assertThat(schema.getAllPredicates())
+                    .contains(p, q);
+            assertThat(schema.getLogicConstraintByID(new ConstraintID("1")))
+                    .body()
+                    .anyMatch(lit -> lit instanceof OrdinaryLiteral oLit && oLit.getPredicate() == p)
+                    .anyMatch(lit -> lit instanceof OrdinaryLiteral oLit && oLit.getPredicate() == q);
+        }
+
+        @Test
+        void should_createNewPredicates_whenUsingPredicates_notGivenInInput() {
+            Predicate p = new Predicate("P", 1);
+            Predicate q = new Predicate("Q", 2);
+            Set<Predicate> relationalSchema = Set.of(p, q);
+            String schemaString1 = "@1 :- P(x), Q(x, y), R(x, y)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+            LogicSchema schema = logicSchemaParser.parse(schemaString1, relationalSchema);
+
+            assertThat(schema.getAllPredicates())
+                    .contains(p, q)
+                    .anyMatch(pred -> pred.getName().equals("R"));
+            assertThat(schema.getLogicConstraintByID(new ConstraintID("1")))
+                    .body()
+                    .anyMatch(lit -> lit instanceof OrdinaryLiteral oLit && oLit.getPredicate() == p)
+                    .anyMatch(lit -> lit instanceof OrdinaryLiteral oLit && oLit.getPredicate() == q)
+                    .anyMatch(lit -> lit instanceof OrdinaryLiteral oLit && oLit.getPredicateName().equals("R"));
+        }
+
+        @Test
+        void should_throwException_whenUsingPredicates_withDifferentArity_asInInput() {
+            Predicate p = new Predicate("P", 1);
+            Set<Predicate> relationalSchema = Set.of(p);
+            String schemaString1 = "@1 :- P(x, x)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+            Assertions.assertThatThrownBy(() -> logicSchemaParser.parse(schemaString1, relationalSchema))
+                    .isInstanceOf(RepeatedPredicateName.class);
+        }
+
     }
 }
