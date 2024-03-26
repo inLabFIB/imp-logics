@@ -18,13 +18,15 @@ import java.util.Set;
 public class QueryParser {
 
     private final QueryGrammarToSpecVisitor visitor;
+    private final CustomBuiltInPredicateNameChecker builtInPredicateNameChecker;
 
     public QueryParser() {
-        this(new AllVariableTermTypeCriteria());
+        this(new AllVariableTermTypeCriteria(), new CustomBuiltInPredicateNameChecker(Set.of()));
     }
 
-    public QueryParser(TermTypeCriteria termTypeCriteria) {
-        visitor = new QueryGrammarToSpecVisitor(new StringToTermSpecFactory(termTypeCriteria));
+    public QueryParser(TermTypeCriteria termTypeCriteria, CustomBuiltInPredicateNameChecker builtInPredicateNameChecker) {
+        this.visitor = new QueryGrammarToSpecVisitor(new StringToTermSpecFactory(termTypeCriteria));
+        this.builtInPredicateNameChecker = builtInPredicateNameChecker;
     }
 
     public List<Query> parse(String queriesString) {
@@ -43,7 +45,7 @@ public class QueryParser {
 
     public QuerySetSpec parseToSpec(String queriesString) {
         CharStream input = CharStreams.fromString(queriesString);
-        QueryGrammarLexer lexer = new QueryGrammarLexer(input);
+        QueryGrammarLexer lexer = new QueryGrammarLexer(input, builtInPredicateNameChecker);
         lexer.removeErrorListeners();
         lexer.addErrorListener(new QueryParser.ErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);

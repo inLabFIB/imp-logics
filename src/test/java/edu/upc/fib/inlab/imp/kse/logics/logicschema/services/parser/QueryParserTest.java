@@ -77,6 +77,41 @@ class QueryParserTest {
                     .containsAtomsByPredicateName(ImmutableAtomListMother.create("p(x), q(y)"));
         }
 
+        @Test
+        void shouldParse_simpleQuery_withNegatedLiteral() {
+            String queriesString = "() :- not(p(x))";
+            QueryParser parser = new QueryParser();
+
+            List<Query> queries = parser.parse(queriesString);
+
+            assertThat(queries)
+                    .hasSize(1)
+                    .first(instanceOfQueryAssert)
+                    .hasBodySize(1);
+            Query query = queries.get(0);
+            Assertions.assertThat(query.isConjunctiveQuery()).isFalse();
+            assertThat((query).getBody())
+                    .containsExactlyLiteralsOf(List.of("not(p(x))"));
+        }
+
+        @Test
+        void shouldParse_simpleQuery_withComparisonBuiltInLiteral() {
+            String queriesString = "(x) :- p(x), x<1";
+            QueryParser parser = new QueryParser();
+
+            List<Query> queries = parser.parse(queriesString);
+
+            assertThat(queries)
+                    .hasSize(1)
+                    .first(instanceOfQueryAssert)
+                    .hasNonEmptyHead()
+                    .hasBodySize(2);
+            Query query = queries.get(0);
+            Assertions.assertThat(query.isConjunctiveQuery()).isFalse();
+            assertThat((query).getBody())
+                    .containsExactlyLiteralsOf(List.of("p(x)", "x<1"));
+        }
+
     }
 
     @Nested
@@ -170,5 +205,6 @@ class QueryParserTest {
             Assertions.assertThat(queries).hasSize(1);
         }
     }
+
 
 }

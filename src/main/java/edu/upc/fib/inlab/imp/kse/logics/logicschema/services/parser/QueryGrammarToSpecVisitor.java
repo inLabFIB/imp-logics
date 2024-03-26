@@ -23,7 +23,7 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
     }
 
     @Override
-    public QuerySpec visitConjunctiveQuery(QueryGrammarParser.ConjunctiveQueryContext ctx) {
+    public QuerySpec visitQuery(QueryGrammarParser.QueryContext ctx) {
         List<TermSpec> headTerms = createTermsList(ctx.termsList());
         BodySpec body = createBody(ctx.body());
         QuerySpec parsedQuerySpec = new QuerySpec(headTerms, body);
@@ -40,10 +40,37 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
     }
 
     @Override
+    public BuiltInLiteralSpec visitComparisonBuiltInLiteral(QueryGrammarParser.ComparisonBuiltInLiteralContext ctx) {
+        TermSpec leftTermSpec = visitTerm(ctx.term(0));
+        TermSpec rightTermSpec = visitTerm(ctx.term(1));
+        List<TermSpec> termSpecList = List.of(leftTermSpec, rightTermSpec);
+        return new BuiltInLiteralSpec(ctx.OPERATOR().getText(), termSpecList);
+    }
+
+    @Override
+    public BuiltInLiteralSpec visitBooleanBuiltInLiteral(QueryGrammarParser.BooleanBuiltInLiteralContext ctx) {
+        return new BuiltInLiteralSpec(ctx.BOOLEAN().getText(), List.of());
+    }
+
+    @Override
+    public BuiltInLiteralSpec visitCustomBuiltInLiteral(QueryGrammarParser.CustomBuiltInLiteralContext ctx) {
+        String operatorName = ctx.BUILTIN_PREDICATE().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.termsList());
+        return new BuiltInLiteralSpec(operatorName, termSpecList);
+    }
+
+    @Override
     public OrdinaryLiteralSpec visitPositiveAtom(QueryGrammarParser.PositiveAtomContext ctx) {
         String predicateName = ctx.atom().predicate().getText();
         List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
         return new OrdinaryLiteralSpec(predicateName, termSpecList, true);
+    }
+
+    @Override
+    public OrdinaryLiteralSpec visitNegatedAtom(QueryGrammarParser.NegatedAtomContext ctx) {
+        String predicateName = ctx.atom().predicate().getText();
+        List<TermSpec> termSpecList = createTermsList(ctx.atom().termsList());
+        return new OrdinaryLiteralSpec(predicateName, termSpecList, false);
     }
 
     private List<TermSpec> createTermsList(QueryGrammarParser.TermsListContext ctx) {
