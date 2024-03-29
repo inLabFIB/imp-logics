@@ -43,7 +43,15 @@ class NonConflictingEGDsAnalyzerTest {
                                  WorksIn(name, dept) -> Person(name, city, state)
                                 Person(name, city, state), Person(name2, city, state2) -> state=state2
                                                 """
-                )
+                ),
+                Arguments.of("EGD is conflicting KeyDependency with non linear TGD",
+                        """
+                                % If a teacher is expert in a subject from a study plan, the teacher gives the subject
+                                ExpertIn(teacher, subject), ComposesPlan(subject, studyPlan) -> Teaches(teacher, subject)
+                                                    
+                                % Just one teacher per subject
+                                Teaches(teacher1, subject), Teaches(teacher2, subject) -> teacher1=teacher2
+                                            """)
         );
     }
 
@@ -55,5 +63,25 @@ class NonConflictingEGDsAnalyzerTest {
         boolean separable = new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(schema);
 
         Assertions.assertThat(separable).isFalse();
+    }
+
+    @Test
+    void shouldIdentifyAsSeparable() {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
+                    % If a student passes a subject, the student has some evaluation
+                    HasPassed(student, subject) -> Exam(teacher, student, subject, data)
+
+                    % If a teacher teaches a subject a student is coursing, the teacher evaluates the student
+                    Teaches(teacher, subject), Studies(student, subject) -> Exam(teacher, student, subject, data)
+
+                    % A subject has, at most, one exam per day
+                    Exam(teacher, student, subject, data), Exam(teacher2, student2, subject, data) -> teacher = teacher2
+                    Exam(teacher, student, subject, data), Exam(teacher2, student2, subject, data) -> student = student2
+                   
+                """);
+
+        boolean separable = new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(schema);
+
+        Assertions.assertThat(separable).isTrue();
     }
 }

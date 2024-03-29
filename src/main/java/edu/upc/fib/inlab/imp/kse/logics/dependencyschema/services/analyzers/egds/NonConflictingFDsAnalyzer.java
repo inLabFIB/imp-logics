@@ -87,10 +87,16 @@ public class NonConflictingFDsAnalyzer {
     private boolean isConflicting(Atom headAtom, Set<Variable> universalVariables, FunctionalDependency fd) {
         if (!headAtom.getPredicate().getName().equals(fd.getPredicateName())) return false;
         if (hasRepeatedExistentialVariable(headAtom, universalVariables)) return true;
+        if (!fd.isKeyDependency()) return true;
         if (containsConstant(headAtom)) return true;
 
         Set<Integer> universalPositions = getPositionsOfUniversalVariables(headAtom, universalVariables);
-        return universalPositions.stream().anyMatch(universalPos -> !fd.keyPositions().contains(universalPos));
+        return isProperSubset(fd.keyPositions(), universalPositions);
+    }
+
+    private static boolean isProperSubset(Set<Integer> firstSet, Set<Integer> secondSet) {
+        return firstSet.stream().allMatch(secondSet::contains) &&
+               firstSet.size() < secondSet.size();
     }
 
     private boolean containsConstant(Atom headAtom) {
