@@ -4,17 +4,28 @@
 
 The code is organized as follows:
 
-- `logics.schema`: contains the entities that represents the logic objects
-- `logics.services`: contains the services that operates over such entities:
-  - `logics.services.creation`: contains the services related to creating a logic schema
-  - `logics.services.parser`: contains the service of parsing
-  - `logics.services.comparator`: contains the service for analyzing the equivalence between two normal clauses
-  - `logic.services.normalizer`: contains some services for applying usefull equivalent transformations in logic
+- `dependencyschema.domain`: contains the entities that represents the logic objects of a dependency schema.
+- `dependencyschema.services`: contains the services that operates over such entities:
+  - `dependencyschema.services.creation`: contains the services related to creating a logic schema
+  - `dependencyschema.services.parser`: contains the service of parsing
+  - `dependencyschema.services.printer`: contains the service of printing
+  - `dependencyschema.services.analyzer`: contains some services for applying usefull analysis over dependency schemas.
+    schemas (e.g. unfolding).
+  - `dependencyschema.services.processes`: contains some services for applying usefull equivalent transformations in
+    logic
+
+- `logicschema.domain`: contains the entities that represents the logic objects of a Datalog program
+- `logicschema.services`: contains the services that operates over such entities:
+  - `logicschema.services.creation`: contains the services related to creating a logic schema
+  - `logicschema.services.parser`: contains the service of parsing
+  - `logicschema.services.printer`: contains the service of printing
+  - `logicschema.services.comparator`: contains the service for analyzing the equivalence between two normal clauses
+  - `logicschema.services.processes`: contains some services for applying usefull equivalent transformations in logic
     schemas (e.g. unfolding).
 
-We expect this project to grow with new services to be written in the `logics.services` package.
+On the following, we pay special attention to the LogicSchema part of the library.
 
-## Guidance for creating a LogicSchema
+## Guidance for creating a LogicSchema or DependencySchema
 
 Terms are Value Objects, so, they can be reused among several constructions. E.g, a variable term "x" can
 be reused in several atoms, or built-in literals, even from different schemas.
@@ -23,9 +34,22 @@ Predicates are Entities (since they are identified by their name).
 They can be reused to create several atoms inside the schema they belong to, but should not be used in different
 schemas.
 
-Atoms, and Literals should not be reused in several NormalClauses, neither twice in the same NormalClause.
+Atoms, and Literals should not be reused in several NormalClauses (or Dependencies),
+neither twice in the same NormalClause (or Dependency).
 This is because they are not value objects, but entities. Indeed, they cannot be value objects since they contain
 predicates, which are entities.
+
+## Guidance for extending DatalogPlusMinusAnalyzer to identify new Datalog+/- languages
+
+DatalogPlusMinusAnalyzer is the class in charge of identifying the specific Datalog+/-
+language some dependency schema is written in (e.g. *linear*, *guarded*, etc).
+
+In case you want to extend such Analyzer to identify a new Datalog+/- language, please,
+proceed as follows:
+
+1. Extend the enumeration from DatalogPlusMinusAnalyzer::DatalogPlusMinusLanguage to include your language.
+2. Implement a new subclass of DatalogPlusMinusLanguageChecker and implement its abstract methods.
+3. Instantiate such new subclass in the structure DatalogPlusMinusAnalyzer::datalogCheckers
 
 ## Guidance for creating equals & hashcode
 

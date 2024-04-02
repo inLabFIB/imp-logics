@@ -1,20 +1,29 @@
 # User Guide
 
-IMP logics is the implementation of the metamodel of Datalog extended with negation and built-in literals. This
+IMP-Logics is the implementation of the metamodel of Datalog extended with negation and built-in literals. This
 manual assumes that the user is comfortable with the traditional logic concepts of Term, Variable, Constant,
 Atom, Literal, OrdinaryLiteral, Built-in-Literal, NormalClause, LogicConstraint, and DerivationRule.
 
-By contract, almost all IMP Logics entities are immutable. For instance, if we have the literal "Emp(x)" and apply a
+IMP-Logics also offers an implementation of the metamodel of DependencySchemas, which can be used to define Datalog+/-
+programs.
+This manual assumes that the user is comfortable with the traditional notions of TGD, EGD and dependency.
+
+By contract, almost all IMP-Logics entities are immutable. For instance, if we have the literal "Emp(x)" and apply a
 substitution to obtain "Emp(John)", we are obtaining a new object "Emp(John)", rather than modifying the original "Emp(
 x)".
 Since, transformations over logic objects generates new logic objects, a user can apply as many transformations as
 he/she
 wants without any side effect on its originally created objects.
 
-Users of IMP logics can freely create the instances of the metamodel as they wish. For instance, they can freely
+Users of IMP-Logics can freely create the instances of the metamodel as they wish. For instance, they can freely
 create Terms, Atoms, Literals, etc. and manage them manually.
 
-However, to better manage such objects, we strongly recommend the usage of a LogicSchema.
+However, to better manage such objects, we strongly recommend the usage of a LogicSchema, in case the schema
+represents a Datalog schema, or a DependencySchema, in case the schema represents a Datalog+/- schema.
+
+On the following we first review the LogicSchema class, and then, the DependencySchema class.
+
+## LogicSchema
 
 Structurally, a LogicSchema is a set of:
 
@@ -27,7 +36,7 @@ A logic schema bounds all such objects together and ensures their consistency. T
 - LogicConstraintKey: There are no 2 logic constraints with the same constraintID
 - PredicateClosure: All derived predicates and logic constraints are defined using predicates that belongs to the schema
 
-## Instantiating a logic schema
+### Instantiating a logic schema
 
 To better instantiate a logic schema, we provide three mechanisms:
 
@@ -90,7 +99,12 @@ logicSchemaSpec.addDerivationRule(derivationRule);
 LogicSchema logicSchema = LogicSchemaFactory.defaultLogicSchemaWithoutIDsFactory().createLogicSchema(logicSchemaSpec);
 ```
 
-### How to use the LogicSchemaBuilder and LogicSchemaFactory?
+Do note the existence of the *Spec* concepts. The *Specs* (abbreviation of *specification*) are classes
+that specify the schema, but are not the schema per se. For instance, the *OrdinaryLiteralSpec*
+contains a string representing a predicate name, but it is not a Predicate object (with the link to its
+derivation rules). The full list of *Specs* can be seen in: *logicschema/services/creation/spec*.
+
+#### How to use the LogicSchemaBuilder and LogicSchemaFactory?
 
 We recommend using the `LogicSchemaBuilder` and `LogicSchemaFactory` on the following fashion:
 
@@ -99,12 +113,12 @@ We recommend using the `LogicSchemaBuilder` and `LogicSchemaFactory` on the foll
    operation (`LogicSchemaBuilder::addPredicate`, or `LogicSchemaSpecification::addPredicate`). The other predicates
    are automatically managed by the builder/factory and hence, you do not require to specify them.
 
-### How to manage the logic constraint IDs?
+#### How to manage the logic constraint IDs?
 
 Every logic constraint has an ID that permits identifying it. You can decide to create such identifiers manually,
-or delegate IMP logics to decide them for you.
+or delegate IMP-Logics to decide them for you.
 
-#### Managing the logic constraint IDs manually
+##### Managing the logic constraint IDs manually
 
 If you want to manage the IDs manually, you should use:
 
@@ -118,7 +132,7 @@ E.g. "@1 :- Dept(D), not(MinOneEmp(D))"
 If you are using the factory, or the builder, you might be interested in using the operation
 `LogicConstraintWithIDSpecBuilder::addConstraintId` to add constraint ids to your logic constraint specifications.
 
-#### Managing the logic constraint through IMP logics
+##### Managing the logic constraint through IMP-Logics
 
 If you want to manage the IDs automatically, you should use:
 
@@ -126,19 +140,19 @@ If you want to manage the IDs automatically, you should use:
 - LogicSchemaBuilder<LogicConstraintWithoutIDSpec> in case you are using the builder.
 - LogicSchemaFactory<LogicConstraintWithoutIDSpec> in case you are using the factory.
 
-By default, IMP logics will use consecutive numbers, starting form 1, to identify your constraints (e.g. 1, 2, 3, ...)
+By default, IMP-Logics will use consecutive numbers, starting form 1, to identify your constraints (e.g. 1, 2, 3, ...)
 However, such strategy can be overridden by providing a new implementation of the class `ConstraintIDGenerator`.
 
-### Creating constants or variables
+#### Creating constants or variables
 
-When using the parser, and the builders, IMP logics will, by default, interpret that:
+When using the parser, and the builders, IMP-Logics will, by default, interpret that:
 
 - Constants are specified with numbers and (single or doubled) quoted strings. E.g.: 1, 2, "Socrates", 'Plato'...
 - Variables are the rest of strings
 
 However, such strategy can be overridden by providing a new implementation of the class `StringToTermSpecFactory`.
 
-## Applying processes to the Schema
+### Applying processes to the Schema
 
 There are several processes that, given some logic schema, returns a new logic schema. Such processes
 ranges from unfolding the schema, to a process to remove equalities and replace them for the corresponding
@@ -172,7 +186,7 @@ list such processes, together the reason they are not query-equivalent:
 
 The complete specification of each process is given in the corresponding Javadocs.
 
-### Using pipelines
+#### Using pipelines
 
 We can apply several logic processes to a logic schema through a LogicProcessPipeline. E.g.
 
@@ -182,10 +196,63 @@ List<LogicProcess> logicProcesses=List.of(new BodySorter(),new PredicateCleaner(
         LogicSchema logicSchemaOutput=pipeline.execute(schema);
 ```
 
-### Using SchemaTransformation
+#### Using SchemaTransformation
 
 Similarly to the logic schema process, there is the concept of logic schema transformation process.
 A `LogicSchemaTransformationProcess` is a logic process that, additionally, permits storing some traceability
 between the transformation in a new object we call `SchemaTransformation`.
 
 More details can be found in the Javadocs.
+
+## DependencySchema
+
+Structurally, a DependencySchema is a set of:
+
+- Predicates
+- Dependencies
+
+A logic schema bounds all such objects together and ensures their consistency. That is:
+
+- PredicateKey: There are no 2 predicates with the same name in the logic schema
+- PredicateClosure: All predicates dependencies are defined using predicates that belongs to the schema
+
+### Instantiating dependency schema
+
+To better instantiate a dependency schema, we provide:
+
+- DependencySchemaParser: parses a String codifying a dependency schema according to some grammar
+
+Example of usage of a DependencySchemaParser:
+
+```java
+String schemaString = "q() -> p()";
+DependencySchemaParser parser = new DependencySchemaParser();
+DependencySchema dependencySchema = parser.parse(schemaString);
+```
+
+In the future, we will also offer two additional methods:
+
+- DependencySchemaBuilder: programmatically creates, in an incremental fashion, a dependency schema
+- DependencySchemaFactory: programmatically creates, in a single step, a dependency schema
+
+### Applying processes to the Schema
+
+There are several processes that, given some dependency schema, returns a new dependency schema.
+The idea of the processes is to retrieve an equivalent dependency schema but with some transformation
+that makes it easier to work with.
+
+Currently there are two processes:
+
+- SingleExistentialVarTGDTransformer
+- SingleHeadTGDTransformer
+
+The complete specification of each process is given in the corresponding Javadocs.
+
+### Analyzing the Schema
+
+Currently there are some analyzers of a dependency schema. The most important ones are:
+
+- DatalogPlusMinusAnalyzer
+- NonConflictingEGDsAnalyzer
+
+The complete specification of each process is given in the corresponding Javadocs.
