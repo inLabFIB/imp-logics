@@ -37,9 +37,9 @@ class SingleExistentialVarTGDTransformerTest {
                 Arguments.of(
                         "P(x) -> Q(x, y, z)",
                         Set.of(
-                                "P(x) -> AUX1(x, y)",
-                                "AUX1(x, y) -> AUX2(x, y, z)",
-                                "AUX2(x, y, z) -> Q(x, y, z)"
+                                "P(x) -> Q_WithOneExistentialVar(x, y)",
+                                "Q_WithOneExistentialVar(x, y) -> Q_WithOneExistentialVar2(x, y, z)",
+                                "Q_WithOneExistentialVar2(x, y, z) -> Q(x, y, z)"
                         )
                 ),
                 Arguments.of(
@@ -51,9 +51,9 @@ class SingleExistentialVarTGDTransformerTest {
                 Arguments.of(
                         "P(x) -> Q(x, y), R(y, z)",
                         Set.of(
-                                "P(x) -> AUX1(x, y)",
-                                "AUX1(x, y) -> AUX2(x, y, z)",
-                                "AUX2(x, y, z) -> Q(x, y), R(y, z)"
+                                "P(x) -> Q_R_WithOneExistentialVar(x, y)",
+                                "Q_R_WithOneExistentialVar(x, y) -> Q_R_WithOneExistentialVar2(x, y, z)",
+                                "Q_R_WithOneExistentialVar2(x, y, z) -> Q(x, y), R(y, z)"
                         )
                 )
         );
@@ -92,12 +92,12 @@ class SingleExistentialVarTGDTransformerTest {
                                  P(x) -> R2(x, y, z)
                                 """,
                         Set.of(
-                                "P(x) -> AUX1(x, y)",
-                                "AUX1(x, y) -> AUX2(x, y, z)",
-                                "AUX2(x, y, z) -> R1(x, y, z)",
-                                "P(x) -> AUX3(x, y)",
-                                "AUX3(x,y) -> AUX4(x, y, z)",
-                                "AUX4(x,y,z) -> R2(x, y, z)"
+                                "P(x) -> R1_WithOneExistentialVar(x, y)",
+                                "R1_WithOneExistentialVar(x, y) -> R1_WithOneExistentialVar2(x, y, z)",
+                                "R1_WithOneExistentialVar2(x, y, z) -> R1(x, y, z)",
+                                "P(x) -> R2_WithOneExistentialVar(x, y)",
+                                "R2_WithOneExistentialVar(x,y) -> R2_WithOneExistentialVar2(x, y, z)",
+                                "R2_WithOneExistentialVar2(x,y,z) -> R2(x, y, z)"
                         )
                 )
         );

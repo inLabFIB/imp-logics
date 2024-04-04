@@ -34,25 +34,25 @@ class SingleHeadTGDTransformerTest {
                 Arguments.of(
                         "P(x) -> A1(x), A2(x)",
                         Set.of(
-                                "P(x) -> AUX1(x)",
-                                "AUX1(x) -> A1(x)",
-                                "AUX1(x) -> A2(x)"
+                                "P(x) -> A1_A2_SingleHead(x)",
+                                "A1_A2_SingleHead(x) -> A1(x)",
+                                "A1_A2_SingleHead(x) -> A2(x)"
                         )
                 ),
                 Arguments.of(
                         "P(x), Q(x) -> A1(x), A2(y)",
                         Set.of(
-                                "P(x), Q(x) -> AUX1(x, y)",
-                                "AUX1(x, y) -> A1(x)",
-                                "AUX1(x, y) -> A2(y)"
+                                "P(x), Q(x) -> A1_A2_SingleHead(x, y)",
+                                "A1_A2_SingleHead(x, y) -> A1(x)",
+                                "A1_A2_SingleHead(x, y) -> A2(y)"
                         )
                 ),
                 Arguments.of(
-                        "P(x), AUX1(x) -> A1(x), A2(y)",
+                        "P(x), A1_A2_SingleHead(x) -> A1(x), A2(y)",
                         Set.of(
-                                "P(x), AUX1(x) -> AUX2(x, y)",
-                                "AUX2(x, y) -> A1(x)",
-                                "AUX2(x, y) -> A2(y)"
+                                "P(x), A1_A2_SingleHead(x) -> A1_A2_SingleHead2(x, y)",
+                                "A1_A2_SingleHead2(x, y) -> A1(x)",
+                                "A1_A2_SingleHead2(x, y) -> A2(y)"
                         )
                 )
         );
@@ -92,12 +92,12 @@ class SingleHeadTGDTransformerTest {
                                 T(x,y) -> x=y
                                 """,
                         Set.of(
-                                "P(x) -> AUX1(x)",
-                                "AUX1(x) -> A1(x)",
-                                "AUX1(x) -> A2(x)",
-                                "P(x), Q(x) -> AUX2(x, y)",
-                                "AUX2(x, y) -> A1(x)",
-                                "AUX2(x, y) -> A2(y)",
+                                "P(x) -> A1_A2_SingleHead(x)",
+                                "A1_A2_SingleHead(x) -> A1(x)",
+                                "A1_A2_SingleHead(x) -> A2(x)",
+                                "P(x), Q(x) -> A1_A2_SingleHead2(x, y)",
+                                "A1_A2_SingleHead2(x, y) -> A1(x)",
+                                "A1_A2_SingleHead2(x, y) -> A2(y)",
                                 "T(x,y) -> x=y"
                         )
                 )

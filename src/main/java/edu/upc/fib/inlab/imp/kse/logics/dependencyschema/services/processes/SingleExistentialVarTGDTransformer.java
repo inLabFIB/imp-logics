@@ -9,6 +9,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.HeadAtomsSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.helpers.DependencySchemaToSpecHelper;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.processes.utils.PredicateNamingUtils;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
@@ -17,18 +18,13 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermS
 
 import java.util.*;
 
-import static edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.processes.SingleHeadTGDTransformer.obtainPredicateNames;
-
 public class SingleExistentialVarTGDTransformer implements DependencyProcess {
-    //todo: change this aux string for using original predicate name adding numbering at the end (collaborator should be
-    // created)
-    private static final String AUX_PREDICATE_NAME = "AUX";
-    private int auxPredicateNameIndex = 1;
+    private static final String AUX_PREDICATE_NAME_SUFFIX = "_WithOneExistentialVar";
 
     @Override
     public DependencySchema execute(DependencySchema dependencySchema) {
         DependencySchemaBuilder builder = new DependencySchemaBuilder();
-        Set<String> alreadyUsedPredicateNames = new HashSet<>(obtainPredicateNames(dependencySchema));
+        Set<String> alreadyUsedPredicateNames = new HashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
 
         for (Dependency dependency : dependencySchema.getAllDependencies()) {
             if (dependency instanceof EGD egd) {
@@ -61,7 +57,7 @@ public class SingleExistentialVarTGDTransformer implements DependencyProcess {
             List<TermSpec> newTermList = new ArrayList<>(previousTermList);
             newTermList.add(DependencySchemaToSpecHelper.buildTermSpec(nextVariable));
 
-            String newAuxPredicateName = createNewAuxPredicateName(alreadyUsedPredicateNames);
+            String newAuxPredicateName = PredicateNamingUtils.createNewAuxPredicateName(originalTGD.getHead(), alreadyUsedPredicateNames, AUX_PREDICATE_NAME_SUFFIX);
             alreadyUsedPredicateNames.add(newAuxPredicateName);
 
             HeadAtomsSpec newHead = createNewHead(newTermList, newAuxPredicateName);
@@ -75,14 +71,6 @@ public class SingleExistentialVarTGDTransformer implements DependencyProcess {
         TGDSpec newTgd = new TGDSpec(nextBody, DependencySchemaToSpecHelper.buildHeadAtomsSpec(originalTGD.getHead()));
         result.add(newTgd);
         return result;
-    }
-
-    private String createNewAuxPredicateName(Set<String> usedPredicateNames) {
-        String newAuxPredicate = AUX_PREDICATE_NAME + auxPredicateNameIndex++;
-        while (usedPredicateNames.contains(newAuxPredicate)) {
-            newAuxPredicate = AUX_PREDICATE_NAME + auxPredicateNameIndex++;
-        }
-        return newAuxPredicate;
     }
 
     private BodySpec createBodyFromHead(HeadAtomsSpec newHead) {

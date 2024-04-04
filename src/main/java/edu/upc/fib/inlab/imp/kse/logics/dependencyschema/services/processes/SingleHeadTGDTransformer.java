@@ -9,8 +9,8 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.HeadAtomsSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.helpers.DependencySchemaToSpecHelper;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.processes.utils.PredicateNamingUtils;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Atom;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
@@ -27,15 +27,12 @@ import java.util.stream.Collectors;
  * Process to create an equivalent DependencySchema where each TGD only contains one rule in its head
  */
 public class SingleHeadTGDTransformer implements DependencyProcess {
-    //todo: change this aux string for using original predicate name adding numbering at the end (collaborator should be
-    // created)
-    private static final String AUX_PREDICATE_NAME = "AUX";
-    private int auxPredicateNameIndex = 1;
+    private static final String AUX_PREDICATE_NAME_SUFFIX = "_SingleHead";
 
     @Override
     public DependencySchema execute(DependencySchema dependencySchema) {
         DependencySchemaBuilder builder = new DependencySchemaBuilder();
-        Set<String> alreadyUsedPredicateNames = new HashSet<>(obtainPredicateNames(dependencySchema));
+        Set<String> alreadyUsedPredicateNames = new HashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
 
         for (Dependency dependency : dependencySchema.getAllDependencies()) {
             if (dependency instanceof EGD egd) {
@@ -44,7 +41,7 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
                 if (containsOneHeadAtom(tgd)) {
                     builder.addDependency(DependencySchemaToSpecHelper.buildTGDSpec(tgd));
                 } else {
-                    String newAuxPredicateName = createNewAuxPredicateName(alreadyUsedPredicateNames);
+                    String newAuxPredicateName = PredicateNamingUtils.createNewAuxPredicateName(tgd.getHead(), alreadyUsedPredicateNames, AUX_PREDICATE_NAME_SUFFIX);
                     alreadyUsedPredicateNames.add(newAuxPredicateName);
                     builder.addAllDependencies(obtainNewSpecsWithNewSingleHeadAtom(tgd, newAuxPredicateName));
                 }
@@ -87,16 +84,5 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
         return tgd.getHead().size() == 1;
     }
 
-    private String createNewAuxPredicateName(Set<String> usedPredicateNames) {
-        String newAuxPredicate = AUX_PREDICATE_NAME + auxPredicateNameIndex++;
-        while (usedPredicateNames.contains(newAuxPredicate)) {
-            newAuxPredicate = AUX_PREDICATE_NAME + auxPredicateNameIndex++;
-        }
-        return newAuxPredicate;
-    }
 
-
-    static Set<String> obtainPredicateNames(DependencySchema schema) {
-        return schema.getAllPredicates().stream().map(Predicate::getName).collect(Collectors.toSet());
-    }
 }
