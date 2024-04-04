@@ -67,6 +67,7 @@ public class QueryMother {
         while (matcher.find()) {
             String predicateName = matcher.group(1);
             List<String> termNames = List.of(matcher.group(2).split(","));
+            termNames = termNames.stream().map(String::trim).toList();
 
             List<Term> constantList = TermMother.createTerms(termNames);
             Predicate predicate = predicates.stream().filter(p -> p.getName().equals(predicateName)).findFirst().get();
