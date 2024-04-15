@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
@@ -376,7 +376,7 @@ class LogicSchemaParserTest {
             String schemaString1 = "@1 :- P(x, x)";
             LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
             Assertions.assertThatThrownBy(() -> logicSchemaParser.parse(schemaString1, relationalSchema))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
     }

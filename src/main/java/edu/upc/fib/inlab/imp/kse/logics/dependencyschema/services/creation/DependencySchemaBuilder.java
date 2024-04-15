@@ -8,7 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.EGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LiteralFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
@@ -54,7 +54,7 @@ public class DependencySchemaBuilder {
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
         if (predicatesByName.containsKey(predicateName)
                 && predicatesByName.get(predicateName).getArity() != arity) {
-            throw new RepeatedPredicateName(predicateName);
+            throw new RepeatedPredicateNameException(predicateName);
         }
     }
 

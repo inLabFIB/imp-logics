@@ -27,12 +27,12 @@ public class LogicSchema {
 
     public LogicSchema(Set<Predicate> predicates, Set<LogicConstraint> constraints) {
         predicates.forEach(predicate -> {
-            if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateName(predicate.getName());
+            if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateNameException(predicate.getName());
             predicatesByName.put(predicate.getName(), predicate);
         });
 
         constraints.forEach(c -> {
-            if (constraintsByID.containsKey(c.getID())) throw new RepeatedConstraintID(c.getID());
+            if (constraintsByID.containsKey(c.getID())) throw new RepeatedConstraintIDException(c.getID());
             checkPredicatesBelongsToSchema(c);
 
             constraintsByID.put(c.getID(), c);
@@ -59,30 +59,30 @@ public class LogicSchema {
                 Predicate predicateFromConstraint = ol.getAtom().getPredicate();
                 Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
                 if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchema(predicateFromConstraint.getName());
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint.getName());
             }
         }
     }
 
     public Predicate getPredicateByName(String predicateName) {
         if (!predicatesByName.containsKey(predicateName)) {
-            throw new PredicateNotExists(predicateName);
+            throw new PredicateNotExistsException(predicateName);
         }
         return predicatesByName.get(predicateName);
     }
 
     public LogicConstraint getLogicConstraintByID(ConstraintID constraintID) {
-        if (!constraintsByID.containsKey(constraintID)) throw new LogicConstraintNotExists(constraintID);
+        if (!constraintsByID.containsKey(constraintID)) throw new LogicConstraintDoesNotExistException(constraintID);
         return constraintsByID.get(constraintID);
     }
 
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
-        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotExists(derivedPredicateName);
+        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotExistsException(derivedPredicateName);
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {
             return predicate.getDerivationRules();
-        } else throw new PredicateIsNotDerived(derivedPredicateName);
+        } else throw new PredicateIsNotDerivedException(derivedPredicateName);
     }
 
     public Set<Predicate> getAllPredicates() {

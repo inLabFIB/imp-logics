@@ -1,8 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions;
 
-public class ArityMismatch extends RuntimeException {
+public class ArityMismatchException extends IMPLogicsException {
 
-    public ArityMismatch(int expected, int provided) {
+    public ArityMismatchException(int expected, int provided) {
         super("Expected arity " + expected + " but provided " + provided);
     }
 }

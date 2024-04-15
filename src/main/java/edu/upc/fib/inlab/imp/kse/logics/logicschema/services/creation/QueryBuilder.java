@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class QueryBuilder {
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
         if (predicatesByName.containsKey(predicateName)
                 && predicatesByName.get(predicateName).getArity() != arity) {
-            throw new RepeatedPredicateName(predicateName);
+            throw new RepeatedPredicateNameException(predicateName);
         }
     }
 }

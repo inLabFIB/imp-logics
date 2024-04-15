@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatch;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatchException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 
@@ -42,7 +42,7 @@ public class Atom {
     }
 
     private static void checkArityMatches(int arity, List<Term> terms) {
-        if (arity != terms.size()) throw new ArityMismatch(arity, terms.size());
+        if (arity != terms.size()) throw new ArityMismatchException(arity, terms.size());
     }
 
     /**

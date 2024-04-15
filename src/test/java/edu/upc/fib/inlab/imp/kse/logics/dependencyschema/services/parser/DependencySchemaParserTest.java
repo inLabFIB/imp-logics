@@ -5,7 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.CustomBuiltInPredicateNameChecker;
@@ -52,7 +52,7 @@ class DependencySchemaParserTest {
 
             String schemaString2 = "q(x) -> p(x)";
             Assertions.assertThatThrownBy(() -> parser.parse(schemaString2, relationalSchema1))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test

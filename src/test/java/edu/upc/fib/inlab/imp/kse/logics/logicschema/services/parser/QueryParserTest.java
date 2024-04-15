@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.QueryAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableAtomListMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithIDSpec;
 import org.assertj.core.api.Assertions;
@@ -188,7 +188,7 @@ class QueryParserTest {
             QueryParser queryParser = new QueryParser();
 
             Assertions.assertThatThrownBy(() -> queryParser.parse(queryString, relationalSchema))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test

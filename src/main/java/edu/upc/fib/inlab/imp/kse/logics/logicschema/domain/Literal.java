@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.NoNegatableLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.NoNegatableLiteralException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 
@@ -40,10 +40,10 @@ public abstract class Literal {
      * Not all built-in literals can be negated. Thus, this function might throw an Exception.
      *
      * @return a new literal that is the negation of this literal, if this is possible
-     * @throws NoNegatableLiteral in case the literal cannot be negated
+     * @throws NoNegatableLiteralException in case the literal cannot be negated
      */
     public Literal buildNegatedLiteral() {
-        throw new NoNegatableLiteral(this);
+        throw new NoNegatableLiteralException(this);
     }
 
 
@@ -55,7 +55,7 @@ public abstract class Literal {
         try {
             buildNegatedLiteral();
             return true;
-        } catch (NoNegatableLiteral ex) {
+        } catch (NoNegatableLiteralException ex) {
             return false;
         }
     }

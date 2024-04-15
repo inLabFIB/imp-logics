@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.LevelHierarchyException;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotInLevel;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotInLevelException;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -107,7 +107,7 @@ public class LevelHierarchy implements Iterable<Level> {
                 return index;
             }
         }
-        throw new PredicateNotInLevel(predicate.getName());
+        throw new PredicateNotInLevelException(predicate.getName());
     }
 
     /**

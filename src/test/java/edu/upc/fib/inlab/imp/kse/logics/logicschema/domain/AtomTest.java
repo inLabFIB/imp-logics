@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.AtomAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.ImmutableLiteralsListAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatch;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatchException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.AtomMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableLiteralsListMother;
@@ -59,7 +59,7 @@ public class AtomTest {
         @MethodSource("provideWrongAritiesAndLists")
         void should_ThrowException_WhenCreatingAtomWithWrongArity(int arity, List<Term> terms) {
             assertThatThrownBy(() -> new Atom(new MutablePredicate("P", arity), terms))
-                    .isInstanceOf(ArityMismatch.class);
+                    .isInstanceOf(ArityMismatchException.class);
         }
     }
 

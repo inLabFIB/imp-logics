@@ -10,7 +10,7 @@ import java.util.Objects;
 
 /**
  * This class is responsible to recall which constraintsID (from one schema) comes from what constraintID (from an
- * original schema) when applying a logic process
+ * original schema) when applying a logic process.
  */
 public class SchemaTraceabilityMap {
     private final Map<ConstraintID, ConstraintID> constraintToOrigConstraintIDMap;

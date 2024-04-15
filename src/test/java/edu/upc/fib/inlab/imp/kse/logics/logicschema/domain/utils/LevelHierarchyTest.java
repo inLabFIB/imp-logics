@@ -2,11 +2,10 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.utils;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LevelAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Level;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.LevelHierarchyException;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotInLevel;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotInLevelException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LevelHierarchyMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LogicSchemaMother;
@@ -26,13 +25,13 @@ class LevelHierarchyTest {
     class CreationTests {
         @Test
         void should_ThrowException_WhenLevelsIsNull() {
-            assertThatThrownBy(() -> new LevelHierarchy(null))
+            assertThatThrownBy(() -> new edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void should_notThrowException_WhenLevelsIsEmpty() {
-            assertThatCode(() -> new LevelHierarchy(List.of()))
+            assertThatCode(() -> new edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy(List.of()))
                     .doesNotThrowAnyException();
         }
 
@@ -40,7 +39,7 @@ class LevelHierarchyTest {
         void should_ThrowException_WhenLevelsContainsNulls() {
             List<Level> levels = new LinkedList<>();
             levels.add(null);
-            assertThatThrownBy(() -> new LevelHierarchy(levels))
+            assertThatThrownBy(() -> new edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy(levels))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -51,7 +50,7 @@ class LevelHierarchyTest {
             Level level0 = new Level(Set.of(predicateP));
             Level level1 = new Level(Set.of(predicateQ));
 
-            assertThatThrownBy(() -> new LevelHierarchy(List.of(level0, level1)))
+            assertThatThrownBy(() -> new edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy(List.of(level0, level1)))
                     .isInstanceOf(LevelHierarchyException.class);
         }
 
@@ -62,7 +61,7 @@ class LevelHierarchyTest {
             Predicate predicateQ = schema.getPredicateByName("Q");
             Level level0 = new Level(Set.of(predicateP, predicateQ));
 
-            assertThatThrownBy(() -> new LevelHierarchy(List.of(level0)))
+            assertThatThrownBy(() -> new edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy(List.of(level0)))
                     .isInstanceOf(LevelHierarchyException.class);
         }
 
@@ -70,13 +69,13 @@ class LevelHierarchyTest {
 
     @Test
     void should_returnTheNumberOfLevels() {
-        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
         assertThat(levelHierarchy.getNumberOfLevels()).isEqualTo(2);
     }
 
     @Test
     void should_returnLevel() {
-        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
 
         Level level = levelHierarchy.getLevel(0);
 
@@ -87,7 +86,7 @@ class LevelHierarchyTest {
     class ReturnLevelIndexTests {
         @Test
         void should_throwException_whenPredicateIsNull() {
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
 
             assertThatThrownBy(() -> levelHierarchy.getLevelIndexOfPredicate(null))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -98,7 +97,7 @@ class LevelHierarchyTest {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
             int index = levelHierarchy.getLevelIndexOfPredicate(predicateP);
 
@@ -110,12 +109,12 @@ class LevelHierarchyTest {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
 
             Predicate inexistentPredicate = new Predicate("R", 0);
             assertThatThrownBy(() -> levelHierarchy.getLevelIndexOfPredicate(inexistentPredicate))
-                    .isInstanceOf(PredicateNotInLevel.class);
+                    .isInstanceOf(PredicateNotInLevelException.class);
 
         }
     }
@@ -125,7 +124,7 @@ class LevelHierarchyTest {
 
         @Test
         void should_throwException_whenPredicateIsNull() {
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"));
 
             assertThatThrownBy(() -> levelHierarchy.getLevelOfPredicate(null))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -136,7 +135,7 @@ class LevelHierarchyTest {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
             Level level = levelHierarchy.getLevelOfPredicate(predicateP);
 
@@ -148,11 +147,11 @@ class LevelHierarchyTest {
             Predicate predicateP = new Predicate("P", 0);
             Set<Predicate> level0 = Set.of(predicateP);
             Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-            LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+            edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
             Predicate inexistentPredicate = new Predicate("R", 0);
             assertThatThrownBy(() -> levelHierarchy.getLevelOfPredicate(inexistentPredicate))
-                    .isInstanceOf(PredicateNotInLevel.class);
+                    .isInstanceOf(PredicateNotInLevelException.class);
 
         }
     }
@@ -162,7 +161,7 @@ class LevelHierarchyTest {
         Predicate predicateP = new Predicate("P", 0);
         Set<Predicate> level0 = Set.of(predicateP);
         Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
         Level level = levelHierarchy.getBasePredicatesLevel();
 
@@ -174,7 +173,7 @@ class LevelHierarchyTest {
         Predicate predicateP = new Predicate("P", 0);
         Set<Predicate> level0 = Set.of(predicateP);
         Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-        LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
 
         List<Level> derivedLevels = levelHierarchy.getDerivedLevels();
 

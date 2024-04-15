@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExists;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExistsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismComparator;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismOptions;
@@ -178,7 +178,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
             try {
                 Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
                 PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
-            } catch (PredicateNotExists predicateNotExists) {
+            } catch (PredicateNotExistsException predicateNotExistsException) {
                 Assertions.fail("Actual predicate " + actualPredicate.getName() + " is not expected");
             }
         }
@@ -186,7 +186,7 @@ public class LogicSchemaAssert extends AbstractAssert<LogicSchemaAssert, LogicSc
         for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
             try {
                 actual.getPredicateByName(expectedPredicate.getName());
-            } catch (PredicateNotExists predicateNotExists) {
+            } catch (PredicateNotExistsException predicateNotExistsException) {
                 Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
             }
         }

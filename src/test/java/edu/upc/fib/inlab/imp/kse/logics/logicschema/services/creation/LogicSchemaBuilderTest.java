@@ -5,8 +5,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedConstraintIDException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.DerivationRuleSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithIDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicConstraintWithoutIDSpec;
@@ -54,7 +54,7 @@ class LogicSchemaBuilderTest {
         LogicSchemaBuilder<LogicConstraintWithoutIDSpec> builder = LogicSchemaBuilder.defaultLogicSchemaWithoutIDsBuilder()
                 .addPredicate("p", 2);
         assertThatThrownBy(() -> builder.addPredicate("p", 3))
-                .isInstanceOf(RepeatedPredicateName.class);
+                .isInstanceOf(RepeatedPredicateNameException.class);
     }
 
     @Test
@@ -117,7 +117,7 @@ class LogicSchemaBuilderTest {
         LogicSchemaBuilder<LogicConstraintWithIDSpec> builder = LogicSchemaBuilder.defaultLogicSchemaWithIDsBuilder()
                 .addLogicConstraint(logicConstraintSpec);
         assertThatThrownBy(() -> builder.addLogicConstraint(logicConstraintSpec))
-                .isInstanceOf(RepeatedConstraintID.class);
+                .isInstanceOf(RepeatedConstraintIDException.class);
     }
 
     @Test

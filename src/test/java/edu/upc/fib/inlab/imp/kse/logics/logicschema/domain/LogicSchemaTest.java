@@ -25,7 +25,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of();
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test
@@ -37,7 +37,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of(c1, c2);
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(RepeatedConstraintID.class);
+                    .isInstanceOf(RepeatedConstraintIDException.class);
         }
 
         @Test
@@ -48,7 +48,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of(c1);
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -59,7 +59,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of();
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -86,7 +86,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getPredicateByName("p"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotExistsException.class);
         }
     }
 
@@ -107,7 +107,7 @@ class LogicSchemaTest {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
             assertThatThrownBy(() -> logicSchema.getLogicConstraintByID(constraintID))
-                    .isInstanceOf(LogicConstraintNotExists.class);
+                    .isInstanceOf(LogicConstraintDoesNotExistException.class);
         }
 
         @Test
@@ -140,7 +140,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingDerivationRules_WithNonExistentPredicateName() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName("nonExistentPredicateName"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotExistsException.class);
         }
 
         @Test
@@ -149,7 +149,7 @@ class LogicSchemaTest {
             Predicate basePredicate = new MutablePredicate(basePredicateName, 2);
             LogicSchema logicSchema = new LogicSchema(Set.of(basePredicate), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName(basePredicateName))
-                    .isInstanceOf(PredicateIsNotDerived.class);
+                    .isInstanceOf(PredicateIsNotDerivedException.class);
         }
     }
 

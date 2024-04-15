@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatch;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatchException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.QueryMother;
 import org.junit.jupiter.api.Nested;
@@ -59,7 +59,7 @@ class PredicateTest {
     void should_ThrowException_WhenCreatingPredicate_WithQueriesNotMatchInArity() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         assertThatThrownBy(() -> new Predicate("p", 0, List.of(definitionRule))).isInstanceOf(
-                ArityMismatch.class
+                ArityMismatchException.class
         );
     }
 
