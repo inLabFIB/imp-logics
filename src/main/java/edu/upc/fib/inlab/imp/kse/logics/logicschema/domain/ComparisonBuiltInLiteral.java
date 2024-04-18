@@ -6,8 +6,9 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVi
 import java.util.Objects;
 
 /**
- * Implementation of the logic ComparisonBuiltInLiteral.
- * {@code E.g. "x < 4".}
+ * Implementation of the logic comparison built-in literal.
+ * <p>
+ *  E.g. "{@code x < 4}"
  */
 public class ComparisonBuiltInLiteral extends BuiltInLiteral {
 
@@ -21,6 +22,14 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     private final Term rightTerm;
     private final ComparisonOperator operator;
 
+    /**
+     * Constructs a new {@code ComparisonBuiltInLiteral}.
+     *
+     * @param leftTerm  left term.
+     * @param rightTerm right term.
+     * @param operator  comparison operator.
+     * @throws IllegalArgumentException if left term, right term or comparison operator are {@code null}.
+     */
     public ComparisonBuiltInLiteral(Term leftTerm, Term rightTerm, ComparisonOperator operator) {
         if (Objects.isNull(leftTerm)) throw new IllegalArgumentException("Left term cannot be null");
         if (Objects.isNull(rightTerm)) throw new IllegalArgumentException("Right term cannot be null");
