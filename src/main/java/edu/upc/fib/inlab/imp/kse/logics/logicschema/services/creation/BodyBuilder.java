@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
@@ -26,7 +27,7 @@ class BodyBuilder {
             body.add(literalFactory.buildOrdinaryLiteral(olSpec));
         } else if (literalSpec instanceof BuiltInLiteralSpec biSpec) {
             body.add(literalFactory.buildBuiltInLiteral(biSpec));
-        } else throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+        } else throw new IMPLogicsException("Unrecognized literalSpec " + literalSpec.getClass().getName());
         return this;
     }
 

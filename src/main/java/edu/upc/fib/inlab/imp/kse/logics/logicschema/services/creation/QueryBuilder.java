@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
@@ -51,7 +52,7 @@ public class QueryBuilder {
                 int numberOfTerms = olSpec.getTermSpecList().size();
                 addPredicateIfAbsent(olSpec.getPredicateName(), numberOfTerms);
             } else if (!(literalSpec instanceof BuiltInLiteralSpec)) {
-                throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+                throw new IMPLogicsException("Unrecognized literalSpec " + literalSpec.getClass().getName());
             }
         }
     }

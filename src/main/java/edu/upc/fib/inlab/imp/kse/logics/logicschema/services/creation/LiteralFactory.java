@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteralException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
 
@@ -53,7 +53,7 @@ public class LiteralFactory {
 
     private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec, int expectedTerms) {
         if (bilSpec.getTermSpecList().size() != expectedTerms)
-            throw new WrongNumberOfTermsInBuiltInLiteral(expectedTerms, bilSpec.getTermSpecList().size());
+            throw new WrongNumberOfTermsInBuiltInLiteralException(expectedTerms, bilSpec.getTermSpecList().size());
     }
 
 }

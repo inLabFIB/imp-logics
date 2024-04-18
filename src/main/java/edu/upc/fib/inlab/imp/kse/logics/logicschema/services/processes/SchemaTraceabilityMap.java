@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoin;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoinException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +62,7 @@ public class SchemaTraceabilityMap {
      * @param current not null
      * @return a new SchemaTraceabilityMap changing the original constraintId of the current map, for the
      * original constraintId, as defined by previous, of the original constraintId.
-     * @throws MapsDoNotJoin if the current map has some constraintID whose original constraintID
+     * @throws MapsDoNotJoinException if the current map has some constraintID whose original constraintID
      *                       did not join any original constraintID from this map
      */
     public SchemaTraceabilityMap joinMap(SchemaTraceabilityMap current) {
@@ -72,7 +72,7 @@ public class SchemaTraceabilityMap {
         SchemaTraceabilityMap result = new SchemaTraceabilityMap(current);
         current.constraintToOrigConstraintIDMap.forEach((finalId, originalId) -> {
             ConstraintID newOriginalId = this.getOriginalConstraintID(originalId);
-            if (Objects.isNull(newOriginalId)) throw new MapsDoNotJoin("Could not join " + originalId);
+            if (Objects.isNull(newOriginalId)) throw new MapsDoNotJoinException("Could not join " + originalId);
             result.addConstraintIDOrigin(finalId, newOriginalId);
         });
         return result;

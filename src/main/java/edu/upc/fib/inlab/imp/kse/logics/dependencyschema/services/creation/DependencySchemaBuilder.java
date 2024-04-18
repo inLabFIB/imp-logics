@@ -8,6 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.EGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.TGDSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LiteralFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
@@ -86,7 +87,7 @@ public class DependencySchemaBuilder {
         } else if (dependencySpec instanceof EGDSpec egdSpec) {
             EqualityComparisonBuiltInLiteral head = (EqualityComparisonBuiltInLiteral) (new LiteralFactory(predicatesByName)).buildBuiltInLiteral(egdSpec.getHead());
             dependencies.add(new EGD(body, head));
-        } else throw new RuntimeException("Unknown Dependency type");
+        } else throw new IMPLogicsException("Unknown Dependency type");
     }
 
     private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
@@ -100,7 +101,7 @@ public class DependencySchemaBuilder {
                 int numberOfTerms = olSpec.getTermSpecList().size();
                 addPredicateIfAbsent(olSpec.getPredicateName(), numberOfTerms);
             } else if (!(literalSpec instanceof BuiltInLiteralSpec)) {
-                throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+                throw new IMPLogicsException("Unrecognized literalSpec " + literalSpec.getClass().getName());
             }
         }
     }

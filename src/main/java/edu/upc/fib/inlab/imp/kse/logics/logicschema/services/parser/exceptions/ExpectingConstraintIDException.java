@@ -2,9 +2,9 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 
-public class ParserCanceledException extends IMPLogicsException {
+public class ExpectingConstraintIDException extends IMPLogicsException {
 
-    public ParserCanceledException(String errorMessage) {
-        super(errorMessage);
+    public ExpectingConstraintIDException() {
+        super("Expecting constraint ID");
     }
 }

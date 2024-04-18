@@ -2,9 +2,5 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.excepti
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 
-public class SubstitutionException extends IMPLogicsException {
-
-    public SubstitutionException(String s) {
-        super(s);
-    }
+public class DerivedLiteralInHomomorphismCheckException extends IMPLogicsException {
 }

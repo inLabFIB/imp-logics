@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
 import java.util.*;
@@ -71,7 +72,7 @@ public class LogicSchemaToSpecHelper {
             return new ConstantSpec(t.getName());
         } else if (t instanceof Variable) {
             return new VariableSpec(t.getName());
-        } else throw new RuntimeException("Unknown term type: " + t.getClass().getName());
+        } else throw new IMPLogicsException("Unknown term type: " + t.getClass().getName());
     }
 
     public static BodySpec buildBodySpec(List<Literal> body) {
@@ -81,7 +82,7 @@ public class LogicSchemaToSpecHelper {
                         return buildOrdinaryLiteralSpec(ordinaryLiteral);
                     } else if (l instanceof BuiltInLiteral comparisonBuiltInLiteral) {
                         return buildBuiltInLiteralSpec(comparisonBuiltInLiteral);
-                    } else throw new RuntimeException("Unknown literal type: " + l.getClass().getName());
+                    } else throw new IMPLogicsException("Unknown literal type: " + l.getClass().getName());
                 })
                 .toList());
     }

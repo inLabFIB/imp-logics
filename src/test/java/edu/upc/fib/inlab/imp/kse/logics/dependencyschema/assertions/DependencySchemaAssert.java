@@ -8,7 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExistsException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.LogicEquivalenceAnalyzer;
 import org.assertj.core.api.AbstractAssert;
@@ -104,7 +104,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
             try {
                 Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
                 PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
-            } catch (PredicateNotExistsException predicateNotExistsException) {
+            } catch (PredicateNotFoundException predicateNotFoundException) {
                 Assertions.fail("Actual predicate " + actualPredicate.getName() + " is not expected");
             }
         }
@@ -112,7 +112,7 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
             try {
                 actual.getPredicateByName(expectedPredicate.getName());
-            } catch (PredicateNotExistsException predicateNotExistsException) {
+            } catch (PredicateNotFoundException predicateNotFoundException) {
                 Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
             }
         }

@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateHasNoDerivationRulesException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerivedException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 
 import java.util.Collections;
@@ -131,7 +131,7 @@ public class Predicate {
     }
 
     public DerivationRule getFirstDerivationRule() {
-        if (isBase()) throw new PredicateHasNoDerivationRulesException(this);
+        if (isBase()) throw new PredicateIsNotDerivedException(this);
         return getDerivationRules().get(0);
     }
 

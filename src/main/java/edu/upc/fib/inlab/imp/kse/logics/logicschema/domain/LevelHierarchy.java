@@ -107,7 +107,7 @@ public class LevelHierarchy implements Iterable<Level> {
                 return index;
             }
         }
-        throw new PredicateNotInLevelException(predicate.getName());
+        throw new PredicateNotInLevelException(predicate);
     }
 
     /**

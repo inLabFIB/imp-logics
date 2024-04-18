@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatchException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 
@@ -115,7 +116,7 @@ public class Atom {
                     substitution.addMapping((Variable) headTerm, actualTerm);
                     visitedVariablesToIndex.put(headVariable, i);
                 }
-            } else throw new RuntimeException("Unrecognized term subclass " + headTerm.getClass().getName());
+            } else throw new IMPLogicsException("Unrecognized term subclass " + headTerm.getClass().getName());
         }
         return new SubstitutionAndBuiltInLiterals(substitution, builtInLiterals);
     }

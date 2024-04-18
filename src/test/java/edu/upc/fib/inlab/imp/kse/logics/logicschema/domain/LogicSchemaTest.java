@@ -86,7 +86,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getPredicateByName("p"))
-                    .isInstanceOf(PredicateNotExistsException.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
     }
 
@@ -107,7 +107,7 @@ class LogicSchemaTest {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
             assertThatThrownBy(() -> logicSchema.getLogicConstraintByID(constraintID))
-                    .isInstanceOf(LogicConstraintDoesNotExistException.class);
+                    .isInstanceOf(LogicConstraintNotFoundException.class);
         }
 
         @Test
@@ -140,7 +140,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingDerivationRules_WithNonExistentPredicateName() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName("nonExistentPredicateName"))
-                    .isInstanceOf(PredicateNotExistsException.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
 
         @Test

@@ -12,6 +12,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.processes.utils.PredicateNamingUtils;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Atom;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
@@ -45,7 +46,7 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
                     alreadyUsedPredicateNames.add(newAuxPredicateName);
                     builder.addAllDependencies(obtainNewSpecsWithNewSingleHeadAtom(tgd, newAuxPredicateName));
                 }
-            } else throw new RuntimeException("Unknown subclass of dependency: " + dependency.getClass().getName());
+            } else throw new IMPLogicsException("Unknown subclass of dependency: " + dependency.getClass().getName());
         }
         return builder.build();
     }

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class represents a substitution of variables to terms.
+ * <p>
  * I.e., it is a mapping from variables to terms, where each variable can be mapped, at most, to one term.
  */
 public class Substitution {

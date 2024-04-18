@@ -59,30 +59,30 @@ public class LogicSchema {
                 Predicate predicateFromConstraint = ol.getAtom().getPredicate();
                 Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
                 if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchemaException(predicateFromConstraint.getName());
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
             }
         }
     }
 
     public Predicate getPredicateByName(String predicateName) {
         if (!predicatesByName.containsKey(predicateName)) {
-            throw new PredicateNotExistsException(predicateName);
+            throw new PredicateNotFoundException(predicateName);
         }
         return predicatesByName.get(predicateName);
     }
 
     public LogicConstraint getLogicConstraintByID(ConstraintID constraintID) {
-        if (!constraintsByID.containsKey(constraintID)) throw new LogicConstraintDoesNotExistException(constraintID);
+        if (!constraintsByID.containsKey(constraintID)) throw new LogicConstraintNotFoundException(constraintID);
         return constraintsByID.get(constraintID);
     }
 
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
-        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotExistsException(derivedPredicateName);
+        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotFoundException(derivedPredicateName);
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {
             return predicate.getDerivationRules();
-        } else throw new PredicateIsNotDerivedException(derivedPredicateName);
+        } else throw new PredicateIsNotDerivedException(predicate);
     }
 
     public Set<Predicate> getAllPredicates() {

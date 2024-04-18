@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
@@ -32,7 +33,7 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
         } else if (actual instanceof BooleanBuiltInLiteral actualBoolBIL) {
             Assertions.assertThat(spec).isInstanceOf(BuiltInLiteralSpec.class);
             BuiltInLiteralAssert.assertThat(actualBoolBIL).correspondsSpec((BuiltInLiteralSpec) spec);
-        } else throw new RuntimeException("Unrecognized literal " + actual.getClass().getName());
+        } else throw new IMPLogicsException("Unrecognized literal " + actual.getClass().getName());
         return this;
     }
 
@@ -47,7 +48,7 @@ public class LiteralAssert extends AbstractAssert<LiteralAssert, Literal> {
             Assertions.assertThat(actual)
                     .asInstanceOf(LogicInstanceOfAssertFactories.BUILT_IN_LITERAL)
                     .correspondsTo(expectedLiteralString);
-        } else throw new RuntimeException("Unknown Literal type.");
+        } else throw new IMPLogicsException("Unknown Literal type.");
         return this;
     }
 

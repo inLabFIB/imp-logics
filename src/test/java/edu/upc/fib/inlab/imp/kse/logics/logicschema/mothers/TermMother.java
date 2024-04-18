@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Constant;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableTermList;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.TermTypeCriteria;
 
@@ -27,6 +28,6 @@ public class TermMother {
             return new Variable(termName);
         } else if (termTypeCriteria.isConstant(termName)) {
             return new Constant(termName);
-        } else throw new RuntimeException("Unrecognized term name " + termName);
+        } else throw new IMPLogicsException("Unrecognized term name " + termName);
     }
 }

@@ -2,7 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerivedException;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExistsException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateOutsideSchemaException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
@@ -104,7 +104,7 @@ class DependencySchemaTest {
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             DependencySchema dependencySchema = new DependencySchema(Set.of(), Set.of());
             assertThatThrownBy(() -> dependencySchema.getPredicateByName("p"))
-                    .isInstanceOf(PredicateNotExistsException.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
     }
 
@@ -151,7 +151,7 @@ class DependencySchemaTest {
         void should_throwException_WhenRetrievingDerivationRules_WithNonExistentPredicateName() {
             DependencySchema dependencySchema = new DependencySchema(Set.of(), Set.of());
             assertThatThrownBy(() -> dependencySchema.getDerivationRulesByPredicateName("nonExistentPredicateName"))
-                    .isInstanceOf(PredicateNotExistsException.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
 
         @Test

@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.DerivationRuleSpecBuilder;
@@ -265,7 +266,7 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
                 return List.of(bodyFragment);
             }
         } else {
-            throw new RuntimeException("Literal type not supported");
+            throw new IMPLogicsException("Literal type not supported");
         }
     }
 

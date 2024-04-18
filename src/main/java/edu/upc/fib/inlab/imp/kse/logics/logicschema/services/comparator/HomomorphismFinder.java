@@ -1,8 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheckException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.SubstitutionException;
 
 import java.util.LinkedList;
@@ -129,7 +130,7 @@ public class HomomorphismFinder {
         if (literals.stream()
                 .filter(OrdinaryLiteral.class::isInstance)
                 .map(OrdinaryLiteral.class::cast)
-                .anyMatch(OrdinaryLiteral::isDerived)) throw new DerivedLiteralInHomomorphismCheck();
+                .anyMatch(OrdinaryLiteral::isDerived)) throw new DerivedLiteralInHomomorphismCheckException();
     }
 
     /**
@@ -188,7 +189,7 @@ public class HomomorphismFinder {
             if (rangeLiteral instanceof BuiltInLiteral rangeBuiltInLiteral) {
                 result.addAll(computeHomomorphismExtensionForBuiltInLiteral(currentSubstitution, domainBuiltInLiteral, rangeBuiltInLiteral));
             }
-        } else throw new RuntimeException("Unrecognized literal " + domainLiteral.getClass().getName());
+        } else throw new IMPLogicsException("Unrecognized literal " + domainLiteral.getClass().getName());
         return result;
     }
 
@@ -242,7 +243,7 @@ public class HomomorphismFinder {
             if (domainLiteral.isPositive() != rangeLiteral.isPositive()) return Optional.empty();
             return computeHomomorphismExtensionForAtom(currentSubstitution, domainLiteral.getAtom(), rangeLiteral.getAtom());
         } else {
-            if (isNull(derivedOrdinaryLiteralHomomorphismCriteria)) throw new DerivedLiteralInHomomorphismCheck();
+            if (isNull(derivedOrdinaryLiteralHomomorphismCriteria)) throw new DerivedLiteralInHomomorphismCheckException();
             return derivedOrdinaryLiteralHomomorphismCriteria
                     .computeHomomorphismExtensionForDerivedOrdinaryLiteral(this, currentSubstitution, domainLiteral, rangeLiteral);
         }

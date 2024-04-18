@@ -11,6 +11,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.helpers.DependencySchemaToSpecHelper;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.processes.utils.PredicateNamingUtils;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodySpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
@@ -35,7 +36,7 @@ public class SingleExistentialVarTGDTransformer implements DependencyProcess {
                 } else {
                     builder.addAllDependencies(normalizeExistentiallyQuantifiedVariables(tgd, alreadyUsedPredicateNames));
                 }
-            } else throw new RuntimeException("Unrecognized kind of dependency: " + dependency.getClass().getName());
+            } else throw new IMPLogicsException("Unrecognized kind of dependency: " + dependency.getClass().getName());
         }
 
         return builder.build();

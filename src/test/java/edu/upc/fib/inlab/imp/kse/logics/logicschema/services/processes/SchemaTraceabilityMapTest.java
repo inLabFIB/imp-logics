@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.assertions.SchemaTraceabilityMapAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoin;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoinException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.mothers.SchemaTraceabilityMapMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ class SchemaTraceabilityMapTest {
                     .create(Map.of("1_1", "1"));
 
             assertThatThrownBy(() -> oldMap.joinMap(newMap))
-                    .isInstanceOf(MapsDoNotJoin.class);
+                    .isInstanceOf(MapsDoNotJoinException.class);
         }
 
         @Test

@@ -5,6 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.TermAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Constant;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
@@ -59,7 +60,7 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
                 SubstitutionAssert.assertThat(actual).mapsToVariable(term.getName(), expectedImage.getName());
             } else if (expectedImage instanceof Constant) {
                 SubstitutionAssert.assertThat(actual).mapsToConstant(term.getName(), expectedImage.getName());
-            } else throw new RuntimeException("Unrecognized term type: " + expectedImage.getClass().getName());
+            } else throw new IMPLogicsException("Unrecognized term type: " + expectedImage.getClass().getName());
         }
         SubstitutionAssert.assertThat(actual).hasSize(expected.size());
         return this;

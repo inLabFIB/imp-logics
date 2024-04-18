@@ -6,7 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivationRuleMother
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LogicConstraintMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.assertions.SubstitutionAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheckException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +58,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiteralList, rangeLiterals))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
@@ -69,7 +69,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiteralsList))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
 
@@ -324,7 +324,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
@@ -339,7 +339,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
         }
 
@@ -431,7 +431,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
@@ -446,7 +446,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, rangeRule))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
         }
 

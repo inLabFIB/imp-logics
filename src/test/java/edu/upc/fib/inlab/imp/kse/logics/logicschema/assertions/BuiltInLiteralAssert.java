@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
@@ -46,7 +47,7 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
             BuiltInLiteralAssert.assertThat(actual)
                     .isCustomBuiltInLiteral()
                     .isEqualTo(expectedCustomBIL); //TODO: think about this when used!
-        } else throw new RuntimeException("Unknown BuiltInLiteral type");
+        } else throw new IMPLogicsException("Unknown BuiltInLiteral type");
 
         return this;
     }

@@ -5,7 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.BooleanBuiltInLiteral
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.CustomBuiltInLiteral;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableLiteralsList;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteral;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.exceptions.WrongNumberOfTermsInBuiltInLiteralException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
@@ -67,7 +67,7 @@ class BodyBuilderTest {
 
         BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(Collections.emptyMap()));
         assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
-                WrongNumberOfTermsInBuiltInLiteral.class
+                WrongNumberOfTermsInBuiltInLiteralException.class
         );
     }
 
@@ -98,7 +98,7 @@ class BodyBuilderTest {
 
             BodyBuilder bodyBuilder = new BodyBuilder(new LiteralFactory(Collections.emptyMap()));
             assertThatThrownBy(() -> bodyBuilder.addLiteral(builtInLiteralSpec)).isInstanceOf(
-                    WrongNumberOfTermsInBuiltInLiteral.class
+                    WrongNumberOfTermsInBuiltInLiteralException.class
             );
         }
 

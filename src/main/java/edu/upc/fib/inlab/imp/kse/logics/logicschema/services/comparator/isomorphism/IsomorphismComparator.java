@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.PredicateComparator;
 
 import java.util.*;
@@ -438,7 +439,7 @@ public class IsomorphismComparator {
         } else if (!l1.getClass().isAssignableFrom(l2.getClass())) {
             return List.of();
         } else {
-            throw new RuntimeException("To be implemented");
+            throw new IMPLogicsException("To be implemented");
         }
     }
 
@@ -483,7 +484,7 @@ public class IsomorphismComparator {
         } else if (!bl1.getClass().isAssignableFrom(bl2.getClass())) {
             return List.of();
         } else {
-            throw new RuntimeException("To be implemented");
+            throw new IMPLogicsException("To be implemented");
         }
     }
 

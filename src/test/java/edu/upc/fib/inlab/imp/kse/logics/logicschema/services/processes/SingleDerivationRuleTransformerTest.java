@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExistsException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorphism.IsomorphismOptions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.LogicSchemaWithIDsParser;
@@ -93,7 +93,7 @@ class SingleDerivationRuleTransformerTest {
             LogicSchema logicSchemaTransformed = singleDerivationRuleTransformer.transform(logicSchema);
 
             assertThatThrownBy(() -> logicSchemaTransformed.getPredicateByName("P"))
-                    .isInstanceOf(PredicateNotExistsException.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
 
         @Test

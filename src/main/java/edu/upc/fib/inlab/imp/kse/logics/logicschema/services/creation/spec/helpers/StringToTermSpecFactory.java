@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers;
 
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConstantSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.VariableSpec;
@@ -39,7 +40,7 @@ public class StringToTermSpecFactory {
         } else if (termTypeCriteria.isVariable(name)) {
             return new VariableSpec(name);
         } else {
-            throw new RuntimeException("Unrecognized term name: " + name);
+            throw new IMPLogicsException("Unrecognized term name: " + name);
         }
     }
 }

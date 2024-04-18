@@ -1,5 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substitution;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LiteralMother;
@@ -140,12 +141,12 @@ class LiteralTest {
 
         @Override
         public Literal applySubstitution(Substitution substitution) {
-            throw new RuntimeException("Not should be called");
+            throw new IMPLogicsException("Not should be called");
         }
 
         @Override
         public <T> T accept(LogicSchemaVisitor<T> visitor) {
-            throw new RuntimeException("Not should be called");
+            throw new IMPLogicsException("Not should be called");
         }
     }
 }
