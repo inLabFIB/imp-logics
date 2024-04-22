@@ -8,16 +8,10 @@ import java.util.Objects;
 /**
  * Implementation of the logic comparison built-in literal.
  * <p>
- *  E.g. "{@code x < 4}"
+ * E.g. "{@code x < 4}"
  */
 public class ComparisonBuiltInLiteral extends BuiltInLiteral {
 
-    /**
-     * Invariants:
-     * - leftTerm must not be null
-     * - rightTerm must not be null
-     * - operator must not be null
-     */
     private final Term leftTerm;
     private final Term rightTerm;
     private final ComparisonOperator operator;
@@ -40,16 +34,9 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
         this.operator = operator;
     }
 
-    public Term getLeftTerm() {
-        return leftTerm;
-    }
-
-    public Term getRightTerm() {
-        return rightTerm;
-    }
-
-    public ComparisonOperator getOperator() {
-        return operator;
+    @Override
+    public String toString() {
+        return leftTerm.getName() + " " + operator.getSymbol() + " " + rightTerm.getName();
     }
 
     @Override
@@ -57,6 +44,13 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
         return new ImmutableTermList(leftTerm, rightTerm);
     }
 
+    /**
+     * Constructs new {@code ComparisonBuiltInLiteral} after applying the substitution to the literal terms.
+     *
+     * @param substitution  substitution to apply.
+     * @return              a comparison built-in literal after applying the given substitution. The literal will be
+     *                      new if some term has changed, otherwise it will be the same.
+     */
     @Override
     public ComparisonBuiltInLiteral applySubstitution(Substitution substitution) {
         if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
@@ -73,17 +67,25 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     }
 
     @Override
+    public ComparisonBuiltInLiteral buildNegatedLiteral() {
+        return new ComparisonBuiltInLiteral(this.getLeftTerm(), this.getRightTerm(), operator.getNegatedOperator());
+    }
+
+    public Term getLeftTerm() {
+        return leftTerm;
+    }
+
+    public Term getRightTerm() {
+        return rightTerm;
+    }
+
+    public ComparisonOperator getOperator() {
+        return operator;
+    }
+
+    @Override
     public String getOperationName() {
         return operator.getSymbol();
     }
 
-    @Override
-    public String toString() {
-        return leftTerm.getName() + " " + operator.getSymbol() + " " + rightTerm.getName();
-    }
-
-    @Override
-    public ComparisonBuiltInLiteral buildNegatedLiteral() {
-        return new ComparisonBuiltInLiteral(this.getLeftTerm(), this.getRightTerm(), operator.getNegatedOperator());
-    }
 }
