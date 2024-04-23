@@ -12,6 +12,29 @@
     <description>
         IMP Logics is a metamodel for expressing logical formulas based on Datalog.
     </description>
+    <url>https://inlabfib.github.io/imp-logics/</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://raw.githubusercontent.com/inLabFIB/imp-logics/master/README.md</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>inLab FIB</name>
+            <email>inlab@fib.upc.edu</email>
+            <organization>inLab FIB - UPC</organization>
+            <organizationUrl>https://inlab.fib.upc.edu</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/inLabFIB/imp-logics.git</connection>
+        <developerConnection>scm:git:ssh://github.com:inLabFIB/imp-logics.git</developerConnection>
+        <url>http://github.com/inLabFIB/imp-logics/tree/master</url>
+    </scm>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -136,6 +159,14 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/inLabFIB/imp-logics</url>
+        </repository>
+    </distributionManagement>
 
     <profiles>
         <profile>
