@@ -3,8 +3,8 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 import java.util.List;
 
 /**
- * Mutable implementation of a logic predicate.
- * The logic predicate is mutable in the sense that we can add derivation rules to it at runtime.
+ * Mutable implementation of a logic predicate. The logic predicate is mutable in the sense that we can add derivation
+ * rules to it at runtime.
  */
 public class MutablePredicate extends Predicate {
 

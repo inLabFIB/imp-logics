@@ -24,31 +24,31 @@ public class DependencySchemaToSpecHelper {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
-        return LogicSchemaToSpecHelper.buildTermsSpecs(terms);
-    }
-
     public static DependencySpec buildEGDSpec(EGD egd) {
         return new EGDSpec(buildBodySpec(egd.getBody()), buildBuiltInSpec(egd.getHead()));
-    }
-
-    private static BuiltInLiteralSpec buildBuiltInSpec(EqualityComparisonBuiltInLiteral equality) {
-        return new BuiltInLiteralSpec(equality.getOperationName(), buildTermsSpecs(equality.getTerms()));
-    }
-
-    public static TGDSpec buildTGDSpec(TGD originalTGD) {
-        return new TGDSpec(buildBodySpec(originalTGD.getBody()), buildHeadAtomsSpec(originalTGD.getHead()));
     }
 
     public static BodySpec buildBodySpec(List<Literal> body) {
         return LogicSchemaToSpecHelper.buildBodySpec(body);
     }
 
+    private static BuiltInLiteralSpec buildBuiltInSpec(EqualityComparisonBuiltInLiteral equality) {
+        return new BuiltInLiteralSpec(equality.getOperationName(), buildTermsSpecs(equality.getTerms()));
+    }
+
     public static HeadAtomsSpec buildHeadAtomsSpec(List<Atom> newHead) {
         List<OrdinaryLiteralSpec> literalSpecs = newHead.stream().map(atom ->
-                        new OrdinaryLiteralSpec(atom.getPredicateName(), buildTermsSpecs(atom.getTerms()), true))
+                                                                              new OrdinaryLiteralSpec(atom.getPredicateName(), buildTermsSpecs(atom.getTerms()), true))
                 .toList();
         return new HeadAtomsSpec(literalSpecs);
+    }
+
+    public static TGDSpec buildTGDSpec(TGD originalTGD) {
+        return new TGDSpec(buildBodySpec(originalTGD.getBody()), buildHeadAtomsSpec(originalTGD.getHead()));
+    }
+
+    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
+        return LogicSchemaToSpecHelper.buildTermsSpecs(terms);
     }
 
     public static TermSpec buildTermSpec(Term t) {

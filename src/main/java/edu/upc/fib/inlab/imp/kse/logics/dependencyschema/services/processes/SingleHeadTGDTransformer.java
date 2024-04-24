@@ -51,6 +51,10 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
         return builder.build();
     }
 
+    boolean containsOneHeadAtom(TGD tgd) {
+        return tgd.getHead().size() == 1;
+    }
+
     private List<DependencySpec> obtainNewSpecsWithNewSingleHeadAtom(TGD originalTGD, String newAuxPredicateName) {
         List<DependencySpec> result = new LinkedList<>();
         TGDSpec newTGDWithNewHead = createNewTGDSpecWithNewHead(originalTGD, newAuxPredicateName);
@@ -69,7 +73,7 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
     private TGDSpec createNewTGDSpecWithNewHead(TGD originalTGD, String auxPredicateName) {
         List<TermSpec> allVariablesOfHead = new LinkedList<>(obtainVariablesOfHead(originalTGD));
         return new TGDSpec(DependencySchemaToSpecHelper.buildBodySpec(originalTGD.getBody()),
-                new HeadAtomsSpec(List.of(new OrdinaryLiteralSpec(auxPredicateName, allVariablesOfHead))));
+                           new HeadAtomsSpec(List.of(new OrdinaryLiteralSpec(auxPredicateName, allVariablesOfHead))));
     }
 
     private static Set<TermSpec> obtainVariablesOfHead(TGD tgd) {
@@ -79,10 +83,6 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
                 .map(t -> (Term) t)
                 .map(DependencySchemaToSpecHelper::buildTermSpec)
                 .collect(Collectors.toSet());
-    }
-
-    boolean containsOneHeadAtom(TGD tgd) {
-        return tgd.getHead().size() == 1;
     }
 
 

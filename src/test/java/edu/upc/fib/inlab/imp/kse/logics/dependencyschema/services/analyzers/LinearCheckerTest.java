@@ -21,9 +21,9 @@ class LinearCheckerTest {
     @Test
     void shouldReturnTrue_whenCheckingIfLinear_withSchemaWithLinearTGDs() {
         DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                p() -> q()
-                r() -> s(), t()
-                """);
+                                                                                                 p() -> q()
+                                                                                                 r() -> s(), t()
+                                                                                                 """);
         Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(0)).isLinear()).isTrue();
         Assertions.assertThat(((TGD) dependencySchema.getAllDependencies().stream().toList().get(1)).isLinear()).isTrue();
 
@@ -35,9 +35,9 @@ class LinearCheckerTest {
     @Test
     void shouldReturnFalse_whenCheckingIfLinear_withSchemaWithNonLinearTGDs() {
         DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                p(), q() -> r()
-                p() -> r()
-                """);
+                                                                                                 p(), q() -> r()
+                                                                                                 p() -> r()
+                                                                                                 """);
 
         boolean isLinear = new LinearChecker().isLinear(dependencySchema);
 
@@ -49,9 +49,9 @@ class LinearCheckerTest {
         @Test
         void shouldReturnTrue_whenEGDsAreNonConflicting_withLinearTGDs() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    WorksIn(name, dept) -> Person(name, age)
-                    Person(name, age), Person(name, age2) -> age = age2
-                    """);
+                                                                                                     WorksIn(name, dept) -> Person(name, age)
+                                                                                                     Person(name, age), Person(name, age2) -> age = age2
+                                                                                                     """);
 
             boolean isLinear = new LinearChecker().isLinear(dependencySchema);
 
@@ -61,9 +61,9 @@ class LinearCheckerTest {
         @Test
         void shouldReturnFalse_whenEGDsAreConflicting_withLinterTGDs() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p() -> r()
-                    s(x) -> x = y
-                    """);
+                                                                                                     p() -> r()
+                                                                                                     s(x) -> x = y
+                                                                                                     """);
 
             boolean isLinear = new LinearChecker().isLinear(dependencySchema);
 

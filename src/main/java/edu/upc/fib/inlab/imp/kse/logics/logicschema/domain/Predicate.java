@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Representation of a logic predicate. E.g. Predicate "Emp" with arity 2.
- * A Predicate is a weak entity w.r.t. LogicSchema. That is:
+ * Representation of a logic predicate. E.g. Predicate "Emp" with arity 2. A Predicate is a weak entity w.r.t.
+ * LogicSchema. That is:
  * <ul>
  * <li> One Predicate can only belong to one LogicSchema </li>
  * <li> A LogicSchema cannot contain two predicates with the same name </li>
@@ -23,27 +23,15 @@ import java.util.Objects;
  */
 public class Predicate {
     /**
-     * Invariants:
-     * - name cannot be null
-     * - name cannot be empty
-     * - arity >= 0
-     * - the list of derivationRules is not null
-     * - the list of derivationRules it not empty
-     * - derivationRules head terms size matches with arity
-     * - derivationRules are immutable when retrieved
+     * Invariants: - name cannot be null - name cannot be empty - arity >= 0 - the list of derivationRules is not null -
+     * the list of derivationRules it not empty - derivationRules head terms size matches with arity - derivationRules
+     * are immutable when retrieved
      */
 
     protected final List<DerivationRule> derivationRules;
 
     private final String name;
     private final int arity;
-
-    public Predicate(String name, int arity) {
-        checkPredicateInfo(name, arity);
-        this.name = name;
-        this.arity = arity;
-        this.derivationRules = new LinkedList<>();
-    }
 
     public Predicate(String name, int arity, List<Query> definitionQueries) {
         this(name, arity);
@@ -52,10 +40,35 @@ public class Predicate {
         derivationRules.addAll(derivationRuleList);
     }
 
+    public Predicate(String name, int arity) {
+        checkPredicateInfo(name, arity);
+        this.name = name;
+        this.arity = arity;
+        this.derivationRules = new LinkedList<>();
+    }
+
+    private static void checkQueries(List<Query> definitionQueries) {
+        if (Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
+        if (definitionQueries.isEmpty()) throw new IllegalArgumentException("Definition rules cannot be empty");
+    }
+
+    private List<DerivationRule> createDerivationRules(List<Query> definitionQueries) {
+        return definitionQueries.stream().map(q ->
+                                                      new DerivationRule(
+                                                              new Atom(this, q.getHeadTerms()),
+                                                              q.getBody())
+        ).toList();
+    }
+
+    private static void checkPredicateInfo(String name, int arity) {
+        if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        if (arity < 0) throw new IllegalArgumentException("Arity cannot be negative");
+    }
+
     /**
-     * A predicate is recursive if it is derived and it appears in the body of its derivation rules,
-     * or in the body of some derivation rule it depends on.
-     * E.g.:
+     * A predicate is recursive if it is derived and it appears in the body of its derivation rules, or in the body of
+     * some derivation rule it depends on. E.g.:
      * <p>R(x, y) :- R(x, z), R(z, y)
      * <p>R(x, y) :- T(x, y)
      * <p>P(x, y) :- R(x, z)
@@ -69,10 +82,40 @@ public class Predicate {
         return predicateAppearInDerivationRuleBody(new LinkedList<>(), this.getDerivationRules());
     }
 
+    public int getArity() {
+        return arity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public DerivationRule getFirstDerivationRule() {
+        if (isBase()) throw new PredicateIsNotDerivedException(this);
+        return getDerivationRules().get(0);
+    }
+
+    public boolean isBase() {
+        return derivationRules.isEmpty();
+    }
+
+    public List<DerivationRule> getDerivationRules() {
+        return Collections.unmodifiableList(derivationRules);
+    }
+
+    public boolean isDerived() {
+        return !isBase();
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     /**
      * @param visitedDerivationRules not null, might be empty
      * @param derivationRules        not null, might be empty
-     * @return whether this predicate appears in the given derivation rules, ignoring those appearing in visitedDerivationRules
+     * @return whether this predicate appears in the given derivation rules, ignoring those appearing in
+     * visitedDerivationRules
      */
     private boolean predicateAppearInDerivationRuleBody(List<DerivationRule> visitedDerivationRules, List<DerivationRule> derivationRules) {
         if (derivationRules.isEmpty()) return false;
@@ -97,53 +140,5 @@ public class Predicate {
 
     private boolean predicateAppearInDerivationRuleBody(DerivationRule rule) {
         return rule.getBody().stream().anyMatch(l -> l instanceof OrdinaryLiteral oLit && oLit.getPredicate() == this);
-    }
-
-    private static void checkPredicateInfo(String name, int arity) {
-        if (Objects.isNull(name)) throw new IllegalArgumentException("Name cannot be null");
-        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
-        if (arity < 0) throw new IllegalArgumentException("Arity cannot be negative");
-    }
-
-    private static void checkQueries(List<Query> definitionQueries) {
-        if (Objects.isNull(definitionQueries)) throw new IllegalArgumentException("Definition rules cannot be null");
-        if (definitionQueries.isEmpty()) throw new IllegalArgumentException("Definition rules cannot be empty");
-    }
-
-    private List<DerivationRule> createDerivationRules(List<Query> definitionQueries) {
-        return definitionQueries.stream().map(q ->
-                new DerivationRule(
-                        new Atom(this, q.getHeadTerms()),
-                        q.getBody())
-        ).toList();
-    }
-
-    public int getArity() {
-        return arity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<DerivationRule> getDerivationRules() {
-        return Collections.unmodifiableList(derivationRules);
-    }
-
-    public DerivationRule getFirstDerivationRule() {
-        if (isBase()) throw new PredicateIsNotDerivedException(this);
-        return getDerivationRules().get(0);
-    }
-
-    public boolean isDerived() {
-        return !isBase();
-    }
-
-    public boolean isBase() {
-        return derivationRules.isEmpty();
-    }
-
-    public <T> T accept(LogicSchemaVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 }

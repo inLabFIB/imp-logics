@@ -27,7 +27,8 @@ public class DependencySchema {
 
     public DependencySchema(Set<Predicate> predicates, Set<Dependency> dependencies) {
         predicates.forEach(predicate -> {
-            if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateNameException(predicate.getName());
+            if (predicatesByName.containsKey(predicate.getName()))
+                throw new RepeatedPredicateNameException(predicate.getName());
             this.predicatesByName.put(predicate.getName(), predicate);
         });
 
@@ -37,25 +38,6 @@ public class DependencySchema {
         });
 
         checkDerivedPredicatesUsesPredicatesFromSchema();
-    }
-
-    private void checkDerivedPredicatesUsesPredicatesFromSchema() {
-        for (Predicate p : predicatesByName.values()) {
-            if (p.isDerived()) {
-                p.getDerivationRules().forEach(this::checkPredicatesBelongsToSchema);
-            }
-        }
-    }
-
-    private void checkPredicatesBelongsToSchema(NormalClause c) {
-        for (Literal l : c.getBody()) {
-            if (l instanceof OrdinaryLiteral ol) {
-                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
-                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
-                if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
-            }
-        }
     }
 
     private void checkPredicatesBelongsToSchema(Dependency d) {
@@ -77,6 +59,25 @@ public class DependencySchema {
         }
     }
 
+    private void checkDerivedPredicatesUsesPredicatesFromSchema() {
+        for (Predicate p : predicatesByName.values()) {
+            if (p.isDerived()) {
+                p.getDerivationRules().forEach(this::checkPredicatesBelongsToSchema);
+            }
+        }
+    }
+
+    private void checkPredicatesBelongsToSchema(NormalClause c) {
+        for (Literal l : c.getBody()) {
+            if (l instanceof OrdinaryLiteral ol) {
+                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
+                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
+                if (predicateFromConstraint != predicateFromSchemaWithSameName)
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
+            }
+        }
+    }
+
     public Set<Predicate> getAllPredicates() {
         return new LinkedHashSet<>(predicatesByName.values());
     }
@@ -89,7 +90,8 @@ public class DependencySchema {
     }
 
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
-        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotFoundException(derivedPredicateName);
+        if (!predicatesByName.containsKey(derivedPredicateName))
+            throw new PredicateNotFoundException(derivedPredicateName);
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {

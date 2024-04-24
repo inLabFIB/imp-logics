@@ -20,6 +20,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ImmutableTermListTest {
 
+    @Test
+    void should_ReturnUsedVariables() {
+        ImmutableTermList immutableTermList = TermMother.createTerms("x", "1", "y");
+
+        Set<Variable> usedVariables = immutableTermList.getUsedVariables();
+
+        assertThat(usedVariables)
+                .hasSize(2)
+                .contains(new Variable("x"), new Variable("y"));
+    }
+
     @Nested
     class CreationTests {
         @Test
@@ -79,19 +90,33 @@ class ImmutableTermListTest {
         }
     }
 
-    @Test
-    void should_ReturnUsedVariables() {
-        ImmutableTermList immutableTermList = TermMother.createTerms("x", "1", "y");
-
-        Set<Variable> usedVariables = immutableTermList.getUsedVariables();
-
-        assertThat(usedVariables)
-                .hasSize(2)
-                .contains(new Variable("x"), new Variable("y"));
-    }
-
     @Nested
     class EqualsTest {
+
+        private static Stream<Arguments> notEqualsTerms() {
+            return Stream.of(
+                    Arguments.of("Terms in different order",
+                                 TermMother.createTerms("x", "y"),
+                                 TermMother.createTerms("y", "x")
+                    ),
+                    Arguments.of("Terms List with different size (size1 > size2)",
+                                 TermMother.createTerms("x", "y"),
+                                 TermMother.createTerms("x", "y", "z")
+                    ),
+                    Arguments.of("Terms List with different size (size1 < size2)",
+                                 TermMother.createTerms("x", "y", "z"),
+                                 TermMother.createTerms("x", "y")
+                    ),
+                    Arguments.of("With constants in list 2",
+                                 TermMother.createTerms("x", "y"),
+                                 TermMother.createTerms("x", "1")
+                    ),
+                    Arguments.of("With constants in list 1",
+                                 TermMother.createTerms("x", "1"),
+                                 TermMother.createTerms("x", "y")
+                    )
+            );
+        }
 
         @Test
         void should_returnTrue_whenTermsAreEquals() {
@@ -109,31 +134,6 @@ class ImmutableTermListTest {
             boolean equals = immutableTermList1.equals(immutableTermList2);
 
             assertThat(equals).as(description).isFalse();
-        }
-
-        private static Stream<Arguments> notEqualsTerms() {
-            return Stream.of(
-                    Arguments.of("Terms in different order",
-                            TermMother.createTerms("x", "y"),
-                            TermMother.createTerms("y", "x")
-                    ),
-                    Arguments.of("Terms List with different size (size1 > size2)",
-                            TermMother.createTerms("x", "y"),
-                            TermMother.createTerms("x", "y", "z")
-                    ),
-                    Arguments.of("Terms List with different size (size1 < size2)",
-                            TermMother.createTerms("x", "y", "z"),
-                            TermMother.createTerms("x", "y")
-                    ),
-                    Arguments.of("With constants in list 2",
-                            TermMother.createTerms("x", "y"),
-                            TermMother.createTerms("x", "1")
-                    ),
-                    Arguments.of("With constants in list 1",
-                            TermMother.createTerms("x", "1"),
-                            TermMother.createTerms("x", "y")
-                    )
-            );
         }
 
     }

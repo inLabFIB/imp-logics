@@ -26,6 +26,15 @@ public class AtomTest {
 
     @Nested
     class CreationTests {
+        private static Stream<Arguments> provideWrongAritiesAndLists() {
+            return Stream.of(
+                    Arguments.of(0, List.of(new Constant("1"))),
+                    Arguments.of(1, List.of()),
+                    Arguments.of(2, List.of(new Constant("1"))),
+                    Arguments.of(1, List.of(new Constant("1"), new Constant("2")))
+            );
+        }
+
         @Test
         void should_ThrowException_WhenCreatingAtomWithNullPredicate() {
             assertThatThrownBy(() -> new Atom(null, List.of()))
@@ -44,15 +53,6 @@ public class AtomTest {
             terms.add(new Variable("x"));
             Atom atom = new Atom(new MutablePredicate("P", 1), terms);
             Assertions.assertThat(atom.getTerms()).isUnmodifiable();
-        }
-
-        private static Stream<Arguments> provideWrongAritiesAndLists() {
-            return Stream.of(
-                    Arguments.of(0, List.of(new Constant("1"))),
-                    Arguments.of(1, List.of()),
-                    Arguments.of(2, List.of(new Constant("1"))),
-                    Arguments.of(1, List.of(new Constant("1"), new Constant("2")))
-            );
         }
 
         @ParameterizedTest
@@ -132,9 +132,9 @@ public class AtomTest {
         @Test
         void should_ReturnSeveralLiteralsList_WhenPredicateHasUniqueDefinitionRule() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
-                        P(x, y) :- R(x, y), S(y, z)
-                        P(x, y) :- R(x, y), T(y, z)
-                    """);
+                                                                                       P(x, y) :- R(x, y), S(y, z)
+                                                                                       P(x, y) :- R(x, y), T(y, z)
+                                                                                   """);
             Atom atom = AtomMother.createAtom(logicSchema, "P", "a", "b");
 
             List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
@@ -192,9 +192,9 @@ public class AtomTest {
             @Test
             void should_obtainTwoRules_whenThereAreTwoRules_EachOneWithDifferentConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
-                                        R(a, 1) :- T(a, b)
-                                        R(a, 2) :- TT(a, b)
-                        """);
+                                                                                                       R(a, 1) :- T(a, b)
+                                                                                                       R(a, 2) :- TT(a, b)
+                                                                                       """);
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
 
                 List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();
@@ -212,9 +212,9 @@ public class AtomTest {
             @Test
             void should_obtainTwoRules_whenThereAreTwoRules_WithOnlyOneWithConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
-                                        R(a, 1) :- T(a, b)
-                                        R(a, b) :- TT(a, b)
-                        """);
+                                                                                                       R(a, 1) :- T(a, b)
+                                                                                                       R(a, b) :- TT(a, b)
+                                                                                       """);
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "y");
 
 
@@ -233,8 +233,8 @@ public class AtomTest {
             @Test
             void should_obtainOneRuleWithContradictoryBuiltIn_whenThereIsOneRule_NotMatchingConstants() {
                 LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
-                                        R(a, 1) :- T(a, b)
-                        """);
+                                                                                                       R(a, 1) :- T(a, b)
+                                                                                       """);
                 Atom atom = AtomMother.createAtom(logicSchema, "R", "x", "2");
 
                 List<ImmutableLiteralsList> unfoldedAtom = atom.unfold();

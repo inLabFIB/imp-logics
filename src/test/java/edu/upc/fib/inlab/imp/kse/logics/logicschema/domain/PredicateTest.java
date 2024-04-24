@@ -133,10 +133,10 @@ class PredicateTest {
         @Test
         void should_returnFalse_whenPredicateIsDerived_definedOverDerivedPredicates_butNotRecursive() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(x, y)
-                            R(x, y) :- S(x, y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(x, y)
+                                                                                        R(x, y) :- S(x, y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isFalse();
         }
@@ -144,10 +144,10 @@ class PredicateTest {
         @Test
         void should_returnFalse_whenPredicateIsDerived_definedOverRecurisvePredicates() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(x, y)
-                            R(x, y) :- R(x, z), R(z, y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(x, y)
+                                                                                        R(x, y) :- R(x, z), R(z, y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isFalse();
         }
@@ -155,9 +155,9 @@ class PredicateTest {
         @Test
         void should_returTrue_whenPredicateIsDirectlyRecursive() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- P(y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- P(y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isTrue();
         }
@@ -165,12 +165,12 @@ class PredicateTest {
         @Test
         void should_returTrue_whenPredicateIsRecursiveThroughSeveralRules() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(y)
-                            P(x) :- Rec(y)
-                            R(y) :- S(y)
-                            Rec(y) :- P(y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(y)
+                                                                                        P(x) :- Rec(y)
+                                                                                        R(y) :- S(y)
+                                                                                        Rec(y) :- P(y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isTrue();
         }

@@ -186,11 +186,11 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnFalse_whenHomomorphismIsNotFoundBidirectionally_and_AllLiteralsAreBaseAndPositive() {
                 LogicConstraint firstRule = LogicConstraintMother.createWithID("""
-                            @1 :- R(x, y), S(x)
-                        """);
+                                                                                           @1 :- R(x, y), S(x)
+                                                                                       """);
                 LogicConstraint secondRule = LogicConstraintMother.createWithID("""
-                            @2 :- R(a, b), S(a), R(b,b)
-                        """);
+                                                                                            @2 :- R(a, b), S(a), R(b,b)
+                                                                                        """);
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);
@@ -202,11 +202,11 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnUnknown_whenHomomorphismIsNotFoundBidirectionally_and_thereAreNegatedLiterals() {
                 LogicConstraint firstRule = LogicConstraintMother.createWithID("""
-                            @1 :- R(x, y), not(S(x))
-                        """);
+                                                                                           @1 :- R(x, y), not(S(x))
+                                                                                       """);
                 LogicConstraint secondRule = LogicConstraintMother.createWithID("""
-                            @2 :- R(a, b), not(S(a)), R(b,b)
-                        """);
+                                                                                            @2 :- R(a, b), not(S(a)), R(b,b)
+                                                                                        """);
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);
@@ -219,11 +219,11 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnUnknown_whenHomomorphismIsNotFoundBidirectionally_and_thereAreBuiltInLiterals() {
                 LogicConstraint firstRule = LogicConstraintMother.createWithID("""
-                            @1 :- R(x, y), x < y
-                        """);
+                                                                                           @1 :- R(x, y), x < y
+                                                                                       """);
                 LogicConstraint secondRule = LogicConstraintMother.createWithID("""
-                            @2 :- R(a, b), a < b, R(b,b)
-                        """);
+                                                                                            @2 :- R(a, b), a < b, R(b,b)
+                                                                                        """);
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);
@@ -236,13 +236,13 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnUnknown_whenHomomorphismIsNotFoundBidirectionally_and_thereAreDerivedLiterals() {
                 LogicConstraint firstRule = LogicConstraintMother.createWithID("""
-                            @1 :- R(x, y)
-                            R(a, b) :- T(a, b)
-                        """);
+                                                                                           @1 :- R(x, y)
+                                                                                           R(a, b) :- T(a, b)
+                                                                                       """);
                 LogicConstraint secondRule = LogicConstraintMother.createWithID("""
-                            @2 :- R(x, x)
-                            R(a, a) :- T(a, a)
-                        """);
+                                                                                            @2 :- R(x, x)
+                                                                                            R(a, a) :- T(a, a)
+                                                                                        """);
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);
@@ -255,11 +255,11 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnUnknown_whenHomomorphismIsFound_inOneDirection_butNotViceversa() {
                 LogicConstraint firstRule = LogicConstraintMother.createWithID("""
-                            @1 :- R(x, y), not(S(x))
-                        """);
+                                                                                           @1 :- R(x, y), not(S(x))
+                                                                                       """);
                 LogicConstraint secondRule = LogicConstraintMother.createWithID("""
-                            @2 :- R(a, b), not(S(a)), R(b,b), T(a, b)
-                        """);
+                                                                                            @2 :- R(a, b), not(S(a)), R(b,b), T(a, b)
+                                                                                        """);
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);
@@ -346,13 +346,13 @@ class LogicEquivalenceAnalyzerTest {
             @Test
             void should_returnUnknown_whenHomomorphismIsNotFoundBidirectionally_and_thereAreDerivedLiterals() {
                 DerivationRule firstRule = DerivationRuleMother.create("""
-                            P() :- R(x, y)
-                            R(a, b) :- T(a, b)
-                        """, "P");
+                                                                                   P() :- R(x, y)
+                                                                                   R(a, b) :- T(a, b)
+                                                                               """, "P");
                 DerivationRule secondRule = DerivationRuleMother.create("""
-                            P() :- R(x, x)
-                            R(a, a) :- T(a, a)
-                        """, "P");
+                                                                                    P() :- R(x, x)
+                                                                                    R(a, a) :- T(a, a)
+                                                                                """, "P");
 
                 LogicEquivalenceAnalyzer logicEquivalenceAnalyzer = new HomomorphismBasedEquivalenceAnalyzer();
                 Optional<Boolean> equivalence = logicEquivalenceAnalyzer.areEquivalent(firstRule, secondRule);

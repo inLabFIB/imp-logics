@@ -11,8 +11,8 @@ public class PredicateOutsideSchemaException extends IMPLogicsException {
      * Constructs an {@code PredicateOutsideSchemaException} with one argument indicating the predicate from another
      * schema.
      * <p>
-     * The predicate is included in this exception's detail message. The exact presentation format of the detail
-     * message is unspecified.
+     * The predicate is included in this exception's detail message. The exact presentation format of the detail message
+     * is unspecified.
      *
      * @param predicate predicate from another {@code LogicSchema}.
      */

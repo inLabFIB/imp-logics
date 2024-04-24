@@ -11,7 +11,6 @@ import java.util.Set;
 public class DatalogPlusMinusAnalyzer {
 
 
-    public enum DatalogPlusMinusLanguage {LINEAR, GUARDED, WEAKLY_GUARDED, STICKY;}
     private static final Map<DatalogPlusMinusLanguage, DatalogPlusMinusLanguageChecker> datalogCheckers;
 
     static {
@@ -23,9 +22,9 @@ public class DatalogPlusMinusAnalyzer {
     }
 
     /**
-     * Method responsible to check if the set of EGDs is non-conflicting from the set of TGDs according to
-     * the paper "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for
-     * New Applications" published in 2010 25th Annual IEEE Symposium on Logic in Computer Science
+     * Method responsible to check if the set of EGDs is non-conflicting from the set of TGDs according to the paper
+     * "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for New Applications" published in
+     * 2010 25th Annual IEEE Symposium on Logic in Computer Science
      *
      * @param schema not null
      * @return whether the egds of this schema are non-conflicting with the TGDs
@@ -43,4 +42,6 @@ public class DatalogPlusMinusAnalyzer {
         }
         return result;
     }
+
+    public enum DatalogPlusMinusLanguage {LINEAR, GUARDED, WEAKLY_GUARDED, STICKY;}
 }

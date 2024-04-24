@@ -23,6 +23,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NonConflictingFDsAnalyzerTest {
 
+    private static TGD createFooTGD() {
+        return TGDMother.createTGD("P(x) -> Q(x)");
+    }
+
+    private static FunctionalDependency createFooFD() {
+        return new FunctionalDependency(new MutablePredicate("P", 2), Set.of(0), Set.of(1));
+    }
+
+    private static FunctionalDependency createKeyDependency(Predicate personPred, Set<Integer> keyPositions) {
+        Set<Integer> determinedPositions = new LinkedHashSet<>();
+        for (int position = 0; position < personPred.getArity(); ++position) {
+            if (!keyPositions.contains(position)) {
+                determinedPositions.add(position);
+            }
+        }
+        return new FunctionalDependency(personPred, keyPositions, determinedPositions);
+    }
+
     @Nested
     class SingleTGDAndSingleFDisConflictTests {
 
@@ -33,7 +51,7 @@ class NonConflictingFDsAnalyzerTest {
                 NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
                 FunctionalDependency fooFD = createFooFD();
                 assertThatThrownBy(() -> analyzer.isConflicting(null,
-                        fooFD))
+                                                                fooFD))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
@@ -42,7 +60,7 @@ class NonConflictingFDsAnalyzerTest {
                 NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
                 TGD fooTGD = createFooTGD();
                 assertThatThrownBy(() -> analyzer.isConflicting(fooTGD,
-                        null))
+                                                                null))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
@@ -51,6 +69,17 @@ class NonConflictingFDsAnalyzerTest {
 
         @Nested
         class SingleHeadedTGDTests {
+            public static Stream<Arguments> provideConflictingTGD() {
+                return Stream.of(
+                        Arguments.of("TGD contains repeated existential variable",
+                                     "WorksIn(name, deptName) -> Person(name, age, x, x)"),
+                        Arguments.of("TGD propagates values for key and some determined position",
+                                     "Child(name, age) -> Person(name, age)"),
+                        Arguments.of("TGD contains constant in head",
+                                     "Child(name, age) -> Person(name, 18)")
+                );
+            }
+
             @Test
             void shouldIdentifyNonConflicting_whenFDAffectsDifferentPredicate() {
                 TGD tgd = TGDMother.createTGD("WorksIn(name, deptName) -> Person(name, age)");
@@ -97,17 +126,6 @@ class NonConflictingFDsAnalyzerTest {
                 boolean isConflicting = nonConflictingFDsAnalyzer.isConflicting(tgd, nonKeyFD);
 
                 assertThat(isConflicting).isTrue();
-            }
-
-            public static Stream<Arguments> provideConflictingTGD() {
-                return Stream.of(
-                        Arguments.of("TGD contains repeated existential variable",
-                                "WorksIn(name, deptName) -> Person(name, age, x, x)"),
-                        Arguments.of("TGD propagates values for key and some determined position",
-                                "Child(name, age) -> Person(name, age)"),
-                        Arguments.of("TGD contains constant in head",
-                                "Child(name, age) -> Person(name, 18)")
-                );
             }
 
             @ParameterizedTest(name = "Test case {0}")
@@ -189,34 +207,12 @@ class NonConflictingFDsAnalyzerTest {
 
     @Nested
     class ListOfTGDAndListOfFDisConflictTest {
-        @Nested
-        class ArgumentsTests {
-            @Test
-            void shouldThrowIllegalArgumentException_whenTGDListIsNull() {
-                NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
-                List<FunctionalDependency> fooFDs = List.of(createFooFD());
-
-                assertThatThrownBy(() -> analyzer.isConflicting(null,
-                        fooFDs))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @Test
-            void shouldThrowIllegalArgumentException_whenFDListIsNull() {
-                NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
-                List<TGD> fooTGDs = List.of(createFooTGD());
-                assertThatThrownBy(() -> analyzer.isConflicting(fooTGDs,
-                        null))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-        }
-
         @Test
         void shouldIdentifyNonConflicting_whenNoTGD_conflictsWithNoFD() {
             DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
-                    WorksIn(name, dept) -> Dept(dept, year)
-                    WorksIn(name, dept) -> Person(name, age)
-                    """);
+                                                                                           WorksIn(name, dept) -> Dept(dept, year)
+                                                                                           WorksIn(name, dept) -> Person(name, age)
+                                                                                           """);
             Predicate personPred = schema.getPredicateByName("Person");
             Predicate deptPred = schema.getPredicateByName("Dept");
             FunctionalDependency fd1 = createKeyDependency(personPred, Set.of(0));
@@ -244,9 +240,9 @@ class NonConflictingFDsAnalyzerTest {
         @Test
         void shouldIdentifyNonConflicting_whenFDList_isEmpty() {
             DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
-                    WorksIn(name, dept) -> Dept(dept, year)
-                    WorksIn(name, dept) -> Person(name, age)
-                    """);
+                                                                                           WorksIn(name, dept) -> Dept(dept, year)
+                                                                                           WorksIn(name, dept) -> Person(name, age)
+                                                                                           """);
 
             NonConflictingFDsAnalyzer nonConflictingFDsAnalyzer = new NonConflictingFDsAnalyzer();
             boolean isConflicting = nonConflictingFDsAnalyzer.isConflicting(schema.getAllTGDs(), List.of());
@@ -257,10 +253,10 @@ class NonConflictingFDsAnalyzerTest {
         @Test
         void shouldIdentifyConflicting_whenSomeTGD_conflictsWithSomeFD() {
             DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
-                    WorksIn(name, dept) -> Dept(dept, year)
-                    WorksIn(name, dept) -> Person(name, age)
-                    Child(name, age) -> Person(name, age)
-                    """);
+                                                                                           WorksIn(name, dept) -> Dept(dept, year)
+                                                                                           WorksIn(name, dept) -> Person(name, age)
+                                                                                           Child(name, age) -> Person(name, age)
+                                                                                           """);
             Predicate personPred = schema.getPredicateByName("Person");
             Predicate deptPred = schema.getPredicateByName("Dept");
             FunctionalDependency fd1 = createKeyDependency(personPred, Set.of(0));
@@ -271,23 +267,27 @@ class NonConflictingFDsAnalyzerTest {
 
             assertThat(isConflicting).isTrue();
         }
-    }
 
-    private static TGD createFooTGD() {
-        return TGDMother.createTGD("P(x) -> Q(x)");
-    }
+        @Nested
+        class ArgumentsTests {
+            @Test
+            void shouldThrowIllegalArgumentException_whenTGDListIsNull() {
+                NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
+                List<FunctionalDependency> fooFDs = List.of(createFooFD());
 
-    private static FunctionalDependency createFooFD() {
-        return new FunctionalDependency(new MutablePredicate("P", 2), Set.of(0), Set.of(1));
-    }
+                assertThatThrownBy(() -> analyzer.isConflicting(null,
+                                                                fooFDs))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
 
-    private static FunctionalDependency createKeyDependency(Predicate personPred, Set<Integer> keyPositions) {
-        Set<Integer> determinedPositions = new LinkedHashSet<>();
-        for (int position = 0; position < personPred.getArity(); ++position) {
-            if (!keyPositions.contains(position)) {
-                determinedPositions.add(position);
+            @Test
+            void shouldThrowIllegalArgumentException_whenFDListIsNull() {
+                NonConflictingFDsAnalyzer analyzer = new NonConflictingFDsAnalyzer();
+                List<TGD> fooTGDs = List.of(createFooTGD());
+                assertThatThrownBy(() -> analyzer.isConflicting(fooTGDs,
+                                                                null))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
-        return new FunctionalDependency(personPred, keyPositions, determinedPositions);
     }
 }

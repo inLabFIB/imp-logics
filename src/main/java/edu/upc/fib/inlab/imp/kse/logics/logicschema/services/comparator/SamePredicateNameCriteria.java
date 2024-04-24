@@ -6,9 +6,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substituti
 import java.util.Optional;
 
 /**
- * Under this strategy, two ordinary literals are considered homomorphic if they have the same name,
- * and their terms are homomorphic.
- * This is even true when one of the literals is base, and the other is derived
+ * Under this strategy, two ordinary literals are considered homomorphic if they have the same name, and their terms are
+ * homomorphic. This is even true when one of the literals is base, and the other is derived
  */
 public class SamePredicateNameCriteria implements DerivedOrdinaryLiteralHomomorphismCriteria {
     @Override

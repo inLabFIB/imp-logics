@@ -14,7 +14,7 @@ public class RepeatedConstraintIDException extends IMPLogicsException {
      * The {@code ConstraintID} is included in this exception's detail message. The exact presentation format of the
      * detail message is unspecified.
      *
-     * @param id    repeated {@code ConstraintID}.
+     * @param id repeated {@code ConstraintID}.
      */
     public RepeatedConstraintIDException(ConstraintID id) {
         super("Repeated constraintID " + id + " in the schema");

@@ -23,8 +23,8 @@ public class AtomAssert extends AbstractAssert<AtomAssert, Atom> {
     }
 
     /**
-     * Asserts that the actual atom should have the very same predicate (i.e., same object reference)
-     * as the one given by parameter
+     * Asserts that the actual atom should have the very same predicate (i.e., same object reference) as the one given
+     * by parameter
      *
      * @param predicate not null
      * @return this assert

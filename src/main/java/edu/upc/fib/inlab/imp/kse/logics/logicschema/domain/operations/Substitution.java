@@ -8,8 +8,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class represents a substitution of variables to terms. I.e., it is a mapping from variables to terms, where
- * each variable can be mapped, at most, to one term.
+ * This class represents a substitution of variables to terms. I.e., it is a mapping from variables to terms, where each
+ * variable can be mapped, at most, to one term.
  */
 public class Substitution {
     private Map<Variable, Term> termsMap = new HashMap<>();
@@ -23,7 +23,7 @@ public class Substitution {
     /**
      * Constructs a new {@code Substitution} with the same mappings as the specified {@code Substitution}.
      *
-     * @param toCopy    the substitution whose mappings are to be placed in this substitution.
+     * @param toCopy the substitution whose mappings are to be placed in this substitution.
      * @throws IllegalArgumentException if toCopy parameter is {@code null}.
      */
     public Substitution(Substitution toCopy) {
@@ -35,11 +35,11 @@ public class Substitution {
      * Constructs a new {@code Substitution} that maps each i-th term from domainTerms with the i-th rangeTerm.
      * <p>
      * If such {@code Substitution} does not exist, it throws a {@code SubstitutionException}. This could happen if the
-     * domainTerms contains a {@code Constant} in the i-th position and the rangeTerms has a different term
-     * (different {@code Constant}, or {@code Variable}), in the i-th position.
+     * domainTerms contains a {@code Constant} in the i-th position and the rangeTerms has a different term (different
+     * {@code Constant}, or {@code Variable}), in the i-th position.
      *
-     * @param domainTerms   list of {@code Term} which forms the domain of the substitution mapping.
-     * @param rangeTerms    list of {@code Term} which forms the range of the substitution mapping.
+     * @param domainTerms list of {@code Term} which forms the domain of the substitution mapping.
+     * @param rangeTerms  list of {@code Term} which forms the range of the substitution mapping.
      * @throws IllegalArgumentException if domainTerms or rangeTerms parameters are {@code null}.
      * @throws SubstitutionException    if arity mismatch between domain and range or if domain {@code Constant} is
      *                                  mapped to different {@code Constant} or {@code Variable}.
@@ -70,7 +70,7 @@ public class Substitution {
      * otherSubstitution.
      *
      * @param otherSubstitution different {@code Substitution}.
-     * @return                  a new {@code Substitution} as a union of substitutions.
+     * @return a new {@code Substitution} as a union of substitutions.
      * @throws IllegalArgumentException if the other {@code Substitution} is {@code null}.
      * @throws SubstitutionException    if both substitutions try to map the same variable to different terms.
      */
@@ -87,8 +87,8 @@ public class Substitution {
     /**
      * Modifies the {@code Substitution} adding a new mapping from the domainVariable to the rangeTerm.
      *
-     * @param domainVariable    domain variable to be mapped.
-     * @param rangeTerm         range term to be mapped.
+     * @param domainVariable domain variable to be mapped.
+     * @param rangeTerm      range term to be mapped.
      * @throws IllegalArgumentException if the domain {@code Variable} or the range {@code Term} are {@code null}.
      * @throws SubstitutionException    if such mapping already exists in the {@code Substitution}.
      */
@@ -109,8 +109,8 @@ public class Substitution {
     /**
      * Returns the image of the {@code Variable}.
      *
-     * @param variable  domain {@code Variable}.
-     * @return          the image of the {@code Variable}.
+     * @param variable domain {@code Variable}.
+     * @return the image of the {@code Variable}.
      * @throws IllegalArgumentException if input domain {@code Variable} is {@code null}.
      */
     public Optional<Term> getTerm(Variable variable) {
@@ -122,7 +122,7 @@ public class Substitution {
     /**
      * Returns substitution map size.
      *
-     * @return  substitution map size.
+     * @return substitution map size.
      */
     public int getSize() {
         return this.termsMap.size();
@@ -131,7 +131,7 @@ public class Substitution {
     /**
      * Returns {@code true} if this substitution contains no mappings.
      *
-     * @return  {@code true} if this substitution contains no mappings
+     * @return {@code true} if this substitution contains no mappings
      */
     public boolean isEmpty() {
         return this.termsMap.isEmpty();
@@ -141,7 +141,7 @@ public class Substitution {
      * Returns {@code true} if any of the variable from the input appear as the domain of a mapping.
      *
      * @param variables set of {@code Variable}.
-     * @return          {@code true} if any of the variable from the input appear as the domain of a mapping.
+     * @return {@code true} if any of the variable from the input appear as the domain of a mapping.
      */
     public boolean replacesSomeVariableOf(Set<Variable> variables) {
         return variables.stream().anyMatch(v -> this.termsMap.containsKey(v));
@@ -150,7 +150,7 @@ public class Substitution {
     /**
      * Returns all the variables appearing in the mappings (either in the domain or the range).
      *
-     * @return  all the variables appearing in the mappings (either in the domain or the range).
+     * @return all the variables appearing in the mappings (either in the domain or the range).
      */
     public Set<Variable> getUsedVariables() {
         Set<Variable> variablesInDomain = this.termsMap.keySet();
@@ -167,14 +167,14 @@ public class Substitution {
     /**
      * Returns {@code true} if all mappings of the substitutions map variable to identical variables.
      *
-     * @return  {@code true} if all mappings of the substitutions map variable to identical variables.
+     * @return {@code true} if all mappings of the substitutions map variable to identical variables.
      */
     public boolean isIdentity() {
         return this.termsMap.entrySet()
                 .stream()
                 .allMatch(entry ->
-                        entry.getValue().isVariable() &&
-                                entry.getValue().getName().equals(entry.getKey().getName()));
+                                  entry.getValue().isVariable() &&
+                                          entry.getValue().getName().equals(entry.getKey().getName()));
     }
 
 }

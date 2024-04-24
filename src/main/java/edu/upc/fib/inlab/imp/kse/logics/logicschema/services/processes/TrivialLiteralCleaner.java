@@ -18,13 +18,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class is responsible for removing the trivial literals from the logic constraints, and logic derivation
- * rules, but without removing derived predicates, neither removing constraints.
+ * This class is responsible for removing the trivial literals from the logic constraints, and logic derivation rules,
+ * but without removing derived predicates, neither removing constraints.
  * <p>
- * A trivial literal is a literal that always evaluates to true, or that always evaluates to false.
- * For instance, BooleanBuiltInLiterals are trivial literals. Hence, this class remove such literals from the bodies
- * of the derivation rules and logic constraints.
- * E.g.: "@1 :- P(x), TRUE()" will be transformed into "@1 :- P(x)"
+ * A trivial literal is a literal that always evaluates to true, or that always evaluates to false. For instance,
+ * BooleanBuiltInLiterals are trivial literals. Hence, this class remove such literals from the bodies of the derivation
+ * rules and logic constraints. E.g.: "@1 :- P(x), TRUE()" will be transformed into "@1 :- P(x)"
  * <p>
  * Currently, this class detects the following trivial literals:
  * <ul>
@@ -41,6 +40,13 @@ import java.util.stream.Collectors;
  * E.g. "P(x) :- FALSE()" will remain as it is.
  */
 public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
+
+    private static DerivationRuleSpec buildFalseRuleForPredicate(Predicate predicate) {
+        return new DerivationRuleSpecBuilder()
+                .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(predicate.getFirstDerivationRule().getHeadTerms()))
+                .addLiteralSpec(LogicSchemaToSpecHelper.buildFalseLiteralSpec())
+                .build();
+    }
 
     /**
      * @param logicSchema not null
@@ -127,13 +133,6 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
             }
         }
         return necessaryAtoms;
-    }
-
-    private static DerivationRuleSpec buildFalseRuleForPredicate(Predicate predicate) {
-        return new DerivationRuleSpecBuilder()
-                .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(predicate.getFirstDerivationRule().getHeadTerms()))
-                .addLiteralSpec(LogicSchemaToSpecHelper.buildFalseLiteralSpec())
-                .build();
     }
 
     private boolean isRedundantWithAnyOf(Atom atom, Set<Atom> necessaryAtoms) {

@@ -26,10 +26,6 @@ public abstract class Dependency {
         this.body = new ImmutableLiteralsList(body);
     }
 
-    public ImmutableLiteralsList getBody() {
-        return body;
-    }
-
     public Set<Variable> getUniversalVariables() {
         return getBody().stream()
                 .flatMap(l -> l.getTerms().stream())
@@ -40,8 +36,12 @@ public abstract class Dependency {
 
     public boolean containsBuiltInOrNegatedLiteralInBody() {
         return this.getBody().stream().anyMatch(lit ->
-                (lit instanceof OrdinaryLiteral oLit && oLit.isNegative()) ||
-                (lit instanceof BuiltInLiteral));
+                                                        (lit instanceof OrdinaryLiteral oLit && oLit.isNegative()) ||
+                                                                (lit instanceof BuiltInLiteral));
+    }
+
+    public ImmutableLiteralsList getBody() {
+        return body;
     }
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);

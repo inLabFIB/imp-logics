@@ -24,37 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LogicSchemaParserTest {
 
-    @Nested
-    class PredicateAndVariableSyntaxTests {
-        @Test
-        void should_allowPredicateNames_withSymbols() {
-            String schemaString = "@1 :- p:$?_s(a)";
-
-            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
-
-            assertThat(logicSchema)
-                    .containsPredicate("p:$?_s", 1);
-        }
-
-        @Test
-        void should_allowTermNames_withSymbols() {
-            String schemaString = "@1 :- p(a:$?_s)";
-
-            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
-
-            assertThat(logicSchema.getAllLogicConstraints())
-                    .hasSize(1);
-
-            LogicConstraint logicConstraint = logicSchema.getAllLogicConstraints().stream().findFirst().orElseThrow();
-
-            assertThat(logicConstraint.getBody())
-                    .hasSize(1)
-                    .first()
-                    .hasPredicate("p", 1)
-                    .hasVariable(0, "a:$?_s");
-        }
-    }
-
     @Test
     void should_fail_whenSchemaContainsErrorSyntax() {
         String schemaString = """
@@ -204,7 +173,45 @@ class LogicSchemaParserTest {
     }
 
     @Nested
+    class PredicateAndVariableSyntaxTests {
+        @Test
+        void should_allowPredicateNames_withSymbols() {
+            String schemaString = "@1 :- p:$?_s(a)";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema)
+                    .containsPredicate("p:$?_s", 1);
+        }
+
+        @Test
+        void should_allowTermNames_withSymbols() {
+            String schemaString = "@1 :- p(a:$?_s)";
+
+            LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse(schemaString);
+
+            assertThat(logicSchema.getAllLogicConstraints())
+                    .hasSize(1);
+
+            LogicConstraint logicConstraint = logicSchema.getAllLogicConstraints().stream().findFirst().orElseThrow();
+
+            assertThat(logicConstraint.getBody())
+                    .hasSize(1)
+                    .first()
+                    .hasPredicate("p", 1)
+                    .hasVariable(0, "a:$?_s");
+        }
+    }
+
+    @Nested
     class BooleanBuiltInLiteralTest {
+        private static Stream<Arguments> booleanValues() {
+            return Stream.of(
+                    Arguments.of("TRUE", true),
+                    Arguments.of("FALSE", false)
+            );
+        }
+
         @ParameterizedTest
         @MethodSource("booleanValues")
         void should_containBooleanBuiltInLiteral_whenBodyContainsBooleanString(String booleanString, boolean booleanValue) {
@@ -218,13 +225,6 @@ class LogicSchemaParserTest {
             assertThat(logicConstraint)
                     .containsBooleanBuiltInLiteral(booleanValue);
         }
-
-        private static Stream<Arguments> booleanValues() {
-            return Stream.of(
-                    Arguments.of("TRUE", true),
-                    Arguments.of("FALSE", false)
-            );
-        }
     }
 
     @Nested
@@ -235,7 +235,7 @@ class LogicSchemaParserTest {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
+                                                                   new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
             ).parse(schemaString);
 
             assertThat(logicSchema).containsConstraintID("1");
@@ -250,7 +250,7 @@ class LogicSchemaParserTest {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
+                                                                   new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
             ).parse(schemaString);
 
             assertThat(logicSchema).containsConstraintID("1");
@@ -310,7 +310,7 @@ class LogicSchemaParserTest {
             String schemaString = "@1 :- P(A)";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
+                                                                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 
@@ -323,7 +323,7 @@ class LogicSchemaParserTest {
             String schemaString = "@1 :- P(" + variableString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
+                                                                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 

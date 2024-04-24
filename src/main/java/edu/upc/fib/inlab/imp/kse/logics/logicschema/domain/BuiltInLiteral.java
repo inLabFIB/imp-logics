@@ -11,7 +11,7 @@ public abstract class BuiltInLiteral extends Literal {
     /**
      * Returns the built-in literal operation name.
      *
-     * @return  the operation name.
+     * @return the operation name.
      */
     public abstract String getOperationName();
 }

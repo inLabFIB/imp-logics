@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DerivationRuleTest {
 
     @Nested
-    class UniversalAndExistencialVariables {
+    class UniversalAndExistentialVariables {
         static Stream<Arguments> provideDerivationRulesWithUniversalVariables() {
             return Stream.of(
                     Arguments.of(
@@ -45,18 +45,7 @@ class DerivationRuleTest {
             );
         }
 
-        @ParameterizedTest
-        @MethodSource("provideDerivationRulesWithUniversalVariables")
-        void should_returnUniversalVariables_whenDerivationRuleHasUniversalVariables(String derivationRuleString, Set<Variable> expectedUniversalVariables) {
-            DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
-
-            Set<Variable> universalVariables = derivationRule.getUniversalVariables();
-
-            assertThat(universalVariables).containsExactlyInAnyOrderElementsOf(expectedUniversalVariables);
-        }
-
-
-        static Stream<Arguments> provideDerivationRulesWithExistencialVariables() {
+        static Stream<Arguments> provideDerivationRulesWithExistentialVariables() {
             return Stream.of(
                     Arguments.of(
                             "A(x) :- B(x), C(x, y)",
@@ -74,13 +63,23 @@ class DerivationRuleTest {
         }
 
         @ParameterizedTest
-        @MethodSource("provideDerivationRulesWithExistencialVariables")
-        void should_returnExistencialVariables_whenDerivationRuleHasExistencialVariables(String derivationRuleString, Set<Variable> expectedExistencialVariables) {
+        @MethodSource("provideDerivationRulesWithUniversalVariables")
+        void should_returnUniversalVariables_whenDerivationRuleHasUniversalVariables(String derivationRuleString, Set<Variable> expectedUniversalVariables) {
+            DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
+
+            Set<Variable> universalVariables = derivationRule.getUniversalVariables();
+
+            assertThat(universalVariables).containsExactlyInAnyOrderElementsOf(expectedUniversalVariables);
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideDerivationRulesWithExistentialVariables")
+        void should_returnExistentialVariables_whenDerivationRuleHasExistentialVariables(String derivationRuleString, Set<Variable> expectedExistentialVariables) {
             DerivationRule derivationRule = DerivationRuleMother.create(derivationRuleString);
 
             Set<Variable> universalVariables = derivationRule.getExistentialVariables();
 
-            assertThat(universalVariables).containsExactlyInAnyOrderElementsOf(expectedExistencialVariables);
+            assertThat(universalVariables).containsExactlyInAnyOrderElementsOf(expectedExistentialVariables);
         }
 
     }

@@ -9,18 +9,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of a logic Atom.
- * An Atom consists of a Predicate (e.g. "Employee") together with a list of Terms (e.g. "x", "y").
- * An atom should belong, at most, to one NormalClause, or one literal. That is,
- * atoms should not be reused several times.
+ * Implementation of a logic Atom. An Atom consists of a Predicate (e.g. "Employee") together with a list of Terms (e.g.
+ * "x", "y"). An atom should belong, at most, to one NormalClause, or one literal. That is, atoms should not be reused
+ * several times.
  */
 public class Atom {
     /**
-     * Invariants:
-     * - Predicate must not be null
-     * - terms must not be null
-     * - The arity of the predicate should coincide with its list of terms
-     * - Terms list is immutable
+     * Invariants: - Predicate must not be null - terms must not be null - The arity of the predicate should coincide
+     * with its list of terms - Terms list is immutable
      */
     private final Predicate predicate;
     private final ImmutableTermList terms;
@@ -34,33 +30,30 @@ public class Atom {
         this.terms = new ImmutableTermList(terms);
     }
 
-    public Predicate getPredicate() {
-        return predicate;
+    private static void checkArityMatches(int arity, List<Term> terms) {
+        if (arity != terms.size()) throw new ArityMismatchException(arity, terms.size());
     }
 
     public ImmutableTermList getTerms() {
         return terms;
     }
 
-    private static void checkArityMatches(int arity, List<Term> terms) {
-        if (arity != terms.size()) throw new ArityMismatchException(arity, terms.size());
-    }
-
     /**
-     * <p>Unfolding an atom returns a list of literals' list, one for each derivation rule of (the predicate of) this atom.
-     * In particular, for each derivation rule, it returns a literals' list replacing the variables of the derivation rule's head
-     * for the terms appearing in this atom. </p>
+     * <p>Unfolding an atom returns a list of literals' list, one for each derivation rule of (the predicate of) this
+     * atom. In particular, for each derivation rule, it returns a literals' list replacing the variables of the
+     * derivation rule's head for the terms appearing in this atom. </p>
      *
-     * <p>For instance, if we have the atom "P(1)", with derivation rules "P(x) :- R(x), S(x)" and "P(y) :- T(y), U(y)",
-     * unfolding "P(1)" will return two literals' list: "R(1), S(1)" and "T(1), U(1)". </p>
+     * <p>For instance, if we have the atom "P(1)", with derivation rules "P(x) :- R(x), S(x)" and "P(y) :- T(y),
+     * U(y)", unfolding "P(1)" will return two literals' list: "R(1), S(1)" and "T(1), U(1)". </p>
      *
-     * <p>This unfolding avoids clashing the variables inside the derivation rule's body with the variables appearing in this atom.
-     * For instance, if we have the ordinary literal "P(a, b)" with a derivation rule "P(x, y) :- R(x, y, a, b)" it will return
-     * "R(a, b, a', b')" </p>
+     * <p>This unfolding avoids clashing the variables inside the derivation rule's body with the variables appearing
+     * in this atom. For instance, if we have the ordinary literal "P(a, b)" with a derivation rule "P(x, y) :- R(x, y,
+     * a, b)" it will return "R(a, b, a', b')" </p>
      *
-     * <p>If the the derivation rules of such atom contains constants, or repeated variables in the head, they are treated as new
-     * built-in literals. E.g. if we have the rule "R(a, 1) :- S(a)", and we unfold "R(x, y)", we obtain "R(x, y), y = 1";
-     * similarly, if we have the rule "R(a,a) :- S(a)", and we unfold "R(x,y)" we obtain "R(x,y), x=y"</p>
+     * <p>If the the derivation rules of such atom contains constants, or repeated variables in the head, they are
+     * treated as new built-in literals. E.g. if we have the rule "R(a, 1) :- S(a)", and we unfold "R(x, y)", we obtain
+     * "R(x, y), y = 1"; similarly, if we have the rule "R(a,a) :- S(a)", and we unfold "R(x,y)" we obtain "R(x,y),
+     * x=y"</p>
      *
      * @return a list of ImmutableLiteralsList representing the result of unfolding this atom
      */
@@ -69,14 +62,20 @@ public class Atom {
             return List.of(new ImmutableLiteralsList(new OrdinaryLiteral(this)));
         } else {
             List<ImmutableLiteralsList> result = new LinkedList<>();
-            for (int derivationRuleIndex = 0; derivationRuleIndex < this.getPredicate().getDerivationRules().size();
-                 derivationRuleIndex++) {
+            for (int derivationRuleIndex = 0; derivationRuleIndex < this.getPredicate().getDerivationRules().size(); derivationRuleIndex++) {
                 result.add(this.unfold(derivationRuleIndex));
             }
             return result;
         }
     }
 
+    public boolean isBase() {
+        return predicate.isBase();
+    }
+
+    public Predicate getPredicate() {
+        return predicate;
+    }
 
     protected ImmutableLiteralsList unfold(int derivationRuleIndex) {
         if (this.isBase()) {
@@ -89,12 +88,31 @@ public class Atom {
         }
     }
 
+    /**
+     * @param substitution not null
+     * @return an atom after applying the given substitution. The atom will be new if some term has changed. Otherwise,
+     * it will be the same
+     */
+    public Atom applySubstitution(Substitution substitution) {
+        if (substitution.replacesSomeVariableOf(this.getVariables())) {
+            return new Atom(this.predicate, this.terms.applySubstitution(substitution));
+        } else return this;
+    }
+
+    public Set<Variable> getVariables() {
+        return terms.stream().filter(Variable.class::isInstance).map(Variable.class::cast).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     private ImmutableLiteralsList computeLiteralsWhenUnifyingTheHead(List<Term> headTerms, ImmutableLiteralsList bodyLiterals) {
         SubstitutionAndBuiltInLiterals substitutionAndBuiltInLiterals = computeSubstitutionForHeadAndAdditionalBuiltInLiterals(headTerms);
         ImmutableLiteralsList bodyLiteralsAfterSubstitution = bodyLiterals.applySubstitution(substitutionAndBuiltInLiterals.substitution());
         List<Literal> allLiterals = new LinkedList<>(bodyLiteralsAfterSubstitution);
         allLiterals.addAll(substitutionAndBuiltInLiterals.builtInLiterals);
         return new ImmutableLiteralsList(allLiterals);
+    }
+
+    public String getPredicateName() {
+        return predicate.getName();
     }
 
     private SubstitutionAndBuiltInLiterals computeSubstitutionForHeadAndAdditionalBuiltInLiterals(List<Term> headTerms) {
@@ -121,6 +139,10 @@ public class Atom {
         return new SubstitutionAndBuiltInLiterals(substitution, builtInLiterals);
     }
 
+    public boolean isDerived() {
+        return predicate.isDerived();
+    }
+
     private Set<Variable> computePotentiallyClashingVariables(DerivationRule derivationRule) {
         /*
          * There might be a clash with the terms that are currently in this atom's terms such that
@@ -140,7 +162,6 @@ public class Atom {
         return potentiallyClashingVariables;
     }
 
-
     private ImmutableLiteralsList computeListThatAvoidsClash(ImmutableLiteralsList literalsList, Set<Variable> potentiallyClashingTerms) {
         Substitution substitutionForClashingTerms = new Substitution();
         Set<Variable> currentlyUsedVariables = computeCurrentlyUsedVariables(literalsList, potentiallyClashingTerms);
@@ -152,41 +173,17 @@ public class Atom {
         return literalsList.applySubstitution(substitutionForClashingTerms);
     }
 
+    @Override
+    public String toString() {
+        String termsAsString = terms.stream().map(Term::getName).collect(Collectors.joining(", "));
+        return this.getPredicateName() + "(" + termsAsString + ")";
+    }
+
     private Set<Variable> computeCurrentlyUsedVariables(ImmutableLiteralsList literalsList, Set<Variable> potentiallyClashingTerms) {
         Set<Variable> usedVariables = new LinkedHashSet<>();
         usedVariables.addAll(literalsList.getUsedVariables());
         usedVariables.addAll(potentiallyClashingTerms);
         return usedVariables;
-    }
-
-
-    public String getPredicateName() {
-        return predicate.getName();
-    }
-
-    public boolean isDerived() {
-        return predicate.isDerived();
-    }
-
-    public boolean isBase() {
-        return predicate.isBase();
-    }
-
-    /**
-     * @param substitution not null
-     * @return an atom after applying the given substitution. The atom will be new if some term has changed.
-     * Otherwise, it will be the same
-     */
-    public Atom applySubstitution(Substitution substitution) {
-        if (substitution.replacesSomeVariableOf(this.getVariables())) {
-            return new Atom(this.predicate, this.terms.applySubstitution(substitution));
-        } else return this;
-    }
-
-    @Override
-    public String toString() {
-        String termsAsString = terms.stream().map(Term::getName).collect(Collectors.joining(", "));
-        return this.getPredicateName() + "(" + termsAsString + ")";
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
@@ -200,12 +197,6 @@ public class Atom {
         return terms.stream().allMatch(Term::isConstant);
     }
 
-    public Set<Variable> getVariables() {
-        return terms.stream().filter(Variable.class::isInstance)
-                .map(Variable.class::cast)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     /**
      * @return whether the Predicate of this atom is recursive, or not
      */
@@ -213,6 +204,5 @@ public class Atom {
         return predicate.isRecursive();
     }
 
-    private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {
-    }
+    private record SubstitutionAndBuiltInLiterals(Substitution substitution, List<BuiltInLiteral> builtInLiterals) {}
 }

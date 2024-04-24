@@ -9,6 +9,20 @@ import java.util.*;
 
 public class NonConflictingFDsAnalyzer {
 
+    private static boolean isProperSubset(Set<Integer> firstSet, Set<Integer> secondSet) {
+        return firstSet.stream().allMatch(secondSet::contains) &&
+                firstSet.size() < secondSet.size();
+    }
+
+    /**
+     * @param tgds not null
+     * @param fds  not null
+     * @return whether all TGD of the given list is non-conflicting with all FD of the given list
+     */
+    public boolean isNonConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
+        return !isConflicting(tgds, fds);
+    }
+
     /**
      * @param tgd not null
      * @param fd  not null
@@ -48,15 +62,6 @@ public class NonConflictingFDsAnalyzer {
         return false;
     }
 
-    /**
-     * @param tgds not null
-     * @param fds  not null
-     * @return whether all TGD of the given list is non-conflicting with all FD of the given list
-     */
-    public boolean isNonConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
-        return !isConflicting(tgds, fds);
-    }
-
     private boolean containsRepeatedExistentialVariable(TGD tgd) {
         Set<Variable> existentialVars = tgd.getExistentialVariables();
         for (Variable existVar : existentialVars) {
@@ -66,23 +71,6 @@ public class NonConflictingFDsAnalyzer {
         }
         return false;
     }
-
-    private boolean appearsMoreThanOnce(Variable existVar, TGD tgd) {
-        int counter = 0;
-        for (Atom atomHead : tgd.getHead()) {
-            if (atomHead.getTerms().contains(existVar)) {
-                counter++;
-            }
-        }
-        return counter > 1;
-    }
-
-    private boolean affectsSamePredicate(TGD tgd, FunctionalDependency fd) {
-        return tgd.getHead().stream()
-                .map(Atom::getPredicate)
-                .anyMatch(p -> fd.predicate().equals(p));
-    }
-
 
     private boolean isConflicting(Atom headAtom, Set<Variable> universalVariables, FunctionalDependency fd) {
         if (!headAtom.getPredicate().getName().equals(fd.getPredicateName())) return false;
@@ -94,9 +82,20 @@ public class NonConflictingFDsAnalyzer {
         return isProperSubset(fd.keyPositions(), universalPositions);
     }
 
-    private static boolean isProperSubset(Set<Integer> firstSet, Set<Integer> secondSet) {
-        return firstSet.stream().allMatch(secondSet::contains) &&
-               firstSet.size() < secondSet.size();
+    private boolean affectsSamePredicate(TGD tgd, FunctionalDependency fd) {
+        return tgd.getHead().stream()
+                .map(Atom::getPredicate)
+                .anyMatch(p -> fd.predicate().equals(p));
+    }
+
+    private boolean appearsMoreThanOnce(Variable existVar, TGD tgd) {
+        int counter = 0;
+        for (Atom atomHead : tgd.getHead()) {
+            if (atomHead.getTerms().contains(existVar)) {
+                counter++;
+            }
+        }
+        return counter > 1;
     }
 
     private boolean containsConstant(Atom headAtom) {

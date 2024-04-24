@@ -27,14 +27,6 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
         return Optional.ofNullable(booleanValue);
     }
 
-    public static String fromValue(boolean booleanValue) {
-        if (booleanValue) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
-
     @Override
     public String getOperationName() {
         return value ? TRUE : FALSE;
@@ -45,22 +37,9 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
         return new ImmutableTermList();
     }
 
-    public boolean isTrue() {
-        return value;
-    }
-
-    public boolean isFalse() {
-        return !value;
-    }
-
     @Override
     public BooleanBuiltInLiteral applySubstitution(Substitution substitution) {
         return this;
-    }
-
-    @Override
-    public BooleanBuiltInLiteral buildNegatedLiteral() {
-        return new BooleanBuiltInLiteral(!value);
     }
 
     @Override
@@ -68,8 +47,29 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
         return visitor.visit(this);
     }
 
+    public static String fromValue(boolean booleanValue) {
+        if (booleanValue) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    @Override
+    public BooleanBuiltInLiteral buildNegatedLiteral() {
+        return new BooleanBuiltInLiteral(!value);
+    }
+
+    public boolean isTrue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return fromValue(value) + "()";
+    }
+
+    public boolean isFalse() {
+        return !value;
     }
 }

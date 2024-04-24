@@ -6,8 +6,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
 import java.util.Objects;
 
 /**
- * Class that remembers the transformation applied from an original LogicSchema to a transformedLogicSchema.
- * Currently, it remembers which logic constraintID comes from what constraintID.
+ * Class that remembers the transformation applied from an original LogicSchema to a transformedLogicSchema. Currently,
+ * it remembers which logic constraintID comes from what constraintID.
  */
 public record SchemaTransformation(LogicSchema original, LogicSchema transformed,
                                    SchemaTraceabilityMap schemaTraceabilityMap) {

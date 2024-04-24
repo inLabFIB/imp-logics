@@ -13,7 +13,7 @@ public class NoNegatableLiteralException extends IMPLogicsException {
      * The literal is included in this exception's detail message. The exact presentation format of the detail message
      * is unspecified.
      *
-     * @param literal   non negatable literal.
+     * @param literal non negatable literal.
      */
     public NoNegatableLiteralException(Literal literal) {
         super("Currently, we do not know how to negate the literal " + literal);

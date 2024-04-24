@@ -161,12 +161,12 @@ class LogicSchemaBuilderTest {
 
     @Test
     void should_createSchema_whenDefiningSchema() {
-//            :- WorksIn(E, D), not(Emp(E))
-//            :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
-//            :- Dept(D), not(MinOneSpecialEmployee(D))
-//            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
-//            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
-//            % Existing but unused predicates: Project(p)
+        //            :- WorksIn(E, D), not(Emp(E))
+        //            :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
+        //            :- Dept(D), not(MinOneSpecialEmployee(D))
+        //            MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
+        //            MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
+        //            % Existing but unused predicates: Project(p)
         LogicConstraintWithIDSpec logicConstraint1 = new LogicConstraintWithIDSpecBuilder()
                 .addConstraintId("1")
                 .addOrdinaryLiteral("WorksIn", "E", "D")

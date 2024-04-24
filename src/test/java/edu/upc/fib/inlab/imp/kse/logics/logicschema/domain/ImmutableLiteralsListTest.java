@@ -23,6 +23,44 @@ import static org.assertj.core.api.Assertions.*;
 
 class ImmutableLiteralsListTest {
 
+    @Test
+    void should_ReturnPredicatePositions_ofGivenVariable() {
+        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
+        );
+
+        Set<PredicatePosition> occupiedPositions = literalsList.getPredicatePositionsWithVar(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(5)
+                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("A") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
+    }
+
+    @Test
+    void should_ReturnLiteralPositions_ofGivenVariable() {
+        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
+                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
+        );
+        Literal p = literalsList.get(0);
+        Literal a = literalsList.get(1);
+        Literal diff = literalsList.get(2);
+        Literal q = literalsList.get(3);
+        Literal r = literalsList.get(4);
+
+        Set<LiteralPosition> occupiedPositions = literalsList.getLiteralPositionWithVariable(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(6)
+                .anyMatch(litPos -> litPos.literal() == p && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == a && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == diff && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == q && litPos.position() == 1)
+                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 0)
+                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 1);
+    }
+
     @Nested
     class CreateImmutableLiteralsList {
         @Test
@@ -276,10 +314,10 @@ class ImmutableLiteralsListTest {
             @Test
             void should_rememberOriginalLiterals_whenThereAreSeveralDerivationRules() {
                 ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create("A(x), Derived(x), C(x)",
-                        """
-                                Derived(x) :- B1(x), B2(x)
-                                Derived(x) :- B3(x), B4(x)
-                                """);
+                                                                                        """
+                                                                                                Derived(x) :- B1(x), B2(x)
+                                                                                                Derived(x) :- B3(x), B4(x)
+                                                                                                """);
 
                 List<ImmutableLiteralsList> unfoldedLiteralsList = literalsList.unfold(1);
 
@@ -481,46 +519,40 @@ class ImmutableLiteralsListTest {
         }
     }
 
-    @Test
-    void should_ReturnPredicatePositions_ofGivenVariable() {
-        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
-                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
-        );
-
-        Set<PredicatePosition> occupiedPositions = literalsList.getPredicatePositionsWithVar(new Variable("x"));
-
-        assertThat(occupiedPositions).hasSize(5)
-                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
-                .anyMatch(p -> p.getPredicateName().equals("A") && p.position() == 0)
-                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
-                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
-                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
-    }
-
-    @Test
-    void should_ReturnLiteralPositions_ofGivenVariable() {
-        ImmutableLiteralsList literalsList = ImmutableLiteralsListMother.create(
-                "P(x), not(A(x)), x<>y, Q(y,x), R(x,x)"
-        );
-        Literal p = literalsList.get(0);
-        Literal a = literalsList.get(1);
-        Literal diff = literalsList.get(2);
-        Literal q = literalsList.get(3);
-        Literal r = literalsList.get(4);
-
-        Set<LiteralPosition> occupiedPositions = literalsList.getLiteralPositionWithVariable(new Variable("x"));
-
-        assertThat(occupiedPositions).hasSize(6)
-                .anyMatch(litPos -> litPos.literal() == p && litPos.position() == 0)
-                .anyMatch(litPos -> litPos.literal() == a && litPos.position() == 0)
-                .anyMatch(litPos -> litPos.literal() == diff && litPos.position() == 0)
-                .anyMatch(litPos -> litPos.literal() == q && litPos.position() == 1)
-                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 0)
-                .anyMatch(litPos -> litPos.literal() == r && litPos.position() == 1);
-    }
-
     @Nested
     class EqualsTest {
+
+        private static Stream<Arguments> equalsLiterals() {
+            return Stream.of(
+                    Arguments.of("Literal List with one literal",
+                                 List.of("P(x, y)")
+                    ),
+                    Arguments.of("Literal List with several literals",
+                                 List.of("P(x, y)", "Q(x, y)")
+                    )
+            );
+        }
+
+        private static Stream<Arguments> notEqualsLiterals() {
+            return Stream.of(
+                    Arguments.of("Literal List with different size",
+                                 "P(x, y), Q(x, y)",
+                                 "P(x, y)"
+                    ),
+                    Arguments.of("Literal List with different literals",
+                                 "P(x, y), Q(x, y)",
+                                 "P(x, y), Q(x, z)"
+                    ),
+                    Arguments.of("Literal List with different order",
+                                 "P(x, y), Q(x, y)",
+                                 "Q(x, y), P(x, y)"
+                    ),
+                    Arguments.of("Literal List with different literals order",
+                                 "P(x, y), Q(x, y)",
+                                 "Q(x, y), P(x, z)"
+                    )
+            );
+        }
 
         @ParameterizedTest(name = "{0}")
         @MethodSource("equalsLiterals")
@@ -544,38 +576,6 @@ class ImmutableLiteralsListTest {
             boolean equals = immutableLiteralsList1.equals(immutableLiteralsList2);
 
             assertThat(equals).as(description).isFalse();
-        }
-
-        private static Stream<Arguments> equalsLiterals() {
-            return Stream.of(
-                    Arguments.of("Literal List with one literal",
-                            List.of("P(x, y)")
-                    ),
-                    Arguments.of("Literal List with several literals",
-                            List.of("P(x, y)", "Q(x, y)")
-                    )
-            );
-        }
-
-        private static Stream<Arguments> notEqualsLiterals() {
-            return Stream.of(
-                    Arguments.of("Literal List with different size",
-                            "P(x, y), Q(x, y)",
-                            "P(x, y)"
-                    ),
-                    Arguments.of("Literal List with different literals",
-                            "P(x, y), Q(x, y)",
-                            "P(x, y), Q(x, z)"
-                    ),
-                    Arguments.of("Literal List with different order",
-                            "P(x, y), Q(x, y)",
-                            "Q(x, y), P(x, y)"
-                    ),
-                    Arguments.of("Literal List with different literals order",
-                            "P(x, y), Q(x, y)",
-                            "Q(x, y), P(x, z)"
-                    )
-            );
         }
 
     }

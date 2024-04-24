@@ -43,11 +43,11 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
     }
 
     /**
-     * Checks whether the actual constraint is the same as the expected logic constraint up-to renaming
-     * variables, and derived predicate names.
+     * Checks whether the actual constraint is the same as the expected logic constraint up-to renaming variables, and
+     * derived predicate names.
      * <br>
-     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity
-     * That is, two predicates of different logic schemas can be considered equal
+     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity That
+     * is, two predicates of different logic schemas can be considered equal
      *
      * @param expected not-null
      * @return this assertion
@@ -61,15 +61,15 @@ public class LogicConstraintAssert extends NormalClauseAssert<LogicConstraint> {
         if (equivalenceResult.isPresent()) {
             Assertions.assertThat(equivalenceResult)
                     .overridingErrorMessage("Actual constraint: " + actual.toString() + "\n" +
-                            "   is not equivalent to \n" +
-                            "Expected constraint: " + expected.toString()
+                                                    "   is not equivalent to \n" +
+                                                    "Expected constraint: " + expected.toString()
                     )
                     .contains(true);
         } else {
             Assertions.fail("Current logicEquivalenceAnalyzer: " + logicEquivalenceAnalyzer.getClass().getName() + "\n" +
-                    " could not determine if actual constraint: " + actual.toString() + "\n" +
-                    "   is equivalent to\n" +
-                    "Expected constraint: " + expected.toString() + "\n");
+                                    " could not determine if actual constraint: " + actual.toString() + "\n" +
+                                    "   is equivalent to\n" +
+                                    "Expected constraint: " + expected.toString() + "\n");
         }
         return this;
     }

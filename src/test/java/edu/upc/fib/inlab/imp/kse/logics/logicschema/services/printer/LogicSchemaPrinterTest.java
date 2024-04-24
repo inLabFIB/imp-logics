@@ -14,6 +14,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class LogicSchemaPrinterTest {
 
+    @Test
+    void should_printLogicSchema() {
+        String schemaString = """
+                @1 :- WorksIn(E, D), not(Emp(E))
+                @2 :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
+                @3 :- Dept(D), not(MinOneSpecialEmployee(D))
+                MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
+                MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
+                """;
+
+        LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+        LogicSchemaPrinter printer = new LogicSchemaPrinter();
+        String actualLogicSchema = printer.print(logicSchema);
+
+        Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
+        Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+
+        assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
+    }
+
     @Nested
     class ConstraintPrintingTests {
 
@@ -75,27 +96,6 @@ class LogicSchemaPrinterTest {
 
             assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
         }
-    }
-
-    @Test
-    void should_printLogicSchema() {
-        String schemaString = """
-                @1 :- WorksIn(E, D), not(Emp(E))
-                @2 :- WorksIn(E, D), Manages(E, D), CrucialDept(D)
-                @3 :- Dept(D), not(MinOneSpecialEmployee(D))
-                MinOneSpecialEmployee(D) :- WorksIn(E, D), Happy(E)
-                MinOneSpecialEmployee(D) :- WorksIn(E, D), not(Rich(E))
-                """;
-
-        LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
-
-        LogicSchemaPrinter printer = new LogicSchemaPrinter();
-        String actualLogicSchema = printer.print(logicSchema);
-
-        Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
-        Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
-
-        assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
     }
 
     @Nested

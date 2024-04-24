@@ -73,10 +73,10 @@ class PredicateCleanerTest {
     @Test
     void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
         LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                @1 :- P(x)
-                @2 :- Q(x)
-                @3 :- R(x)
-                """);
+                                                                                       @1 :- P(x)
+                                                                                       @2 :- Q(x)
+                                                                                       @3 :- R(x)
+                                                                                       """);
 
         PredicateCleaner predicateCleaner = new PredicateCleaner();
         SchemaTransformation schemaTransformation = predicateCleaner.executeTransformation(originalSchema);

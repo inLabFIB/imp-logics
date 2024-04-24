@@ -12,6 +12,9 @@ import java.util.List;
 
 public class LogicConstraintMother {
 
+    private final static LogicSchemaParser<LogicConstraintWithIDSpec> parserWithIDs = new LogicSchemaWithIDsParser();
+    private final static LogicSchemaParser<LogicConstraintWithoutIDSpec> parserWithoutIDs = new LogicSchemaWithoutIDsParser();
+
     public static LogicConstraint createTrivialLogicConstraint(ConstraintID constraintID, Predicate p) {
         List<Term> terms = new LinkedList<>();
         for (int i = 0; i < p.getArity(); ++i) {
@@ -19,9 +22,6 @@ public class LogicConstraintMother {
         }
         return new LogicConstraint(constraintID, List.of(new OrdinaryLiteral(new Atom(p, terms))));
     }
-
-    private final static LogicSchemaParser<LogicConstraintWithIDSpec> parserWithIDs = new LogicSchemaWithIDsParser();
-    private final static LogicSchemaParser<LogicConstraintWithoutIDSpec> parserWithoutIDs = new LogicSchemaWithoutIDsParser();
 
     /**
      * @param schema a not null string representing a logic constraint, together the related derivation rules, without

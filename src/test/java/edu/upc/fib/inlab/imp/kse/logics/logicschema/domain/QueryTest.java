@@ -74,12 +74,12 @@ public class QueryTest {
         }
 
         @Test
-        void should_returnSeveralQueries_ifItQueryDependsOnSseveralDerivationRule() {
+        void should_returnSeveralQueries_ifItQueryDependsOnSeveralDerivationRule() {
             Query query = QueryMother.createQuery(List.of("x"), "P(x), R(x)",
-                    """
-                            R(x) :- S(x, y)
-                            R(x) :- T(x, z)
-                            """);
+                                                  """
+                                                          R(x) :- S(x, y)
+                                                          R(x) :- T(x, z)
+                                                          """);
             List<Query> unfolded = query.unfold();
             assertThat(unfolded)
                     .hasSize(2)
@@ -90,12 +90,12 @@ public class QueryTest {
         @Test
         void should_returnSeveralQueries_ifItDependsOnSeveralDerivationRule_recursively() {
             Query query = QueryMother.createQuery(List.of("x"), "P(x), R(x)",
-                    """
-                            R(x) :- S(x, y)
-                            S(x, y) :- A(x, y)
-                            R(x) :- T(x, z)
-                            T(x, z) :- B(x, z)
-                            """);
+                                                  """
+                                                          R(x) :- S(x, y)
+                                                          S(x, y) :- A(x, y)
+                                                          R(x) :- T(x, z)
+                                                          T(x, z) :- B(x, z)
+                                                          """);
             List<Query> unfolded = query.unfold();
             assertThat(unfolded)
                     .hasSize(2)

@@ -16,6 +16,10 @@ public class LiteralMother {
         return createOrdinaryLiteral(isPositive, predicateName, terms);
     }
 
+    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, List<Term> terms) {
+        return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
+    }
+
     public static OrdinaryLiteral createOrdinaryLiteral(String predicateName, List<Term> terms) {
         return createOrdinaryLiteral(true, predicateName, terms);
     }
@@ -24,12 +28,12 @@ public class LiteralMother {
         return createOrdinaryLiteral(true, predicateName, termNames);
     }
 
-    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, List<Term> terms) {
+    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, String... terms) {
         return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
     }
 
-    public static OrdinaryLiteral createOrdinaryLiteral(boolean isPositive, String predicateName, String... terms) {
-        return new OrdinaryLiteral(AtomMother.createAtom(predicateName, terms), isPositive);
+    public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, String predicateName, String... termNames) {
+        return createOrdinaryLiteral(schema, true, predicateName, termNames);
     }
 
     public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, boolean isPositive, String predicateName, String... termNames) {
@@ -37,18 +41,14 @@ public class LiteralMother {
         return new OrdinaryLiteral(new Atom(predicateFromSchema, TermMother.createTerms(termNames)), isPositive);
     }
 
-    public static OrdinaryLiteral createOrdinaryLiteral(LogicSchema schema, String predicateName, String... termNames) {
+    @SuppressWarnings("unused")
+    public static OrdinaryLiteral createOrdinaryLiteral(DependencySchema schema, String predicateName, String... termNames) {
         return createOrdinaryLiteral(schema, true, predicateName, termNames);
     }
 
     public static OrdinaryLiteral createOrdinaryLiteral(DependencySchema schema, boolean isPositive, String predicateName, String... termNames) {
         Predicate predicateFromSchema = schema.getPredicateByName(predicateName);
         return new OrdinaryLiteral(new Atom(predicateFromSchema, TermMother.createTerms(termNames)), isPositive);
-    }
-
-    @SuppressWarnings("unused")
-    public static OrdinaryLiteral createOrdinaryLiteral(DependencySchema schema, String predicateName, String... termNames) {
-        return createOrdinaryLiteral(schema, true, predicateName, termNames);
     }
 
     public static CustomBuiltInLiteral createCustomBuiltInLiteral(String customBuiltIn, String... termNames) {

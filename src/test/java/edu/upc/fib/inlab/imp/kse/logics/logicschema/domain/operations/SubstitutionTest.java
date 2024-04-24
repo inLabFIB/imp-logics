@@ -23,6 +23,62 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class SubstitutionTest {
 
+    static Stream<Arguments> provideCompatibleDomainTermsAndRangeTerms() {
+        return Stream.of(
+                Arguments.of(
+                        TermMother.createTerms("x", "y"),
+                        TermMother.createTerms("1", "z"),
+                        Map.of(
+                                new Variable("x"), new Constant("1"),
+                                new Variable("y"), new Variable("z")
+                        ),
+                        "Mapping vars to vars and constants"),
+                Arguments.of(
+                        TermMother.createTerms("x", "1"),
+                        TermMother.createTerms("a", "1"),
+                        Map.of(new Variable("x"), new Variable("a")),
+                        "Mapping vars to vars and constant to same constant"),
+                Arguments.of(
+                        TermMother.createTerms("x", "y"),
+                        TermMother.createTerms("a", "b"),
+                        Map.of(
+                                new Variable("x"), new Variable("a"),
+                                new Variable("y"), new Variable("b")
+                        ),
+                        "Mapping vars to vars"),
+                Arguments.of(
+                        TermMother.createTerms("x", "y", "x"),
+                        TermMother.createTerms("a", "b", "a"),
+                        Map.of(
+                                new Variable("x"), new Variable("a"),
+                                new Variable("y"), new Variable("b")
+                        ),
+                        "Mapping vars to vars, repeating domain var")
+        );
+    }
+
+    static Stream<Arguments> provideIncompatibleDomainTermsAndRangeTerms() {
+        return Stream.of(
+                Arguments.of(
+                        TermMother.createTerms("x", "x"),
+                        TermMother.createTerms("x", "y"),
+                        "Cannot map the same variable to different terms"),
+                Arguments.of(
+                        TermMother.createTerms("x", "1"),
+                        TermMother.createTerms("x", "2"),
+                        "Cannot map a constant to a different constant"),
+                Arguments.of(
+                        List.of(new Constant("x")),
+                        List.of(new Variable("x")),
+                        "Cannot map a constant to a variable with the same name"),
+                Arguments.of(
+                        TermMother.createTerms("x"),
+                        TermMother.createTerms("x", "1"),
+                        "Mismatch between list sizes")
+        );
+
+    }
+
     @Test
     void should_containAllMappings_whenCopyingSubstitution() {
         Substitution originalSubstitution = new Substitution();
@@ -65,66 +121,10 @@ class SubstitutionTest {
         assertThat(new Substitution(domainTerms, rangeTerms)).describedAs(message).encodesMapping(expected);
     }
 
-    static Stream<Arguments> provideCompatibleDomainTermsAndRangeTerms() {
-        return Stream.of(
-                Arguments.of(
-                        TermMother.createTerms("x", "y"),
-                        TermMother.createTerms("1", "z"),
-                        Map.of(
-                                new Variable("x"), new Constant("1"),
-                                new Variable("y"), new Variable("z")
-                        ),
-                        "Mapping vars to vars and constants"),
-                Arguments.of(
-                        TermMother.createTerms("x", "1"),
-                        TermMother.createTerms("a", "1"),
-                        Map.of(new Variable("x"), new Variable("a")),
-                        "Mapping vars to vars and constant to same constant"),
-                Arguments.of(
-                        TermMother.createTerms("x", "y"),
-                        TermMother.createTerms("a", "b"),
-                        Map.of(
-                                new Variable("x"), new Variable("a"),
-                                new Variable("y"), new Variable("b")
-                        ),
-                        "Mapping vars to vars"),
-                Arguments.of(
-                        TermMother.createTerms("x", "y", "x"),
-                        TermMother.createTerms("a", "b", "a"),
-                        Map.of(
-                                new Variable("x"), new Variable("a"),
-                                new Variable("y"), new Variable("b")
-                        ),
-                        "Mapping vars to vars, repeating domain var")
-        );
-    }
-
     @ParameterizedTest(name = "{index} {2}")
     @MethodSource("provideIncompatibleDomainTermsAndRangeTerms")
     void should_throwException_whenUsingIncompatibleTermsList(List<Term> domainTerms, List<Term> rangeTerms, String message) {
         assertThatThrownBy(() -> new Substitution(domainTerms, rangeTerms)).describedAs(message).isInstanceOf(SubstitutionException.class);
-    }
-
-    static Stream<Arguments> provideIncompatibleDomainTermsAndRangeTerms() {
-        return Stream.of(
-                Arguments.of(
-                        TermMother.createTerms("x", "x"),
-                        TermMother.createTerms("x", "y"),
-                        "Cannot map the same variable to different terms"),
-                Arguments.of(
-                        TermMother.createTerms("x", "1"),
-                        TermMother.createTerms("x", "2"),
-                        "Cannot map a constant to a different constant"),
-                Arguments.of(
-                        List.of(new Constant("x")),
-                        List.of(new Variable("x")),
-                        "Cannot map a constant to a variable with the same name"),
-                Arguments.of(
-                        TermMother.createTerms("x"),
-                        TermMother.createTerms("x", "1"),
-                        "Mismatch between list sizes")
-        );
-
     }
 
     @Test

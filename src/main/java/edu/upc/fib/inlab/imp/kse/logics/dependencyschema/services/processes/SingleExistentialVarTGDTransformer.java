@@ -74,12 +74,12 @@ public class SingleExistentialVarTGDTransformer implements DependencyProcess {
         return result;
     }
 
+    private HeadAtomsSpec createNewHead(List<TermSpec> newTermList, String newAuxPredicateName) {
+        return new HeadAtomsSpec(List.of(new OrdinaryLiteralSpec(newAuxPredicateName, newTermList)));
+    }
+
     private BodySpec createBodyFromHead(HeadAtomsSpec newHead) {
         List<LiteralSpec> literalSpecs = new LinkedList<>(newHead.atoms());
         return new BodySpec(literalSpecs);
-    }
-
-    private HeadAtomsSpec createNewHead(List<TermSpec> newTermList, String newAuxPredicateName) {
-        return new HeadAtomsSpec(List.of(new OrdinaryLiteralSpec(newAuxPredicateName, newTermList)));
     }
 }

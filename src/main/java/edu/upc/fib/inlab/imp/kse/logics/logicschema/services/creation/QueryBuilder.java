@@ -24,15 +24,11 @@ public class QueryBuilder {
 
     public QueryBuilder(Set<Predicate> relationalSchema) {
         this.predicatesByName = new HashMap<>();
-        for(Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
+        for (Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, BodySpec bodySpec) {
         return buildQuery(termSpecList, bodySpec.literals());
-    }
-
-    public Query buildQuery(QuerySpec queriesSpec) {
-        return buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
@@ -67,5 +63,9 @@ public class QueryBuilder {
                 && predicatesByName.get(predicateName).getArity() != arity) {
             throw new RepeatedPredicateNameException(predicateName);
         }
+    }
+
+    public Query buildQuery(QuerySpec queriesSpec) {
+        return buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
     }
 }

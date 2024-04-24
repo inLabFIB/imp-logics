@@ -29,6 +29,10 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
         return self();
     }
 
+    public T addNegatedOrdinaryLiteral(String predicateName, String... terms) {
+        return addOrdinaryLiteral(predicateName, false, terms);
+    }
+
     public T addLiteralSpec(LiteralSpec literal) {
         bodySpec.add(literal);
         return self();
@@ -38,23 +42,19 @@ public abstract class NormalClauseSpecBuilder<T extends NormalClauseSpecBuilder<
         return addOrdinaryLiteral(predicateName, true, terms);
     }
 
-    public T addNegatedOrdinaryLiteral(String predicateName, String... terms) {
-        return addOrdinaryLiteral(predicateName, false, terms);
-    }
-
     public T addOrdinaryLiteral(String predicateName, boolean isPositive, String... terms) {
         bodySpec.add(new OrdinaryLiteralSpec(predicateName, stringToTermSpecFactory.createTermSpecs(terms), isPositive));
-        return self();
-    }
-
-    public T addBuiltInLiteral(String builtInOperation, String... terms) {
-        bodySpec.add(new BuiltInLiteralSpec(builtInOperation, stringToTermSpecFactory.createTermSpecs(terms)));
         return self();
     }
 
     @SuppressWarnings("unchecked")
     private T self() {
         return (T) this;
+    }
+
+    public T addBuiltInLiteral(String builtInOperation, String... terms) {
+        bodySpec.add(new BuiltInLiteralSpec(builtInOperation, stringToTermSpecFactory.createTermSpecs(terms)));
+        return self();
     }
 
 }

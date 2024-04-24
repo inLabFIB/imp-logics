@@ -8,14 +8,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of non-standard built-in literals.
- * That is, built-in literals that are not the usual arithmetic comparisons.
+ * Implementation of non-standard built-in literals. That is, built-in literals that are not the usual arithmetic
+ * comparisons.
  */
 public class CustomBuiltInLiteral extends BuiltInLiteral {
     /**
-     * Invariants:
-     * - operationName cannot be null neither empty,
-     * - terms cannot contain nulls, but might be empty.
+     * Invariants: - operationName cannot be null neither empty, - terms cannot contain nulls, but might be empty.
      */
     private final String operationName;
     private final ImmutableTermList terms;

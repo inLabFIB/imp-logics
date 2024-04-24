@@ -47,16 +47,16 @@ public class ComparisonBuiltInLiteral extends BuiltInLiteral {
     /**
      * Constructs new {@code ComparisonBuiltInLiteral} after applying the substitution to the literal terms.
      *
-     * @param substitution  substitution to apply.
-     * @return              a comparison built-in literal after applying the given substitution. The literal will be
-     *                      new if some term has changed, otherwise it will be the same.
+     * @param substitution substitution to apply.
+     * @return a comparison built-in literal after applying the given substitution. The literal will be new if some term
+     * has changed, otherwise it will be the same.
      */
     @Override
     public ComparisonBuiltInLiteral applySubstitution(Substitution substitution) {
         if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
             return new ComparisonBuiltInLiteral(leftTerm.applySubstitution(substitution),
-                    rightTerm.applySubstitution(substitution),
-                    operator
+                                                rightTerm.applySubstitution(substitution),
+                                                operator
             );
         } else return this;
     }

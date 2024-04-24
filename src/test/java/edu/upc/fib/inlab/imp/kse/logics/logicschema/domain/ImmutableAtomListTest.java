@@ -20,6 +20,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ImmutableAtomListTest {
 
+    @Test
+    void should_ReturnPredicatePositions_ofGivenVariable() {
+        ImmutableAtomList atomList = ImmutableAtomListMother.create(
+                "P(x), Q(y,x), R(x,x)"
+        );
+
+        Set<PredicatePosition> occupiedPositions = atomList.getPredicatePositionsWithVar(new Variable("x"));
+
+        assertThat(occupiedPositions).hasSize(4)
+                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
+                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
+    }
+
     @Nested
     class CreationTests {
         @Test
@@ -57,6 +72,38 @@ class ImmutableAtomListTest {
     @Nested
     class EqualsTest {
 
+        private static Stream<Arguments> equalAtoms() {
+            return Stream.of(
+                    Arguments.of("Atom list with one atom",
+                                 List.of("P(x, y)")
+                    ),
+                    Arguments.of("Atom list with several atoms",
+                                 List.of("P(x, y)", "Q(x, y)")
+                    )
+            );
+        }
+
+        private static Stream<Arguments> notEqualsAtoms() {
+            return Stream.of(
+                    Arguments.of("Atom list with different size",
+                                 "P(x, y), Q(x, y)",
+                                 "P(x, y)"
+                    ),
+                    Arguments.of("Atom list with different atoms",
+                                 "P(x, y), Q(x, y)",
+                                 "P(x, y), Q(x, z)"
+                    ),
+                    Arguments.of("Atom list with different order",
+                                 "P(x, y), Q(x, y)",
+                                 "Q(x, y), P(x, y)"
+                    ),
+                    Arguments.of("Atom list with different atom order",
+                                 "P(x, y), Q(x, y)",
+                                 "Q(x, y), P(x, z)"
+                    )
+            );
+        }
+
         @ParameterizedTest(name = "{0}")
         @MethodSource("equalAtoms")
         void should_returnTrue_whenAtomsAreEquals(String description, List<String> atomStrings) {
@@ -77,53 +124,5 @@ class ImmutableAtomListTest {
 
             assertThat(immutableAtomList1).isNotEqualTo(immutableAtomList2);
         }
-
-        private static Stream<Arguments> equalAtoms() {
-            return Stream.of(
-                    Arguments.of("Atom list with one atom",
-                            List.of("P(x, y)")
-                    ),
-                    Arguments.of("Atom list with several atoms",
-                            List.of("P(x, y)", "Q(x, y)")
-                    )
-            );
-        }
-
-        private static Stream<Arguments> notEqualsAtoms() {
-            return Stream.of(
-                    Arguments.of("Atom list with different size",
-                            "P(x, y), Q(x, y)",
-                            "P(x, y)"
-                    ),
-                    Arguments.of("Atom list with different atoms",
-                            "P(x, y), Q(x, y)",
-                            "P(x, y), Q(x, z)"
-                    ),
-                    Arguments.of("Atom list with different order",
-                            "P(x, y), Q(x, y)",
-                            "Q(x, y), P(x, y)"
-                    ),
-                    Arguments.of("Atom list with different atom order",
-                            "P(x, y), Q(x, y)",
-                            "Q(x, y), P(x, z)"
-                    )
-            );
-        }
-    }
-
-
-    @Test
-    void should_ReturnPredicatePositions_ofGivenVariable() {
-        ImmutableAtomList atomList = ImmutableAtomListMother.create(
-                "P(x), Q(y,x), R(x,x)"
-        );
-
-        Set<PredicatePosition> occupiedPositions = atomList.getPredicatePositionsWithVar(new Variable("x"));
-
-        assertThat(occupiedPositions).hasSize(4)
-                .anyMatch(p -> p.getPredicateName().equals("P") && p.position() == 0)
-                .anyMatch(p -> p.getPredicateName().equals("Q") && p.position() == 1)
-                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 0)
-                .anyMatch(p -> p.getPredicateName().equals("R") && p.position() == 1);
     }
 }

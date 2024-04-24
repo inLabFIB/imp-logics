@@ -15,17 +15,6 @@ class SchemaTraceabilityMapTest {
 
     @Nested
     class JoinMapTests {
-        @Nested
-        class InputValidation {
-            @Test
-            void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
-                SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
-                        .createEmptyMap();
-                assertThatThrownBy(() -> emptyMap.joinMap(null))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-        }
-
         @Test
         void should_returnNewMap_whenJoiningMaps() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
@@ -73,6 +62,17 @@ class SchemaTraceabilityMapTest {
                     .create(Map.of("1_1", "1", "2_1_1", "2_1"));
 
             assertDoesNotThrow(() -> oldMap.joinMap(newMap));
+        }
+
+        @Nested
+        class InputValidation {
+            @Test
+            void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
+                SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
+                        .createEmptyMap();
+                assertThatThrownBy(() -> emptyMap.joinMap(null))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
         }
 
     }

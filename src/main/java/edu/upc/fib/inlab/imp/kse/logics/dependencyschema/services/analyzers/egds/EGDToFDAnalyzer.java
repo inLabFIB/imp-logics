@@ -28,39 +28,24 @@ public class EGDToFDAnalyzer {
         return new EGDToFDAnalysisResult(functionalDependenciesEGDs, nonFunctionalDependenciesEGDs);
     }
 
-    private FunctionalDependencyWithEGDs createNewFunctionalDependency(EGD egd) {
-        Set<Integer> keyPositions = getKeyPositions(egd);
-        Integer determinedPosition = getDeterminedPosition(egd);
-        Predicate affectedPredicate = getAffectedPredicate(egd);
+    private boolean isFunctionalDependency(EGD egd) {
+        if (egd.getBody().size() != 2) return false;
 
-        return new FunctionalDependencyWithEGDs(List.of(egd), new FunctionalDependency(affectedPredicate, keyPositions, Set.of(determinedPosition)));
+        return egd.getBody().get(0) instanceof OrdinaryLiteral oLit1 &&
+                egd.getBody().get(1) instanceof OrdinaryLiteral oLit2 &&
+                hasSamePredicate(oLit1, oLit2) &&
+                shareSomeVariable(oLit1, oLit2) &&
+                allTermsAreDifferentVariables(oLit1) &&
+                allTermsAreDifferentVariables(oLit2) &&
+                equatesSamePositionOfDifferentLiterals(egd);
     }
 
-    /**
-     * @param fd  not null
-     * @param egd affects the same predicate as fd, and has the same key positions
-     * @return a new functional dependency that adds the determined positions of the egd to fd
-     */
-    private FunctionalDependencyWithEGDs createNewFunctionalDependency(FunctionalDependencyWithEGDs fd, EGD egd) {
-        List<EGD> newEGDList = new ArrayList<>(fd.egdList());
-        newEGDList.add(egd);
-
-        FunctionalDependency currentFD = fd.functionalDependency();
-        Set<Integer> newDeterminedPositions = new LinkedHashSet<>(currentFD.determinedPositions());
-        newDeterminedPositions.add(getDeterminedPosition(egd));
-
-        return new FunctionalDependencyWithEGDs(newEGDList,
-                new FunctionalDependency(currentFD.predicate(), currentFD.keyPositions(), newDeterminedPositions));
+    private boolean hasSamePredicate(OrdinaryLiteral oLit1, OrdinaryLiteral oLit2) {
+        return oLit1.getPredicateName().equals(oLit2.getPredicateName());
     }
 
-    /**
-     * @param egd that defines a functional dependency
-     * @return the positions determined by this dependency
-     */
-    private Integer getDeterminedPosition(EGD egd) {
-        Term leftTerm = egd.getHead().getLeftTerm();
-        Set<LiteralPosition> literalPositionWithVariable = egd.getBody().getLiteralPositionWithVariable((Variable) leftTerm);
-        return literalPositionWithVariable.iterator().next().position();
+    private boolean shareSomeVariable(OrdinaryLiteral oLit1, OrdinaryLiteral oLit2) {
+        return oLit1.getTerms().stream().anyMatch(t -> t instanceof Variable && oLit2.getTerms().contains(t));
     }
 
     /**
@@ -76,8 +61,12 @@ public class EGDToFDAnalyzer {
                 .findFirst();
     }
 
-    private static boolean areSameKeyAndPredicate(FunctionalDependencyWithEGDs fd, Predicate predicate, Set<Integer> keyPositions) {
-        return fd.getPredicateName().equals(predicate.getName()) && fd.functionalDependency().keyPositions().equals(keyPositions);
+    /**
+     * @param egd that defines a functional dependency
+     * @return the affected predicate of the functional dependency
+     */
+    private Predicate getAffectedPredicate(EGD egd) {
+        return ((OrdinaryLiteral) egd.getBody().get(0)).getPredicate();
     }
 
     /**
@@ -99,26 +88,6 @@ public class EGDToFDAnalyzer {
         }
 
         return keyPositions;
-    }
-
-    /**
-     * @param egd that defines a functional dependency
-     * @return the affected predicate of the functional dependency
-     */
-    private Predicate getAffectedPredicate(EGD egd) {
-        return ((OrdinaryLiteral) egd.getBody().get(0)).getPredicate();
-    }
-
-    private boolean isFunctionalDependency(EGD egd) {
-        if (egd.getBody().size() != 2) return false;
-
-        return egd.getBody().get(0) instanceof OrdinaryLiteral oLit1 &&
-                egd.getBody().get(1) instanceof OrdinaryLiteral oLit2 &&
-                hasSamePredicate(oLit1, oLit2) &&
-                shareSomeVariable(oLit1, oLit2) &&
-                allTermsAreDifferentVariables(oLit1) &&
-                allTermsAreDifferentVariables(oLit2) &&
-                equatesSamePositionOfDifferentLiterals(egd);
     }
 
     private boolean allTermsAreDifferentVariables(OrdinaryLiteral oLit) {
@@ -147,6 +116,45 @@ public class EGDToFDAnalyzer {
         } else return false;
     }
 
+    private static boolean areSameKeyAndPredicate(FunctionalDependencyWithEGDs fd, Predicate predicate, Set<Integer> keyPositions) {
+        return fd.getPredicateName().equals(predicate.getName()) && fd.functionalDependency().keyPositions().equals(keyPositions);
+    }
+
+    /**
+     * @param fd  not null
+     * @param egd affects the same predicate as fd, and has the same key positions
+     * @return a new functional dependency that adds the determined positions of the egd to fd
+     */
+    private FunctionalDependencyWithEGDs createNewFunctionalDependency(FunctionalDependencyWithEGDs fd, EGD egd) {
+        List<EGD> newEGDList = new ArrayList<>(fd.egdList());
+        newEGDList.add(egd);
+
+        FunctionalDependency currentFD = fd.functionalDependency();
+        Set<Integer> newDeterminedPositions = new LinkedHashSet<>(currentFD.determinedPositions());
+        newDeterminedPositions.add(getDeterminedPosition(egd));
+
+        return new FunctionalDependencyWithEGDs(newEGDList,
+                                                new FunctionalDependency(currentFD.predicate(), currentFD.keyPositions(), newDeterminedPositions));
+    }
+
+    /**
+     * @param egd that defines a functional dependency
+     * @return the positions determined by this dependency
+     */
+    private Integer getDeterminedPosition(EGD egd) {
+        Term leftTerm = egd.getHead().getLeftTerm();
+        Set<LiteralPosition> literalPositionWithVariable = egd.getBody().getLiteralPositionWithVariable((Variable) leftTerm);
+        return literalPositionWithVariable.iterator().next().position();
+    }
+
+    private FunctionalDependencyWithEGDs createNewFunctionalDependency(EGD egd) {
+        Set<Integer> keyPositions = getKeyPositions(egd);
+        Integer determinedPosition = getDeterminedPosition(egd);
+        Predicate affectedPredicate = getAffectedPredicate(egd);
+
+        return new FunctionalDependencyWithEGDs(List.of(egd), new FunctionalDependency(affectedPredicate, keyPositions, Set.of(determinedPosition)));
+    }
+
     private Optional<Integer> getPositionOfVariable(EGD egd, Variable var1) {
         return egd.getBody().getPredicatePositionsWithVar(var1).stream().map(PredicatePosition::position).findFirst();
     }
@@ -161,13 +169,5 @@ public class EGDToFDAnalyzer {
 
     private static boolean areDifferentReference(Object o1, Object o2) {
         return o1 != o2;
-    }
-
-    private boolean shareSomeVariable(OrdinaryLiteral oLit1, OrdinaryLiteral oLit2) {
-        return oLit1.getTerms().stream().anyMatch(t -> t instanceof Variable && oLit2.getTerms().contains(t));
-    }
-
-    private boolean hasSamePredicate(OrdinaryLiteral oLit1, OrdinaryLiteral oLit2) {
-        return oLit1.getPredicateName().equals(oLit2.getPredicateName());
     }
 }

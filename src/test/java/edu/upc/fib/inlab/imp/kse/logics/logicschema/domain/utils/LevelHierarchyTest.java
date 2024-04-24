@@ -21,6 +21,47 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class LevelHierarchyTest {
+    @Test
+    void should_returnTheNumberOfLevels() {
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
+        assertThat(levelHierarchy.getNumberOfLevels()).isEqualTo(2);
+    }
+
+    @Test
+    void should_returnLevel() {
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
+
+        Level level = levelHierarchy.getLevel(0);
+
+        LevelAssert.assertThat(level).containsExactlyPredicateNames("P");
+    }
+
+    @Test
+    void should_returnBaseLevel() {
+        Predicate predicateP = new Predicate("P", 0);
+        Set<Predicate> level0 = Set.of(predicateP);
+        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+
+        Level level = levelHierarchy.getBasePredicatesLevel();
+
+        LevelAssert.assertThat(level).containsExactlyPredicateNames("P");
+    }
+
+    @Test
+    void should_returnIterableDerivedLevels() {
+        Predicate predicateP = new Predicate("P", 0);
+        Set<Predicate> level0 = Set.of(predicateP);
+        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
+        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
+
+        List<Level> derivedLevels = levelHierarchy.getDerivedLevels();
+
+        assertThat(derivedLevels).hasSize(1);
+        Level derivedLevel = derivedLevels.get(0);
+        LevelAssert.assertThat(derivedLevel).containsExactlyPredicateNames("Q");
+    }
+
     @Nested
     class CreationTests {
         @Test
@@ -65,21 +106,6 @@ class LevelHierarchyTest {
                     .isInstanceOf(LevelHierarchyException.class);
         }
 
-    }
-
-    @Test
-    void should_returnTheNumberOfLevels() {
-        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
-        assertThat(levelHierarchy.getNumberOfLevels()).isEqualTo(2);
-    }
-
-    @Test
-    void should_returnLevel() {
-        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(List.of("P"), List.of("Q"));
-
-        Level level = levelHierarchy.getLevel(0);
-
-        LevelAssert.assertThat(level).containsExactlyPredicateNames("P");
     }
 
     @Nested
@@ -154,31 +180,5 @@ class LevelHierarchyTest {
                     .isInstanceOf(PredicateNotInLevelException.class);
 
         }
-    }
-
-    @Test
-    void should_returnBaseLevel() {
-        Predicate predicateP = new Predicate("P", 0);
-        Set<Predicate> level0 = Set.of(predicateP);
-        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
-
-        Level level = levelHierarchy.getBasePredicatesLevel();
-
-        LevelAssert.assertThat(level).containsExactlyPredicateNames("P");
-    }
-
-    @Test
-    void should_returnIterableDerivedLevels() {
-        Predicate predicateP = new Predicate("P", 0);
-        Set<Predicate> level0 = Set.of(predicateP);
-        Set<Predicate> level1 = Set.of(DerivedPredicateMother.createOArityDerivedPredicate("Q", predicateP));
-        edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LevelHierarchy levelHierarchy = LevelHierarchyMother.createLevelHierarchy(level0, level1);
-
-        List<Level> derivedLevels = levelHierarchy.getDerivedLevels();
-
-        assertThat(derivedLevels).hasSize(1);
-        Level derivedLevel = derivedLevels.get(0);
-        LevelAssert.assertThat(derivedLevel).containsExactlyPredicateNames("Q");
     }
 }

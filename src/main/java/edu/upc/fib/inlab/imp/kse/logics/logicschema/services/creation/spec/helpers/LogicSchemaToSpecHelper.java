@@ -63,42 +63,25 @@ public class LogicSchemaToSpecHelper {
         return new PredicateSpec(predicate.getName(), predicate.getArity());
     }
 
-    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
-        return terms.stream().map(LogicSchemaToSpecHelper::buildTermSpec).toList();
-    }
-
-    public static TermSpec buildTermSpec(Term t) {
-        if (t instanceof Constant) {
-            return new ConstantSpec(t.getName());
-        } else if (t instanceof Variable) {
-            return new VariableSpec(t.getName());
-        } else throw new IMPLogicsException("Unknown term type: " + t.getClass().getName());
-    }
-
     public static BodySpec buildBodySpec(List<Literal> body) {
         return new BodySpec(body.stream()
-                .map(l -> {
-                    if (l instanceof OrdinaryLiteral ordinaryLiteral) {
-                        return buildOrdinaryLiteralSpec(ordinaryLiteral);
-                    } else if (l instanceof BuiltInLiteral comparisonBuiltInLiteral) {
-                        return buildBuiltInLiteralSpec(comparisonBuiltInLiteral);
-                    } else throw new IMPLogicsException("Unknown literal type: " + l.getClass().getName());
-                })
-                .toList());
+                                    .map(l -> {
+                                        if (l instanceof OrdinaryLiteral ordinaryLiteral) {
+                                            return buildOrdinaryLiteralSpec(ordinaryLiteral);
+                                        } else if (l instanceof BuiltInLiteral comparisonBuiltInLiteral) {
+                                            return buildBuiltInLiteralSpec(comparisonBuiltInLiteral);
+                                        } else
+                                            throw new IMPLogicsException("Unknown literal type: " + l.getClass().getName());
+                                    })
+                                    .toList());
     }
 
     public static OrdinaryLiteralSpec buildOrdinaryLiteralSpec(OrdinaryLiteral ordinaryLiteral) {
         ImmutableTermList terms = ordinaryLiteral.getTerms();
         List<TermSpec> termSpecs = buildTermsSpecs(terms);
         return new OrdinaryLiteralSpec(ordinaryLiteral.getAtom().getPredicateName(),
-                termSpecs,
-                ordinaryLiteral.isPositive());
-    }
-
-    public static BuiltInLiteralSpec buildBuiltInLiteralSpec(BuiltInLiteral builtInLiteral) {
-        ImmutableTermList terms = builtInLiteral.getTerms();
-        List<TermSpec> termSpecs = buildTermsSpecs(terms);
-        return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
+                                       termSpecs,
+                                       ordinaryLiteral.isPositive());
     }
 
     public static LiteralSpec buildLiteralSpec(Literal literal) {
@@ -111,6 +94,24 @@ public class LogicSchemaToSpecHelper {
 
     public static BuiltInLiteralSpec buildFalseLiteralSpec() {
         return LogicSchemaToSpecHelper.buildBuiltInLiteralSpec(new BooleanBuiltInLiteral(false));
+    }
+
+    public static BuiltInLiteralSpec buildBuiltInLiteralSpec(BuiltInLiteral builtInLiteral) {
+        ImmutableTermList terms = builtInLiteral.getTerms();
+        List<TermSpec> termSpecs = buildTermsSpecs(terms);
+        return new BuiltInLiteralSpec(builtInLiteral.getOperationName(), termSpecs);
+    }
+
+    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
+        return terms.stream().map(LogicSchemaToSpecHelper::buildTermSpec).toList();
+    }
+
+    public static TermSpec buildTermSpec(Term t) {
+        if (t instanceof Constant) {
+            return new ConstantSpec(t.getName());
+        } else if (t instanceof Variable) {
+            return new VariableSpec(t.getName());
+        } else throw new IMPLogicsException("Unknown term type: " + t.getClass().getName());
     }
 
     public static BuiltInLiteralSpec buildTrueLiteralSpec() {

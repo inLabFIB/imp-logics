@@ -3,11 +3,8 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec;
 import java.util.Objects;
 
 /**
- * Specification of a predicate. Do note that a predicate specification is just a name, and one arity.
- * I.e., a predicate specification has no derivation rules associated.
- *
- * @param name
- * @param arity
+ * Specification of a predicate. Do note that a predicate specification is just a name, and one arity. I.e., a predicate
+ * specification has no derivation rules associated.
  */
 public record PredicateSpec(String name, int arity) {
 

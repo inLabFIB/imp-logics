@@ -10,6 +10,10 @@ public class DerivationRuleSpec extends NormalClauseSpec implements LogicElement
     private final String predicateName;
     private final List<TermSpec> termSpecList;
 
+    public DerivationRuleSpec(String predicateName, List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
+        this(predicateName, termSpecList, new BodySpec(bodySpec));
+    }
+
     public DerivationRuleSpec(String predicateName, List<TermSpec> headTermsSpec, BodySpec body) {
         super(body);
         if (Objects.isNull(predicateName)) throw new IllegalArgumentException("Predicate name cannot be null");
@@ -18,10 +22,6 @@ public class DerivationRuleSpec extends NormalClauseSpec implements LogicElement
 
         this.predicateName = predicateName;
         this.termSpecList = headTermsSpec;
-    }
-
-    public DerivationRuleSpec(String predicateName, List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
-        this(predicateName, termSpecList, new BodySpec(bodySpec));
     }
 
     public String getPredicateName() {

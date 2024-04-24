@@ -7,8 +7,8 @@ import java.util.Set;
  */
 public record QuerySetSpec(Set<QuerySpec> querySpecSet) implements LogicElementSpec {
 
-        public QuerySetSpec {
-            if (querySpecSet == null) throw new IllegalArgumentException("Conjunctive query set cannot be null");
-            if (querySpecSet.isEmpty()) throw new IllegalArgumentException("Conjunctive query set cannot be empty");
-        }
+    public QuerySetSpec {
+        if (querySpecSet == null) throw new IllegalArgumentException("Conjunctive query set cannot be null");
+        if (querySpecSet.isEmpty()) throw new IllegalArgumentException("Conjunctive query set cannot be empty");
+    }
 }

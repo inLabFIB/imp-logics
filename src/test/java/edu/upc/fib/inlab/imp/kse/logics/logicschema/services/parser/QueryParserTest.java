@@ -131,26 +131,26 @@ class QueryParserTest {
             assertThat(queries)
                     .hasSize(2)
                     .satisfiesOnlyOnce(q -> {
-                                assertThat(q)
-                                        .hasEmptyHead()
-                                        .hasBodySize(1);
-                                assertThat(q.getHeadTerms())
-                                        .isEmpty();
-                        Assertions.assertThat(q.isConjunctiveQuery()).isTrue();
-                        assertThat(((ConjunctiveQuery) q).getBodyAtoms())
-                                        .containsAtomsByPredicateName(ImmutableAtomListMother.create("p(x)"));
-                            }
+                                           assertThat(q)
+                                                   .hasEmptyHead()
+                                                   .hasBodySize(1);
+                                           assertThat(q.getHeadTerms())
+                                                   .isEmpty();
+                                           Assertions.assertThat(q.isConjunctiveQuery()).isTrue();
+                                           assertThat(((ConjunctiveQuery) q).getBodyAtoms())
+                                                   .containsAtomsByPredicateName(ImmutableAtomListMother.create("p(x)"));
+                                       }
                     )
                     .satisfiesOnlyOnce(q -> {
-                                assertThat(q)
-                                        .hasNonEmptyHead()
-                                        .hasBodySize(2);
-                                assertThat(q.getHeadTerms())
-                                        .containsOnly(new Variable("x"), new Variable("y"));
-                        Assertions.assertThat(q.isConjunctiveQuery()).isTrue();
-                        assertThat(((ConjunctiveQuery) q).getBodyAtoms())
-                                        .containsAtomsByPredicateName(ImmutableAtomListMother.create("p(x), q(y)"));
-                            }
+                                           assertThat(q)
+                                                   .hasNonEmptyHead()
+                                                   .hasBodySize(2);
+                                           assertThat(q.getHeadTerms())
+                                                   .containsOnly(new Variable("x"), new Variable("y"));
+                                           Assertions.assertThat(q.isConjunctiveQuery()).isTrue();
+                                           assertThat(((ConjunctiveQuery) q).getBodyAtoms())
+                                                   .containsAtomsByPredicateName(ImmutableAtomListMother.create("p(x), q(y)"));
+                                       }
                     );
         }
     }

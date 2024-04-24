@@ -20,11 +20,6 @@ public class Variable extends Term {
     }
 
     @Override
-    public String toString() {
-        return "Var{'" + this.getName() + "'}";
-    }
-
-    @Override
     public boolean isVariable() {
         return true;
     }
@@ -32,6 +27,11 @@ public class Variable extends Term {
     @Override
     public <T> T accept(LogicSchemaVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Var{'" + this.getName() + "'}";
     }
 
 }

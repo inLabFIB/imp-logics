@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 
 public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
 
-    private static final String CONSTRAINT_ID_PREFIX = "@";
     public static final String NORMAL_CLAUSE_SEPARATOR = ":-";
     public static final String COMMA_SEPARATOR = ",";
     public static final String NOT = "not";
+    private static final String CONSTRAINT_ID_PREFIX = "@";
 
     public String print(LogicSchema logicSchema) {
         return this.visit(logicSchema);
@@ -57,7 +57,7 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     @Override
     public String visit(ImmutableLiteralsList literals) {
         return literals.stream().map(literal ->
-                literal.accept(this)
+                                             literal.accept(this)
         ).collect(Collectors.joining(COMMA_SEPARATOR + " "));
     }
 
@@ -103,6 +103,13 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     }
 
     @Override
+    public String visit(Atom atom) {
+        Predicate predicate = atom.getPredicate();
+        ImmutableTermList terms = atom.getTerms();
+        return predicate.accept(this) + "(" + terms.accept(this) + ")";
+    }
+
+    @Override
     public String visit(ComparisonOperator comparisonOperator) {
         return comparisonOperator.getSymbol();
     }
@@ -131,14 +138,7 @@ public class LogicSchemaPrinter implements LogicSchemaVisitor<String> {
     @Override
     public String visit(ImmutableAtomList atoms) {
         return atoms.stream().map(atom ->
-                atom.accept(this)
+                                          atom.accept(this)
         ).collect(Collectors.joining(COMMA_SEPARATOR + " "));
-    }
-
-    @Override
-    public String visit(Atom atom) {
-        Predicate predicate = atom.getPredicate();
-        ImmutableTermList terms = atom.getTerms();
-        return predicate.accept(this) + "(" + terms.accept(this) + ")";
     }
 }

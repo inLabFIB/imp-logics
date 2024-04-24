@@ -13,10 +13,6 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         super(comparisonBuiltInLiteral, BuiltInLiteralAssert.class);
     }
 
-    public static BuiltInLiteralAssert assertThat(BuiltInLiteral actual) {
-        return new BuiltInLiteralAssert(actual);
-    }
-
     @SuppressWarnings("UnusedReturnValue")
     public BuiltInLiteralAssert correspondsSpec(BuiltInLiteralSpec spec) {
         Assertions.assertThat(actual.getOperationName()).isEqualTo(spec.getOperator());
@@ -58,6 +54,10 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         return this;
     }
 
+    public static BuiltInLiteralAssert assertThat(BuiltInLiteral actual) {
+        return new BuiltInLiteralAssert(actual);
+    }
+
     public BuiltInLiteralAssert isCustomBuiltInLiteral() {
         Assertions.assertThat(actual).isInstanceOf(CustomBuiltInLiteral.class);
         return this;
@@ -67,6 +67,7 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         Assertions.assertThat(actual.getOperationName()).isEqualTo(operationName);
         return this;
     }
+
     @SuppressWarnings("unused")
     public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
         objects.assertIsInstanceOf(info, actual, ComparisonBuiltInLiteral.class);

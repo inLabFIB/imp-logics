@@ -58,21 +58,6 @@ class SingleHeadTGDTransformerTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTGDsToNormalizeToOneHeadAtom")
-    void should_return_SingleHeadedTGD_whenSchemaHasOneTGD(String tgdString, Set<String> expectedTGDsString) {
-        DependencySchema tgd = DependencySchemaMother.buildDependencySchema(tgdString);
-        SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
-
-        DependencySchema normalizedTGD = tgdNormalizer.execute(tgd);
-
-        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
-
-        Assertions.assertThat(normalizedTGD.getAllTGDs())
-                .usingElementComparator(tgdComparator())
-                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
-    }
-
     static Stream<Arguments> provideSchemasToNormalizeToOneHeadAtom() {
         return Stream.of(
                 Arguments.of(
@@ -105,18 +90,18 @@ class SingleHeadTGDTransformerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideSchemasToNormalizeToOneHeadAtom")
-    void should_return_SingleHeadedTGD_whenSchemaHasSeveralDependencies(String dependencyString, Set<String> expectedTGDsString) {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema(dependencyString);
+    @MethodSource("provideTGDsToNormalizeToOneHeadAtom")
+    void should_return_SingleHeadedTGD_whenSchemaHasOneTGD(String tgdString, Set<String> expectedTGDsString) {
+        DependencySchema tgd = DependencySchemaMother.buildDependencySchema(tgdString);
         SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
 
-        DependencySchema normalizedTGD = tgdNormalizer.execute(schema);
+        DependencySchema normalizedTGD = tgdNormalizer.execute(tgd);
 
-        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
 
-        Assertions.assertThat(normalizedTGD.getAllDependencies())
-                .usingElementComparator(dependenciesComparator())
-                .containsExactlyInAnyOrderElementsOf(expectedDependencies);
+        Assertions.assertThat(normalizedTGD.getAllTGDs())
+                .usingElementComparator(tgdComparator())
+                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
     }
 
     static Comparator<TGD> tgdComparator() {
@@ -139,6 +124,21 @@ class SingleHeadTGDTransformerTest {
             }
             return 0;
         };
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSchemasToNormalizeToOneHeadAtom")
+    void should_return_SingleHeadedTGD_whenSchemaHasSeveralDependencies(String dependencyString, Set<String> expectedTGDsString) {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(dependencyString);
+        SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
+
+        DependencySchema normalizedTGD = tgdNormalizer.execute(schema);
+
+        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+
+        Assertions.assertThat(normalizedTGD.getAllDependencies())
+                .usingElementComparator(dependenciesComparator())
+                .containsExactlyInAnyOrderElementsOf(expectedDependencies);
     }
 
     static Comparator<Dependency> dependenciesComparator() {

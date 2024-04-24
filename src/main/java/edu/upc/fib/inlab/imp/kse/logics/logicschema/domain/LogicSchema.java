@@ -27,7 +27,8 @@ public class LogicSchema {
 
     public LogicSchema(Set<Predicate> predicates, Set<LogicConstraint> constraints) {
         predicates.forEach(predicate -> {
-            if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateNameException(predicate.getName());
+            if (predicatesByName.containsKey(predicate.getName()))
+                throw new RepeatedPredicateNameException(predicate.getName());
             predicatesByName.put(predicate.getName(), predicate);
         });
 
@@ -41,8 +42,15 @@ public class LogicSchema {
         checkDerivedPredicatesUsesPredicatesFromSchema();
     }
 
-    public boolean isEmpty() {
-        return predicatesByName.isEmpty() && constraintsByID.isEmpty();
+    private void checkPredicatesBelongsToSchema(NormalClause c) {
+        for (Literal l : c.getBody()) {
+            if (l instanceof OrdinaryLiteral ol) {
+                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
+                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
+                if (predicateFromConstraint != predicateFromSchemaWithSameName)
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
+            }
+        }
     }
 
     private void checkDerivedPredicatesUsesPredicatesFromSchema() {
@@ -53,15 +61,8 @@ public class LogicSchema {
         }
     }
 
-    private void checkPredicatesBelongsToSchema(NormalClause c) {
-        for (Literal l : c.getBody()) {
-            if (l instanceof OrdinaryLiteral ol) {
-                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
-                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
-                if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
-            }
-        }
+    public boolean isEmpty() {
+        return predicatesByName.isEmpty() && constraintsByID.isEmpty();
     }
 
     public Predicate getPredicateByName(String predicateName) {
@@ -77,7 +78,8 @@ public class LogicSchema {
     }
 
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
-        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotFoundException(derivedPredicateName);
+        if (!predicatesByName.containsKey(derivedPredicateName))
+            throw new PredicateNotFoundException(derivedPredicateName);
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {
@@ -114,9 +116,9 @@ public class LogicSchema {
     }
 
     /**
-     * A LevelHierarchy is a partition of the predicates of a schema into several levels,
-     * where level 0 contains the base predicates, and each derived predicate from level i
-     * is defined through predicates from levels {@code j < i}.
+     * A LevelHierarchy is a partition of the predicates of a schema into several levels, where level 0 contains the
+     * base predicates, and each derived predicate from level i is defined through predicates from levels
+     * {@code j < i}.
      *
      * @return a LevelHierarchy for this schema
      */
@@ -129,6 +131,15 @@ public class LogicSchema {
         List<Level> levels = createLevels(predicateToLevelMap);
         return new LevelHierarchy(levels);
 
+    }
+
+    public boolean isSafe() {
+        return getAllLogicConstraints().stream().allMatch(LogicConstraint::isSafe)
+                && getAllDerivationRules().stream().allMatch(DerivationRule::isSafe);
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     private void fillPredicateIntoALevel(Predicate predicate, Map<Predicate, Integer> predicateToLevelMap) {
@@ -165,14 +176,5 @@ public class LogicSchema {
             levels.add(new Level(predicates));
         }
         return levels;
-    }
-
-    public boolean isSafe() {
-        return getAllLogicConstraints().stream().allMatch(LogicConstraint::isSafe)
-                && getAllDerivationRules().stream().allMatch(DerivationRule::isSafe);
-    }
-
-    public <T> T accept(LogicSchemaVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 }

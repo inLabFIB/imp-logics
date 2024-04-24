@@ -19,8 +19,8 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnPredicatePosition_whenItContainsExistentialVariable() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x, y)
-                    """);
+                                                                                                     p(x) -> r(x, y)
+                                                                                                     """);
 
             Set<PredicatePosition> affectedPositions = WeaklyGuardedChecker.getAffectedPositions(dependencySchema);
 
@@ -32,9 +32,9 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnPredicatePosition_whenItContainsUniversalVar_butPropagatesExistentialVars() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x, y)
-                    r(x, y) -> q(y)
-                    """);
+                                                                                                     p(x) -> r(x, y)
+                                                                                                     r(x, y) -> q(y)
+                                                                                                     """);
 
             Set<PredicatePosition> affectedPositions = WeaklyGuardedChecker.getAffectedPositions(dependencySchema);
 
@@ -47,9 +47,9 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldNotReturnPredicatePosition_whenPropagatesExistentialVars_butJoinsNonAffectedPositions() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x, y)
-                    r(x, y), s(y) -> q(y)
-                    """);
+                                                                                                     p(x) -> r(x, y)
+                                                                                                     r(x, y), s(y) -> q(y)
+                                                                                                     """);
 
             Set<PredicatePosition> affectedPositions = WeaklyGuardedChecker.getAffectedPositions(dependencySchema);
 
@@ -61,10 +61,10 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnPredicatePosition_whenExistentialVariable_AppearsTwice_inAffectedPositions() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x, y)
-                    t() -> s(y)
-                    r(x, y), s(y) -> q(y)
-                    """);
+                                                                                                     p(x) -> r(x, y)
+                                                                                                     t() -> s(y)
+                                                                                                     r(x, y), s(y) -> q(y)
+                                                                                                     """);
 
             Set<PredicatePosition> affectedPositions = WeaklyGuardedChecker.getAffectedPositions(dependencySchema);
 
@@ -78,11 +78,11 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnPredicatePosition_whenPropagatingThroughSeveralRules() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x, y)
-                    p(x) -> s(x, y)
-                    r(x, y), s(x,y) -> q(y)
-                    q(y) -> t(y, u)
-                    """);
+                                                                                                     p(x) -> r(x, y)
+                                                                                                     p(x) -> s(x, y)
+                                                                                                     r(x, y), s(x,y) -> q(y)
+                                                                                                     q(y) -> t(y, u)
+                                                                                                     """);
 
             Set<PredicatePosition> affectedPositions = WeaklyGuardedChecker.getAffectedPositions(dependencySchema);
 
@@ -135,14 +135,14 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnWeaklyGuarded_whenTGDIsWeaklyGuarded() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    r(x,a), s(y,a) -> t(a)
-                    """);
+                                                                                                     r(x,a), s(y,a) -> t(a)
+                                                                                                     """);
             TGD tgd = dependencySchema.getAllTGDs().get(0);
             Predicate sPredicate = dependencySchema.getPredicateByName("s");
             Predicate rPredicate = dependencySchema.getPredicateByName("r");
 
             Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(sPredicate, 1),
-                    new PredicatePosition(rPredicate, 1));
+                                                              new PredicatePosition(rPredicate, 1));
 
 
             boolean isWeaklyGuarded = WeaklyGuardedChecker.isWeaklyGuarded(tgd, affectedPositions);
@@ -153,14 +153,14 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnNonWeaklyGuarded_whenTGDIsNotWeaklyGuarded() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    r(x,a1), s(y,a2) -> t(a)
-                    """);
+                                                                                                     r(x,a1), s(y,a2) -> t(a)
+                                                                                                     """);
             TGD tgd = dependencySchema.getAllTGDs().get(0);
             Predicate sPredicate = dependencySchema.getPredicateByName("s");
             Predicate rPredicate = dependencySchema.getPredicateByName("r");
 
             Set<PredicatePosition> affectedPositions = Set.of(new PredicatePosition(sPredicate, 1),
-                    new PredicatePosition(rPredicate, 1));
+                                                              new PredicatePosition(rPredicate, 1));
 
 
             boolean isWeaklyGuarded = WeaklyGuardedChecker.isWeaklyGuarded(tgd, affectedPositions);
@@ -184,9 +184,9 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnWeaklyGuarded_whenDependenciesAreGuarded() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p() -> q()
-                    r(x,y), s(x) -> t(x,w)
-                    """);
+                                                                                                     p() -> q()
+                                                                                                     r(x,y), s(x) -> t(x,w)
+                                                                                                     """);
 
             boolean isWeaklyGuarded = new WeaklyGuardedChecker().isWeaklyGuarded(dependencySchema);
 
@@ -196,10 +196,10 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnWeaklyGuarded_whenAllDependenciesAreWeaklyGuarded() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x,a)
-                    p(x) -> s(x,a)
-                    r(x,a), s(y,a) -> t(a)
-                    """);
+                                                                                                     p(x) -> r(x,a)
+                                                                                                     p(x) -> s(x,a)
+                                                                                                     r(x,a), s(y,a) -> t(a)
+                                                                                                     """);
 
             boolean isWeaklyGuarded = new WeaklyGuardedChecker().isWeaklyGuarded(dependencySchema);
             Assertions.assertThat(isWeaklyGuarded).isTrue();
@@ -208,11 +208,11 @@ class WeaklyGuardedCheckerTest {
         @Test
         void shouldReturnNotWeaklyGuarded_whenSomeDependencyIsNotWeaklyGuarded() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x) -> r(x,a)
-                    p(x) -> s(x,a)
-                    r(x,a), s(y,a) -> t(a)
-                    r(x,a1), s(y,a2) -> t(a1)
-                    """);
+                                                                                                     p(x) -> r(x,a)
+                                                                                                     p(x) -> s(x,a)
+                                                                                                     r(x,a), s(y,a) -> t(a)
+                                                                                                     r(x,a1), s(y,a2) -> t(a1)
+                                                                                                     """);
 
             boolean isWeaklyGuarded = new WeaklyGuardedChecker().isWeaklyGuarded(dependencySchema);
             Assertions.assertThat(isWeaklyGuarded).isFalse();
@@ -223,9 +223,9 @@ class WeaklyGuardedCheckerTest {
             @Test
             void shouldReturnTrue_whenEGDsAreNonConflicting_withWeaklyGuardedTGDs() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        WorksIn(name, dept), Dept(dept) -> Person(name, age)
-                        Person(name, age), Person(name, age2) -> age = age2
-                        """);
+                                                                                                         WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                                                                                                         Person(name, age), Person(name, age2) -> age = age2
+                                                                                                         """);
 
                 boolean isGuarded = new WeaklyGuardedChecker().isWeaklyGuarded(dependencySchema);
 
@@ -235,9 +235,9 @@ class WeaklyGuardedCheckerTest {
             @Test
             void shouldReturnFalse_whenEGDsAreConflicting_withWeaklyGuardedTGDs() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        WorksIn(name, dept), Dept(dept) -> Person(name, age)
-                        Child(name, age), Person(name, age2) -> age = age2
-                        """);
+                                                                                                         WorksIn(name, dept), Dept(dept) -> Person(name, age)
+                                                                                                         Child(name, age), Person(name, age2) -> age = age2
+                                                                                                         """);
 
                 boolean isGuarded = new WeaklyGuardedChecker().isWeaklyGuarded(dependencySchema);
 

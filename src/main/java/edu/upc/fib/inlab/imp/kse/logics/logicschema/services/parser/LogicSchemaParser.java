@@ -29,8 +29,6 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
 
     protected abstract LogicSchemaGrammarToSpecVisitor<T> createVisitor(StringToTermSpecFactory stringToTermSpecFactory);
 
-    protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
-
     public LogicSchema parse(String schemaString) {
         return parse(schemaString, Set.of());
     }
@@ -51,6 +49,8 @@ public abstract class LogicSchemaParser<T extends LogicConstraintSpec> {
         LogicSchemaGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
     }
+
+    protected abstract LogicSchemaFactory<T> createLogicSchemaFactory();
 
     private static class LexerErrorListener extends BaseErrorListener {
         @Override

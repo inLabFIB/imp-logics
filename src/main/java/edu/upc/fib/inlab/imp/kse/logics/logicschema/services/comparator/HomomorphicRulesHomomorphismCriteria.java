@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Under this criteria, two derived ordinary literals are considered homomorphic, even if they have different predicate names,
- * if their derivation rules are homomorphic
+ * Under this criteria, two derived ordinary literals are considered homomorphic, even if they have different predicate
+ * names, if their derivation rules are homomorphic
  */
 public class HomomorphicRulesHomomorphismCriteria implements DerivedOrdinaryLiteralHomomorphismCriteria {
 

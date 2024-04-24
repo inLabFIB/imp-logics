@@ -8,17 +8,13 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Implementation of a logic constraint. That is, a NormalClause  without head.
- * E.g. " :- Emp(x), not(Adult(x))"
- * A LogicConstraint is a weak entity w.r.t. a logic schema, that is:
- * - There are no 2 LogicConstraints with the same ConstraintID in the same schema
- * - A LogicConstraint cannot appear in two schemas
+ * Implementation of a logic constraint. That is, a NormalClause  without head. E.g. " :- Emp(x), not(Adult(x))" A
+ * LogicConstraint is a weak entity w.r.t. a logic schema, that is: - There are no 2 LogicConstraints with the same
+ * ConstraintID in the same schema - A LogicConstraint cannot appear in two schemas
  */
 public class LogicConstraint extends NormalClause {
     /**
-     * Invariants:
-     * - constraintID must not be null
-     * - constraintID must be immutable
+     * Invariants: - constraintID must not be null - constraintID must be immutable
      */
     private final ConstraintID constraintID;
 
@@ -28,13 +24,13 @@ public class LogicConstraint extends NormalClause {
         this.constraintID = constraintID;
     }
 
-    public ConstraintID getID() {
-        return constraintID;
-    }
-
     @Override
     public String toString() {
         return "@" + getID() + " :- " + this.getBody();
+    }
+
+    public ConstraintID getID() {
+        return constraintID;
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {

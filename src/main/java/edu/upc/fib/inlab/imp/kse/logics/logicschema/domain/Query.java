@@ -4,21 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A Query is composed of a list of terms, and a body
- * E.g.: (x,y) :- P(x, y), not(R(x))
- * Queries can be used to define DerivedPredicates.
- * For instance, the derived predicate D, with arity 2, is defined by the queries:
- * (x,y) :- P(x, y), not(R(x))
- * (x,y) :- P(x, y), not(S(x))
+ * A Query is composed of a list of terms, and a body E.g.: (x,y) :- P(x, y), not(R(x)) Queries can be used to define
+ * DerivedPredicates. For instance, the derived predicate D, with arity 2, is defined by the queries: (x,y) :- P(x, y),
+ * not(R(x)) (x,y) :- P(x, y), not(S(x))
  */
 public class Query {
     /**
-     * Invariants:
-     * - headTerms cannot be null, although it might be empty
-     * - headTerms must be immutable
-     * - body cannot be null
-     * - body cannot be empty
-     * - body is immutable
+     * Invariants: - headTerms cannot be null, although it might be empty - headTerms must be immutable - body cannot be
+     * null - body cannot be empty - body is immutable
      */
 
     private final ImmutableTermList headTerms;

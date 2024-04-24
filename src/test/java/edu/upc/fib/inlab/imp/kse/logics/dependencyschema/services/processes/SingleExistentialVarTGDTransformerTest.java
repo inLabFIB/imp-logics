@@ -59,21 +59,6 @@ class SingleExistentialVarTGDTransformerTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTGDsTONormalizeExistentiallyQuantifiedVariables")
-    void should_return_tgdConvertedToSingleExistentialVarTGD(String tgdString, Set<String> expectedTGDsString) {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema(tgdString);
-        SingleExistentialVarTGDTransformer transformer = new SingleExistentialVarTGDTransformer();
-
-        DependencySchema transformedSchema = transformer.execute(schema);
-
-        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
-
-        assertThat(transformedSchema.getAllTGDs())
-                .usingElementComparator(tgdComparator())
-                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
-    }
-
     static Stream<Arguments> provideSchemasTONormalizeExistentiallyQuantifiedVariables() {
         return Stream.of(
                 Arguments.of(
@@ -101,6 +86,21 @@ class SingleExistentialVarTGDTransformerTest {
                         )
                 )
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTGDsTONormalizeExistentiallyQuantifiedVariables")
+    void should_return_tgdConvertedToSingleExistentialVarTGD(String tgdString, Set<String> expectedTGDsString) {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(tgdString);
+        SingleExistentialVarTGDTransformer transformer = new SingleExistentialVarTGDTransformer();
+
+        DependencySchema transformedSchema = transformer.execute(schema);
+
+        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
+
+        assertThat(transformedSchema.getAllTGDs())
+                .usingElementComparator(tgdComparator())
+                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
     }
 
     @ParameterizedTest

@@ -21,13 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BodySorterTest {
 
-    @Test
-    void should_throwException_whenSortingNullSchema() {
-        BodySorter bodySorter = new BodySorter();
-        assertThatThrownBy(() -> bodySorter.sort(null))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     static Stream<Arguments> provideLogicSchemasAndExpectedSortedBodies() {
         return Stream.of(
                 Arguments.of(
@@ -56,6 +49,13 @@ class BodySorterTest {
                         List.of("Emp(x)", "not(Adult(x))", "not(Adult(y))", "x=1", "y=2")
                 )
         );
+    }
+
+    @Test
+    void should_throwException_whenSortingNullSchema() {
+        BodySorter bodySorter = new BodySorter();
+        assertThatThrownBy(() -> bodySorter.sort(null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest
@@ -103,10 +103,10 @@ class BodySorterTest {
     @Test
     void should_returnOriginalConstraintID_when_SchemaHasSeveralConstraints() {
         LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                @1 :- P(x)
-                @2 :- Q(x)
-                @3 :- R(x)
-                """);
+                                                                                       @1 :- P(x)
+                                                                                       @2 :- Q(x)
+                                                                                       @3 :- R(x)
+                                                                                       """);
 
         SchemaTransformation schemaTransformation = new BodySorter().executeTransformation(originalSchema);
 

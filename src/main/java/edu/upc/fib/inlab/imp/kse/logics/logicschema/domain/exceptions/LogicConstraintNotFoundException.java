@@ -14,7 +14,7 @@ public class LogicConstraintNotFoundException extends IMPLogicsException {
      * The constraintID is included in this exception's detail message. The exact presentation format of the detail
      * message is unspecified.
      *
-     * @param constraintID  the constraintID of the nonexistent logic constraint.
+     * @param constraintID the constraintID of the nonexistent logic constraint.
      */
     public LogicConstraintNotFoundException(ConstraintID constraintID) {
         super("LogicConstraint " + constraintID + " does not exist.");

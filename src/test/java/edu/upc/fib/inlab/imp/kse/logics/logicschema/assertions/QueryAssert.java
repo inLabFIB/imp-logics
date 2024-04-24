@@ -54,6 +54,11 @@ public class QueryAssert extends AbstractAssert<QueryAssert, Query> {
         return this;
     }
 
+    public QueryAssert isIsomorphicTo(List<String> headTerms, String expectedString) {
+        Query expectedQuery = QueryMother.createQuery(headTerms, expectedString);
+        return isIsomorphicTo(expectedQuery);
+    }
+
     public QueryAssert isIsomorphicTo(Query expected) {
         boolean result = new IsomorphismComparator(new IsomorphismOptions())
                 .areIsomorphic(actual, expected);
@@ -62,11 +67,6 @@ public class QueryAssert extends AbstractAssert<QueryAssert, Query> {
                 .describedAs("Actual query '" + queryPrinter.print(actual) + "' is not isomorphic to\nExpected query '" + queryPrinter.print(expected) + "'")
                 .isTrue();
         return this;
-    }
-
-    public QueryAssert isIsomorphicTo(List<String> headTerms, String expectedString) {
-        Query expectedQuery = QueryMother.createQuery(headTerms, expectedString);
-        return isIsomorphicTo(expectedQuery);
     }
 
 }

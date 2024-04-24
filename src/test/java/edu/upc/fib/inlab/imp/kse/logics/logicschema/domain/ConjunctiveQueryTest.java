@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+
 class ConjunctiveQueryTest {
 
     @Test

@@ -12,26 +12,6 @@ import java.util.Set;
 
 public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
 
-    public boolean isWeaklyGuarded(DependencySchema dependencySchema) {
-        return satisfies(dependencySchema);
-    }
-
-    @Override
-    public boolean satisfies(DependencySchema dependencySchema) {
-        if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
-            throw new UnsupportedOperationException("Weakly guarded analysis does not currently support negated nor built-in literals");
-        }
-        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
-
-        Set<PredicatePosition> affectedPositions = getAffectedPositions(dependencySchema);
-        for (TGD tgd : dependencySchema.getAllTGDs()) {
-            if (!isWeaklyGuarded(tgd, affectedPositions)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * @param tgd               not null
      * @param affectedPositions not null, might be empty
@@ -40,13 +20,13 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
     static boolean isWeaklyGuarded(TGD tgd, Set<PredicatePosition> affectedPositions) {
         Set<Variable> universalVars = tgd.getUniversalVariables();
         List<Variable> affectedVars = universalVars.stream().filter(u ->
-                        affectedPositions.containsAll(tgd.getBody().getPredicatePositionsWithVar(u)))
+                                                                            affectedPositions.containsAll(tgd.getBody().getPredicatePositionsWithVar(u)))
                 .toList();
 
         //Searching the guard
         for (Literal lit : tgd.getBody()) {
             if (lit instanceof OrdinaryLiteral &&
-                lit.getTerms().containsAll(affectedVars)) {
+                    lit.getTerms().containsAll(affectedVars)) {
                 return true;
             }
         }
@@ -55,14 +35,11 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
     }
 
     /**
-     * This method implements the affected positions definition
-     * given in IEEE Symposion on Logic in Computer Science 2010
-     * "Datalog+/-: A Family of Logical Knowledge Representation
-     * and Query Languages for New Applications" by Cali, et al.
+     * This method implements the affected positions definition given in IEEE Symposion on Logic in Computer Science
+     * 2010 "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for New Applications" by Cali,
+     * et al.
      *
-     * @param dependencySchema
-     * @return those predicate positions that might contain null values
-     * when chasing the schema dependencies.
+     * @return those predicate positions that might contain null values when chasing the schema dependencies.
      */
     public static Set<PredicatePosition> getAffectedPositions(DependencySchema dependencySchema) {
         Set<PredicatePosition> positionsWithExistsVars = getPositionsWithExistentialVars(dependencySchema);
@@ -88,14 +65,10 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
     }
 
     /**
-     * This method computes the affected positions of this schema by
-     * saturating the set of affectedPositions.
-     * That is, it recursively keeps adding predicatePositions to
-     * affectedPositions until no more predicatePositions can be
-     * added. When no more predicatePositions can be added, the algorithm
-     * finishes
+     * This method computes the affected positions of this schema by saturating the set of affectedPositions. That is,
+     * it recursively keeps adding predicatePositions to affectedPositions until no more predicatePositions can be
+     * added. When no more predicatePositions can be added, the algorithm finishes
      *
-     * @param dependencySchema
      * @param affectedPositions not null
      * @return the set of affected positions given the initial set of affected positions
      */
@@ -115,6 +88,26 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
         if (!affectedPositions.containsAll(newAffectedPositions))
             return getAffectedPositions(dependencySchema, newAffectedPositions);
         else return newAffectedPositions;
+    }
+
+    public boolean isWeaklyGuarded(DependencySchema dependencySchema) {
+        return satisfies(dependencySchema);
+    }
+
+    @Override
+    public boolean satisfies(DependencySchema dependencySchema) {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
+            throw new UnsupportedOperationException("Weakly guarded analysis does not currently support negated nor built-in literals");
+        }
+        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
+
+        Set<PredicatePosition> affectedPositions = getAffectedPositions(dependencySchema);
+        for (TGD tgd : dependencySchema.getAllTGDs()) {
+            if (!isWeaklyGuarded(tgd, affectedPositions)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

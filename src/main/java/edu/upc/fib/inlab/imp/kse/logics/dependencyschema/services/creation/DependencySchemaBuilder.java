@@ -36,30 +36,6 @@ public class DependencySchemaBuilder {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public DependencySchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {
-        Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
-        return this;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public DependencySchemaBuilder addPredicate(String predicateName, int arity) {
-        addPredicateIfAbsent(predicateName, arity);
-        return this;
-    }
-
-    private void addPredicateIfAbsent(String predicateName, int arity) {
-        checkRepeatedNameWithDifferentArity(predicateName, arity);
-        predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, arity));
-    }
-
-    private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
-        if (predicatesByName.containsKey(predicateName)
-                && predicatesByName.get(predicateName).getArity() != arity) {
-            throw new RepeatedPredicateNameException(predicateName);
-        }
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
     @SafeVarargs
     public final DependencySchemaBuilder addDependency(DependencySpec... dependencySpecs) {
         return addDependency(Arrays.stream(dependencySpecs).toList());
@@ -106,6 +82,18 @@ public class DependencySchemaBuilder {
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    public DependencySchemaBuilder addPredicate(PredicateSpec... predicateSpecs) {
+        Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public DependencySchemaBuilder addPredicate(String predicateName, int arity) {
+        addPredicateIfAbsent(predicateName, arity);
+        return this;
+    }
+
     public DependencySchema build() {
         return new DependencySchema(
                 new LinkedHashSet<>(this.predicatesByName.values()),
@@ -121,5 +109,17 @@ public class DependencySchemaBuilder {
     public DependencySchemaBuilder addAllPredicates(List<PredicateSpec> allPredicates) {
         allPredicates.forEach(this::addPredicate);
         return this;
+    }
+
+    private void addPredicateIfAbsent(String predicateName, int arity) {
+        checkRepeatedNameWithDifferentArity(predicateName, arity);
+        predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, arity));
+    }
+
+    private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
+        if (predicatesByName.containsKey(predicateName)
+                && predicatesByName.get(predicateName).getArity() != arity) {
+            throw new RepeatedPredicateNameException(predicateName);
+        }
     }
 }

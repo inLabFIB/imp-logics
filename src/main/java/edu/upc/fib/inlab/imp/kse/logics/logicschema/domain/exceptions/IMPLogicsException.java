@@ -18,8 +18,8 @@ public class IMPLogicsException extends RuntimeException {
     /**
      * Constructs a new IMP Logics exception with the specified detail message.
      *
-     * @param message   the detail message. The detail message is saved for
-     *                  later retrieval by the {@link #getMessage()} method.
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     *                method.
      */
     public IMPLogicsException(String message) {
         super(message);

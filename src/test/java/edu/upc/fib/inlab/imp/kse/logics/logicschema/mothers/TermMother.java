@@ -19,15 +19,15 @@ public class TermMother {
         return new ImmutableTermList(terms.stream().map(TermMother::createTerm).toList());
     }
 
-    public static ImmutableTermList createTerms(String... terms) {
-        return new ImmutableTermList(Arrays.stream(terms).map(TermMother::createTerm).toList());
-    }
-
     public static Term createTerm(String termName) {
         if (termTypeCriteria.isVariable(termName)) {
             return new Variable(termName);
         } else if (termTypeCriteria.isConstant(termName)) {
             return new Constant(termName);
         } else throw new IMPLogicsException("Unrecognized term name " + termName);
+    }
+
+    public static ImmutableTermList createTerms(String... terms) {
+        return new ImmutableTermList(Arrays.stream(terms).map(TermMother::createTerm).toList());
     }
 }

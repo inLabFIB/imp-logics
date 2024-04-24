@@ -23,17 +23,17 @@ class BodyBuilder {
         this.literalFactory = literalFactory;
     }
 
+    public BodyBuilder addLiterals(List<LiteralSpec> bodySpec) {
+        bodySpec.forEach(this::addLiteral);
+        return this;
+    }
+
     public BodyBuilder addLiteral(LiteralSpec literalSpec) {
         if (literalSpec instanceof OrdinaryLiteralSpec olSpec) {
             body.add(literalFactory.buildOrdinaryLiteral(olSpec));
         } else if (literalSpec instanceof BuiltInLiteralSpec biSpec) {
             body.add(literalFactory.buildBuiltInLiteral(biSpec));
         } else throw new IMPLogicsException("Unrecognized literalSpec " + literalSpec.getClass().getName());
-        return this;
-    }
-
-    public BodyBuilder addLiterals(List<LiteralSpec> bodySpec) {
-        bodySpec.forEach(this::addLiteral);
         return this;
     }
 

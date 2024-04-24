@@ -9,19 +9,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Factory in charge of instantiating the corresponding subclass of Term (Constant, or Variable)
- * for a given String.
+ * Factory in charge of instantiating the corresponding subclass of Term (Constant, or Variable) for a given String.
  */
 public class StringToTermSpecFactory {
 
     private final TermTypeCriteria termTypeCriteria;
 
-    public StringToTermSpecFactory(TermTypeCriteria termTypeCriteria) {
-        this.termTypeCriteria = termTypeCriteria;
-    }
-
     public StringToTermSpecFactory() {
         this(new AllVariableTermTypeCriteria());
+    }
+
+    public StringToTermSpecFactory(TermTypeCriteria termTypeCriteria) {
+        this.termTypeCriteria = termTypeCriteria;
     }
 
     public List<TermSpec> createTermSpecs(String... termNames) {

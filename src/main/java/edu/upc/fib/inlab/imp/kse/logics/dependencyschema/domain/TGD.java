@@ -31,13 +31,6 @@ public class TGD extends Dependency {
         this.head = new ImmutableAtomList(head);
     }
 
-    public ImmutableAtomList getHead() {
-        return head;
-    }
-
-
-
-
     public Set<Variable> getExistentialVariables() {
         Set<Variable> universalVariables = getUniversalVariables();
         return getHead().stream()
@@ -46,6 +39,10 @@ public class TGD extends Dependency {
                 .map(t -> (Variable) t)
                 .filter(t -> !universalVariables.contains(t))
                 .collect(Collectors.toSet());
+    }
+
+    public ImmutableAtomList getHead() {
+        return head;
     }
 
     /**
@@ -71,7 +68,7 @@ public class TGD extends Dependency {
         if (containsBuiltInOrNegatedLiteralInBody())
             throw new UnsupportedOperationException("Guardedness check not implemented yet when body contains built-in or negated literals");
         Set<Variable> uVars = getUniversalVariables();
-        for (Literal l: getBody()) {
+        for (Literal l : getBody()) {
             if (new HashSet<>(l.getTerms()).containsAll(uVars)) return true;
         }
         return false;

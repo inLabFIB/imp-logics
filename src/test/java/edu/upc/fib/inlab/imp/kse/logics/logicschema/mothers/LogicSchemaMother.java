@@ -40,7 +40,7 @@ public class LogicSchemaMother {
 
     public static LogicSchema buildLogicSchemaWithIDs(String schema, Set<String> customBuiltInOperators) {
         return new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
-                new CustomBuiltInPredicateNameChecker(customBuiltInOperators))
+                                            new CustomBuiltInPredicateNameChecker(customBuiltInOperators))
                 .parse(schema);
     }
 }

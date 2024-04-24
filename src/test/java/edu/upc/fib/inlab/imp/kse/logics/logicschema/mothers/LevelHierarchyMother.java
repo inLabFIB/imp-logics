@@ -23,16 +23,16 @@ public class LevelHierarchyMother {
         return new LevelHierarchy(hierarchyLevels);
     }
 
-    private static Level createDerivedPredicate(List<String> predicateNamesLevel, Predicate predicateFromPreviousLevel) {
+    private static Level createBasePredicates(List<String> predicateNamesLevel) {
         Set<Predicate> predicates = predicateNamesLevel.stream()
-                .map(name -> DerivedPredicateMother.createOArityDerivedPredicate(name, predicateFromPreviousLevel))
+                .map(name -> new Predicate(name, 0))
                 .collect(Collectors.toSet());
         return new Level(predicates);
     }
 
-    private static Level createBasePredicates(List<String> predicateNamesLevel) {
+    private static Level createDerivedPredicate(List<String> predicateNamesLevel, Predicate predicateFromPreviousLevel) {
         Set<Predicate> predicates = predicateNamesLevel.stream()
-                .map(name -> new Predicate(name, 0))
+                .map(name -> DerivedPredicateMother.createOArityDerivedPredicate(name, predicateFromPreviousLevel))
                 .collect(Collectors.toSet());
         return new Level(predicates);
     }

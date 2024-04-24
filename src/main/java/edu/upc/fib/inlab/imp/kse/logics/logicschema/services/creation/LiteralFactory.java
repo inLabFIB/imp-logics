@@ -47,13 +47,13 @@ public class LiteralFactory {
         }
     }
 
-    private static void checkEmptyTerms(BuiltInLiteralSpec bilSpec) {
-        checkNumberOfTerms(bilSpec, 0);
-    }
-
     private static void checkNumberOfTerms(BuiltInLiteralSpec bilSpec, int expectedTerms) {
         if (bilSpec.getTermSpecList().size() != expectedTerms)
             throw new WrongNumberOfTermsInBuiltInLiteralException(expectedTerms, bilSpec.getTermSpecList().size());
+    }
+
+    private static void checkEmptyTerms(BuiltInLiteralSpec bilSpec) {
+        checkNumberOfTerms(bilSpec, 0);
     }
 
 }

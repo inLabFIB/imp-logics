@@ -20,32 +20,6 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
         super(substitution, SubstitutionAssert.class);
     }
 
-    public static SubstitutionAssert assertThat(Substitution actual) {
-        return new SubstitutionAssert(actual);
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public SubstitutionAssert mapsToConstant(String domainVariableName, String rangeConstantName) {
-        Optional<Term> actualTermImageOpt = actual.getTerm(new Variable(domainVariableName));
-        Assertions.assertThat(actualTermImageOpt).isPresent();
-        Term actualImage = actualTermImageOpt.get();
-        TermAssert.assertThat(actualImage).isConstant(rangeConstantName);
-        return this;
-    }
-
-    public SubstitutionAssert mapsToVariable(String domainVariableName, String rangeVariableName) {
-        Optional<Term> actualTermImageOpt = actual.getTerm(new Variable(domainVariableName));
-        Assertions.assertThat(actualTermImageOpt).isPresent();
-        Term actualImage = actualTermImageOpt.get();
-        TermAssert.assertThat(actualImage).isVariable(rangeVariableName);
-        return this;
-    }
-
-    public SubstitutionAssert hasSize(int size) {
-        Assertions.assertThat(actual.getSize()).isEqualTo(size);
-        return this;
-    }
-
     public SubstitutionAssert isEmpty() {
         Assertions.assertThat(actual.isEmpty()).isTrue();
         return this;
@@ -66,10 +40,36 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
         return this;
     }
 
+    public static SubstitutionAssert assertThat(Substitution actual) {
+        return new SubstitutionAssert(actual);
+    }
+
+    public SubstitutionAssert mapsToVariable(String domainVariableName, String rangeVariableName) {
+        Optional<Term> actualTermImageOpt = actual.getTerm(new Variable(domainVariableName));
+        Assertions.assertThat(actualTermImageOpt).isPresent();
+        Term actualImage = actualTermImageOpt.get();
+        TermAssert.assertThat(actualImage).isVariable(rangeVariableName);
+        return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public SubstitutionAssert mapsToConstant(String domainVariableName, String rangeConstantName) {
+        Optional<Term> actualTermImageOpt = actual.getTerm(new Variable(domainVariableName));
+        Assertions.assertThat(actualTermImageOpt).isPresent();
+        Term actualImage = actualTermImageOpt.get();
+        TermAssert.assertThat(actualImage).isConstant(rangeConstantName);
+        return this;
+    }
+
+    public SubstitutionAssert hasSize(int size) {
+        Assertions.assertThat(actual.getSize()).isEqualTo(size);
+        return this;
+    }
+
     /**
-     * Checks whether the actual substitution replaces each variable of the input to a different variable.
-     * The check fails if some variable from the input is not mapped to any term, or if some variable of the
-     * input is mapped to a constant.
+     * Checks whether the actual substitution replaces each variable of the input to a different variable. The check
+     * fails if some variable from the input is not mapped to any term, or if some variable of the input is mapped to a
+     * constant.
      *
      * @param variables non null set of variables, might be empty
      * @return this assert

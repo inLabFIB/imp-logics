@@ -68,32 +68,13 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         return this;
     }
 
-    @SuppressWarnings("unused")
-    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
-        return logicConstraintIsContainedInList(constraint, constraintSet, analyzer);
-    }
-
-    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
-        boolean unknownFound = false;
-        for (LogicConstraint aConstraintFromSet : constraintSet) {
-            Optional<Boolean> equivalenceResult = analyzer.areEquivalent(constraint, aConstraintFromSet);
-            if (equivalenceResult.isPresent() && equivalenceResult.get()) {
-                return Optional.of(true);
-            } else if (equivalenceResult.isEmpty()) {
-                unknownFound = true;
-            }
-        }
-        if (unknownFound) return Optional.empty();
-        return Optional.of(false);
-    }
-
     /**
-     * Asserts whether the actual logicSchema predicates (base or derived) are equivalent to the expectedSchema.
-     * Do note that this comparison is NOT agnostic with the name of the derived predicates.
+     * Asserts whether the actual logicSchema predicates (base or derived) are equivalent to the expectedSchema. Do note
+     * that this comparison is NOT agnostic with the name of the derived predicates.
      * <p>
-     * Since this check is not decidable, this method applies a sound (but not complete) strategy.
-     * In particular, for each derivation rule of one schema, it tries to find a homomorphic derivation rule of the other
-     * schema, and vice versa.
+     * Since this check is not decidable, this method applies a sound (but not complete) strategy. In particular, for
+     * each derivation rule of one schema, it tries to find a homomorphic derivation rule of the other schema, and vice
+     * versa.
      *
      * @param expectedSchema not null
      * @return this assert
@@ -121,8 +102,8 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     /**
-     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent according to the given strategy.
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent according to the given strategy.
      *
      * @param expectedRule            not null
      * @param derivedLiteralsStrategy not null
@@ -136,8 +117,8 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     /**
-     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent iff their definition rules are equivalent
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent iff their definition rules are equivalent
      *
      * @param expectedRule not null
      * @return this assert
@@ -150,9 +131,9 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     /**
-     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
-     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
-     * according to the derivedLiteralStrategy given
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering that two
+     * derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent according to
+     * the derivedLiteralStrategy given
      *
      * @param expectedPredicate       not null
      * @param derivedLiteralsStrategy not null
@@ -166,9 +147,9 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
     }
 
     /**
-     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
-     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
-     * iff their definition rules are equivalent
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering that two
+     * derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent iff their
+     * definition rules are equivalent
      *
      * @param expectedPredicate not null
      * @return this assert
@@ -178,5 +159,24 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
         PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
         return this;
+    }
+
+    @SuppressWarnings("unused")
+    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
+        return logicConstraintIsContainedInList(constraint, constraintSet, analyzer);
+    }
+
+    private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet, LogicEquivalenceAnalyzer analyzer) {
+        boolean unknownFound = false;
+        for (LogicConstraint aConstraintFromSet : constraintSet) {
+            Optional<Boolean> equivalenceResult = analyzer.areEquivalent(constraint, aConstraintFromSet);
+            if (equivalenceResult.isPresent() && equivalenceResult.get()) {
+                return Optional.of(true);
+            } else if (equivalenceResult.isEmpty()) {
+                unknownFound = true;
+            }
+        }
+        if (unknownFound) return Optional.empty();
+        return Optional.of(false);
     }
 }

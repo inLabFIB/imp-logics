@@ -5,8 +5,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
 import java.util.List;
 
 /**
- * Interface for generating several constraintIDs from a single constraintID.
- * This is though to be used in processes that transform one LogicConstraint to several LogicConstraints.
+ * Interface for generating several constraintIDs from a single constraintID. This is though to be used in processes
+ * that transform one LogicConstraint to several LogicConstraints.
  */
 public interface MultipleConstraintIDGenerator {
     /**

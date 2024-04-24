@@ -7,12 +7,12 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * <p> This class implements the definition of hierarchical database as defined in "Basis for Deductive Database Systems"
- * by J. W. Lloyd AND R. W. Topor.</p>
+ * <p> This class implements the definition of hierarchical database as defined in "Basis for Deductive Database
+ * Systems" by J. W. Lloyd AND R. W. Topor.</p>
  *
  * <p>A database is called hierarchical if its predicates can be partitioned into
- * levels so that the definitions of level 0 predicates consist solely of base predicates
- * and the bodies of the derived predicates of level j contain only level i predicates, where {@code i < j}. </p>
+ * levels so that the definitions of level 0 predicates consist solely of base predicates and the bodies of the derived
+ * predicates of level j contain only level i predicates, where {@code i < j}. </p>
  */
 public class LevelHierarchy implements Iterable<Level> {
     private final List<Level> levels;
@@ -34,21 +34,27 @@ public class LevelHierarchy implements Iterable<Level> {
         this.levels = Collections.unmodifiableList(levels);
     }
 
-    private void checkNoBasePredicateAppearsInHighLevel(List<Level> levels) {
-        for (int index = 1; index < levels.size(); ++index) {
-            boolean derivedPredicateFound = levels.get(index).getAllPredicates().stream().anyMatch(Predicate::isBase);
-            if (derivedPredicateFound) {
-                throw new LevelHierarchyException("Cannot put base predicate in level " + index);
-            }
-        }
-    }
-
     private void checkLevelsCorrectness(List<Level> levels) {
         for (int index = 0; index < levels.size(); ++index) {
             Set<Predicate> predicatesInLowerLevels = computePredicatesInLowerLevels(index, levels);
             Set<Predicate> predicatesInCurrentLevel = levels.get(index).getAllPredicates();
             checkLevelCorrectness(predicatesInCurrentLevel, predicatesInLowerLevels);
         }
+    }
+
+    /**
+     * May throw exception if predicate is not contained in the hierarchy
+     *
+     * @param predicate a non-null predicate
+     * @return the level of the predicate
+     */
+    public Level getLevelOfPredicate(Predicate predicate) {
+        int index = this.getLevelIndexOfPredicate(predicate);
+        return this.getLevel(index);
+    }
+
+    public Level getLevel(int index) {
+        return levels.get(index);
     }
 
     private void checkLevelCorrectness(Set<Predicate> predicatesInCurrentLevel, Set<Predicate> predicatesInLowerLevels) {
@@ -77,20 +83,8 @@ public class LevelHierarchy implements Iterable<Level> {
         return predicatesUsed;
     }
 
-    private Set<Predicate> computePredicatesInLowerLevels(int currentLevelIndex, List<Level> levels) {
-        Set<Predicate> result = new LinkedHashSet<>();
-        for (int index = 0; index < currentLevelIndex; ++index) {
-            result.addAll(levels.get(index).getAllPredicates());
-        }
-        return result;
-    }
-
     public int getNumberOfLevels() {
         return levels.size();
-    }
-
-    public Level getLevel(int index) {
-        return levels.get(index);
     }
 
     /**
@@ -110,15 +104,21 @@ public class LevelHierarchy implements Iterable<Level> {
         throw new PredicateNotInLevelException(predicate);
     }
 
-    /**
-     * May throw exception if predicate is not contained in the hierarchy
-     *
-     * @param predicate a non-null predicate
-     * @return the level of the predicate
-     */
-    public Level getLevelOfPredicate(Predicate predicate) {
-        int index = this.getLevelIndexOfPredicate(predicate);
-        return this.getLevel(index);
+    private void checkNoBasePredicateAppearsInHighLevel(List<Level> levels) {
+        for (int index = 1; index < levels.size(); ++index) {
+            boolean derivedPredicateFound = levels.get(index).getAllPredicates().stream().anyMatch(Predicate::isBase);
+            if (derivedPredicateFound) {
+                throw new LevelHierarchyException("Cannot put base predicate in level " + index);
+            }
+        }
+    }
+
+    private Set<Predicate> computePredicatesInLowerLevels(int currentLevelIndex, List<Level> levels) {
+        Set<Predicate> result = new LinkedHashSet<>();
+        for (int index = 0; index < currentLevelIndex; ++index) {
+            result.addAll(levels.get(index).getAllPredicates());
+        }
+        return result;
     }
 
     /**

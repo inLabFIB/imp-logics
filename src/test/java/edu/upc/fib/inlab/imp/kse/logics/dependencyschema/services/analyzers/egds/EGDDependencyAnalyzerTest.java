@@ -16,85 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EGDDependencyAnalyzerTest {
 
-    @ParameterizedTest(name = "Test Case: {0}")
-    @MethodSource("providesFunctionalDependencyEGDsTestCases")
-    void shouldIdentifyFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, String entity, List<Integer> keyPositions, List<Integer> determinedPositions) {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
-
-        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
-        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
-        assertThat(result.functionalDependenciesEGDs()).anySatisfy(
-                fd -> assertThat(fd)
-                        //TODO: .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1))
-                        .affectsPredicate(entity)
-                        .containsExactlyKeyPositions(keyPositions)
-                        .containsExactlyDeterminedPositions(determinedPositions));
-    }
-
-    @ParameterizedTest(name = "Test case: {0}")
-    @MethodSource("providesNonFunctionalDependencyEGDsTestCases")
-    void shouldIdentifyNonFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, List<Integer> egdIndexes) {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
-
-        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
-        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
-        List<EGD> indexedEGDList = schema.getAllEGDs().stream()
-                .filter(egd -> egdIndexes.contains(schema.getAllEGDs().indexOf(egd)))
-                .toList();
-        assertThat(result).containsNonFunctionalEGD(indexedEGDList);
-    }
-
-    @Test
-    void shouldIdentifyFunctionalAndNonFunctionalDependencyEGD() {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
-                        Person(name, age, weight), Person(name, age2, weight2) -> age=age2
-                        Person(name, age, weight), Person(name, age2, weight2) -> weight=weight2
-                        Child(name, age), Person(name, age2, weight) -> age = age2
-                        P(x, y, z), P(x, y2, z2) -> y=y2
-                """);
-        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
-        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
-
-        assertThat(result.functionalDependenciesEGDs())
-                .anySatisfy(
-                        fd -> assertThat(fd)
-                                .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1))
-                                .affectsPredicate("Person")
-                                .containsExactlyKeyPositions(0)
-                                .containsExactlyDeterminedPositions(1, 2))
-                .anySatisfy(
-                        fd -> assertThat(fd)
-                                .containsExactlyEGDs(schema.getAllEGDs().get(3))      //P(x, y, z), P(x, y2, z2) -> y=y2
-                                .affectsPredicate("P")
-                                .containsExactlyKeyPositions(0)
-                                .containsExactlyDeterminedPositions(1)
-                );
-
-        List<EGD> indexedEGDList = List.of(schema.getAllEGDs().get(2)); //Child(name, age), Person(name, age2) -> age = age2
-        assertThat(result).containsNonFunctionalEGD(indexedEGDList);
-    }
-
-    @Test
-    void shouldIdentifyFunctionalAndNonFunctionalDependencyEGD_evenUnderRepetitions() {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema("""
-                        Person(name, age, weight), Person(name, age2, weight2) -> age=age2
-                        Person(name, age, weight), Person(name, age2, weight2) -> weight=weight2
-                        Person(name, age, weight), Person(name, age2, weight3) -> weight=weight3
-                """);
-        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
-        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
-
-        assertThat(result.functionalDependenciesEGDs()).anySatisfy(
-                fd -> assertThat(fd)
-                        .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1), schema.getAllEGDs().get(2))
-                        .affectsPredicate("Person")
-                        .containsExactlyKeyPositions(0)
-                        .containsExactlyDeterminedPositions(1, 2)
-        );
-
-        assertThat(result).containsNonFunctionalEGD(List.of());
-    }
-
     private static Stream<Arguments> providesFunctionalDependencyEGDsTestCases() {
         return Stream.of(
                 Arguments.of(
@@ -187,6 +108,87 @@ class EGDDependencyAnalyzerTest {
                         List.of(0)
                 )
         );
+    }
+
+    @ParameterizedTest(name = "Test Case: {0}")
+    @MethodSource("providesFunctionalDependencyEGDsTestCases")
+    void shouldIdentifyFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, String entity, List<Integer> keyPositions, List<Integer> determinedPositions) {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
+
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
+        assertThat(result.functionalDependenciesEGDs()).anySatisfy(
+                fd -> assertThat(fd)
+                        //TODO: .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1))
+                        .affectsPredicate(entity)
+                        .containsExactlyKeyPositions(keyPositions)
+                        .containsExactlyDeterminedPositions(determinedPositions));
+    }
+
+    @ParameterizedTest(name = "Test case: {0}")
+    @MethodSource("providesNonFunctionalDependencyEGDsTestCases")
+    void shouldIdentifyNonFunctionalDependencyEGDs(@SuppressWarnings("unused") String testTitle, String schemaDefinition, List<Integer> egdIndexes) {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(schemaDefinition);
+
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
+        List<EGD> indexedEGDList = schema.getAllEGDs().stream()
+                .filter(egd -> egdIndexes.contains(schema.getAllEGDs().indexOf(egd)))
+                .toList();
+        assertThat(result).containsNonFunctionalEGD(indexedEGDList);
+    }
+
+    @Test
+    void shouldIdentifyFunctionalAndNonFunctionalDependencyEGD() {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(
+                """
+                                Person(name, age, weight), Person(name, age2, weight2) -> age=age2
+                                Person(name, age, weight), Person(name, age2, weight2) -> weight=weight2
+                                Child(name, age), Person(name, age2, weight) -> age = age2
+                                P(x, y, z), P(x, y2, z2) -> y=y2
+                        """);
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
+
+        assertThat(result.functionalDependenciesEGDs())
+                .anySatisfy(
+                        fd -> assertThat(fd)
+                                .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1))
+                                .affectsPredicate("Person")
+                                .containsExactlyKeyPositions(0)
+                                .containsExactlyDeterminedPositions(1, 2))
+                .anySatisfy(
+                        fd -> assertThat(fd)
+                                .containsExactlyEGDs(schema.getAllEGDs().get(3))      //P(x, y, z), P(x, y2, z2) -> y=y2
+                                .affectsPredicate("P")
+                                .containsExactlyKeyPositions(0)
+                                .containsExactlyDeterminedPositions(1)
+                );
+
+        List<EGD> indexedEGDList = List.of(schema.getAllEGDs().get(2)); //Child(name, age), Person(name, age2) -> age = age2
+        assertThat(result).containsNonFunctionalEGD(indexedEGDList);
+    }
+
+    @Test
+    void shouldIdentifyFunctionalAndNonFunctionalDependencyEGD_evenUnderRepetitions() {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(
+                """
+                                Person(name, age, weight), Person(name, age2, weight2) -> age=age2
+                                Person(name, age, weight), Person(name, age2, weight2) -> weight=weight2
+                                Person(name, age, weight), Person(name, age2, weight3) -> weight=weight3
+                        """);
+        EGDToFDAnalyzer analyzer = new EGDToFDAnalyzer();
+        EGDToFDAnalysisResult result = analyzer.analyze(schema.getAllEGDs());
+
+        assertThat(result.functionalDependenciesEGDs()).anySatisfy(
+                fd -> assertThat(fd)
+                        .containsExactlyEGDs(schema.getAllEGDs().get(0), schema.getAllEGDs().get(1), schema.getAllEGDs().get(2))
+                        .affectsPredicate("Person")
+                        .containsExactlyKeyPositions(0)
+                        .containsExactlyDeterminedPositions(1, 2)
+        );
+
+        assertThat(result).containsNonFunctionalEGD(List.of());
     }
 
 }

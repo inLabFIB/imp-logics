@@ -9,15 +9,15 @@ public class ConjunctiveQuery extends Query {
             throw new IllegalArgumentException("Body must only contain positive ordinary literals with base predicates");
     }
 
-    public ImmutableAtomList getBodyAtoms() {
-        return new ImmutableAtomList(getBody().stream()
-                .map(l -> ((OrdinaryLiteral) l).getAtom())
-                .toList());
-    }
-
     @Override
     public boolean isConjunctiveQuery() {
         return true;
+    }
+
+    public ImmutableAtomList getBodyAtoms() {
+        return new ImmutableAtomList(getBody().stream()
+                                             .map(l -> ((OrdinaryLiteral) l).getAtom())
+                                             .toList());
     }
 
 }

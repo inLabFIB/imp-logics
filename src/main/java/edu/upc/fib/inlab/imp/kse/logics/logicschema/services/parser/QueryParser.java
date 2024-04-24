@@ -11,7 +11,6 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpe
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
 import org.antlr.v4.runtime.*;
 
-
 import java.util.List;
 import java.util.Set;
 
@@ -36,13 +35,6 @@ public class QueryParser {
                 .toList();
     }
 
-    public List<Query> parse(String queriesString, Set<Predicate> relationalSchema) {
-        QuerySetSpec queriesSpecs = parseToSpec(queriesString);
-        return queriesSpecs.querySpecSet().stream()
-                .map(querySpec -> new QueryBuilder(relationalSchema).buildQuery(querySpec))
-                .toList();
-    }
-
     public QuerySetSpec parseToSpec(String queriesString) {
         CharStream input = CharStreams.fromString(queriesString);
         QueryGrammarLexer lexer = new QueryGrammarLexer(input, builtInPredicateNameChecker);
@@ -53,6 +45,13 @@ public class QueryParser {
         parser.addErrorListener(new QueryParser.ErrorListener());
         QueryGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
+    }
+
+    public List<Query> parse(String queriesString, Set<Predicate> relationalSchema) {
+        QuerySetSpec queriesSpecs = parseToSpec(queriesString);
+        return queriesSpecs.querySpecSet().stream()
+                .map(querySpec -> new QueryBuilder(relationalSchema).buildQuery(querySpec))
+                .toList();
     }
 
     private static class ErrorListener extends BaseErrorListener {

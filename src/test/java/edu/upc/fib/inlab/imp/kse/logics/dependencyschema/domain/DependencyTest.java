@@ -17,27 +17,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class DependencyTest {
 
-    private static class DummyDependency extends Dependency {
-
-        protected DummyDependency(List<Literal> body) {
-            super(body);
-        }
-
-        @Override
-        public Set<Variable> getUniversalVariables() {
-            return null;
-        }
-
-        public Set<Variable> getExistentialVariables() {
-            return null;
-        }
-
-        @Override
-        public <T> T accept(DependencySchemaVisitor<T> visitor) {
-            return null;
-        }
-    }
-
     @Test
     void should_throwException_whenCreatingADependency_withNullBody() {
         assertThatThrownBy(() -> new DummyDependency(null)).isInstanceOf(IllegalArgumentException.class);
@@ -56,6 +35,31 @@ class DependencyTest {
         Dependency dependency = new DummyDependency(body);
 
         assertThat(dependency.getBody()).isUnmodifiable();
+    }
+
+    private static List<Literal> createMutableLiteralList(Literal... literals) {
+        return new LinkedList<>(List.of(literals));
+    }
+
+    private static class DummyDependency extends Dependency {
+
+        protected DummyDependency(List<Literal> body) {
+            super(body);
+        }
+
+        @Override
+        public Set<Variable> getUniversalVariables() {
+            return null;
+        }
+
+        @Override
+        public <T> T accept(DependencySchemaVisitor<T> visitor) {
+            return null;
+        }
+
+        public Set<Variable> getExistentialVariables() {
+            return null;
+        }
     }
 
     @Nested
@@ -81,9 +85,5 @@ class DependencyTest {
             assertThat(result).isFalse();
         }
 
-    }
-
-    private static List<Literal> createMutableLiteralList(Literal... literals) {
-        return new LinkedList<>(List.of(literals));
     }
 }

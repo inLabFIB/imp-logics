@@ -8,8 +8,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.Logic
 public class LogicConstraintWithoutIDSpecBuilder extends NormalClauseSpecBuilder<LogicConstraintWithoutIDSpecBuilder> {
 
     /**
-     * Creates a new LogicConstraintWithoutIDSpecBuilder using a DefaultStringToTermSpecFactory to distinguish
-     * the kind of Term to instantiate for the given term names.
+     * Creates a new LogicConstraintWithoutIDSpecBuilder using a DefaultStringToTermSpecFactory to distinguish the kind
+     * of Term to instantiate for the given term names.
      */
     public LogicConstraintWithoutIDSpecBuilder() {
         this(new AllVariableTermTypeCriteria());

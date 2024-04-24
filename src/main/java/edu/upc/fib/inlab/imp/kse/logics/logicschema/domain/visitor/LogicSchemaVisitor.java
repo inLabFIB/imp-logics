@@ -5,7 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 /**
  * Visitor for the main classes of the logic schema domain.
  *
- * @param <T>   return type for visit methods.
+ * @param <T> return type for visit methods.
  */
 public interface LogicSchemaVisitor<T> {
 

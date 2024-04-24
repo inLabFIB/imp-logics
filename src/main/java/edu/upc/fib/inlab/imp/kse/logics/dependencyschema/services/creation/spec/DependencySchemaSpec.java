@@ -1,6 +1,5 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.DerivationRuleSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicElementSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.PredicateSpec;
 

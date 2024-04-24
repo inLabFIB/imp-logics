@@ -7,12 +7,12 @@ import java.util.List;
  */
 public abstract class LogicConstraintSpec extends NormalClauseSpec implements LogicElementSpec {
 
-    protected LogicConstraintSpec(BodySpec body) {
-        super(body);
-    }
-
     protected LogicConstraintSpec(List<LiteralSpec> bodyLiterals) {
         this(new BodySpec(bodyLiterals));
+    }
+
+    protected LogicConstraintSpec(BodySpec body) {
+        super(body);
     }
 
 }

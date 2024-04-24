@@ -22,11 +22,11 @@ class StickyCheckerTest {
         @Test
         void shouldReturnTrue_withStickySchema() {
             DependencySchema emptyDependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> p(y,z)
-                    p(x,y) -> q(x)
-                    q(x), q(y) -> r(x,y)
-                    p(x,y), p(z,x) -> q(x)
-                    """);
+                                                                                                          p(x,y) -> p(y,z)
+                                                                                                          p(x,y) -> q(x)
+                                                                                                          q(x), q(y) -> r(x,y)
+                                                                                                          p(x,y), p(z,x) -> q(x)
+                                                                                                          """);
 
             boolean isSticky = new StickyChecker().isSticky(emptyDependencySchema);
 
@@ -36,9 +36,9 @@ class StickyCheckerTest {
         @Test
         void shouldReturnFalse_withNonStickySchema() {
             DependencySchema emptyDependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    q(x), q(y) -> r(x)
-                    p(y,x), p(x, z) -> q(x)
-                    """);
+                                                                                                          q(x), q(y) -> r(x)
+                                                                                                          p(y,x), p(x, z) -> q(x)
+                                                                                                          """);
 
             boolean isSticky = new StickyChecker().isSticky(emptyDependencySchema);
 
@@ -50,9 +50,9 @@ class StickyCheckerTest {
             @Test
             void shouldReturnTrue_whenEGDsAreNonConflicting_withStickyTGDs() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        p(x,y) -> p(y,z)
-                        p(a, b), p(a, b2) -> b = b2
-                        """);
+                                                                                                         p(x,y) -> p(y,z)
+                                                                                                         p(a, b), p(a, b2) -> b = b2
+                                                                                                         """);
 
                 boolean isGuarded = new StickyChecker().isSticky(dependencySchema);
 
@@ -62,9 +62,9 @@ class StickyCheckerTest {
             @Test
             void shouldReturnFalse_whenEGDsAreConflicting_withStickyTGDs() {
                 DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                        p(x,y) -> p(y,z)
-                        p(a, b), q(a, b2) -> b = b2
-                        """);
+                                                                                                         p(x,y) -> p(y,z)
+                                                                                                         p(a, b), q(a, b2) -> b = b2
+                                                                                                         """);
 
                 boolean isGuarded = new StickyChecker().isSticky(dependencySchema);
 

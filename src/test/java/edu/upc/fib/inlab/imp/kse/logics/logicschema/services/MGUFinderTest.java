@@ -28,6 +28,73 @@ class MGUFinderTest {
         @Nested
         class UnifyTwoAtoms {
 
+            private static Stream<Arguments> provideUnifiableTermsLists() {
+                return Stream.of(
+                        Arguments.of("Terms containing equal constants",
+                                     TermMother.createTerms("x", "1"),
+                                     TermMother.createTerms("a", "1"),
+                                     TermMother.createTerms("x", "1")
+                        ),
+                        Arguments.of("Terms containing variable unifiable with constants, twice",
+                                     TermMother.createTerms("x", "x", "y"),
+                                     TermMother.createTerms("1", "1", "z"),
+                                     TermMother.createTerms("1", "1", "a")
+                        ),
+                        Arguments.of("Terms containing variables unifiable with constants",
+                                     TermMother.createTerms("x", "y"),
+                                     TermMother.createTerms("a", "1"),
+                                     TermMother.createTerms("xa", "1")
+                        ),
+                        Arguments.of("Terms containing same variable names in different positions",
+                                     TermMother.createTerms("x", "y"),
+                                     TermMother.createTerms("y", "x"),
+                                     TermMother.createTerms("xy", "yx")
+                        ),
+                        Arguments.of("Terms containing repeated variables in same position",
+                                     TermMother.createTerms("x", "y"),
+                                     TermMother.createTerms("a", "a"),
+                                     TermMother.createTerms("a", "a")
+                        ),
+                        Arguments.of("Terms containing repeated variables using same names",
+                                     TermMother.createTerms("x", "y"),
+                                     TermMother.createTerms("x", "x"),
+                                     TermMother.createTerms("x", "x")
+                        ),
+                        Arguments.of("Repeating different variables in different positions",
+                                     TermMother.createTerms("x", "y", "x"),
+                                     TermMother.createTerms("a", "b", "b"),
+                                     TermMother.createTerms("x", "x", "x")
+                        ),
+                        Arguments.of("Combining variable repetitions and constants",
+                                     TermMother.createTerms("x", "y", "x", "x"),
+                                     TermMother.createTerms("a", "b", "b", "1"),
+                                     TermMother.createTerms("1", "1", "1", "1")
+                        ),
+                        Arguments.of("Combining variable repetitions and constants reusing variable names",
+                                     TermMother.createTerms("x", "y", "x", "x"),
+                                     TermMother.createTerms("y", "x", "x", "1"),
+                                     TermMother.createTerms("1", "1", "1", "1")
+                        )
+                );
+            }
+
+            private static Stream<Arguments> provideNonUnifiableTermsLists() {
+                return Stream.of(
+                        Arguments.of("Terms containing different constants",
+                                     TermMother.createTerms("x", "2"),
+                                     TermMother.createTerms("a", "1")
+                        ),
+                        Arguments.of("Combining variable repetitions and constants",
+                                     TermMother.createTerms("x", "x"),
+                                     TermMother.createTerms("2", "1")
+                        ),
+                        Arguments.of("Combining variable repetitions and constants",
+                                     TermMother.createTerms("x", "2", "x"),
+                                     TermMother.createTerms("b", "b", "1")
+                        )
+                );
+            }
+
             @Test
             void should_notReturnMGU_WhenAtomsHaveDifferentPredicates() {
                 Predicate pPred = new Predicate("P", 1);
@@ -79,56 +146,6 @@ class MGUFinderTest {
                 SubstitutionAssert.assertThat(mgu.get()).mapsToDifferentVariables(terms2.getUsedVariables());
             }
 
-            private static Stream<Arguments> provideUnifiableTermsLists() {
-                return Stream.of(
-                        Arguments.of("Terms containing equal constants",
-                                TermMother.createTerms("x", "1"),
-                                TermMother.createTerms("a", "1"),
-                                TermMother.createTerms("x", "1")
-                        ),
-                        Arguments.of("Terms containing variable unifiable with constants, twice",
-                                TermMother.createTerms("x", "x", "y"),
-                                TermMother.createTerms("1", "1", "z"),
-                                TermMother.createTerms("1", "1", "a")
-                        ),
-                        Arguments.of("Terms containing variables unifiable with constants",
-                                TermMother.createTerms("x", "y"),
-                                TermMother.createTerms("a", "1"),
-                                TermMother.createTerms("xa", "1")
-                        ),
-                        Arguments.of("Terms containing same variable names in different positions",
-                                TermMother.createTerms("x", "y"),
-                                TermMother.createTerms("y", "x"),
-                                TermMother.createTerms("xy", "yx")
-                        ),
-                        Arguments.of("Terms containing repeated variables in same position",
-                                TermMother.createTerms("x", "y"),
-                                TermMother.createTerms("a", "a"),
-                                TermMother.createTerms("a", "a")
-                        ),
-                        Arguments.of("Terms containing repeated variables using same names",
-                                TermMother.createTerms("x", "y"),
-                                TermMother.createTerms("x", "x"),
-                                TermMother.createTerms("x", "x")
-                        ),
-                        Arguments.of("Repeating different variables in different positions",
-                                TermMother.createTerms("x", "y", "x"),
-                                TermMother.createTerms("a", "b", "b"),
-                                TermMother.createTerms("x", "x", "x")
-                        ),
-                        Arguments.of("Combining variable repetitions and constants",
-                                TermMother.createTerms("x", "y", "x", "x"),
-                                TermMother.createTerms("a", "b", "b", "1"),
-                                TermMother.createTerms("1", "1", "1", "1")
-                        ),
-                        Arguments.of("Combining variable repetitions and constants reusing variable names",
-                                TermMother.createTerms("x", "y", "x", "x"),
-                                TermMother.createTerms("y", "x", "x", "1"),
-                                TermMother.createTerms("1", "1", "1", "1")
-                        )
-                );
-            }
-
             /**
              * Corner cases tests
              */
@@ -148,24 +165,6 @@ class MGUFinderTest {
                 ImmutableTermListAssert.assertThat(terms1.applySubstitution(mgu.get())).isIsomorphicTo(expectedTermsList);
                 ImmutableTermListAssert.assertThat(terms2.applySubstitution(mgu.get())).isIsomorphicTo(expectedTermsList);
             }
-
-            private static Stream<Arguments> provideNonUnifiableTermsLists() {
-                return Stream.of(
-                        Arguments.of("Terms containing different constants",
-                                TermMother.createTerms("x", "2"),
-                                TermMother.createTerms("a", "1")
-                        ),
-                        Arguments.of("Combining variable repetitions and constants",
-                                TermMother.createTerms("x", "x"),
-                                TermMother.createTerms("2", "1")
-                        ),
-                        Arguments.of("Combining variable repetitions and constants",
-                                TermMother.createTerms("x", "2", "x"),
-                                TermMother.createTerms("b", "b", "1")
-                        )
-                );
-            }
-
 
             @ParameterizedTest(name = "{0}. Terms1 = {1}; Terms2 = {2}")
             @MethodSource("provideNonUnifiableTermsLists")
@@ -252,7 +251,7 @@ class MGUFinderTest {
         @Nested
         class UnifyAtomsList {
             @Test
-            void should_returnMGU_whenListIsUnifiable(){
+            void should_returnMGU_whenListIsUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b"));
@@ -276,7 +275,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_notReturnMGU_whenListIsNotUnifiable(){
+            void should_notReturnMGU_whenListIsNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "3", "b"));
@@ -288,7 +287,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_notReturnMGU_whenAtomsIsNotUnifiable(){
+            void should_notReturnMGU_whenAtomsIsNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 3);
 
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
@@ -305,7 +304,7 @@ class MGUFinderTest {
         @Nested
         class UnifiableAtoms {
             @Test
-            void should_returnTrue_whenListIsUnifiable(){
+            void should_returnTrue_whenListIsUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b"));
@@ -317,7 +316,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnTrue_whenAtomsAreUnifiable(){
+            void should_returnTrue_whenAtomsAreUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b"));
@@ -329,7 +328,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnFalse_whenAtomsAreNotUnifiable(){
+            void should_returnFalse_whenAtomsAreNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b"));
@@ -341,7 +340,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnFalse_whenListIsNotUnifiable(){
+            void should_returnFalse_whenListIsNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 Atom pAtom1 = new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b"));
@@ -353,10 +352,20 @@ class MGUFinderTest {
             }
         }
     }
+
     @Nested
     class LiteralsTests {
         @Nested
-        class UnifyTwoLiterals{
+        class UnifyTwoLiterals {
+
+            @Test
+            void should_notUnify_TwoDifferentKindsOfLiterals() {
+                OrdinaryLiteral ol1 = new OrdinaryLiteral(new Atom(new Predicate("P", 2), TermMother.createTerms("x", "x")));
+                CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("Q", TermMother.createTerms("1", "2"));
+
+                Optional<Substitution> mgu = MGUFinder.getLiteralsMGU(ol1, cust2);
+                assertThat(mgu).isEmpty();
+            }
 
             @Nested
             class UnifyTwoOrdinaryLiterals {
@@ -401,10 +410,10 @@ class MGUFinderTest {
             }
 
             @Nested
-            class UnifyTwoBooleanBuiltInLiterals{
+            class UnifyTwoBooleanBuiltInLiterals {
                 @ParameterizedTest
-                @ValueSource(booleans = {true,false})
-                void should_returnEmptyMGU_whenBothBooleanBuiltInAreTheSame(boolean b){
+                @ValueSource(booleans = {true, false})
+                void should_returnEmptyMGU_whenBothBooleanBuiltInAreTheSame(boolean b) {
                     Literal literal1 = new BooleanBuiltInLiteral(b);
                     Literal literal2 = new BooleanBuiltInLiteral(b);
 
@@ -414,8 +423,8 @@ class MGUFinderTest {
                 }
 
                 @ParameterizedTest
-                @ValueSource(booleans = {true,false})
-                void should_notReturnMGU_whenBothBooleanBuiltInAreDifferent(boolean b){
+                @ValueSource(booleans = {true, false})
+                void should_notReturnMGU_whenBothBooleanBuiltInAreDifferent(boolean b) {
                     Literal literal1 = new BooleanBuiltInLiteral(b);
                     Literal literal2 = new BooleanBuiltInLiteral(!b);
 
@@ -425,10 +434,10 @@ class MGUFinderTest {
             }
 
             @Nested
-            class UnifyTwoComparisonBuiltInLiterals{
+            class UnifyTwoComparisonBuiltInLiterals {
                 @ParameterizedTest
                 @EnumSource
-                void should_returnMGU_whenComparatorIsTheSame_AndTermsAreUnifiable(ComparisonOperator operator){
+                void should_returnMGU_whenComparatorIsTheSame_AndTermsAreUnifiable(ComparisonOperator operator) {
                     ComparisonBuiltInLiteral comp1 = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("y"), operator);
                     ComparisonBuiltInLiteral comp2 = new ComparisonBuiltInLiteral(new Variable("a"), new Variable("b"), operator);
 
@@ -440,7 +449,7 @@ class MGUFinderTest {
                 }
 
                 @Test
-                void should_notReturnMGU_whenComparatorIsDifferent(){
+                void should_notReturnMGU_whenComparatorIsDifferent() {
                     ComparisonBuiltInLiteral comp1 = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("y"), ComparisonOperator.EQUALS);
                     ComparisonBuiltInLiteral comp2 = new ComparisonBuiltInLiteral(new Variable("a"), new Variable("b"), ComparisonOperator.LESS_THAN);
 
@@ -450,7 +459,7 @@ class MGUFinderTest {
 
                 @ParameterizedTest
                 @EnumSource
-                void should_notReturnMGU_whenComparatorIsTheSame_butTermsAreNotUnifiable(ComparisonOperator operator){
+                void should_notReturnMGU_whenComparatorIsTheSame_butTermsAreNotUnifiable(ComparisonOperator operator) {
                     ComparisonBuiltInLiteral comp1 = new ComparisonBuiltInLiteral(new Variable("x"), new Variable("x"), operator);
                     ComparisonBuiltInLiteral comp2 = new ComparisonBuiltInLiteral(new Constant("1"), new Constant("2"), operator);
 
@@ -461,9 +470,9 @@ class MGUFinderTest {
             }
 
             @Nested
-            class UnifyTwoCustomBuiltInLiterals{
+            class UnifyTwoCustomBuiltInLiterals {
                 @Test
-                void should_returnMGU_whenOperatorIsTheSame_AndTermsAreUnifiable(){
+                void should_returnMGU_whenOperatorIsTheSame_AndTermsAreUnifiable() {
                     CustomBuiltInLiteral cust1 = new CustomBuiltInLiteral("P", TermMother.createTerms("x", "y"));
                     CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("P", TermMother.createTerms("a", "b"));
 
@@ -475,7 +484,7 @@ class MGUFinderTest {
                 }
 
                 @Test
-                void should_notReturnMGU_whenOperatorIsDifferent(){
+                void should_notReturnMGU_whenOperatorIsDifferent() {
                     CustomBuiltInLiteral cust1 = new CustomBuiltInLiteral("P", TermMother.createTerms("x", "y"));
                     CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("Q", TermMother.createTerms("a", "b"));
 
@@ -484,7 +493,7 @@ class MGUFinderTest {
                 }
 
                 @Test
-                void should_notReturnMGU_whenOperatorIsTheSame_butTermsAreNotUnifiable(){
+                void should_notReturnMGU_whenOperatorIsTheSame_butTermsAreNotUnifiable() {
                     CustomBuiltInLiteral cust1 = new CustomBuiltInLiteral("P", TermMother.createTerms("x", "x"));
                     CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("Q", TermMother.createTerms("1", "2"));
 
@@ -493,7 +502,7 @@ class MGUFinderTest {
                 }
 
                 @Test
-                void should_notReturnMGU_whenOperatorIsTheSame_butTermsSizeIsDifferent(){
+                void should_notReturnMGU_whenOperatorIsTheSame_butTermsSizeIsDifferent() {
                     CustomBuiltInLiteral cust1 = new CustomBuiltInLiteral("P", TermMother.createTerms("x", "x"));
                     CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("P", TermMother.createTerms("x"));
 
@@ -503,21 +512,12 @@ class MGUFinderTest {
 
             }
 
-            @Test
-            void should_notUnify_TwoDifferentKindsOfLiterals(){
-                OrdinaryLiteral ol1 = new OrdinaryLiteral(new Atom(new Predicate("P",2), TermMother.createTerms("x", "x")));
-                CustomBuiltInLiteral cust2 = new CustomBuiltInLiteral("Q", TermMother.createTerms("1", "2"));
-
-                Optional<Substitution> mgu = MGUFinder.getLiteralsMGU(ol1, cust2);
-                assertThat(mgu).isEmpty();
-            }
-
         }
 
         @Nested
-        class UnifySeveralLiterals{
+        class UnifySeveralLiterals {
             @Test
-            void should_returnMGU_whenLiteralsAreUnifiable(){
+            void should_returnMGU_whenLiteralsAreUnifiable() {
                 Predicate pPred1 = new Predicate("P", 3);
 
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
@@ -541,7 +541,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_notReturnMGU_whenLiteralsAreNotUnifiable(){
+            void should_notReturnMGU_whenLiteralsAreNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 3);
 
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
@@ -556,16 +556,16 @@ class MGUFinderTest {
         }
 
         @Nested
-        class UnifyLiteralsList{
+        class UnifyLiteralsList {
             @Test
-            void should_returnEmptyMGU_whenListIsEmpty(){
+            void should_returnEmptyMGU_whenListIsEmpty() {
                 Optional<Substitution> mgu = MGUFinder.getLiteralsMGU(List.of());
                 assertThat(mgu).isPresent();
                 SubstitutionAssert.assertThat(mgu.get()).isEmpty();
             }
 
             @Test
-            void should_returnMGU_whenListIsSingleton(){
+            void should_returnMGU_whenListIsSingleton() {
                 Predicate pPred1 = new Predicate("P", 3);
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
                 OrdinaryLiteral lit1 = new OrdinaryLiteral(new Atom(pPred1, terms1));
@@ -576,7 +576,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnMGU_whenLiteralsAreUnifiable(){
+            void should_returnMGU_whenLiteralsAreUnifiable() {
                 Predicate pPred1 = new Predicate("P", 3);
 
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
@@ -600,7 +600,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_notReturnMGU_whenLiteralsAreNotUnifiable(){
+            void should_notReturnMGU_whenLiteralsAreNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 3);
 
                 ImmutableTermList terms1 = TermMother.createTerms("x", "y", "a");
@@ -615,9 +615,9 @@ class MGUFinderTest {
         }
 
         @Nested
-        class UnifiableLiterals{
+        class UnifiableLiterals {
             @Test
-            void should_returnTrue_whenListIsUnifiable(){
+            void should_returnTrue_whenListIsUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 OrdinaryLiteral pLit1 = new OrdinaryLiteral(new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b")));
@@ -629,7 +629,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnTrue_whenAtomsAreUnifiable(){
+            void should_returnTrue_whenAtomsAreUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 OrdinaryLiteral pLit1 = new OrdinaryLiteral(new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b")));
@@ -641,7 +641,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnFalse_whenAtomsAreNotUnifiable(){
+            void should_returnFalse_whenAtomsAreNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 OrdinaryLiteral pLit1 = new OrdinaryLiteral(new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b")));
@@ -653,7 +653,7 @@ class MGUFinderTest {
             }
 
             @Test
-            void should_returnFalse_whenListIsNotUnifiable(){
+            void should_returnFalse_whenListIsNotUnifiable() {
                 Predicate pPred1 = new Predicate("P", 4);
 
                 OrdinaryLiteral pLit1 = new OrdinaryLiteral(new Atom(pPred1, TermMother.createTerms("x", "y", "z", "b")));

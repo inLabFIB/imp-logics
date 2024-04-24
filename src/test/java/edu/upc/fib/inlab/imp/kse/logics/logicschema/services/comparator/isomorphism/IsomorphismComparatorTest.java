@@ -65,7 +65,7 @@ class IsomorphismComparatorTest {
                                     "Can not compare base literals with derived literals",
                                     ImmutableLiteralsListMother.create("P(x), Der(x)"),
                                     ImmutableLiteralsListMother.create("P(x), Der" +
-                                            "(x)", "Der(x) :- R(x, y)")
+                                                                               "(x)", "Der(x) :- R(x, y)")
                             ),
                             Arguments.of(
                                     "Can not compare positive with negated literals",
@@ -97,14 +97,6 @@ class IsomorphismComparatorTest {
             @Nested
             class BooleanBuiltInLiteralCases {
 
-                @ParameterizedTest(name = "[{index}] {0}")
-                @MethodSource("provideBooleanBuiltInLiteralsIsomorphic")
-                void should_returnTrue_whenBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                    assertThat(isIsomorphism).describedAs(name).isTrue();
-                }
-
                 private static Stream<Arguments> provideBooleanBuiltInLiteralsIsomorphic() {
                     return Stream.of(
                             Arguments.of(
@@ -123,14 +115,6 @@ class IsomorphismComparatorTest {
                                     ImmutableLiteralsListMother.create("P(x), FALSE(), x < 1")
                             )
                     );
-                }
-
-                @ParameterizedTest(name = "[{index}] {0}")
-                @MethodSource("provideBooleanBuiltInLiteralsNonIsomorphic")
-                void should_returnFalse_whenBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                    assertThat(isIsomorphism).describedAs(name).isFalse();
                 }
 
                 private static Stream<Arguments> provideBooleanBuiltInLiteralsNonIsomorphic() {
@@ -157,29 +141,26 @@ class IsomorphismComparatorTest {
                             )
                     );
                 }
-            }
-
-            @Nested
-            class ComparisonBuiltInLiteralCases {
-
-                @ParameterizedTest
-                @ValueSource(strings = {"=", "<>"})
-                void should_returnTrue_whenBuiltInLiteralsAreIsomorphic_ButNotWithFirstPossibleMap(String selfSymmetricOperator) {
-                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-                    ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("x" + selfSymmetricOperator + "z, T(x, y), S(x,z)");
-                    ImmutableLiteralsList list2 = ImmutableLiteralsListMother.create("z" + selfSymmetricOperator + "x, T(x, y), S(x,z)");
-                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                    assertThat(isIsomorphism).isTrue();
-                }
-
 
                 @ParameterizedTest(name = "[{index}] {0}")
-                @MethodSource("provideBuiltInLiteralsIsomorphic")
+                @MethodSource("provideBooleanBuiltInLiteralsIsomorphic")
                 void should_returnTrue_whenBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
                     IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
                     boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
                     assertThat(isIsomorphism).describedAs(name).isTrue();
                 }
+
+                @ParameterizedTest(name = "[{index}] {0}")
+                @MethodSource("provideBooleanBuiltInLiteralsNonIsomorphic")
+                void should_returnFalse_whenBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                    assertThat(isIsomorphism).describedAs(name).isFalse();
+                }
+            }
+
+            @Nested
+            class ComparisonBuiltInLiteralCases {
 
                 private static Stream<Arguments> provideBuiltInLiteralsIsomorphic() {
                     List<Arguments> arguments = new LinkedList<>();
@@ -200,14 +181,6 @@ class IsomorphismComparatorTest {
                         ));
                     }
                     return arguments.stream();
-                }
-
-                @ParameterizedTest
-                @MethodSource("provideBuiltInLiteralsNotIsomorphic")
-                void should_returnFalse_whenBuiltInLiteralsAreNotIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                    assertThat(isIsomorphism).describedAs(name).isFalse();
                 }
 
                 private static Stream<Arguments> provideBuiltInLiteralsNotIsomorphic() {
@@ -231,18 +204,36 @@ class IsomorphismComparatorTest {
                     }
                     return arguments.stream();
                 }
-            }
 
-            @Nested
-            class CustomBuiltInLiteralCases {
+                @ParameterizedTest
+                @ValueSource(strings = {"=", "<>"})
+                void should_returnTrue_whenBuiltInLiteralsAreIsomorphic_ButNotWithFirstPossibleMap(String selfSymmetricOperator) {
+                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                    ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("x" + selfSymmetricOperator + "z, T(x, y), S(x,z)");
+                    ImmutableLiteralsList list2 = ImmutableLiteralsListMother.create("z" + selfSymmetricOperator + "x, T(x, y), S(x,z)");
+                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                    assertThat(isIsomorphism).isTrue();
+                }
 
                 @ParameterizedTest(name = "[{index}] {0}")
-                @MethodSource("provideCustomBuiltInLiteralsIsomorphic")
-                void should_returnTrue_whenContainsCustomBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                @MethodSource("provideBuiltInLiteralsIsomorphic")
+                void should_returnTrue_whenBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
                     IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
                     boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
                     assertThat(isIsomorphism).describedAs(name).isTrue();
                 }
+
+                @ParameterizedTest
+                @MethodSource("provideBuiltInLiteralsNotIsomorphic")
+                void should_returnFalse_whenBuiltInLiteralsAreNotIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                    assertThat(isIsomorphism).describedAs(name).isFalse();
+                }
+            }
+
+            @Nested
+            class CustomBuiltInLiteralCases {
 
                 private static Stream<Arguments> provideCustomBuiltInLiteralsIsomorphic() {
                     return Stream.of(
@@ -257,14 +248,6 @@ class IsomorphismComparatorTest {
                                     ImmutableLiteralsListMother.createWithCustomBuiltinLiterals("P(x), custom(x), x < 1", Set.of("custom"))
                             )
                     );
-                }
-
-                @ParameterizedTest(name = "[{index}] {0}")
-                @MethodSource("provideCustomBuiltInLiteralsNotIsomorphic")
-                void should_returnFalse_whenContainsCustomBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                    assertThat(isIsomorphism).describedAs(name).isFalse();
                 }
 
                 private static Stream<Arguments> provideCustomBuiltInLiteralsNotIsomorphic() {
@@ -282,6 +265,22 @@ class IsomorphismComparatorTest {
                     );
                 }
 
+                @ParameterizedTest(name = "[{index}] {0}")
+                @MethodSource("provideCustomBuiltInLiteralsIsomorphic")
+                void should_returnTrue_whenContainsCustomBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                    assertThat(isIsomorphism).describedAs(name).isTrue();
+                }
+
+                @ParameterizedTest(name = "[{index}] {0}")
+                @MethodSource("provideCustomBuiltInLiteralsNotIsomorphic")
+                void should_returnFalse_whenContainsCustomBuiltInLiteralsAreIsomorphic(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                    IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+                    boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                    assertThat(isIsomorphism).describedAs(name).isFalse();
+                }
+
             }
         }
 
@@ -290,18 +289,18 @@ class IsomorphismComparatorTest {
             @Test
             void should_returnTrue_whenCombiningSeveralTypesOfLiteralsAndParameters() {
                 ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("""
-                                P(x), Q(x, y), Q(y, z), z < x, x = y
-                                """,
-                        """
-                                P(x) :- S(x, x), not(T(x))
-                                """
+                                                                                         P(x), Q(x, y), Q(y, z), z < x, x = y
+                                                                                         """,
+                                                                                 """
+                                                                                         P(x) :- S(x, x), not(T(x))
+                                                                                         """
                 );
                 ImmutableLiteralsList list2 = ImmutableLiteralsListMother.create("""
-                                Q(b, c), a = b, P1(a), Q(a, b), c < a
-                                """,
-                        """
-                                P1(e) :- S(e,e), not(T(e))
-                                """);
+                                                                                         Q(b, c), a = b, P1(a), Q(a, b), c < a
+                                                                                         """,
+                                                                                 """
+                                                                                         P1(e) :- S(e,e), not(T(e))
+                                                                                         """);
 
                 IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
 
@@ -313,18 +312,6 @@ class IsomorphismComparatorTest {
 
         @Nested
         class ChangingDerivedPredicateName {
-
-            @ParameterizedTest(name = "[{index}] {0}")
-            @MethodSource("provideDerivedPredicateNamesRenamed")
-            void changeDerivedPredicateNameAllowed_resultTrue(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-
-                boolean changingDerivedPredicateNameAllowed = true;
-                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, changingDerivedPredicateNameAllowed));
-
-                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-
-                assertThat(isIsomorphism).describedAs(name).isTrue();
-            }
 
             private static Stream<Arguments> provideDerivedPredicateNamesRenamed() {
                 return Stream.of(
@@ -374,15 +361,6 @@ class IsomorphismComparatorTest {
                                                 """)
                         )
                 );
-            }
-
-            @ParameterizedTest(name = "[{index}] {0}")
-            @MethodSource("provideDerivedPredicateNamesRenamedNotIsomorphic")
-            void changeDerivedPredicateNameAllowed_resultFalse(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
-                boolean changingDerivedPredicateNameAllowed = true;
-                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, changingDerivedPredicateNameAllowed));
-                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
-                assertThat(isIsomorphism).describedAs(name).isFalse();
             }
 
             private static Stream<Arguments> provideDerivedPredicateNamesRenamedNotIsomorphic() {
@@ -458,6 +436,27 @@ class IsomorphismComparatorTest {
                 );
             }
 
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideDerivedPredicateNamesRenamed")
+            void changeDerivedPredicateNameAllowed_resultTrue(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+
+                boolean changingDerivedPredicateNameAllowed = true;
+                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, changingDerivedPredicateNameAllowed));
+
+                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+
+                assertThat(isIsomorphism).describedAs(name).isTrue();
+            }
+
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideDerivedPredicateNamesRenamedNotIsomorphic")
+            void changeDerivedPredicateNameAllowed_resultFalse(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
+                boolean changingDerivedPredicateNameAllowed = true;
+                IsomorphismComparator isomorphismComparator = new IsomorphismComparator(new IsomorphismOptions(false, false, changingDerivedPredicateNameAllowed));
+                boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
+                assertThat(isIsomorphism).describedAs(name).isFalse();
+            }
+
             @Test
             void changeDerivedPredicateNameNotAllowed_resultTrue() {
                 ImmutableLiteralsList list1 = ImmutableLiteralsListMother.create("P(x), Der(x)", "Der(x) :- R(x, y)");
@@ -486,6 +485,56 @@ class IsomorphismComparatorTest {
 
         @Nested
         class ChangingVariableNames {
+
+            private static Stream<Arguments> provideIsomorphicLiteralListsAllowingVariableNamesChanges() {
+                return Stream.of(
+                        Arguments.of(
+                                "Trivial case",
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))")
+                        ),
+                        Arguments.of(
+                                "Identical case",
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(x,y), not(Q(y))")
+                        ),
+                        Arguments.of(
+                                "Identical case with repeated variables",
+                                ImmutableLiteralsListMother.create("P(a,b), P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(x,y), P(x,y), not(Q(y))")
+                        ),
+                        Arguments.of(
+                                "Identical case with repeated variables in different places",
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(b,a), not(Q(a))")
+                        )
+                );
+            }
+
+            private static Stream<Arguments> provideNonIsomorphicLiteralListsAllowingVariableNamesChanges() {
+                return Stream.of(
+                        Arguments.of(
+                                "Non isomorphic case",
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(x,y), not(Q(x))")
+                        ),
+                        Arguments.of(
+                                "Non isomorphic case with repeated variables",
+                                ImmutableLiteralsListMother.create("P(a,b), P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(x,y), P(x,y), not(Q(x))")
+                        ),
+                        Arguments.of(
+                                "Non isomorphic case with repeated variables in different places",
+                                ImmutableLiteralsListMother.create("P(a,b)"),
+                                ImmutableLiteralsListMother.create("P(x,x)")
+                        ),
+                        Arguments.of(
+                                "Non isomorphic case with constant",
+                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
+                                ImmutableLiteralsListMother.create("P(1,b), not(Q(b))")
+                        )
+                );
+            }
 
             @Test
             void changeVariableNamesAllowed_resultTrue_whenVarNamesNotToChangeAreCompatible() {
@@ -516,31 +565,6 @@ class IsomorphismComparatorTest {
                 boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
 
                 assertThat(isIsomorphism).describedAs(name).isTrue();
-            }
-
-            private static Stream<Arguments> provideIsomorphicLiteralListsAllowingVariableNamesChanges() {
-                return Stream.of(
-                        Arguments.of(
-                                "Trivial case",
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))")
-                        ),
-                        Arguments.of(
-                                "Identical case",
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(x,y), not(Q(y))")
-                        ),
-                        Arguments.of(
-                                "Identical case with repeated variables",
-                                ImmutableLiteralsListMother.create("P(a,b), P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(x,y), P(x,y), not(Q(y))")
-                        ),
-                        Arguments.of(
-                                "Identical case with repeated variables in different places",
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(b,a), not(Q(a))")
-                        )
-                );
             }
 
             @ParameterizedTest(name = "[{index}] {0}")
@@ -576,35 +600,35 @@ class IsomorphismComparatorTest {
                 boolean isIsomorphism = isomorphismComparator.areIsomorphic(list1, list2);
                 assertThat(isIsomorphism).isFalse();
             }
-
-            private static Stream<Arguments> provideNonIsomorphicLiteralListsAllowingVariableNamesChanges() {
-                return Stream.of(
-                        Arguments.of(
-                                "Non isomorphic case",
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(x,y), not(Q(x))")
-                        ),
-                        Arguments.of(
-                                "Non isomorphic case with repeated variables",
-                                ImmutableLiteralsListMother.create("P(a,b), P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(x,y), P(x,y), not(Q(x))")
-                        ),
-                        Arguments.of(
-                                "Non isomorphic case with repeated variables in different places",
-                                ImmutableLiteralsListMother.create("P(a,b)"),
-                                ImmutableLiteralsListMother.create("P(x,x)")
-                        ),
-                        Arguments.of(
-                                "Non isomorphic case with constant",
-                                ImmutableLiteralsListMother.create("P(a,b), not(Q(b))"),
-                                ImmutableLiteralsListMother.create("P(1,b), not(Q(b))")
-                        )
-                );
-            }
         }
 
         @Nested
         class ChangingLiteralOrder {
+            private static Stream<Arguments> provideSameLiteralListsInDifferentOrder() {
+                return Stream.of(
+                        Arguments.of(
+                                "Non same order",
+                                ImmutableLiteralsListMother.create("P(x), Q(x, y)"),
+                                ImmutableLiteralsListMother.create("Q(x, y), P(x)")
+                        ),
+                        Arguments.of(
+                                "Repeated literals",
+                                ImmutableLiteralsListMother.create("P(x), P(x), Q(x, y)"),
+                                ImmutableLiteralsListMother.create("Q(x, y), P(x), P(x)")
+                        ),
+                        Arguments.of(
+                                "Repeated predicates",
+                                ImmutableLiteralsListMother.create("P(x), Q(x, y), P(y)"),
+                                ImmutableLiteralsListMother.create("Q(x, y), P(y), P(x)")
+                        ),
+                        Arguments.of(
+                                "Using polarity",
+                                ImmutableLiteralsListMother.create("not(P(x)), Q(x, y)"),
+                                ImmutableLiteralsListMother.create("Q(x,y), not(P(x))")
+                        )
+                );
+            }
+
             @ParameterizedTest(name = "[{index}] {0}")
             @MethodSource("provideSameLiteralListsInDifferentOrder")
             void changeLiteralOrderAllowed_resultTrue(String name, ImmutableLiteralsList list1, ImmutableLiteralsList list2) {
@@ -650,31 +674,6 @@ class IsomorphismComparatorTest {
 
                 assertThat(isIsomorphism).describedAs(name).isFalse();
             }
-
-            private static Stream<Arguments> provideSameLiteralListsInDifferentOrder() {
-                return Stream.of(
-                        Arguments.of(
-                                "Non same order",
-                                ImmutableLiteralsListMother.create("P(x), Q(x, y)"),
-                                ImmutableLiteralsListMother.create("Q(x, y), P(x)")
-                        ),
-                        Arguments.of(
-                                "Repeated literals",
-                                ImmutableLiteralsListMother.create("P(x), P(x), Q(x, y)"),
-                                ImmutableLiteralsListMother.create("Q(x, y), P(x), P(x)")
-                        ),
-                        Arguments.of(
-                                "Repeated predicates",
-                                ImmutableLiteralsListMother.create("P(x), Q(x, y), P(y)"),
-                                ImmutableLiteralsListMother.create("Q(x, y), P(y), P(x)")
-                        ),
-                        Arguments.of(
-                                "Using polarity",
-                                ImmutableLiteralsListMother.create("not(P(x)), Q(x, y)"),
-                                ImmutableLiteralsListMother.create("Q(x,y), not(P(x))")
-                        )
-                );
-            }
         }
     }
 
@@ -691,6 +690,10 @@ class IsomorphismComparatorTest {
             verify(spyComparator).areIsomorphic(constraint1.getBody(), constraint2.getBody());
         }
 
+        private LogicConstraint createDummy() {
+            return LogicConstraintMother.createWithoutID(":- P(x)");
+        }
+
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void should_returnSameResult_asImmutableLiteralsListIsomorphism(boolean expectedResult) {
@@ -703,10 +706,6 @@ class IsomorphismComparatorTest {
             boolean areIsomorphic = spyComparator.areIsomorphic(constraint1, constraint2);
 
             assertThat(areIsomorphic).isEqualTo(expectedResult);
-        }
-
-        private LogicConstraint createDummy() {
-            return LogicConstraintMother.createWithoutID(":- P(x)");
         }
 
         @Test
@@ -757,14 +756,6 @@ class IsomorphismComparatorTest {
         @Nested
         class ParameterIntegrationTest {
 
-            @ParameterizedTest(name = "[{index}] {0}")
-            @MethodSource("provideNonIsomorphicDerivationRules")
-            void should_returnFalse_whenDerivationRulesAreNotIsomorphic(String name, DerivationRule rule1, DerivationRule rule2) {
-                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
-                boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
-                assertThat(areIsomorphic).describedAs(name).isFalse();
-            }
-
             private static Stream<Arguments> provideNonIsomorphicDerivationRules() {
 
                 return Stream.of(
@@ -782,23 +773,19 @@ class IsomorphismComparatorTest {
 
             }
 
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideNonIsomorphicDerivationRules")
+            void should_returnFalse_whenDerivationRulesAreNotIsomorphic(String name, DerivationRule rule1, DerivationRule rule2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+                boolean areIsomorphic = comparator.areIsomorphic(rule1, rule2);
+                assertThat(areIsomorphic).describedAs(name).isFalse();
+            }
+
         }
     }
 
     @Nested
     class SchemaIsomorphismTest {
-        @ParameterizedTest(name = "[{index}] {0}")
-        @MethodSource("providePredicateSpecs")
-        void should_returnFalse_whenSchemasDiffer_inBasePredicates_evenWhenTheyAreNotUsed(String name, List<PredicateSpec> predicates1, List<PredicateSpec> predicates2) {
-            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("@1 :- P(x)", predicates1);
-            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("@1 :- P(x)", predicates2);
-
-            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
-
-            assertThat(areIsomorphic).describedAs(name).isFalse();
-        }
-
         private static Stream<Arguments> providePredicateSpecs() {
             return Stream.of(
                     Arguments.of(
@@ -812,25 +799,6 @@ class IsomorphismComparatorTest {
                             List.of(new PredicateSpec("Q", 2))
                     )
             );
-        }
-
-        @Test
-        void should_returnFalse_whenSchemasDiffer_inDerivedPredicates_evenWhenTheyAreNotUsed() {
-            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("P(x) :- R(x)");
-            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("Q(x) :- S(x)");
-
-            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
-            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
-
-            assertThat(areIsomorphic).isFalse();
-        }
-
-        @ParameterizedTest(name = "[{index}] {0}")
-        @MethodSource("provideIsomorphicSchemas")
-        void should_returnTrue_whenSchemasAreIsomorphic(String name, LogicSchema schema1, LogicSchema schema2) {
-            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
-            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
-            assertThat(areIsomorphic).describedAs(name).isTrue();
         }
 
         private static Stream<Arguments> provideIsomorphicSchemas() {
@@ -876,14 +844,6 @@ class IsomorphismComparatorTest {
                                             """)
                     )
             );
-        }
-
-        @ParameterizedTest(name = "[{index}] {0}")
-        @MethodSource("provideNonIsomorphicSchemas")
-        void should_returnFalse_whenSchemaDiffer_inNumberOfRepeatedIsomorphicDerivationRules(String name, LogicSchema schema1, LogicSchema schema2) {
-            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
-            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
-            assertThat(areIsomorphic).describedAs(name).isFalse();
         }
 
         private static Stream<Arguments> provideNonIsomorphicSchemas() {
@@ -946,6 +906,45 @@ class IsomorphismComparatorTest {
                     )
             );
         }
+
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("providePredicateSpecs")
+        void should_returnFalse_whenSchemasDiffer_inBasePredicates_evenWhenTheyAreNotUsed(String name, List<PredicateSpec> predicates1, List<PredicateSpec> predicates2) {
+            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("@1 :- P(x)", predicates1);
+            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("@1 :- P(x)", predicates2);
+
+            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
+
+            assertThat(areIsomorphic).describedAs(name).isFalse();
+        }
+
+        @Test
+        void should_returnFalse_whenSchemasDiffer_inDerivedPredicates_evenWhenTheyAreNotUsed() {
+            LogicSchema schema1 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("P(x) :- R(x)");
+            LogicSchema schema2 = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates("Q(x) :- S(x)");
+
+            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(false, false, false));
+            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
+
+            assertThat(areIsomorphic).isFalse();
+        }
+
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("provideIsomorphicSchemas")
+        void should_returnTrue_whenSchemasAreIsomorphic(String name, LogicSchema schema1, LogicSchema schema2) {
+            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
+            assertThat(areIsomorphic).describedAs(name).isTrue();
+        }
+
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("provideNonIsomorphicSchemas")
+        void should_returnFalse_whenSchemaDiffer_inNumberOfRepeatedIsomorphicDerivationRules(String name, LogicSchema schema1, LogicSchema schema2) {
+            IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+            boolean areIsomorphic = comparator.areIsomorphic(schema1, schema2);
+            assertThat(areIsomorphic).describedAs(name).isFalse();
+        }
     }
 
     @Nested
@@ -1007,14 +1006,6 @@ class IsomorphismComparatorTest {
         @Nested
         class PermittingAllChanges {
 
-            @ParameterizedTest(name = "[{index}] {0}")
-            @MethodSource("provideNonIsomorphicQueriesUpToAllPossibleChanges")
-            void should_returnFalse_whenQueriesAreNotIsomorphicUpToAllChanges(String name, Query query1, Query query2) {
-                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
-                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
-                assertThat(areIsomorphic).describedAs(name).isFalse();
-            }
-
             private static Stream<Arguments> provideNonIsomorphicQueriesUpToAllPossibleChanges() {
 
                 return Stream.of(
@@ -1047,15 +1038,6 @@ class IsomorphismComparatorTest {
 
             }
 
-
-            @ParameterizedTest(name = "[{index}] {0}")
-            @MethodSource("provideIsomorphicQueriesUpToAllPossibleChanges")
-            void should_returnTrue_whenQueriesAreIsomorphicUpToPermittedChanges(String name, Query query1, Query query2) {
-                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
-                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
-                assertThat(areIsomorphic).describedAs(name).isTrue();
-            }
-
             private static Stream<Arguments> provideIsomorphicQueriesUpToAllPossibleChanges() {
 
                 return Stream.of(
@@ -1075,6 +1057,22 @@ class IsomorphismComparatorTest {
                                 QueryMother.createQuery(List.of("x", "y"), "P(x, y), Q2(x, y)", "Q2(x, y) :- T(x, y)")
                         )
                 );
+            }
+
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideNonIsomorphicQueriesUpToAllPossibleChanges")
+            void should_returnFalse_whenQueriesAreNotIsomorphicUpToAllChanges(String name, Query query1, Query query2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).describedAs(name).isFalse();
+            }
+
+            @ParameterizedTest(name = "[{index}] {0}")
+            @MethodSource("provideIsomorphicQueriesUpToAllPossibleChanges")
+            void should_returnTrue_whenQueriesAreIsomorphicUpToPermittedChanges(String name, Query query1, Query query2) {
+                IsomorphismComparator comparator = new IsomorphismComparator(new IsomorphismOptions(true, true, true));
+                boolean areIsomorphic = comparator.areIsomorphic(query1, query2);
+                assertThat(areIsomorphic).describedAs(name).isTrue();
             }
         }
     }
