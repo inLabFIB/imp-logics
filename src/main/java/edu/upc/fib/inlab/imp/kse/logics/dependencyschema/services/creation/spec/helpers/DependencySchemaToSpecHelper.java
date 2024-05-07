@@ -36,19 +36,19 @@ public class DependencySchemaToSpecHelper {
         return new BuiltInLiteralSpec(equality.getOperationName(), buildTermsSpecs(equality.getTerms()));
     }
 
-    public static HeadAtomsSpec buildHeadAtomsSpec(List<Atom> newHead) {
-        List<OrdinaryLiteralSpec> literalSpecs = newHead.stream().map(atom ->
-                                                                              new OrdinaryLiteralSpec(atom.getPredicateName(), buildTermsSpecs(atom.getTerms()), true))
-                .toList();
-        return new HeadAtomsSpec(literalSpecs);
+    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
+        return LogicSchemaToSpecHelper.buildTermsSpecs(terms);
     }
 
     public static TGDSpec buildTGDSpec(TGD originalTGD) {
         return new TGDSpec(buildBodySpec(originalTGD.getBody()), buildHeadAtomsSpec(originalTGD.getHead()));
     }
 
-    public static List<TermSpec> buildTermsSpecs(List<Term> terms) {
-        return LogicSchemaToSpecHelper.buildTermsSpecs(terms);
+    public static HeadAtomsSpec buildHeadAtomsSpec(List<Atom> newHead) {
+        List<OrdinaryLiteralSpec> literalSpecs = newHead.stream().map(atom ->
+                                                                              new OrdinaryLiteralSpec(atom.getPredicateName(), buildTermsSpecs(atom.getTerms()), true))
+                .toList();
+        return new HeadAtomsSpec(literalSpecs);
     }
 
     public static TermSpec buildTermSpec(Term t) {

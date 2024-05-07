@@ -66,25 +66,6 @@ public class Substitution {
     }
 
     /**
-     * Constructs a new {@code Substitution} making the union between this {@code Substitution}, and the
-     * otherSubstitution.
-     *
-     * @param otherSubstitution different {@code Substitution}.
-     * @return a new {@code Substitution} as a union of substitutions.
-     * @throws IllegalArgumentException if the other {@code Substitution} is {@code null}.
-     * @throws SubstitutionException    if both substitutions try to map the same variable to different terms.
-     */
-    public Substitution union(Substitution otherSubstitution) {
-        if (Objects.isNull(otherSubstitution)) throw new IllegalArgumentException("otherSubstitution cannot be null");
-
-        Substitution result = new Substitution(this);
-        for (Map.Entry<Variable, Term> otherMapping : otherSubstitution.termsMap.entrySet()) {
-            result.addMapping(otherMapping.getKey(), otherMapping.getValue());
-        }
-        return result;
-    }
-
-    /**
      * Modifies the {@code Substitution} adding a new mapping from the domainVariable to the rangeTerm.
      *
      * @param domainVariable domain variable to be mapped.
@@ -104,6 +85,25 @@ public class Substitution {
                             " to " + currentTermImage.getName() +
                             " which is not equal to " + rangeTerm.getName());
         }
+    }
+
+    /**
+     * Constructs a new {@code Substitution} making the union between this {@code Substitution}, and the
+     * otherSubstitution.
+     *
+     * @param otherSubstitution different {@code Substitution}.
+     * @return a new {@code Substitution} as a union of substitutions.
+     * @throws IllegalArgumentException if the other {@code Substitution} is {@code null}.
+     * @throws SubstitutionException    if both substitutions try to map the same variable to different terms.
+     */
+    public Substitution union(Substitution otherSubstitution) {
+        if (Objects.isNull(otherSubstitution)) throw new IllegalArgumentException("otherSubstitution cannot be null");
+
+        Substitution result = new Substitution(this);
+        for (Map.Entry<Variable, Term> otherMapping : otherSubstitution.termsMap.entrySet()) {
+            result.addMapping(otherMapping.getKey(), otherMapping.getValue());
+        }
+        return result;
     }
 
     /**

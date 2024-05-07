@@ -9,11 +9,6 @@ import java.util.*;
 
 public class NonConflictingFDsAnalyzer {
 
-    private static boolean isProperSubset(Set<Integer> firstSet, Set<Integer> secondSet) {
-        return firstSet.stream().allMatch(secondSet::contains) &&
-                firstSet.size() < secondSet.size();
-    }
-
     /**
      * @param tgds not null
      * @param fds  not null
@@ -21,6 +16,24 @@ public class NonConflictingFDsAnalyzer {
      */
     public boolean isNonConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
         return !isConflicting(tgds, fds);
+    }
+
+    /**
+     * @param tgds not null
+     * @param fds  not null
+     * @return whether some TGD of the given list is conflicting with some FD of the given list
+     */
+    public boolean isConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
+        if (Objects.isNull(tgds)) throw new IllegalArgumentException("TGDs cannot be null");
+        if (Objects.isNull(fds)) throw new IllegalArgumentException("Functional Dependency cannot be null");
+
+        for (TGD tgd : tgds) {
+            for (FunctionalDependency fd : fds) {
+                if (isConflicting(tgd, fd)) return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -44,22 +57,10 @@ public class NonConflictingFDsAnalyzer {
         return false;
     }
 
-    /**
-     * @param tgds not null
-     * @param fds  not null
-     * @return whether some TGD of the given list is conflicting with some FD of the given list
-     */
-    public boolean isConflicting(List<TGD> tgds, List<FunctionalDependency> fds) {
-        if (Objects.isNull(tgds)) throw new IllegalArgumentException("TGDs cannot be null");
-        if (Objects.isNull(fds)) throw new IllegalArgumentException("Functional Dependency cannot be null");
-
-        for (TGD tgd : tgds) {
-            for (FunctionalDependency fd : fds) {
-                if (isConflicting(tgd, fd)) return true;
-            }
-        }
-
-        return false;
+    private boolean affectsSamePredicate(TGD tgd, FunctionalDependency fd) {
+        return tgd.getHead().stream()
+                .map(Atom::getPredicate)
+                .anyMatch(p -> fd.predicate().equals(p));
     }
 
     private boolean containsRepeatedExistentialVariable(TGD tgd) {
@@ -82,12 +83,6 @@ public class NonConflictingFDsAnalyzer {
         return isProperSubset(fd.keyPositions(), universalPositions);
     }
 
-    private boolean affectsSamePredicate(TGD tgd, FunctionalDependency fd) {
-        return tgd.getHead().stream()
-                .map(Atom::getPredicate)
-                .anyMatch(p -> fd.predicate().equals(p));
-    }
-
     private boolean appearsMoreThanOnce(Variable existVar, TGD tgd) {
         int counter = 0;
         for (Atom atomHead : tgd.getHead()) {
@@ -96,6 +91,17 @@ public class NonConflictingFDsAnalyzer {
             }
         }
         return counter > 1;
+    }
+
+    private boolean hasRepeatedExistentialVariable(Atom headAtom, Set<Variable> universalVariables) {
+        List<Variable> existentialVarsList = headAtom.getTerms().stream()
+                .filter(Variable.class::isInstance)
+                .map(Variable.class::cast)
+                .filter(variable -> !universalVariables.contains(variable))
+                .toList();
+
+        Set<Variable> existentialVarsSet = new HashSet<>(existentialVarsList);
+        return existentialVarsSet.size() < existentialVarsList.size();
     }
 
     private boolean containsConstant(Atom headAtom) {
@@ -113,15 +119,9 @@ public class NonConflictingFDsAnalyzer {
         return result;
     }
 
-    private boolean hasRepeatedExistentialVariable(Atom headAtom, Set<Variable> universalVariables) {
-        List<Variable> existentialVarsList = headAtom.getTerms().stream()
-                .filter(Variable.class::isInstance)
-                .map(Variable.class::cast)
-                .filter(variable -> !universalVariables.contains(variable))
-                .toList();
-
-        Set<Variable> existentialVarsSet = new HashSet<>(existentialVarsList);
-        return existentialVarsSet.size() < existentialVarsList.size();
+    private static boolean isProperSubset(Set<Integer> firstSet, Set<Integer> secondSet) {
+        return secondSet.containsAll(firstSet) &&
+                firstSet.size() < secondSet.size();
     }
 
 

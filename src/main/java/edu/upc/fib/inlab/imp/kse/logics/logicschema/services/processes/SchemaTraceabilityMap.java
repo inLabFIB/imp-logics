@@ -29,6 +29,13 @@ public class SchemaTraceabilityMap {
     }
 
     /**
+     * @return the number of mapped constraint IDs to original constraint IDs.
+     */
+    public int size() {
+        return constraintToOrigConstraintIDMap.size();
+    }
+
+    /**
      * Method to collapse a list of maps into a unique one by means of joining them.
      * <p>
      * In particular, the new map will contain the finalConstraintIDs of the first map given pointing to the
@@ -109,12 +116,5 @@ public class SchemaTraceabilityMap {
             throw new IllegalArgumentException("Original constraintID cannot be null");
         }
         constraintToOrigConstraintIDMap.put(constraintID, originalID);
-    }
-
-    /**
-     * @return the number of mapped constraint IDs to original constraint IDs.
-     */
-    public int size() {
-        return constraintToOrigConstraintIDMap.size();
     }
 }

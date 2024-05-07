@@ -15,6 +15,23 @@ import java.util.stream.Collectors;
  */
 public class PredicateCleaner extends LogicSchemaTransformationProcess {
 
+    /**
+     * @param logicSchema not null
+     * @return a transformation where the resulting logicSchema does not have any unused predicate
+     */
+    @Override
+    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
+        return cleanTransformation(logicSchema);
+    }
+
+    /**
+     * @param logicSchema not null
+     * @return a copy of the logic schema where the unused predicates have been removed
+     */
+    public LogicSchema clean(LogicSchema logicSchema) {
+        return cleanTransformation(logicSchema).transformed();
+    }
+
     private static List<DerivationRule> filterUsedDerivationRules(LogicSchema logicSchema) {
         Set<String> usedPredicates = filterUsedPredicateNames(logicSchema);
         return logicSchema.getAllDerivationRules().stream()
@@ -77,15 +94,6 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
         return logicConstraintsSpecs;
     }
 
-    /**
-     * @param logicSchema not null
-     * @return a transformation where the resulting logicSchema does not have any unused predicate
-     */
-    @Override
-    public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
-        return cleanTransformation(logicSchema);
-    }
-
     private SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
         checkLogicSchema(originalSchema);
 
@@ -96,13 +104,5 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
         LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
 
         return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
-    }
-
-    /**
-     * @param logicSchema not null
-     * @return a copy of the logic schema where the unused predicates have been removed
-     */
-    public LogicSchema clean(LogicSchema logicSchema) {
-        return cleanTransformation(logicSchema).transformed();
     }
 }

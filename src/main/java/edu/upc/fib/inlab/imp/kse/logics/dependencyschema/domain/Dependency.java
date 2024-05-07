@@ -34,14 +34,14 @@ public abstract class Dependency {
                 .collect(Collectors.toSet());
     }
 
+    public ImmutableLiteralsList getBody() {
+        return body;
+    }
+
     public boolean containsBuiltInOrNegatedLiteralInBody() {
         return this.getBody().stream().anyMatch(lit ->
                                                         (lit instanceof OrdinaryLiteral oLit && oLit.isNegative()) ||
                                                                 (lit instanceof BuiltInLiteral));
-    }
-
-    public ImmutableLiteralsList getBody() {
-        return body;
     }
 
     public abstract <T> T accept(DependencySchemaVisitor<T> visitor);

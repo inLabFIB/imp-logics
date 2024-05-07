@@ -51,18 +51,6 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         this.generatorId = generatorId;
     }
 
-    private static boolean predicateGeneratesSingleRule(Predicate predicate, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
-        boolean isSimple = false;
-        if (predicate.getDerivationRules().size() == 1) {
-            DerivationRule dr = predicate.getFirstDerivationRule();
-            isSimple = dr.getBody().stream()
-                    .filter(OrdinaryLiteral.class::isInstance)
-                    .map(OrdinaryLiteral.class::cast)
-                    .noneMatch(ol -> ol.isPositive() && predicateTransformMap.get(ol.getAtom().getPredicateName()).size() > 1);
-        }
-        return isSimple;
-    }
-
     /**
      * @param logicSchema not-null
      * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived
@@ -81,6 +69,17 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         return transformTransformation(logicSchema).transformed();
     }
 
+    private static boolean predicateGeneratesSingleRule(Predicate predicate, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
+        boolean isSimple = false;
+        if (predicate.getDerivationRules().size() == 1) {
+            DerivationRule dr = predicate.getFirstDerivationRule();
+            isSimple = dr.getBody().stream()
+                    .filter(OrdinaryLiteral.class::isInstance)
+                    .map(OrdinaryLiteral.class::cast)
+                    .noneMatch(ol -> ol.isPositive() && predicateTransformMap.get(ol.getAtom().getPredicateName()).size() > 1);
+        }
+        return isSimple;
+    }
 
     private SchemaTransformation transformTransformation(LogicSchema logicSchema) {
         checkLogicSchema(logicSchema);

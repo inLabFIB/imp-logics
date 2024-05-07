@@ -71,6 +71,10 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         return this;
     }
 
+    public static ImmutableLiteralsListAssert assertThat(ImmutableLiteralsList actual) {
+        return new ImmutableLiteralsListAssert(actual);
+    }
+
     /**
      * Checks that the i-th literal has an original literal which is exactly the same (i.e., same object reference) as
      * the expectedOriginalLiteral
@@ -102,10 +106,6 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                 .as("Original literal of " + currentLiteral + " is " + actualOriginalLiteral.get() + ", but has not the same reference as " + expectedOriginalLiteral)
                 .containsSame(expectedOriginalLiteral);
         return this;
-    }
-
-    public static ImmutableLiteralsListAssert assertThat(ImmutableLiteralsList actual) {
-        return new ImmutableLiteralsListAssert(actual);
     }
 
     public ImmutableLiteralsListAssert literalPositionComesFrom(

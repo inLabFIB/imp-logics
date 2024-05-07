@@ -42,28 +42,6 @@ public class MGUFinder {
         }
     }
 
-    private static void addTermsIfNotMapped(Substitution substitution, Set<Variable> otherVars) {
-        for (Variable variable : otherVars) {
-            if (substitution.getTerm(variable).isEmpty()) {
-                substitution.addMapping(variable, variable);
-            }
-        }
-    }
-
-    private static Optional<Substitution> getMGU(Literal lit1, Literal lit2) {
-        if (!schemaIsUnifiable(lit1, lit2)) return Optional.empty();
-
-        Set<Variable> allVariables = lit1.getUsedVariables();
-        allVariables.addAll(lit2.getUsedVariables());
-
-        Substitution substitution = new Substitution();
-        for (Variable variable : allVariables) {
-            substitution.addMapping(variable, variable);
-        }
-
-        return getMGURecursive(substitution, lit1.getTerms(), lit2.getTerms());
-    }
-
     public static boolean areLiteralsUnifiable(Collection<Literal> literals) {
         return getLiteralsMGU(literals).isPresent();
     }
@@ -71,27 +49,6 @@ public class MGUFinder {
     public static boolean areLiteralsUnifiable(Literal... literals) {
         return getLiteralsMGU(literals).isPresent();
     }
-
-    /**
-     * @param lit1 not null
-     * @param lit2 not null
-     * @return whether the schema part of the literals is unifiable, that is, whether they share the same predicate (and
-     * polarity), or they share the same operator.
-     */
-    private static boolean schemaIsUnifiable(Literal lit1, Literal lit2) {
-        if (lit1 instanceof OrdinaryLiteral oLit1 && lit2 instanceof OrdinaryLiteral oLit2) {
-            return oLit1.getPredicate().equals(oLit2.getPredicate()) && oLit1.isPositive() == oLit2.isPositive();
-        } else if (lit1 instanceof BooleanBuiltInLiteral bil1 && lit2 instanceof BooleanBuiltInLiteral bil2) {
-            return bil1.isTrue() == bil2.isTrue();
-        } else if (lit1 instanceof ComparisonBuiltInLiteral comp1 && lit2 instanceof ComparisonBuiltInLiteral comp2) {
-            return comp1.getOperator().equals(comp2.getOperator());
-        } else if (lit1 instanceof CustomBuiltInLiteral cust1 && lit2 instanceof CustomBuiltInLiteral cust2) {
-            return cust1.getOperationName().equals(cust2.getOperationName()) && cust1.getTerms().size() == cust2.getTerms().size();
-        }
-        return false;
-    }
-
-    //Methods with atom
 
     /**
      * @param atoms not null
@@ -127,8 +84,51 @@ public class MGUFinder {
         return getAtomsMGU(atoms).isPresent();
     }
 
+    //Methods with atom
+
     public static boolean areAtomsUnifiable(Atom... atoms) {
         return getAtomsMGU(atoms).isPresent();
+    }
+
+    private static void addTermsIfNotMapped(Substitution substitution, Set<Variable> otherVars) {
+        for (Variable variable : otherVars) {
+            if (substitution.getTerm(variable).isEmpty()) {
+                substitution.addMapping(variable, variable);
+            }
+        }
+    }
+
+    private static Optional<Substitution> getMGU(Literal lit1, Literal lit2) {
+        if (!schemaIsUnifiable(lit1, lit2)) return Optional.empty();
+
+        Set<Variable> allVariables = lit1.getUsedVariables();
+        allVariables.addAll(lit2.getUsedVariables());
+
+        Substitution substitution = new Substitution();
+        for (Variable variable : allVariables) {
+            substitution.addMapping(variable, variable);
+        }
+
+        return getMGURecursive(substitution, lit1.getTerms(), lit2.getTerms());
+    }
+
+    /**
+     * @param lit1 not null
+     * @param lit2 not null
+     * @return whether the schema part of the literals is unifiable, that is, whether they share the same predicate (and
+     * polarity), or they share the same operator.
+     */
+    private static boolean schemaIsUnifiable(Literal lit1, Literal lit2) {
+        if (lit1 instanceof OrdinaryLiteral oLit1 && lit2 instanceof OrdinaryLiteral oLit2) {
+            return oLit1.getPredicate().equals(oLit2.getPredicate()) && oLit1.isPositive() == oLit2.isPositive();
+        } else if (lit1 instanceof BooleanBuiltInLiteral bil1 && lit2 instanceof BooleanBuiltInLiteral bil2) {
+            return bil1.isTrue() == bil2.isTrue();
+        } else if (lit1 instanceof ComparisonBuiltInLiteral comp1 && lit2 instanceof ComparisonBuiltInLiteral comp2) {
+            return comp1.getOperator().equals(comp2.getOperator());
+        } else if (lit1 instanceof CustomBuiltInLiteral cust1 && lit2 instanceof CustomBuiltInLiteral cust2) {
+            return cust1.getOperationName().equals(cust2.getOperationName()) && cust1.getTerms().size() == cust2.getTerms().size();
+        }
+        return false;
     }
 
     /**

@@ -47,14 +47,6 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
         return visitor.visit(this);
     }
 
-    public static String fromValue(boolean booleanValue) {
-        if (booleanValue) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
-
     @Override
     public BooleanBuiltInLiteral buildNegatedLiteral() {
         return new BooleanBuiltInLiteral(!value);
@@ -67,6 +59,14 @@ public class BooleanBuiltInLiteral extends BuiltInLiteral {
     @Override
     public String toString() {
         return fromValue(value) + "()";
+    }
+
+    public static String fromValue(boolean booleanValue) {
+        if (booleanValue) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 
     public boolean isFalse() {

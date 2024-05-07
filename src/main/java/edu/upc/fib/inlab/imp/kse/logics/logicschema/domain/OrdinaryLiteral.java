@@ -63,12 +63,14 @@ public class OrdinaryLiteral extends Literal {
      */
     public List<ImmutableLiteralsList> unfold() {
         return unfold(false);
-    }    public boolean isPositive() {
-        return isPositive;
     }
 
     public boolean isBase() {
         return atom.isBase();
+    }
+
+    public boolean isPositive() {
+        return isPositive;
     }
 
     /**
@@ -102,12 +104,6 @@ public class OrdinaryLiteral extends Literal {
             }
         }
         return atom.unfold();
-    }
-
-    public boolean isNegative() {
-        return !isPositive;
-    }    public Atom getAtom() {
-        return atom;
     }
 
     /**
@@ -168,9 +164,9 @@ public class OrdinaryLiteral extends Literal {
         return atom.unfold(derivationRuleIndex);
     }
 
-
-
-
+    public boolean isNegative() {
+        return !isPositive;
+    }
 
     @Override
     public ImmutableTermList getTerms() {
@@ -202,17 +198,25 @@ public class OrdinaryLiteral extends Literal {
                 .isEmpty();
     }
 
+    private boolean allLiteralsFromDerivationRuleCanBeNegated() {
+        return this.getAtom().getPredicate().getDerivationRules().stream()
+                .flatMap(dr -> dr.getBody().stream())
+                .allMatch(Literal::canBeNegated);
+    }
+
+    public Atom getAtom() {
+        return atom;
+    }
+
+
+
+
+
     @Override
     public OrdinaryLiteral applySubstitution(Substitution substitution) {
         if (substitution.replacesSomeVariableOf(this.getUsedVariables())) {
             return new OrdinaryLiteral(atom.applySubstitution(substitution), isPositive);
         } else return this;
-    }
-
-    private boolean allLiteralsFromDerivationRuleCanBeNegated() {
-        return this.getAtom().getPredicate().getDerivationRules().stream()
-                .flatMap(dr -> dr.getBody().stream())
-                .allMatch(Literal::canBeNegated);
     }
 
 
@@ -227,8 +231,6 @@ public class OrdinaryLiteral extends Literal {
         boolean shouldBePositive = !this.isPositive();
         return new OrdinaryLiteral(new Atom(this.getAtom().getPredicate(), this.getTerms()), shouldBePositive);
     }
-
-
 
 
 }

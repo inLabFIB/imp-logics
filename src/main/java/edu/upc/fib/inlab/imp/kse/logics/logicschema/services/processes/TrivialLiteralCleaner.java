@@ -41,13 +41,6 @@ import java.util.stream.Collectors;
  */
 public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
 
-    private static DerivationRuleSpec buildFalseRuleForPredicate(Predicate predicate) {
-        return new DerivationRuleSpecBuilder()
-                .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(predicate.getFirstDerivationRule().getHeadTerms()))
-                .addLiteralSpec(LogicSchemaToSpecHelper.buildFalseLiteralSpec())
-                .build();
-    }
-
     /**
      * @param logicSchema not null
      * @return a transformation where the final logicSchema a new logicSchema with the trivial literals removed.
@@ -75,6 +68,13 @@ public class TrivialLiteralCleaner extends LogicSchemaTransformationProcess {
      */
     public LogicSchema clean(LogicSchema logicSchema) {
         return executeTransformation(logicSchema).transformed();
+    }
+
+    private static DerivationRuleSpec buildFalseRuleForPredicate(Predicate predicate) {
+        return new DerivationRuleSpecBuilder()
+                .addHead(predicate.getName(), LogicSchemaToSpecHelper.buildTermsSpecs(predicate.getFirstDerivationRule().getHeadTerms()))
+                .addLiteralSpec(LogicSchemaToSpecHelper.buildFalseLiteralSpec())
+                .build();
     }
 
     private List<LogicConstraintWithIDSpec> cleanTrivialInLiteralsInLogicConstraints(Set<LogicConstraint> logicConstraints, SchemaTraceabilityMap schemaTraceabilityMap) {

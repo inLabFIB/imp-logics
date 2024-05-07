@@ -12,6 +12,43 @@ import java.util.Set;
 
 public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
 
+    public boolean isWeaklyGuarded(DependencySchema dependencySchema) {
+        return satisfies(dependencySchema);
+    }
+
+    @Override
+    public boolean satisfies(DependencySchema dependencySchema) {
+        if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
+            throw new UnsupportedOperationException("Weakly guarded analysis does not currently support negated nor built-in literals");
+        }
+        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
+
+        Set<PredicatePosition> affectedPositions = getAffectedPositions(dependencySchema);
+        for (TGD tgd : dependencySchema.getAllTGDs()) {
+            if (!isWeaklyGuarded(tgd, affectedPositions)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * This method implements the affected positions definition given in IEEE Symposion on Logic in Computer Science
+     * 2010 "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for New Applications" by Cali,
+     * et al.
+     *
+     * @return those predicate positions that might contain null values when chasing the schema dependencies.
+     */
+    public static Set<PredicatePosition> getAffectedPositions(DependencySchema dependencySchema) {
+        Set<PredicatePosition> positionsWithExistsVars = getPositionsWithExistentialVars(dependencySchema);
+        return getAffectedPositions(dependencySchema, positionsWithExistsVars);
+    }
+
+    @Override
+    public DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage getDatalogPlusMinusName() {
+        return DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage.WEAKLY_GUARDED;
+    }
+
     /**
      * @param tgd               not null
      * @param affectedPositions not null, might be empty
@@ -32,18 +69,6 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
         }
 
         return false;
-    }
-
-    /**
-     * This method implements the affected positions definition given in IEEE Symposion on Logic in Computer Science
-     * 2010 "Datalog+/-: A Family of Logical Knowledge Representation and Query Languages for New Applications" by Cali,
-     * et al.
-     *
-     * @return those predicate positions that might contain null values when chasing the schema dependencies.
-     */
-    public static Set<PredicatePosition> getAffectedPositions(DependencySchema dependencySchema) {
-        Set<PredicatePosition> positionsWithExistsVars = getPositionsWithExistentialVars(dependencySchema);
-        return getAffectedPositions(dependencySchema, positionsWithExistsVars);
     }
 
     private static Set<PredicatePosition> getPositionsWithExistentialVars(DependencySchema dependencySchema) {
@@ -88,31 +113,6 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
         if (!affectedPositions.containsAll(newAffectedPositions))
             return getAffectedPositions(dependencySchema, newAffectedPositions);
         else return newAffectedPositions;
-    }
-
-    public boolean isWeaklyGuarded(DependencySchema dependencySchema) {
-        return satisfies(dependencySchema);
-    }
-
-    @Override
-    public boolean satisfies(DependencySchema dependencySchema) {
-        if (someDependencyContainsBuiltInOrNegatedLiteralInBody(dependencySchema)) {
-            throw new UnsupportedOperationException("Weakly guarded analysis does not currently support negated nor built-in literals");
-        }
-        if (!new NonConflictingEGDsAnalyzer().areEGDsNonConflictingWithTGDs(dependencySchema)) return false;
-
-        Set<PredicatePosition> affectedPositions = getAffectedPositions(dependencySchema);
-        for (TGD tgd : dependencySchema.getAllTGDs()) {
-            if (!isWeaklyGuarded(tgd, affectedPositions)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage getDatalogPlusMinusName() {
-        return DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage.WEAKLY_GUARDED;
     }
 
 

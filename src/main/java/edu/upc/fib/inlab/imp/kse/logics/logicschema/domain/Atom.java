@@ -139,10 +139,6 @@ public class Atom {
         return new SubstitutionAndBuiltInLiterals(substitution, builtInLiterals);
     }
 
-    public boolean isDerived() {
-        return predicate.isDerived();
-    }
-
     private Set<Variable> computePotentiallyClashingVariables(DerivationRule derivationRule) {
         /*
          * There might be a clash with the terms that are currently in this atom's terms such that
@@ -171,6 +167,10 @@ public class Atom {
             currentlyUsedVariables.add(newFreshVariable);
         }
         return literalsList.applySubstitution(substitutionForClashingTerms);
+    }
+
+    public boolean isDerived() {
+        return predicate.isDerived();
     }
 
     @Override

@@ -39,10 +39,6 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
         return this;
     }
 
-    public static OrdinaryLiteralAssert assertThat(OrdinaryLiteral actual) {
-        return new OrdinaryLiteralAssert(actual);
-    }
-
     @SuppressWarnings("UnusedReturnValue")
     public OrdinaryLiteralAssert hasTerms(ImmutableTermList terms) {
         ImmutableTermListAssert.assertThat(actual.getTerms())
@@ -54,6 +50,10 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
     public OrdinaryLiteralAssert hasPredicateName(String predicateName) {
         AtomAssert.assertThat(actual.getAtom()).hasPredicateName(predicateName);
         return this;
+    }
+
+    public static OrdinaryLiteralAssert assertThat(OrdinaryLiteral actual) {
+        return new OrdinaryLiteralAssert(actual);
     }
 
     public OrdinaryLiteralAssert isPositive() {

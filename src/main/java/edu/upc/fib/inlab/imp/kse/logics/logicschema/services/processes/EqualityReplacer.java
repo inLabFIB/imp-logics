@@ -42,12 +42,9 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
         return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
     }
 
-    private static SchemaTraceabilityMap buildSchemaTraceabilityMap(Set<LogicConstraint> allLogicConstraints) {
-        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
-        allLogicConstraints.forEach(
-                logicConstraint -> schemaTraceabilityMap.addConstraintIDOrigin(logicConstraint.getID(), logicConstraint.getID())
-        );
-        return schemaTraceabilityMap;
+    private List<DerivationRuleSpec> replaceEqualitiesInDerivationRules(Set<DerivationRule> derivationRules) {
+        return derivationRules.stream()
+                .map(this::buildDerivationRuleSpec).toList();
     }
 
     private List<LogicConstraintWithIDSpec> replaceEqualitiesInLogicConstraints(Set<LogicConstraint> logicConstraints) {
@@ -56,9 +53,12 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
                 .toList();
     }
 
-    private List<DerivationRuleSpec> replaceEqualitiesInDerivationRules(Set<DerivationRule> derivationRules) {
-        return derivationRules.stream()
-                .map(this::buildDerivationRuleSpec).toList();
+    private static SchemaTraceabilityMap buildSchemaTraceabilityMap(Set<LogicConstraint> allLogicConstraints) {
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        allLogicConstraints.forEach(
+                logicConstraint -> schemaTraceabilityMap.addConstraintIDOrigin(logicConstraint.getID(), logicConstraint.getID())
+        );
+        return schemaTraceabilityMap;
     }
 
     private DerivationRuleSpec buildDerivationRuleSpec(DerivationRule rule) {

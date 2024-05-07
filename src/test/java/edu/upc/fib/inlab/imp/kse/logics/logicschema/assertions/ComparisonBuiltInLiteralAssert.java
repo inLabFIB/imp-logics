@@ -39,20 +39,6 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
         return this;
     }
 
-    public static ComparisonBuiltInLiteralAssert assertThat(ComparisonBuiltInLiteral actual) {
-        return new ComparisonBuiltInLiteralAssert(actual);
-    }
-
-    public ComparisonBuiltInLiteralAssert isEquality() {
-        objects.assertIsInstanceOf(info, actual, EqualityComparisonBuiltInLiteral.class);
-        return this;
-    }
-
-    public ComparisonBuiltInLiteralAssert hasComparisonOperation(String comparisonOperator) {
-        Assertions.assertThat(actual.getOperator().getSymbol()).isEqualTo(comparisonOperator);
-        return this;
-    }
-
     @SuppressWarnings("UnusedReturnValue")
     private ComparisonBuiltInLiteralAssert hasRightTerm(Term expected) {
         Assertions.assertThat(actual.getRightTerm()).isEqualTo(expected);
@@ -61,6 +47,20 @@ public class ComparisonBuiltInLiteralAssert extends AbstractAssert<ComparisonBui
 
     private ComparisonBuiltInLiteralAssert hasLeftTerm(Term expected) {
         Assertions.assertThat(actual.getLeftTerm()).isEqualTo(expected);
+        return this;
+    }
+
+    public ComparisonBuiltInLiteralAssert hasComparisonOperation(String comparisonOperator) {
+        Assertions.assertThat(actual.getOperator().getSymbol()).isEqualTo(comparisonOperator);
+        return this;
+    }
+
+    public static ComparisonBuiltInLiteralAssert assertThat(ComparisonBuiltInLiteral actual) {
+        return new ComparisonBuiltInLiteralAssert(actual);
+    }
+
+    public ComparisonBuiltInLiteralAssert isEquality() {
+        objects.assertIsInstanceOf(info, actual, EqualityComparisonBuiltInLiteral.class);
         return this;
     }
 

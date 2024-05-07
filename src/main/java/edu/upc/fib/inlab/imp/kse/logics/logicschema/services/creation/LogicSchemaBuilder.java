@@ -80,11 +80,6 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
         }
     }
 
-    public LogicSchemaBuilder<T> addDerivationRule(Collection<DerivationRuleSpec> derivationRules) {
-        derivationRules.forEach(this::addDerivationRule);
-        return this;
-    }
-
     @SafeVarargs
     public final LogicSchemaBuilder<T> addLogicConstraint(T... logicConstraintSpecs) {
         return addLogicConstraint(Arrays.stream(logicConstraintSpecs).toList());
@@ -95,6 +90,11 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
             ConstraintID constraintID = constraintIDGenerator.newConstraintID(lcs);
             addLogicConstraint(constraintID, lcs);
         });
+        return this;
+    }
+
+    public LogicSchemaBuilder<T> addDerivationRule(Collection<DerivationRuleSpec> derivationRules) {
+        derivationRules.forEach(this::addDerivationRule);
         return this;
     }
 
@@ -114,22 +114,6 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
         return this;
     }
 
-    private void addLogicConstraint(ConstraintID constraintID, LogicConstraintSpec lcs) {
-        if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintIDException(constraintID);
-        ImmutableLiteralsList body = buildBody(lcs.getBody());
-        logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
-    }
-
-    public LogicSchemaBuilder<T> addPredicate(PredicateSpec... predicateSpecs) {
-        Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
-        return this;
-    }
-
-    public LogicSchemaBuilder<T> addPredicate(String predicateName, int arity) {
-        addPredicateIfAbsent(predicateName, arity);
-        return this;
-    }
-
     public LogicSchemaBuilder<T> addAllPredicates(List<PredicateSpec> allPredicates) {
         allPredicates.forEach(this::addPredicate);
         return this;
@@ -140,10 +124,26 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
         predicatesByName.putIfAbsent(predicateName, new MutablePredicate(predicateName, arity));
     }
 
+    public LogicSchemaBuilder<T> addPredicate(PredicateSpec... predicateSpecs) {
+        Arrays.stream(predicateSpecs).forEach(predicateSpec -> this.addPredicate(predicateSpec.name(), predicateSpec.arity()));
+        return this;
+    }
+
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
         if (predicatesByName.containsKey(predicateName)
                 && predicatesByName.get(predicateName).getArity() != arity) {
             throw new RepeatedPredicateNameException(predicateName);
         }
+    }
+
+    public LogicSchemaBuilder<T> addPredicate(String predicateName, int arity) {
+        addPredicateIfAbsent(predicateName, arity);
+        return this;
+    }
+
+    private void addLogicConstraint(ConstraintID constraintID, LogicConstraintSpec lcs) {
+        if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintIDException(constraintID);
+        ImmutableLiteralsList body = buildBody(lcs.getBody());
+        logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
     }
 }

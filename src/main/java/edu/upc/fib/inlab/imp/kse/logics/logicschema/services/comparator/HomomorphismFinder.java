@@ -121,6 +121,22 @@ public class HomomorphismFinder {
     }
 
     /**
+     * @param currentSubstitution not null
+     * @param domainTerms         not null
+     * @param rangeTerms          not null
+     * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
+     */
+    protected Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, ImmutableTermList domainTerms, ImmutableTermList rangeTerms) {
+        try {
+            Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
+            Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);
+            return Optional.of(unionSubstitution);
+        } catch (SubstitutionException ex) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * @param currentSubstitution is not null
      * @param domainLiterals      is not null, but might be empty
      * @param rangeLiterals       is not null
@@ -157,22 +173,6 @@ public class HomomorphismFinder {
         }
 
         return computeHomomorphismExtensionForTerms(currentSubstitution, domainAtom.getTerms(), rangeAtom.getTerms());
-    }
-
-    /**
-     * @param currentSubstitution not null
-     * @param domainTerms         not null
-     * @param rangeTerms          not null
-     * @return an extension of the currentSubstitution that makes domainTerms to be equal to rangeTerms, if exists
-     */
-    protected Optional<Substitution> computeHomomorphismExtensionForTerms(Substitution currentSubstitution, ImmutableTermList domainTerms, ImmutableTermList rangeTerms) {
-        try {
-            Substitution homomorphismForBuiltIn = new Substitution(domainTerms, rangeTerms);
-            Substitution unionSubstitution = currentSubstitution.union(homomorphismForBuiltIn);
-            return Optional.of(unionSubstitution);
-        } catch (SubstitutionException ex) {
-            return Optional.empty();
-        }
     }
 
     private void checkIfExistDerivedOrdinaryLiteralWithoutDerivedLiteralCriteria(List<Literal> literals) {

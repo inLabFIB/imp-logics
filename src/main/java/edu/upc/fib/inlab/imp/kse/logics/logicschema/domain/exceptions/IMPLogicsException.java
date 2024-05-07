@@ -9,7 +9,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions;
 public class IMPLogicsException extends RuntimeException {
 
     /**
-     * Constructs a new runtime exception with {@code null} as its detail message.
+     * Constructs a new IMP Logics exception with {@code null} as its detail message.
      */
     public IMPLogicsException() {
         super();

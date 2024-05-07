@@ -120,43 +120,6 @@ public class IsomorphismComparator {
         this.changingDerivedPredicateNameAllowed = options.changingDerivedPredicateNameAllowed();
     }
 
-    private static boolean haveDifferentPredicateName(Atom atom1, Atom atom2) {
-        return !atom1.getPredicateName().equals(atom2.getPredicateName());
-    }
-
-    private static Optional<Predicate> updatePredicateMap(Literal literal1, Literal literal2, PredicateMap predicateMap) {
-        if (literal1 instanceof OrdinaryLiteral ol1
-                && literal2 instanceof OrdinaryLiteral ol2
-                && ol1.isDerived()
-        ) {
-            predicateMap.put(ol1.getPredicate(), ol2.getPredicate());
-            return Optional.of(ol1.getPredicate());
-        }
-        return Optional.empty();
-    }
-
-    private static boolean hasSameBodySize(DerivationRule rule1, DerivationRule rule2) {
-        return rule2.getBody().size() == rule1.getBody().size();
-    }
-
-    private static boolean haveDifferentPolarity(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
-        return ol1.isPositive() != ol2.isPositive();
-    }
-
-    private static boolean haveDifferentArity(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
-        return ol1.getArity() != ol2.getArity();
-    }
-
-    private static boolean haveDifferentNames(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
-        return !ol1.getPredicateName().equals(ol2.getPredicateName());
-    }
-
-    private static ImmutableTermList reverseTerms(ImmutableTermList terms2) {
-        LinkedList<Term> auxTermsToReverse = new LinkedList<>(terms2);
-        Collections.reverse(auxTermsToReverse);
-        return new ImmutableTermList(auxTermsToReverse);
-    }
-
     /**
      * Check whether two lists of literals are isomorphic
      *
@@ -252,6 +215,43 @@ public class IsomorphismComparator {
         PredicateMap predicateMap = new PredicateMap();
         predicateMap.put(p1, p2);
         return areIsomorphic(p1.getDerivationRules(), p2.getDerivationRules(), predicateMap, () -> true);
+    }
+
+    private static boolean haveDifferentPredicateName(Atom atom1, Atom atom2) {
+        return !atom1.getPredicateName().equals(atom2.getPredicateName());
+    }
+
+    private static Optional<Predicate> updatePredicateMap(Literal literal1, Literal literal2, PredicateMap predicateMap) {
+        if (literal1 instanceof OrdinaryLiteral ol1
+                && literal2 instanceof OrdinaryLiteral ol2
+                && ol1.isDerived()
+        ) {
+            predicateMap.put(ol1.getPredicate(), ol2.getPredicate());
+            return Optional.of(ol1.getPredicate());
+        }
+        return Optional.empty();
+    }
+
+    private static boolean hasSameBodySize(DerivationRule rule1, DerivationRule rule2) {
+        return rule2.getBody().size() == rule1.getBody().size();
+    }
+
+    private static boolean haveDifferentPolarity(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
+        return ol1.isPositive() != ol2.isPositive();
+    }
+
+    private static boolean haveDifferentArity(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
+        return ol1.getArity() != ol2.getArity();
+    }
+
+    private static boolean haveDifferentNames(OrdinaryLiteral ol1, OrdinaryLiteral ol2) {
+        return !ol1.getPredicateName().equals(ol2.getPredicateName());
+    }
+
+    private static ImmutableTermList reverseTerms(ImmutableTermList terms2) {
+        LinkedList<Term> auxTermsToReverse = new LinkedList<>(terms2);
+        Collections.reverse(auxTermsToReverse);
+        return new ImmutableTermList(auxTermsToReverse);
     }
 
     private Optional<TermMap> areDerivationRuleHeadsIsomorphic(Atom head1, Atom head2) {
