@@ -27,3 +27,5 @@
 /modules.xml
 /*.iml
 /modules/
+/sonarlint.xml
+/misc.xml
