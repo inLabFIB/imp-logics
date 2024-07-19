@@ -10,29 +10,19 @@ import java.util.*;
 /**
  * This class is responsible for recursively unfolding the positive derived literals of a logic schema.
  * <p>
- * For instance, if the logic schema contains:
- * :- Der1(x), Base1(x) <br>
- * Der1(x) :- Base2(x) <br>
- * Der1(x) :- Der2(x) <br>
- * Der2(x) :- Base3(x) <br>
+ * For instance, if the logic schema contains: :- Der1(x), Base1(x) <br> Der1(x) :- Base2(x) <br> Der1(x) :- Der2(x)
+ * <br> Der2(x) :- Base3(x) <br>
  * <br>
- * This class returns: <br>
- * :- Base2(x), Base1(x) <br>
- * :- Base3(x), Base1(x) <br>
- * Der1(x) :- Base2(x) <br>
- * Der1(x) :- Base3(x) <br>
- * Der2(x) :- Base3(x) <br>
+ * This class returns: <br> :- Base2(x), Base1(x) <br> :- Base3(x), Base1(x) <br> Der1(x) :- Base2(x) <br> Der1(x) :-
+ * Base3(x) <br> Der2(x) :- Base3(x) <br>
  * <p>
- * This class, by default, applies the standard unfolding. That is, it only unfolds positive literals.
- * However, this class can also apply, if desired, some unfoldings over negated derived literals.
- * For instance, if the logic schema contains:
- * :- P(x), not(Derived(x)) <br>
- * Derived(x) :- A(x) <br>
- * The unfolding can return: <br>
- * :- P(x), not(A(x))  <br>
+ * This class, by default, applies the standard unfolding. That is, it only unfolds positive literals. However, this
+ * class can also apply, if desired, some unfoldings over negated derived literals. For instance, if the logic schema
+ * contains: :- P(x), not(Derived(x)) <br> Derived(x) :- A(x) <br> The unfolding can return: <br> :- P(x), not(A(x))
+ * <br>
  * <p>
- * To apply the positive and also negated literal unfoldings, please, instantiate the class with
- * unfoldNegatedLiterals set to true.
+ * To apply the positive and also negated literal unfoldings, please, instantiate the class with unfoldNegatedLiterals
+ * set to true.
  * <p>
  * To see the cases in which such unfolding can be performed, please,check OrdinaryLiteral class
  *
@@ -44,8 +34,24 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
     private final boolean unfoldNegatedLiterals;
 
     /**
-     * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy
-     * for creating new constraintIDs, if necessary.
+     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy for creating new
+     * constraintIDs, if necessary; and use the standard unfolding
+     */
+    public SchemaUnfolder() {
+        this(false);
+    }
+
+    /**
+     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy for creating new
+     * constraintIDs, if necessary; and use the unfolding specified by parameter
+     */
+    public SchemaUnfolder(boolean unfoldNegatedLiterals) {
+        this(new SuffixMultipleConstraintIDGenerator(), unfoldNegatedLiterals);
+    }
+
+    /**
+     * Creates an SchemaUnfolder that will use the given multipleConstraintIDGenerator strategy for creating new
+     * constraintIDs, if necessary.
      *
      * @param multipleConstraintIDGenerator not null
      * @param unfoldNegatedLiterals         , if true, the method tries to unfold negated literals too
@@ -56,22 +62,6 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
         this.unfoldNegatedLiterals = unfoldNegatedLiterals;
     }
 
-    /**
-     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
-     * for creating new constraintIDs, if necessary; and use the unfolding specified by parameter
-     */
-    public SchemaUnfolder(boolean unfoldNegatedLiterals) {
-        this(new SuffixMultipleConstraintIDGenerator(), unfoldNegatedLiterals);
-    }
-
-    /**
-     * Creates an SchemaUnfolder that will use the SuffixMultipleConstraintIDGenerator as a strategy
-     * for creating new constraintIDs, if necessary; and use the standard unfolding
-     */
-    public SchemaUnfolder() {
-        this(false);
-    }
-
     private static void checkParameters(MultipleConstraintIDGenerator multipleConstraintIDGenerator) {
         if (Objects.isNull(multipleConstraintIDGenerator))
             throw new IllegalArgumentException("MultipleConstraintIDGenerator cannot be null");
@@ -79,8 +69,8 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     /**
      * @param logicSchema not null
-     * @return a schema transformation where the final schema has the same (based and derived) predicates as the one given but unfolding
-     * all the positive derived literals
+     * @return a schema transformation where the final schema has the same (based and derived) predicates as the one
+     * given but unfolding all the positive derived literals
      */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
@@ -89,8 +79,8 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
 
     /**
      * @param schema not null
-     * @return a new schema with the same (based and derived) predicates as the one given but unfolding
-     * all the positive derived literals
+     * @return a new schema with the same (based and derived) predicates as the one given but unfolding all the positive
+     * derived literals
      */
     public LogicSchema unfold(LogicSchema schema) {
         return unfoldTransformation(schema).transformed();
@@ -126,7 +116,7 @@ public class SchemaUnfolder extends LogicSchemaTransformationProcess {
         List<BodySpec> unfoldedBodySpecs = computeUnfoldedBodySpec(originalConstraint.getBody());
 
         List<ConstraintID> constraintIDsToUse = multipleConstraintIDGenerator.generateNewConstraintsIDs(originalConstraint.getID(),
-                unfoldedBodySpecs.size());
+                                                                                                        unfoldedBodySpecs.size());
 
         List<LogicConstraintWithIDSpec> result = new LinkedList<>();
         for (int i = 0; i < unfoldedBodySpecs.size(); ++i) {

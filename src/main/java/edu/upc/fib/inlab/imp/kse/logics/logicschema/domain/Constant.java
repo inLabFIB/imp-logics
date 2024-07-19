@@ -17,8 +17,8 @@ public class Constant extends Term {
     }
 
     @Override
-    public String toString() {
-        return "Const{'" + this.getName() + "'}";
+    public boolean isConstant() {
+        return true;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class Constant extends Term {
     }
 
     @Override
-    public boolean isConstant() {
-        return true;
+    public String toString() {
+        return "Const{'" + this.getName() + "'}";
     }
 }

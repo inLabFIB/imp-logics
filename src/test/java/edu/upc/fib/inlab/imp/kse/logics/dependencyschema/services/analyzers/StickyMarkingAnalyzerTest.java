@@ -30,8 +30,8 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldMark_LiteralPosWithVar_NotInOneHead() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> r(x,a)
-                    """);
+                                                                                                     p(x,y) -> r(x,a)
+                                                                                                     """);
             Literal p = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Set<LiteralPosition> markedLiteralPositions = StickyMarkingAnalyzer.getInitialStickyMarking(dependencySchema.getAllTGDs());
 
@@ -43,8 +43,8 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldMark_LiteralPosWithVar_NotInOneHead_ButOnTheOther() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> r(x,y), s(x,a)
-                    """);
+                                                                                                     p(x,y) -> r(x,y), s(x,a)
+                                                                                                     """);
             Literal p = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Set<LiteralPosition> markedLiteralPositions = StickyMarkingAnalyzer.getInitialStickyMarking(dependencySchema.getAllTGDs());
 
@@ -56,9 +56,9 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldMark_LiteralPosWithVar_NotInSomeHead_ofSeveralTGDs() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> r(x,a)
-                    q(x,y) -> s(y,a)
-                    """);
+                                                                                                     p(x,y) -> r(x,a)
+                                                                                                     q(x,y) -> s(y,a)
+                                                                                                     """);
             Literal p = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Literal q = dependencySchema.getAllTGDs().get(1).getBody().get(0);
             Set<LiteralPosition> markedLiteralPositions = StickyMarkingAnalyzer.getInitialStickyMarking(dependencySchema.getAllTGDs());
@@ -72,8 +72,8 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldNotMark_LiteralPosWithVar_AppearingInEveryHeadAtom() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> r(x,y)
-                    """);
+                                                                                                     p(x,y) -> r(x,y)
+                                                                                                     """);
             Set<LiteralPosition> markedLiteralPositions = StickyMarkingAnalyzer.getInitialStickyMarking(dependencySchema.getAllTGDs());
 
             Assertions.assertThat(markedLiteralPositions)
@@ -83,8 +83,8 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldNotMark_LiteralPosWithConstant() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,4) -> r(x,y)
-                    """);
+                                                                                                     p(x,4) -> r(x,y)
+                                                                                                     """);
             Set<LiteralPosition> markedLiteralPositions = StickyMarkingAnalyzer.getInitialStickyMarking(dependencySchema.getAllTGDs());
 
             Assertions.assertThat(markedLiteralPositions)
@@ -97,8 +97,8 @@ class StickyMarkingAnalyzerTest {
         @Test
         void shouldKeepInitialMarking_asPropagatedMarking() {
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    a(x,y), b(y) -> r(x)
-                    """);
+                                                                                                     a(x,y), b(y) -> r(x)
+                                                                                                     """);
             Literal a = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Literal b = dependencySchema.getAllTGDs().get(0).getBody().get(1);
 
@@ -114,8 +114,8 @@ class StickyMarkingAnalyzerTest {
         void shouldPropagateMarking_toOneTGD() {
             //marked variables are m
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    a(x,m), b(m), c(y) -> r(m,y)
-                    """);
+                                                                                                     a(x,m), b(m), c(y) -> r(m,y)
+                                                                                                     """);
             Literal a = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Literal b = dependencySchema.getAllTGDs().get(0).getBody().get(1);
             Atom r = dependencySchema.getAllTGDs().get(0).getHead().get(0);
@@ -133,9 +133,9 @@ class StickyMarkingAnalyzerTest {
         void shouldPropagateMarking_throughSeveralTGDs() {
             //marked variables are m
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    a(x,m), b(m), c(y, z) -> r1(m,y)
-                    c(m, x), d(m, u, w), e(y) -> r2(y,m)
-                    """);
+                                                                                                     a(x,m), b(m), c(y, z) -> r1(m,y)
+                                                                                                     c(m, x), d(m, u, w), e(y) -> r2(y,m)
+                                                                                                     """);
             Literal a = dependencySchema.getAllTGDs().get(0).getBody().get(0);
             Literal b = dependencySchema.getAllTGDs().get(0).getBody().get(1);
             Literal c = dependencySchema.getAllTGDs().get(1).getBody().get(0);
@@ -160,8 +160,8 @@ class StickyMarkingAnalyzerTest {
         void shouldPropagateMarking_WithinTheSameRule() {
             //marked variables are m
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(m,y) -> p(y, z)
-                    """);
+                                                                                                     p(m,y) -> p(y, z)
+                                                                                                     """);
             Literal pBody = dependencySchema.getAllTGDs().get(0).getBody().get(0);
 
             Set<LiteralPosition> initialMarking = Set.of(new LiteralPosition(pBody, 0));
@@ -176,9 +176,9 @@ class StickyMarkingAnalyzerTest {
         void shouldPropagateMarking_Transitively() {
             //marked variables are m
             DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(m,y) -> p(y, z)
-                    q(x,y) -> p(x, y)
-                    """);
+                                                                                                     p(m,y) -> p(y, z)
+                                                                                                     q(x,y) -> p(x, y)
+                                                                                                     """);
             //we will first propagate the initial marking to p[1]
             //then it will be propagated to q[0] and q[1]
             Literal pBody = dependencySchema.getAllTGDs().get(0).getBody().get(0);

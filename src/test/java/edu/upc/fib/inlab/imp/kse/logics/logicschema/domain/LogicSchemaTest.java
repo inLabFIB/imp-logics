@@ -25,7 +25,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of();
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test
@@ -37,7 +37,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of(c1, c2);
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(RepeatedConstraintID.class);
+                    .isInstanceOf(RepeatedConstraintIDException.class);
         }
 
         @Test
@@ -48,7 +48,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of(c1);
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -59,7 +59,7 @@ class LogicSchemaTest {
             Set<LogicConstraint> constraints = Set.of();
 
             assertThatThrownBy(() -> new LogicSchema(predicates, constraints))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -86,7 +86,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getPredicateByName("p"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
     }
 
@@ -107,7 +107,7 @@ class LogicSchemaTest {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             ConstraintID constraintID = ConstraintIDMother.createConstraintID("1");
             assertThatThrownBy(() -> logicSchema.getLogicConstraintByID(constraintID))
-                    .isInstanceOf(LogicConstraintNotExists.class);
+                    .isInstanceOf(LogicConstraintNotFoundException.class);
         }
 
         @Test
@@ -140,7 +140,7 @@ class LogicSchemaTest {
         void should_throwException_WhenRetrievingDerivationRules_WithNonExistentPredicateName() {
             LogicSchema logicSchema = new LogicSchema(Set.of(), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName("nonExistentPredicateName"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
 
         @Test
@@ -149,7 +149,7 @@ class LogicSchemaTest {
             Predicate basePredicate = new MutablePredicate(basePredicateName, 2);
             LogicSchema logicSchema = new LogicSchema(Set.of(basePredicate), Set.of());
             assertThatThrownBy(() -> logicSchema.getDerivationRulesByPredicateName(basePredicateName))
-                    .isInstanceOf(PredicateIsNotDerived.class);
+                    .isInstanceOf(PredicateIsNotDerivedException.class);
         }
     }
 
@@ -159,8 +159,8 @@ class LogicSchemaTest {
         @Test
         void should_includeDerivedLiterals_ThatDoesNotUseBasePredicates_inFirstHierarchyLevel() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- TRUE()
-                    """);
+                                                                                        P(x) :- TRUE()
+                                                                                        """);
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
             LevelHierarchyAssert.assertThat(levelHierarchy)
@@ -171,9 +171,9 @@ class LogicSchemaTest {
         @Test
         void should_makeDerivedLiterals_DefinedOverDerivedLiterals_ThatDoesNotUseBasePredicates_inNextHierarchyLevel() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- TRUE()
-                    Q(x) :- P(x)
-                    """);
+                                                                                        P(x) :- TRUE()
+                                                                                        Q(x) :- P(x)
+                                                                                        """);
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
 
@@ -196,8 +196,8 @@ class LogicSchemaTest {
         @Test
         void should_computeLevels_whenThereIsNoDerivationRule() {
             LogicSchema logicSchema = new LogicSchema(Set.of(new Predicate("P", 0),
-                    new Predicate("Q", 0)),
-                    Set.of());
+                                                             new Predicate("Q", 0)),
+                                                      Set.of());
 
             LevelHierarchy levelHierarchy = logicSchema.computeLevelHierarchy();
 
@@ -209,9 +209,9 @@ class LogicSchemaTest {
         @Test
         void should_computeLevels_whenEachPredicateHasOnlyOneDerivationRule() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- R2(x), S1(x)
-                    R2(x) :- Q1(x)
-                    """);
+                                                                                   P(x) :- R2(x), S1(x)
+                                                                                   R2(x) :- Q1(x)
+                                                                                   """);
 
             LevelHierarchy hierarchy = schema.computeLevelHierarchy();
 
@@ -224,10 +224,10 @@ class LogicSchemaTest {
         @Test
         void should_computeLevels_whenPredicatesHaveSeveralDerivationRules() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- R2(x)
-                    P(x) :- Q1(x)
-                    R2(x) :- S1(x)
-                    """);
+                                                                                   P(x) :- R2(x)
+                                                                                   P(x) :- Q1(x)
+                                                                                   R2(x) :- S1(x)
+                                                                                   """);
 
             LevelHierarchy hierarchy = schema.computeLevelHierarchy();
 
@@ -240,9 +240,9 @@ class LogicSchemaTest {
         @Test
         void should_computeLevels_whenDerivedRuleDoesNotUsePredicates() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- R2(x), S1(x)
-                    R2(x) :- 3 > x
-                    """);
+                                                                                   P(x) :- R2(x), S1(x)
+                                                                                   R2(x) :- 3 > x
+                                                                                   """);
 
             LevelHierarchy hierarchy = schema.computeLevelHierarchy();
 
@@ -272,16 +272,16 @@ class LogicSchemaTest {
         @Test
         void should_beNotEmpty_whenLogicSchemaContainsLogicConstraintWithPredicates() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    @1 :- a < b
-                    """);
+                                                                                        @1 :- a < b
+                                                                                        """);
             assertThat(logicSchema.isEmpty()).isFalse();
         }
 
         @Test
         void should_beNotEmpty_whenLogicSchemaContainsDerivationRule() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    P(x) :- a < b
-                    """);
+                                                                                        P(x) :- a < b
+                                                                                        """);
             assertThat(logicSchema.isEmpty()).isFalse();
         }
     }
@@ -292,11 +292,11 @@ class LogicSchemaTest {
         @Test
         void should_returnTrue_whenAllNormalClausesAllSafe() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    @1 :- P(x)
-                    @2 :- P(x), not(Q(x))
-                    P(x) :- Q(x)
-                    P(x) :- R(x, y), not(Q(x))
-                    """);
+                                                                                        @1 :- P(x)
+                                                                                        @2 :- P(x), not(Q(x))
+                                                                                        P(x) :- Q(x)
+                                                                                        P(x) :- R(x, y), not(Q(x))
+                                                                                        """);
 
             assertThat(logicSchema.isSafe()).isTrue();
         }
@@ -304,12 +304,12 @@ class LogicSchemaTest {
         @Test
         void should_returnFalse_whenAnyNormalClausesIsUnsafe() {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                    @1 :- P(x)
-                    @2 :- P(x), not(Q(x))
-                    P(x) :- Q(x)
-                    P(x) :- R(x, y), not(Q(x))
-                    P(x) :- x = x
-                    """);
+                                                                                        @1 :- P(x)
+                                                                                        @2 :- P(x), not(Q(x))
+                                                                                        P(x) :- Q(x)
+                                                                                        P(x) :- R(x, y), not(Q(x))
+                                                                                        P(x) :- x = x
+                                                                                        """);
 
             assertThat(logicSchema.isSafe()).isFalse();
         }

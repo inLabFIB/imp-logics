@@ -46,16 +46,16 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     /**
-     * Two predicates P and Q are said to be equivalent iff any two atoms P(x) and Q(x), being x any possible
-     * list of constants, P(x) and Q(x) evaluates the same on any possible database.
+     * Two predicates P and Q are said to be equivalent iff any two atoms P(x) and Q(x), being x any possible list of
+     * constants, P(x) and Q(x) evaluates the same on any possible database.
      * <p>
-     * To be equivalent, it is necessary that P and Q have the same name, arity, and both must be base (or both
-     * must be derived).
+     * To be equivalent, it is necessary that P and Q have the same name, arity, and both must be base (or both must be
+     * derived).
      * <p>
-     * When both are derived, it is undecidable to know whether they are equivalent, or not. Hence, this assert
-     * applies a sound (but incomplete) strategy based on checking whether their derivation rules are homomorphic,
-     * where on its turn, two derived literals are considered to be homomorphic iff their terms are homomorphic and
-     * their derivation rules are homomorphic too.
+     * When both are derived, it is undecidable to know whether they are equivalent, or not. Hence, this assert applies
+     * a sound (but incomplete) strategy based on checking whether their derivation rules are homomorphic, where on its
+     * turn, two derived literals are considered to be homomorphic iff their terms are homomorphic and their derivation
+     * rules are homomorphic too.
      */
     @SuppressWarnings("UnusedReturnValue")
     public PredicateAssert isLogicallyEquivalentTo(Predicate expectedPredicate) {
@@ -66,15 +66,10 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         return this;
     }
 
-    public void checkDerivationRulesEquivalenceWithStrategy(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
-        assertThatAllActualDerivationRulesAreEquivalentToExpected(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
-        assertThatAllEquivalentExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
-    }
-
-    private void checkIsBaseIffExpectedIsBase(Predicate expectedPredicate) {
-        Assertions.assertThat(actual.isBase())
-                .describedAs("IsBase value of predicate " + actual.getName())
-                .isEqualTo(expectedPredicate.isBase());
+    private void checkHasSameName(Predicate expectedPredicate) {
+        Assertions.assertThat(actual.getName())
+                .describedAs("Name of predicate")
+                .isEqualTo(expectedPredicate.getName());
     }
 
     private void checkHasSameArity(Predicate expectedPredicate) {
@@ -83,19 +78,15 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
                 .isEqualTo(expectedPredicate.getArity());
     }
 
-    private void checkHasSameName(Predicate expectedPredicate) {
-        Assertions.assertThat(actual.getName())
-                .describedAs("Name of predicate")
-                .isEqualTo(expectedPredicate.getName());
+    private void checkIsBaseIffExpectedIsBase(Predicate expectedPredicate) {
+        Assertions.assertThat(actual.isBase())
+                .describedAs("IsBase value of predicate " + actual.getName())
+                .isEqualTo(expectedPredicate.isBase());
     }
 
-    private void assertThatAllEquivalentExpectedDerivationRulesAreContained(List<DerivationRule> expectedDerivationRules, LogicEquivalenceAnalyzer analyzer) {
-        for (DerivationRule expectedDerivationRule : expectedDerivationRules) {
-            boolean expectedFoundInActual = isDerivationRuleContained(expectedDerivationRule, actual.getDerivationRules(), analyzer);
-            if (!expectedFoundInActual) {
-                Assertions.fail("Derivation rule \"" + expectedDerivationRule + "\" expected, but missing in actual");
-            }
-        }
+    public void checkDerivationRulesEquivalenceWithStrategy(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
+        assertThatAllActualDerivationRulesAreEquivalentToExpected(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
+        assertThatAllEquivalentExpectedDerivationRulesAreContained(expectedPredicate.getDerivationRules(), derivedLiteralsStrategy.getAnalyzer());
     }
 
     private void assertThatAllActualDerivationRulesAreEquivalentToExpected(List<DerivationRule> expectedDerivationRules, LogicEquivalenceAnalyzer analyzer) {
@@ -107,6 +98,14 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
         }
     }
 
+    private void assertThatAllEquivalentExpectedDerivationRulesAreContained(List<DerivationRule> expectedDerivationRules, LogicEquivalenceAnalyzer analyzer) {
+        for (DerivationRule expectedDerivationRule : expectedDerivationRules) {
+            boolean expectedFoundInActual = isDerivationRuleContained(expectedDerivationRule, actual.getDerivationRules(), analyzer);
+            if (!expectedFoundInActual) {
+                Assertions.fail("Derivation rule \"" + expectedDerivationRule + "\" expected, but missing in actual");
+            }
+        }
+    }
 
     private boolean isDerivationRuleContained(DerivationRule derivationRule, List<DerivationRule> listOfRules, LogicEquivalenceAnalyzer analyzer) {
         for (DerivationRule aRuleOfTheList : listOfRules) {
@@ -118,8 +117,8 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     /**
-     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent according to the given strategy.
+     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent according to the given strategy.
      *
      * @param expectedRule not null
      * @return this assert
@@ -133,8 +132,8 @@ public class PredicateAssert extends AbstractAssert<PredicateAssert, Predicate> 
     }
 
     /**
-     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent iff their definition rules are equivalent
+     * Checks whether the actual predicate contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent iff their definition rules are equivalent
      *
      * @param expectedRule not null
      * @return this assert

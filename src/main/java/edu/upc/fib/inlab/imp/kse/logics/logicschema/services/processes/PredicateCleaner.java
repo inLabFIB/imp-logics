@@ -32,19 +32,6 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
         return cleanTransformation(logicSchema).transformed();
     }
 
-
-    private SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
-        checkLogicSchema(originalSchema);
-
-        List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(originalSchema);
-        Set<LogicConstraint> logicConstraints = originalSchema.getAllLogicConstraints();
-
-        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
-        LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
-
-        return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
-    }
-
     private static List<DerivationRule> filterUsedDerivationRules(LogicSchema logicSchema) {
         Set<String> usedPredicates = filterUsedPredicateNames(logicSchema);
         return logicSchema.getAllDerivationRules().stream()
@@ -105,5 +92,17 @@ public class PredicateCleaner extends LogicSchemaTransformationProcess {
             logicConstraintsSpecs.add(logicSchemaSpec);
         }
         return logicConstraintsSpecs;
+    }
+
+    private SchemaTransformation cleanTransformation(LogicSchema originalSchema) {
+        checkLogicSchema(originalSchema);
+
+        List<DerivationRule> usedDerivationRules = filterUsedDerivationRules(originalSchema);
+        Set<LogicConstraint> logicConstraints = originalSchema.getAllLogicConstraints();
+
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        LogicSchema outputSchema = buildLogicSchema(usedDerivationRules, logicConstraints, schemaTraceabilityMap);
+
+        return new SchemaTransformation(originalSchema, outputSchema, schemaTraceabilityMap);
     }
 }

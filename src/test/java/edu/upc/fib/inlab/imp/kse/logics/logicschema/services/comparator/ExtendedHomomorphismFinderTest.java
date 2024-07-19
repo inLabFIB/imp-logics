@@ -16,6 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ExtendedHomomorphismFinderTest {
 
+    static Stream<Arguments> provideLogicSchemasBaseFails() {
+        return Stream.of(
+                Arguments.of(ImmutableLiteralsListMother.create("Base(x)"),
+                             ImmutableLiteralsListMother.create("BaseFail(a)")),
+                Arguments.of(
+                        ImmutableLiteralsListMother.create("Base(x), Derived(x)", "Derived(x) :- Q(x,x)"),
+                        ImmutableLiteralsListMother.create("BaseFail(a), Derived(a)", "Derived(y) :- Q(y,y)"))
+        );
+    }
+
     @Test
     void should_findHomomorphism_whenDomainDerivedLiteralDerivationRule_IsHomomorphicToRangeDerivedLiteralDerivationRule() {
         ImmutableLiteralsList domainLiterals = ImmutableLiteralsListMother.create(
@@ -59,24 +69,6 @@ class ExtendedHomomorphismFinderTest {
         Optional<Substitution> substitutionOpt = extendedHomomorphismFinder.findHomomorphism(domainLiterals, rangeLiterals);
 
         assertThat(substitutionOpt).isNotPresent();
-    }
-
-    static Stream<Arguments> provideLogicSchemasBaseFails() {
-        return Stream.of(
-                Arguments.of(ImmutableLiteralsListMother.create("Base(x)"),
-                        ImmutableLiteralsListMother.create("BaseFail(a)")),
-                Arguments.of(ImmutableLiteralsListMother.create("""
-                                        Base(x), Derived(x)
-                                        """,
-                                """
-                                        Derived(x) :- Q(x,x)
-                                        """),
-                        ImmutableLiteralsListMother.create("""
-                                BaseFail(a), Derived(a)
-                                """, """
-                                Derived(y) :- Q(y,y)
-                                """))
-        );
     }
 
     @Test
@@ -130,7 +122,7 @@ class ExtendedHomomorphismFinderTest {
                         Derived(a, b) :- Q(a,b)
                         Derived(a, b) :- R(a,b)
                         Derived(a, b) :- S(a,b)
-                         """
+                        """
         );
 
         ExtendedHomomorphismFinder extendedHomomorphismFinder = new ExtendedHomomorphismFinder();
@@ -157,7 +149,7 @@ class ExtendedHomomorphismFinderTest {
                         Derived(a, b) :- Q(a,b)
                         Derived(a, b) :- R(a,b)
                         Derived(a, b) :- S(a,b)
-                         """
+                        """
         );
 
         ExtendedHomomorphismFinder extendedHomomorphismFinder = new ExtendedHomomorphismFinder();

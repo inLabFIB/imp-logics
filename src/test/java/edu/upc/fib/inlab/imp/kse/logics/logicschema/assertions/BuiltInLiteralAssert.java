@@ -1,6 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.utils.LiteralParser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
@@ -10,10 +11,6 @@ import org.assertj.core.api.Assertions;
 public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, BuiltInLiteral> {
     public BuiltInLiteralAssert(BuiltInLiteral comparisonBuiltInLiteral) {
         super(comparisonBuiltInLiteral, BuiltInLiteralAssert.class);
-    }
-
-    public static BuiltInLiteralAssert assertThat(BuiltInLiteral actual) {
-        return new BuiltInLiteralAssert(actual);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -46,7 +43,7 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
             BuiltInLiteralAssert.assertThat(actual)
                     .isCustomBuiltInLiteral()
                     .isEqualTo(expectedCustomBIL); //TODO: think about this when used!
-        } else throw new RuntimeException("Unknown BuiltInLiteral type");
+        } else throw new IMPLogicsException("Unknown BuiltInLiteral type");
 
         return this;
     }
@@ -55,6 +52,10 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
     public BuiltInLiteralAssert isBooleanBuiltInLiteral() {
         Assertions.assertThat(actual).isInstanceOf(BooleanBuiltInLiteral.class);
         return this;
+    }
+
+    public static BuiltInLiteralAssert assertThat(BuiltInLiteral actual) {
+        return new BuiltInLiteralAssert(actual);
     }
 
     public BuiltInLiteralAssert isCustomBuiltInLiteral() {
@@ -66,6 +67,7 @@ public class BuiltInLiteralAssert extends AbstractAssert<BuiltInLiteralAssert, B
         Assertions.assertThat(actual.getOperationName()).isEqualTo(operationName);
         return this;
     }
+
     @SuppressWarnings("unused")
     public ComparisonBuiltInLiteralAssert asComparisonBuiltInLiteral() {
         objects.assertIsInstanceOf(info, actual, ComparisonBuiltInLiteral.class);

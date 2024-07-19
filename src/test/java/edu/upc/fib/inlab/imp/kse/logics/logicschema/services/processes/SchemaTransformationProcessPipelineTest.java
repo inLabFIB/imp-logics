@@ -15,31 +15,6 @@ import static org.mockito.Mockito.*;
 
 class SchemaTransformationProcessPipelineTest {
 
-    @Nested
-    class InputValidationTests {
-        @Test
-        void should_throwException_when_SchemaTransformationProcessListIsNull() {
-            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(null))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        void should_throwException_when_SchemaTransformationProcessContainsNull() {
-            List<SchemaTransformationProcess> processList = new LinkedList<>();
-            processList.add(null);
-            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(processList))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        void should_throwException_when_inputLogicSchemaIsNull() {
-            SchemaTransformationProcessPipeline pipeline = new SchemaTransformationProcessPipeline(List.of());
-            assertThatThrownBy(() -> pipeline.executeTransformation(null))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-    }
-
-
     @Test
     void should_invokeTheServiceInInputOrder() {
         LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
@@ -75,6 +50,30 @@ class SchemaTransformationProcessPipelineTest {
     }
 
     @Nested
+    class InputValidationTests {
+        @Test
+        void should_throwException_when_SchemaTransformationProcessListIsNull() {
+            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void should_throwException_when_SchemaTransformationProcessContainsNull() {
+            List<SchemaTransformationProcess> processList = new LinkedList<>();
+            processList.add(null);
+            assertThatThrownBy(() -> new SchemaTransformationProcessPipeline(processList))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void should_throwException_when_inputLogicSchemaIsNull() {
+            SchemaTransformationProcessPipeline pipeline = new SchemaTransformationProcessPipeline(List.of());
+            assertThatThrownBy(() -> pipeline.executeTransformation(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
     class TraceabilityTests {
         @Test
         void should_returnOriginalConstraintID_when_pipelineCreatesSeveralConstraints() {
@@ -94,6 +93,12 @@ class SchemaTransformationProcessPipelineTest {
                     .constraintIDComesFrom("1_2", "1");
         }
 
+        private static SchemaTransformationProcessPipeline normalizePipeline() {
+            return new SchemaTransformationProcessPipeline(List.of(
+                    new SchemaUnfolder(), new SingleDerivationRuleTransformer(), new BodySorter(), new PredicateCleaner()
+            ));
+        }
+
         @Test
         void should_returnOriginalConstraintID_when_processionCreatesOneConstraint() {
             LogicSchema schema = LogicSchemaMother.buildLogicSchemaWithIDs(
@@ -107,12 +112,6 @@ class SchemaTransformationProcessPipelineTest {
 
             SchemaTransformationAssert.assertThat(schemaTransformation)
                     .constraintIDComesFrom("1", "1");
-        }
-
-        private static SchemaTransformationProcessPipeline normalizePipeline() {
-            return new SchemaTransformationProcessPipeline(List.of(
-                    new SchemaUnfolder(), new SingleDerivationRuleTransformer(), new BodySorter(), new PredicateCleaner()
-            ));
         }
     }
 

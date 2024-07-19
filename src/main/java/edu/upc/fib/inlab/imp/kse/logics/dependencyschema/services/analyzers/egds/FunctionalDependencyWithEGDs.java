@@ -6,9 +6,6 @@ import java.util.List;
 
 /**
  * Class that stores the functionalDependency encoded by some egdList
- *
- * @param egdList
- * @param functionalDependency
  */
 public record FunctionalDependencyWithEGDs(List<EGD> egdList, FunctionalDependency functionalDependency) {
     public String getPredicateName() {

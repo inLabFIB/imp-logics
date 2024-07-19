@@ -2,7 +2,6 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.printer;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.mothers.DependencySchemaMother;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

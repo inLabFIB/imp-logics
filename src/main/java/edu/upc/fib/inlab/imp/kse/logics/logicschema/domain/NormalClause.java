@@ -4,15 +4,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Implementation of a logic normal clause. Normal clauses might be LogicConstraints, or DerivationRules
- * A NormalClause should be used, at most, in one LogicSchema.
+ * Implementation of a logic normal clause. Normal clauses might be LogicConstraints, or DerivationRules A NormalClause
+ * should be used, at most, in one LogicSchema.
  */
 public abstract class NormalClause {
     /**
-     * Invariants:
-     * - body must not be null
-     * - body must not be empty
-     * - body must be immutable
+     * Invariants: - body must not be null - body must not be empty - body must be immutable
      */
     private final ImmutableLiteralsList body;
 

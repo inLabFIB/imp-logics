@@ -15,43 +15,14 @@ import java.util.stream.Collectors;
 import static java.util.function.Predicate.not;
 
 /**
- * This class is responsible for removing, when it is possible, the equality built-in literals from the body of
- * a normal clause and apply a substitution that corresponds to such built-in literals.
+ * This class is responsible for removing, when it is possible, the equality built-in literals from the body of a normal
+ * clause and apply a substitution that corresponds to such built-in literals.
  * <p>
- * E.g.:
- * :- P(x), x = 1
- * will be transformed into:
- * :- P(1)
+ * E.g.: :- P(x), x = 1 will be transformed into: :- P(1)
  * <p>
- * However, a case such as:
- * :- P(x), x = 1, x = 2
- * will not be transformed.
+ * However, a case such as: :- P(x), x = 1, x = 2 will not be transformed.
  */
 public class EqualityReplacer extends LogicSchemaTransformationProcess {
-
-    private static SchemaTraceabilityMap buildSchemaTraceabilityMap(Set<LogicConstraint> allLogicConstraints) {
-        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
-        allLogicConstraints.forEach(
-                logicConstraint -> schemaTraceabilityMap.addConstraintIDOrigin(logicConstraint.getID(), logicConstraint.getID())
-        );
-        return schemaTraceabilityMap;
-    }
-
-    private static ImmutableLiteralsList immutableListWithoutEqualityLiterals(ImmutableLiteralsList body, Set<ComparisonBuiltInLiteral> equalityLiterals) {
-        List<Literal> literalsWithoutEqualityLiterals = body.stream()
-                .filter(not(l -> l instanceof ComparisonBuiltInLiteral builtInLiteral && equalityLiterals.contains(builtInLiteral)))
-                .toList();
-        return new ImmutableLiteralsList(literalsWithoutEqualityLiterals);
-    }
-
-    private static Set<ComparisonBuiltInLiteral> equalityLiteralsToReplaceFrom(ImmutableLiteralsList body) {
-        return body.stream()
-                .filter(ComparisonBuiltInLiteral.class::isInstance)
-                .map(ComparisonBuiltInLiteral.class::cast)
-                .filter(comparisonBuiltInLiteral -> ComparisonOperator.EQUALS.equals(comparisonBuiltInLiteral.getOperator()))
-                .filter(comparisonBuiltInLiteral -> comparisonBuiltInLiteral.getTerms().stream().anyMatch(Term::isVariable))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
 
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
@@ -71,25 +42,23 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
         return new SchemaTransformation(logicSchema, outputLogicSchema, schemaTraceabilityMap);
     }
 
+    private List<DerivationRuleSpec> replaceEqualitiesInDerivationRules(Set<DerivationRule> derivationRules) {
+        return derivationRules.stream()
+                .map(this::buildDerivationRuleSpec).toList();
+    }
+
     private List<LogicConstraintWithIDSpec> replaceEqualitiesInLogicConstraints(Set<LogicConstraint> logicConstraints) {
         return logicConstraints.stream()
                 .map(this::buildLogicConstraintSpec)
                 .toList();
     }
 
-    private LogicConstraintWithIDSpec buildLogicConstraintSpec(LogicConstraint logicConstraint) {
-        ImmutableLiteralsList body = logicConstraint.getBody();
-        Set<ComparisonBuiltInLiteral> equalityLiterals = equalityLiteralsToReplaceFrom(body);
-        SubstitutionForEqualities substitutionForEqualities = substitutionsFrom(equalityLiterals);
-        ImmutableLiteralsList immutableLiteralsList = immutableListWithoutEqualityLiterals(body, substitutionForEqualities.equalityLiterals());
-        ImmutableLiteralsList newBody = immutableLiteralsList.applySubstitution(substitutionForEqualities.substitution());
-        ConstraintID id = logicConstraint.getID();
-        return LogicSchemaToSpecHelper.buildLogicConstraintSpec(id, newBody);
-    }
-
-    private List<DerivationRuleSpec> replaceEqualitiesInDerivationRules(Set<DerivationRule> derivationRules) {
-        return derivationRules.stream()
-                .map(this::buildDerivationRuleSpec).toList();
+    private static SchemaTraceabilityMap buildSchemaTraceabilityMap(Set<LogicConstraint> allLogicConstraints) {
+        SchemaTraceabilityMap schemaTraceabilityMap = new SchemaTraceabilityMap();
+        allLogicConstraints.forEach(
+                logicConstraint -> schemaTraceabilityMap.addConstraintIDOrigin(logicConstraint.getID(), logicConstraint.getID())
+        );
+        return schemaTraceabilityMap;
     }
 
     private DerivationRuleSpec buildDerivationRuleSpec(DerivationRule rule) {
@@ -102,6 +71,25 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
         return LogicSchemaToSpecHelper.buildDerivationRuleSpec(newHead, newBody);
     }
 
+    private LogicConstraintWithIDSpec buildLogicConstraintSpec(LogicConstraint logicConstraint) {
+        ImmutableLiteralsList body = logicConstraint.getBody();
+        Set<ComparisonBuiltInLiteral> equalityLiterals = equalityLiteralsToReplaceFrom(body);
+        SubstitutionForEqualities substitutionForEqualities = substitutionsFrom(equalityLiterals);
+        ImmutableLiteralsList immutableLiteralsList = immutableListWithoutEqualityLiterals(body, substitutionForEqualities.equalityLiterals());
+        ImmutableLiteralsList newBody = immutableLiteralsList.applySubstitution(substitutionForEqualities.substitution());
+        ConstraintID id = logicConstraint.getID();
+        return LogicSchemaToSpecHelper.buildLogicConstraintSpec(id, newBody);
+    }
+
+    private static Set<ComparisonBuiltInLiteral> equalityLiteralsToReplaceFrom(ImmutableLiteralsList body) {
+        return body.stream()
+                .filter(ComparisonBuiltInLiteral.class::isInstance)
+                .map(ComparisonBuiltInLiteral.class::cast)
+                .filter(comparisonBuiltInLiteral -> ComparisonOperator.EQUALS.equals(comparisonBuiltInLiteral.getOperator()))
+                .filter(comparisonBuiltInLiteral -> comparisonBuiltInLiteral.getTerms().stream().anyMatch(Term::isVariable))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     /**
      * Returns a substitution from a set of equality literals.
      *
@@ -111,6 +99,13 @@ public class EqualityReplacer extends LogicSchemaTransformationProcess {
     private SubstitutionForEqualities substitutionsFrom(Set<ComparisonBuiltInLiteral> equalityLiterals) {
         PartitionOfEqualityLiterals setOfGroupedTerms = new PartitionOfEqualityLiterals(equalityLiterals);
         return setOfGroupedTerms.computeSubstitutionResult();
+    }
+
+    private static ImmutableLiteralsList immutableListWithoutEqualityLiterals(ImmutableLiteralsList body, Set<ComparisonBuiltInLiteral> equalityLiterals) {
+        List<Literal> literalsWithoutEqualityLiterals = body.stream()
+                .filter(not(l -> l instanceof ComparisonBuiltInLiteral builtInLiteral && equalityLiterals.contains(builtInLiteral)))
+                .toList();
+        return new ImmutableLiteralsList(literalsWithoutEqualityLiterals);
     }
 
 }

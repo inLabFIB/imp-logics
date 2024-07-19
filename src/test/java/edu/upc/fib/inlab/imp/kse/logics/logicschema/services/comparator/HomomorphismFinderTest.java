@@ -6,7 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivationRuleMother
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableLiteralsListMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LogicConstraintMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.assertions.SubstitutionAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheck;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.exceptions.DerivedLiteralInHomomorphismCheckException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -53,23 +53,23 @@ class HomomorphismFinderTest {
             @Test
             void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
                 ImmutableLiteralsList domainLiteralList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
-                        "R(x, y) :- T(x, y)");
+                                                                                             "R(x, y) :- T(x, y)");
                 List<Literal> rangeLiterals = List.of();
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiteralList, rangeLiterals))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
             void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral_andThereIsNoDerivedLiteralCriteria() {
                 List<Literal> domainLiterals = List.of();
                 ImmutableLiteralsList rangeLiteralsList = ImmutableLiteralsListMother.create("R(x, y), S(x)",
-                        "R(x, y) :- T(x, y)");
+                                                                                             "R(x, y) :- T(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainLiterals, rangeLiteralsList))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
 
@@ -317,29 +317,29 @@ class HomomorphismFinderTest {
             @Test
             void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
-                          :- R(x, y), S(x)
-                          R(x, y) :- T(x, y)
-                        """);
+                                                                                                   :- R(x, y), S(x)
+                                                                                                   R(x, y) :- T(x, y)
+                                                                                                 """);
                 LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID(":- R(x, y)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
             void should_throwException_whenRangeLiteralsListIncludesDerivedLiteral() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
-                        :- R(x, y)
-                        """);
+                                                                                                 :- R(x, y)
+                                                                                                 """);
                 LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID("""
-                        :- R(x, y), S(x)
-                        R(x, y) :- T(x, y)
-                        """);
+                                                                                                :- R(x, y), S(x)
+                                                                                                R(x, y) :- T(x, y)
+                                                                                                """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
         }
 
@@ -348,11 +348,11 @@ class HomomorphismFinderTest {
             @Test
             void should_findHomomorphism_whenLogicConstraintsAreTheSame_evenWithDifferentConstraintID() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
-                        @1 :- R(x, y), not(S(x))
-                        """);
+                                                                                              @1 :- R(x, y), not(S(x))
+                                                                                              """);
                 LogicConstraint rangeConstraint = LogicConstraintMother.createWithID("""
-                        @2 :- R(x, y), not(S(x))
-                        """);
+                                                                                             @2 :- R(x, y), not(S(x))
+                                                                                             """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
@@ -366,11 +366,11 @@ class HomomorphismFinderTest {
             @Test
             void should_findHomomorphism_whenLogicConstraintsAreTheSameUpToRenamingVariables_evenWithDifferentConstraintID() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithID("""
-                        @1 :- R(x, y), not(S(x))
-                        """);
+                                                                                              @1 :- R(x, y), not(S(x))
+                                                                                              """);
                 LogicConstraint rangeConstraint = LogicConstraintMother.createWithID("""
-                        @2 :- R(a, b), not(S(a))
-                        """);
+                                                                                             @2 :- R(a, b), not(S(a))
+                                                                                             """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
@@ -384,11 +384,11 @@ class HomomorphismFinderTest {
             @Test
             void should_notFindHomomorphism_whenLogicConstraintsAreNotTheSameUpToRenamingVariables() {
                 LogicConstraint domainConstraint = LogicConstraintMother.createWithoutID("""
-                        :- R(x, y), not(S(x))
-                        """);
+                                                                                                 :- R(x, y), not(S(x))
+                                                                                                 """);
                 LogicConstraint rangeConstraint = LogicConstraintMother.createWithoutID("""
-                        :- T(x)
-                        """);
+                                                                                                :- T(x)
+                                                                                                """);
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 Optional<Substitution> homomorphismOpt = homomorphismFinder.findHomomorphism(domainConstraint, rangeConstraint);
@@ -424,14 +424,14 @@ class HomomorphismFinderTest {
             @Test
             void should_throwException_whenDomainsLiteralsListIncludesDerivedLiteral() {
                 DerivationRule domainDerivationRule = DerivationRuleMother.create("""
-                        P() :- R(x, y), S(x)
-                        R(x, y) :- T(x, y)
-                        """, "P");
+                                                                                          P() :- R(x, y), S(x)
+                                                                                          R(x, y) :- T(x, y)
+                                                                                          """, "P");
                 DerivationRule rangeDerivationRule = DerivationRuleMother.create("P() :- R(x, y), S(x)");
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainDerivationRule, rangeDerivationRule))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
 
             @Test
@@ -446,7 +446,7 @@ class HomomorphismFinderTest {
 
                 HomomorphismFinder homomorphismFinder = new HomomorphismFinder();
                 assertThatThrownBy(() -> homomorphismFinder.findHomomorphism(domainRule, rangeRule))
-                        .isInstanceOf(DerivedLiteralInHomomorphismCheck.class);
+                        .isInstanceOf(DerivedLiteralInHomomorphismCheckException.class);
             }
         }
 

@@ -12,6 +12,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FunctionalDependencyTest {
 
+    @Test
+    void shouldIdentifyAsKeyDependency_whenKeysAndDeterminedCoversWholeArity() {
+        FunctionalDependency dependency = new FunctionalDependency(new MutablePredicate("P", 3), Set.of(0), Set.of(1, 2));
+
+        boolean isKey = dependency.isKeyDependency();
+
+        assertThat(isKey).isTrue();
+    }
+
+    @Test
+    void shouldNotIdentifyAsKeyDependency_whenKeysAndDeterminedDoNotCoverWholeArity() {
+        FunctionalDependency dependency = new FunctionalDependency(new MutablePredicate("P", 4), Set.of(0), Set.of(1, 2));
+
+        boolean isKey = dependency.isKeyDependency();
+
+        assertThat(isKey).isFalse();
+    }
+
     @Nested
     class CreationTests {
         @Test
@@ -38,25 +56,5 @@ class FunctionalDependencyTest {
             assertThatThrownBy(() -> new FunctionalDependency(pred, keyPositions, determinedPositions)).isInstanceOf(IllegalArgumentException.class);
         }
 
-    }
-
-
-
-    @Test
-    void shouldIdentifyAsKeyDependency_whenKeysAndDeterminedCoversWholeArity() {
-        FunctionalDependency dependency = new FunctionalDependency(new MutablePredicate("P", 3), Set.of(0), Set.of(1, 2));
-
-        boolean isKey = dependency.isKeyDependency();
-
-        assertThat(isKey).isTrue();
-    }
-
-    @Test
-    void shouldNotIdentifyAsKeyDependency_whenKeysAndDeterminedDoNotCoverWholeArity() {
-        FunctionalDependency dependency = new FunctionalDependency(new MutablePredicate("P", 4), Set.of(0), Set.of(1, 2));
-
-        boolean isKey = dependency.isKeyDependency();
-
-        assertThat(isKey).isFalse();
     }
 }

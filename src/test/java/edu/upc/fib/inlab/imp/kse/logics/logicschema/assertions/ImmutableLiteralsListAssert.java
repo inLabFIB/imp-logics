@@ -26,17 +26,12 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         super(actual, ImmutableLiteralsListAssert.class);
     }
 
-    public static ImmutableLiteralsListAssert assertThat(ImmutableLiteralsList actual) {
-        return new ImmutableLiteralsListAssert(actual);
-    }
-
-
     /**
-     * Checks whether the actual literals are the same as the expected literals up to renaming variable names
-     * and derived predicate names.
+     * Checks whether the actual literals are the same as the expected literals up to renaming variable names and
+     * derived predicate names.
      * <br>
-     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity
-     * That is, two predicates of different logic schemas can be considered equal
+     * This assert considers two base predicates to be equal iff they have the very same predicate name and arity That
+     * is, two predicates of different logic schemas can be considered equal
      *
      * @param expected not null
      * @return this assert
@@ -47,14 +42,14 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         if (equivalenceResult.isPresent()) {
             Assertions.assertThat(equivalenceResult)
                     .describedAs("Actual literals list: " + actual.toString() + "\n" +
-                            "   is not equivalent to\n" +
-                            "Expected literals list: " + expected.toString() + "\n")
+                                         "   is not equivalent to\n" +
+                                         "Expected literals list: " + expected.toString() + "\n")
                     .contains(true);
         } else {
             Assertions.fail("Current logicEquivalenceAnalyzer: " + logicEquivalenceAnalyzer.getClass().getName() + "\n" +
-                    " could not determine if actual literals list: " + actual.toString() + "\n" +
-                    "   is equivalent to\n" +
-                    "Expected literals list: " + expected.toString() + "\n");
+                                    " could not determine if actual literals list: " + actual.toString() + "\n" +
+                                    "   is equivalent to\n" +
+                                    "Expected literals list: " + expected.toString() + "\n");
         }
         return this;
     }
@@ -76,9 +71,26 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         return this;
     }
 
+    public static ImmutableLiteralsListAssert assertThat(ImmutableLiteralsList actual) {
+        return new ImmutableLiteralsListAssert(actual);
+    }
+
     /**
-     * Checks that the currentLiteral has an original literal which is exactly the same (i.e., same object reference)
-     * as the expectedOriginalLiteral
+     * Checks that the i-th literal has an original literal which is exactly the same (i.e., same object reference) as
+     * the expectedOriginalLiteral
+     *
+     * @param i                       >= 0
+     * @param expectedOriginalLiteral not null
+     * @return this assert
+     */
+    public ImmutableLiteralsListAssert literalComesFrom(int i, Literal expectedOriginalLiteral) {
+        Literal currentLiteral = this.actual.get(i);
+        return this.literalComesFrom(currentLiteral, expectedOriginalLiteral);
+    }
+
+    /**
+     * Checks that the currentLiteral has an original literal which is exactly the same (i.e., same object reference) as
+     * the expectedOriginalLiteral
      *
      * @param currentLiteral          not null
      * @param expectedOriginalLiteral not null
@@ -94,19 +106,6 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
                 .as("Original literal of " + currentLiteral + " is " + actualOriginalLiteral.get() + ", but has not the same reference as " + expectedOriginalLiteral)
                 .containsSame(expectedOriginalLiteral);
         return this;
-    }
-
-    /**
-     * Checks that the i-th literal has an original literal which is exactly the same (i.e., same object reference)
-     * as the expectedOriginalLiteral
-     *
-     * @param i                       >= 0
-     * @param expectedOriginalLiteral not null
-     * @return this assert
-     */
-    public ImmutableLiteralsListAssert literalComesFrom(int i, Literal expectedOriginalLiteral) {
-        Literal currentLiteral = this.actual.get(i);
-        return this.literalComesFrom(currentLiteral, expectedOriginalLiteral);
     }
 
     public ImmutableLiteralsListAssert literalPositionComesFrom(
@@ -178,15 +177,6 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         return this;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public ImmutableLiteralsListAssert hasLiteral(int index, String expectedLiteralString) {
-        Assertions.assertThat(actual)
-                .withFailMessage("Expecting to have some element at index %d", index)
-                .hasSizeGreaterThan(index);
-        LiteralAssert.assertThat(actual.get(index)).correspondsTo(expectedLiteralString);
-        return this;
-    }
-
     @SuppressWarnings({"UnusedReturnValue", "unused"})
     public ImmutableLiteralsListAssert hasLiteral(String expectedLiteralString) {
         assertThat(this.actual).anySatisfy(lit -> LiteralAssert.assertThat(lit).correspondsTo(expectedLiteralString));
@@ -199,11 +189,20 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    public ImmutableLiteralsListAssert hasLiteral(int index, String expectedLiteralString) {
+        Assertions.assertThat(actual)
+                .withFailMessage("Expecting to have some element at index %d", index)
+                .hasSizeGreaterThan(index);
+        LiteralAssert.assertThat(actual.get(index)).correspondsTo(expectedLiteralString);
+        return this;
+    }
+
     /* ISOMORPHIC ASSERTS */
 
     /**
-     * Checks whether the actual literals have an isomorphism to the expected literals without
-     * changing the variable names given by parameter.
+     * Checks whether the actual literals have an isomorphism to the expected literals without changing the variable
+     * names given by parameter.
      * <p>
      * This assert is useful, for instance, to check the correct unfolding of a derived atom. E.g.: suppose an atom
      * "P(a)" with derivation rule "P(x) :- R(x, a)". Its unfolding should bring a result isomorphic to "R(a,a')"
@@ -218,8 +217,8 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expected, varNamesNotToChange);
         Assertions.assertThat(haveIsomorphism)
                 .describedAs("Actual literal list: " + actual + " \n" +
-                        "has no isomorphism with the expected literal list: " + expected +
-                        " without changing the variable names: " + Arrays.toString(varNamesNotToChange)).isTrue();
+                                     "has no isomorphism with the expected literal list: " + expected +
+                                     " without changing the variable names: " + Arrays.toString(varNamesNotToChange)).isTrue();
         return this;
     }
 
@@ -228,7 +227,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expectedLiteralsList);
         Assertions.assertThat(haveIsomorphism)
                 .describedAs("Actual literal list: " + actual + " \n" +
-                        "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
+                                     "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
         return this;
     }
 
@@ -239,7 +238,7 @@ public class ImmutableLiteralsListAssert extends AbstractListAssert<ImmutableLit
         boolean haveIsomorphism = new IsomorphismComparator(isomorphismOptions).areIsomorphic(actual, expectedLiteralsList);
         Assertions.assertThat(haveIsomorphism)
                 .describedAs("Actual literal list: " + actual + " \n" +
-                             "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
+                                     "has no isomorphism with the expected literal list: " + expectedLiteralsList).isTrue();
         return this;
     }
 

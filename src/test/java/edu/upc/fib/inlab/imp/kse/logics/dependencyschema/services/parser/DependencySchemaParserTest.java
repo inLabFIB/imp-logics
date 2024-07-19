@@ -5,7 +5,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.CustomBuiltInPredicateNameChecker;
@@ -26,6 +26,35 @@ import static edu.upc.fib.inlab.imp.kse.logics.dependencyschema.assertions.Depen
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DependencySchemaParserTest {
+
+    @Test
+    void should_containDifferentDependencies_whenParsingSchema() {
+        String schemaString = """
+                q() -> p()
+                r() -> 1=1
+                """;
+
+        DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+        assertThat(dependencySchema)
+                .hasDependencies(2)
+                .dependencies()
+                .anySatisfy(dependency -> {
+                    assertThat(dependency).body()
+                            .hasSize(1)
+                            .hasLiteral(0, "q()");
+                    assertThat(dependency).asTGD()
+                            .headOfSize(1)
+                            .hasAtom(0, "p()");
+                })
+                .anySatisfy(dependency -> {
+                    assertThat(dependency).body()
+                            .hasSize(1)
+                            .hasLiteral(0, "r()");
+                    assertThat(dependency).asEGD()
+                            .hasEquality("1=1");
+                });
+    }
 
     @Nested
     class ParsingWithAlreadyExistingRelationalSchema {
@@ -52,7 +81,7 @@ class DependencySchemaParserTest {
 
             String schemaString2 = "q(x) -> p(x)";
             Assertions.assertThatThrownBy(() -> parser.parse(schemaString2, relationalSchema1))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test
@@ -322,39 +351,17 @@ class DependencySchemaParserTest {
         }
     }
 
-    @Test
-    void should_containDifferentDependencies_whenParsingSchema() {
-        String schemaString = """
-                q() -> p()
-                r() -> 1=1
-                """;
-
-        DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
-
-        assertThat(dependencySchema)
-                .hasDependencies(2)
-                .dependencies()
-                .anySatisfy(dependency -> {
-                    assertThat(dependency).body()
-                            .hasSize(1)
-                            .hasLiteral(0, "q()");
-                    assertThat(dependency).asTGD()
-                            .headOfSize(1)
-                            .hasAtom(0, "p()");
-                })
-                .anySatisfy(dependency -> {
-                    assertThat(dependency).body()
-                            .hasSize(1)
-                            .hasLiteral(0, "r()");
-                    assertThat(dependency).asEGD()
-                            .hasEquality("1=1");
-                });
-    }
-
     //TODO: duplicated code from LogicSchema grammar and parser
 
     @Nested
     class BooleanBuiltInLiteralTest {
+        private static Stream<Arguments> booleanValues() {
+            return Stream.of(
+                    Arguments.of("TRUE", true),
+                    Arguments.of("FALSE", false)
+            );
+        }
+
         @ParameterizedTest
         @MethodSource("booleanValues")
         void should_containBooleanBuiltInLiteral_whenBodyContainsBooleanString(String booleanString, boolean booleanValue) {
@@ -368,13 +375,6 @@ class DependencySchemaParserTest {
             LogicSchemaAssertions.assertThat(logicConstraint)
                     .containsBooleanBuiltInLiteral(booleanValue);
         }
-
-        private static Stream<Arguments> booleanValues() {
-            return Stream.of(
-                    Arguments.of("TRUE", true),
-                    Arguments.of("FALSE", false)
-            );
-        }
     }
 
     @Nested
@@ -385,7 +385,7 @@ class DependencySchemaParserTest {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
+                                                                   new CustomBuiltInPredicateNameChecker(Set.of("myCustomBuiltInPredicate"))
             ).parse(schemaString);
 
             LogicSchemaAssertions.assertThat(logicSchema).containsConstraintID("1");
@@ -400,7 +400,7 @@ class DependencySchemaParserTest {
             String schemaString = "@1 :- myCustomBuiltInPredicate()";
 
             LogicSchema logicSchema = new LogicSchemaWithIDsParser(new AllVariableTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
+                                                                   new CustomBuiltInPredicateNameChecker(Set.of("anotherPredicateName"))
             ).parse(schemaString);
 
             LogicSchemaAssertions.assertThat(logicSchema).containsConstraintID("1");
@@ -460,7 +460,7 @@ class DependencySchemaParserTest {
             String schemaString = "@1 :- P(A)";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
+                                                                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 
@@ -473,7 +473,7 @@ class DependencySchemaParserTest {
             String schemaString = "@1 :- P(" + variableString + ")";
 
             LogicSchema parsedSchema = new LogicSchemaWithIDsParser(new CapitalConstantsTermTypeCriteria(),
-                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
+                                                                    new CustomBuiltInPredicateNameChecker(Set.of())).parse(schemaString);
             LogicConstraint logicConstraint = parsedSchema.getLogicConstraintByID(new ConstraintID("1"));
             OrdinaryLiteral ordinaryLiteral = (OrdinaryLiteral) logicConstraint.getBody().get(0);
 

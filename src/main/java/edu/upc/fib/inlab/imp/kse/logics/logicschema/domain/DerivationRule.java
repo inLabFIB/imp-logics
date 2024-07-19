@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of a logic derivation rule. That is, a NormalClause with head
- * E.g. "P(x) :- R(x, y)"
+ * Implementation of a logic derivation rule. That is, a NormalClause with head E.g. "P(x) :- R(x, y)"
  */
 public class DerivationRule extends NormalClause {
     /**
-     * Invariants:
-     * - head cannot be null
-     * - head's predicate must be a derived predicate
+     * Invariants: - head cannot be null - head's predicate must be a derived predicate
      */
     private final Atom head;
 
@@ -30,22 +27,18 @@ public class DerivationRule extends NormalClause {
         this.head = head;
     }
 
-    public Atom getHead() {
-        return head;
-    }
-
     public ImmutableTermList getHeadTerms() {
         return head.getTerms();
-    }
-
-    public Set<Variable> getUniversalVariables() {
-        return head.getTerms().getUsedVariables();
     }
 
     public Set<Variable> getExistentialVariables() {
         Set<Variable> existentialVariables = new LinkedHashSet<>(getBody().getUsedVariables());
         existentialVariables.removeAll(getUniversalVariables());
         return existentialVariables;
+    }
+
+    public Set<Variable> getUniversalVariables() {
+        return head.getTerms().getUsedVariables();
     }
 
     @Override
@@ -62,6 +55,10 @@ public class DerivationRule extends NormalClause {
         variablesInNegativeLiteralsOrBuiltInLiteralsOrHead.addAll(variablesInHead);
 
         return variablesInPositiveOrdinaryLiterals.containsAll(variablesInNegativeLiteralsOrBuiltInLiteralsOrHead);
+    }
+
+    public Atom getHead() {
+        return head;
     }
 
     @Override

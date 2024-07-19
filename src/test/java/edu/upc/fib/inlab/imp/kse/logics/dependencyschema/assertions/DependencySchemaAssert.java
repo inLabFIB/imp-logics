@@ -8,7 +8,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicConstraint;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExists;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.HomomorphismBasedEquivalenceAnalyzer;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.LogicEquivalenceAnalyzer;
 import org.assertj.core.api.AbstractAssert;
@@ -68,6 +68,99 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         return this;
     }
 
+    /**
+     * Asserts whether the actual logicSchema predicates (base or derived) are equivalent to the expectedSchema. Do note
+     * that this comparison is NOT agnostic with the name of the derived predicates.
+     * <p>
+     * Since this check is not decidable, this method applies a sound (but not complete) strategy. In particular, for
+     * each derivation rule of one schema, it tries to find a homomorphic derivation rule of the other schema, and vice
+     * versa.
+     *
+     * @param expectedSchema not null
+     * @return this assert
+     */
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    public DependencySchemaAssert assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
+        for (Predicate actualPredicate : actual.getAllPredicates()) {
+            try {
+                Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
+                PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
+            } catch (PredicateNotFoundException predicateNotFoundException) {
+                Assertions.fail("Actual predicate " + actualPredicate.getName() + " is not expected");
+            }
+        }
+
+        for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
+            try {
+                actual.getPredicateByName(expectedPredicate.getName());
+            } catch (PredicateNotFoundException predicateNotFoundException) {
+                Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent according to the given strategy.
+     *
+     * @param expectedRule            not null
+     * @param derivedLiteralsStrategy not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public DependencySchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
+        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule, derivedLiteralsStrategy);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering that two
+     * derived ordinary literals are equivalent iff their definition rules are equivalent
+     *
+     * @param expectedRule not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public DependencySchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
+        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering that two
+     * derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent according to
+     * the derivedLiteralStrategy given
+     *
+     * @param expectedPredicate       not null
+     * @param derivedLiteralsStrategy not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public DependencySchemaAssert containsEquivalentPredicate(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
+        PredicateAssert.assertThat(actualPredicate).checkDerivationRulesEquivalenceWithStrategy(expectedPredicate, derivedLiteralsStrategy);
+        return this;
+    }
+
+    /**
+     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering that two
+     * derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent iff their
+     * definition rules are equivalent
+     *
+     * @param expectedPredicate not null
+     * @return this assert
+     */
+    @SuppressWarnings("unused")
+    public DependencySchemaAssert containsEquivalentPredicate(Predicate expectedPredicate) {
+        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
+        PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
+        return this;
+    }
+
     @SuppressWarnings("unused")
     private Optional<Boolean> logicConstraintIsContainedInList(LogicConstraint constraint, Set<LogicConstraint> constraintSet) {
         return logicConstraintIsContainedInList(constraint, constraintSet, analyzer);
@@ -85,98 +178,5 @@ public class DependencySchemaAssert extends AbstractAssert<DependencySchemaAsser
         }
         if (unknownFound) return Optional.empty();
         return Optional.of(false);
-    }
-
-    /**
-     * Asserts whether the actual logicSchema predicates (base or derived) are equivalent to the expectedSchema.
-     * Do note that this comparison is NOT agnostic with the name of the derived predicates.
-     * <p>
-     * Since this check is not decidable, this method applies a sound (but not complete) strategy.
-     * In particular, for each derivation rule of one schema, it tries to find a homomorphic derivation rule of the other
-     * schema, and vice versa.
-     *
-     * @param expectedSchema not null
-     * @return this assert
-     */
-    @SuppressWarnings({"unused", "UnusedReturnValue"})
-    public DependencySchemaAssert assertAllPredicatesAreEquivalent(LogicSchema expectedSchema) {
-        for (Predicate actualPredicate : actual.getAllPredicates()) {
-            try {
-                Predicate expectedPredicate = expectedSchema.getPredicateByName(actualPredicate.getName());
-                PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
-            } catch (PredicateNotExists predicateNotExists) {
-                Assertions.fail("Actual predicate " + actualPredicate.getName() + " is not expected");
-            }
-        }
-
-        for (Predicate expectedPredicate : expectedSchema.getAllPredicates()) {
-            try {
-                actual.getPredicateByName(expectedPredicate.getName());
-            } catch (PredicateNotExists predicateNotExists) {
-                Assertions.fail("Missing expected predicate " + expectedPredicate.getName());
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent according to the given strategy.
-     *
-     * @param expectedRule            not null
-     * @param derivedLiteralsStrategy not null
-     * @return this assert
-     */
-    @SuppressWarnings("unused")
-    public DependencySchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
-        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
-        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule, derivedLiteralsStrategy);
-        return this;
-    }
-
-    /**
-     * Checks whether the actual schema contains a derivation rule equivalent to expectedRule considering
-     * that two derived ordinary literals are equivalent iff their definition rules are equivalent
-     *
-     * @param expectedRule not null
-     * @return this assert
-     */
-    @SuppressWarnings("unused")
-    public DependencySchemaAssert containsEquivalentDerivationRule(DerivationRule expectedRule) {
-        Predicate actualPredicate = actual.getPredicateByName(expectedRule.getHead().getPredicateName());
-        PredicateAssert.assertThat(actualPredicate).containsEquivalentDerivationRule(expectedRule);
-        return this;
-    }
-
-    /**
-     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
-     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
-     * according to the derivedLiteralStrategy given
-     *
-     * @param expectedPredicate       not null
-     * @param derivedLiteralsStrategy not null
-     * @return this assert
-     */
-    @SuppressWarnings("unused")
-    public DependencySchemaAssert containsEquivalentPredicate(Predicate expectedPredicate, LogicSchemaAssert.DerivedLiteralStrategy derivedLiteralsStrategy) {
-        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
-        PredicateAssert.assertThat(actualPredicate).checkDerivationRulesEquivalenceWithStrategy(expectedPredicate, derivedLiteralsStrategy);
-        return this;
-    }
-
-    /**
-     * Checks whether the actual schema contains a predicate equivalent to expectedPredicate considering
-     * that two derived ordinary literals (appearing in the definition rules of the given predicate) are equivalent
-     * iff their definition rules are equivalent
-     *
-     * @param expectedPredicate not null
-     * @return this assert
-     */
-    @SuppressWarnings("unused")
-    public DependencySchemaAssert containsEquivalentPredicate(Predicate expectedPredicate) {
-        Predicate actualPredicate = actual.getPredicateByName(expectedPredicate.getName());
-        PredicateAssert.assertThat(actualPredicate).isLogicallyEquivalentTo(expectedPredicate);
-        return this;
     }
 }

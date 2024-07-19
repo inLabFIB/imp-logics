@@ -13,10 +13,6 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
         super(actual, OrdinaryLiteralAssert.class);
     }
 
-    public static OrdinaryLiteralAssert assertThat(OrdinaryLiteral actual) {
-        return new OrdinaryLiteralAssert(actual);
-    }
-
     @SuppressWarnings("UnusedReturnValue")
     public OrdinaryLiteralAssert correspondsSpec(OrdinaryLiteralSpec spec) {
         Assertions.assertThat(actual.getAtom().getPredicate().getName()).isEqualTo(spec.getPredicateName());
@@ -44,13 +40,30 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public OrdinaryLiteralAssert isPositive(boolean positive) {
-        Assertions.assertThat(actual.isPositive()).isEqualTo(positive);
+    public OrdinaryLiteralAssert hasTerms(ImmutableTermList terms) {
+        ImmutableTermListAssert.assertThat(actual.getTerms())
+                .containsExactlyElementsOf(terms);
         return this;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public OrdinaryLiteralAssert hasPredicateName(String predicateName) {
+        AtomAssert.assertThat(actual.getAtom()).hasPredicateName(predicateName);
+        return this;
+    }
+
+    public static OrdinaryLiteralAssert assertThat(OrdinaryLiteral actual) {
+        return new OrdinaryLiteralAssert(actual);
     }
 
     public OrdinaryLiteralAssert isPositive() {
         return this.isPositive(true);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public OrdinaryLiteralAssert isPositive(boolean positive) {
+        Assertions.assertThat(actual.isPositive()).isEqualTo(positive);
+        return this;
     }
 
     public OrdinaryLiteralAssert isNegated() {
@@ -64,8 +77,8 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
     }
 
     /**
-     * Asserts that the actual atom should have the very same predicate (i.e., same object reference)
-     * as the one given by parameter
+     * Asserts that the actual atom should have the very same predicate (i.e., same object reference) as the one given
+     * by parameter
      *
      * @param predicate not null
      * @return this assert
@@ -73,19 +86,6 @@ public class OrdinaryLiteralAssert extends AbstractAssert<OrdinaryLiteralAssert,
     @SuppressWarnings("UnusedReturnValue")
     public OrdinaryLiteralAssert hasPredicate(Predicate predicate) {
         AtomAssert.assertThat(actual.getAtom()).hasPredicate(predicate);
-        return this;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public OrdinaryLiteralAssert hasPredicateName(String predicateName) {
-        AtomAssert.assertThat(actual.getAtom()).hasPredicateName(predicateName);
-        return this;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public OrdinaryLiteralAssert hasTerms(ImmutableTermList terms) {
-        ImmutableTermListAssert.assertThat(actual.getTerms())
-                .containsExactlyElementsOf(terms);
         return this;
     }
 }

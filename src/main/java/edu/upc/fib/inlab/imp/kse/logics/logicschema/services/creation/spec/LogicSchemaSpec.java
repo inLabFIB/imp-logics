@@ -10,9 +10,8 @@ import java.util.List;
  * logic constraints, and derivation rules. </p>
  *
  * <p> A LogicSchemaSpec can only deal with logic constraints including an id, or logic constraints
- * not including an id, but not both at the same time.
- * Hence, when instantiating a LogicSchemaSpec, we must declare which type
- * of LogicConstraintSpec we are going to use.
+ * not including an id, but not both at the same time. Hence, when instantiating a LogicSchemaSpec, we must declare
+ * which type of LogicConstraintSpec we are going to use.
  * </p>
  *
  * @param <T> kind of LogicConstraintSpec this LogicSchemaSpec will work with

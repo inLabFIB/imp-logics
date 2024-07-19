@@ -18,15 +18,15 @@ public abstract class TermSpec implements LogicElementSpec {
     }
 
     @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TermSpec termSpec)) return false;
 
         return Objects.equals(name, termSpec.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
     }
 }

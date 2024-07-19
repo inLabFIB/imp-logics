@@ -14,15 +14,15 @@ public class EGDSpec extends DependencySpec {
 
     private final BuiltInLiteralSpec head;
 
+    public EGDSpec(List<LiteralSpec> bodyLiterals, BuiltInLiteralSpec head) {
+        this(new BodySpec(bodyLiterals), head);
+    }
+
     public EGDSpec(BodySpec body, BuiltInLiteralSpec head) {
         super(body);
         if (Objects.isNull(head)) throw new IllegalArgumentException("Head cannot be null");
         //TODO: check it is equality
         this.head = head;
-    }
-
-    public EGDSpec(List<LiteralSpec> bodyLiterals, BuiltInLiteralSpec head) {
-        this(new BodySpec(bodyLiterals), head);
     }
 
     public BuiltInLiteralSpec getHead() {

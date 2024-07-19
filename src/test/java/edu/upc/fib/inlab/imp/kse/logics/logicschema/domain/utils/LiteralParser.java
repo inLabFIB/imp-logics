@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.utils;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Literal;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LiteralFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LogicElementSpec;
@@ -34,7 +35,7 @@ public class LiteralParser {
             LiteralFactory literalFactory = new LiteralFactory(Map.of());
             return literalFactory.buildBuiltInLiteral(bls);
         } else {
-            throw new RuntimeException("Unexpected logic element spec type: " + logicSchemaSpec.getClass().getSimpleName());
+            throw new IMPLogicsException("Unexpected logic element spec type: " + logicSchemaSpec.getClass().getSimpleName());
         }
     }
 }

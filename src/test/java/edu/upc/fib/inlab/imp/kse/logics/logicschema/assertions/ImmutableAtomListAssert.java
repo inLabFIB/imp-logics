@@ -13,10 +13,6 @@ public class ImmutableAtomListAssert extends AbstractListAssert<ImmutableAtomLis
         super(atoms, ImmutableAtomListAssert.class);
     }
 
-    public static ImmutableAtomListAssert assertThat(ImmutableAtomList actual) {
-        return new ImmutableAtomListAssert(actual);
-    }
-
     public ImmutableAtomListAssert hasSize(int size) {
         Assertions.assertThat(actual).hasSize(size);
         return this;
@@ -32,8 +28,15 @@ public class ImmutableAtomListAssert extends AbstractListAssert<ImmutableAtomLis
         return assertThat(new ImmutableAtomList(newArrayList(iterable)));
     }
 
-    public ImmutableAtomListAssert containsAtom(int index, Atom atom) {
-        Assertions.assertThat(actual.get(index)).isEqualTo(atom);
+    public static ImmutableAtomListAssert assertThat(ImmutableAtomList actual) {
+        return new ImmutableAtomListAssert(actual);
+    }
+
+    public ImmutableAtomListAssert containsAtomsByPredicateName(ImmutableAtomList expectedAtoms) {
+        Assertions.assertThat(actual).allSatisfy(
+                atom -> assertThat(expectedAtoms)
+                        .containsAtomByPredicateName(atom)
+        );
         return this;
     }
 
@@ -46,11 +49,8 @@ public class ImmutableAtomListAssert extends AbstractListAssert<ImmutableAtomLis
         return this;
     }
 
-    public ImmutableAtomListAssert containsAtomsByPredicateName(ImmutableAtomList expectedAtoms) {
-        Assertions.assertThat(actual).allSatisfy(
-                atom -> assertThat(expectedAtoms)
-                        .containsAtomByPredicateName(atom)
-        );
+    public ImmutableAtomListAssert containsAtom(int index, Atom atom) {
+        Assertions.assertThat(actual.get(index)).isEqualTo(atom);
         return this;
     }
 

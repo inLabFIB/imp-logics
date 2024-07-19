@@ -13,9 +13,9 @@ class DatalogPlusMinusAnalyzerTest {
     @Test
     void should_returnLinearGuardedAndWeaklyGuarde_whenSchemaIsLinear() {
         DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                p(x,y,y) -> q(x)
-                r(x) -> s(x), t(y)
-                """);
+                                                                                                 p(x,y,y) -> q(x)
+                                                                                                 r(x) -> s(x), t(y)
+                                                                                                 """);
 
         Set<DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage> datalogPlusMinusLanguages =
                 new DatalogPlusMinusAnalyzer().getDatalogPlusMinusLanguages(dependencySchema);
@@ -30,11 +30,11 @@ class DatalogPlusMinusAnalyzerTest {
     @Test
     void should_returnSticky_whenSchemaIsSticky() {
         DependencySchema dependencySchema = DependencySchemaMother.buildDependencySchema("""
-                    p(x,y) -> p(y,z)
-                    p(x,y) -> q(x)
-                    q(x), q(y) -> r(x,y)
-                    p(x,y), p(z,x) -> q(x)
-                """);
+                                                                                                     p(x,y) -> p(y,z)
+                                                                                                     p(x,y) -> q(x)
+                                                                                                     q(x), q(y) -> r(x,y)
+                                                                                                     p(x,y), p(z,x) -> q(x)
+                                                                                                 """);
 
         Set<DatalogPlusMinusAnalyzer.DatalogPlusMinusLanguage> datalogPlusMinusLanguages =
                 new DatalogPlusMinusAnalyzer().getDatalogPlusMinusLanguages(dependencySchema);

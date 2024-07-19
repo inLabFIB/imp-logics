@@ -6,8 +6,8 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
 /**
  * A process that, given a logic schema, returns a new logic schema.
  * <p>
- * A LogicProcess does not trace where the resulting LogicSchema comes from. If you are interested in remembering,
- * for instance, which constraintID comes from what constraintID consider using SchemaTransformationProcess.
+ * A LogicProcess does not trace where the resulting LogicSchema comes from. If you are interested in remembering, for
+ * instance, which constraintID comes from what constraintID consider using SchemaTransformationProcess.
  *
  * @see SchemaTransformationProcess
  */

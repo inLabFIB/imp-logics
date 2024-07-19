@@ -26,12 +26,6 @@ public class QueryMother {
         return QueryFactory.createQuery(terms, List.of(new OrdinaryLiteral(new Atom(predicateInBody, terms))));
     }
 
-    public static Query createQuery(List<String> termsString, String queryString) {
-        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString);
-        List<Term> headTerms = TermMother.createTerms(termsString);
-        return QueryFactory.createQuery(headTerms, immutableLiteralsList);
-    }
-
     public static Query createQuery(List<String> termsString, String queryString, String derivationRuleString) {
         ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString, derivationRuleString);
         List<Term> headTerms = TermMother.createTerms(termsString);
@@ -42,14 +36,20 @@ public class QueryMother {
         return createQuery(List.of(), queryString);
     }
 
-    public static ConjunctiveQuery createConjunctiveQuery(List<String> termsString, String queryString) {
+    public static Query createQuery(List<String> termsString, String queryString) {
         ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString);
         List<Term> headTerms = TermMother.createTerms(termsString);
-        return QueryFactory.createConjunctiveQuery(headTerms, immutableLiteralsList);
+        return QueryFactory.createQuery(headTerms, immutableLiteralsList);
     }
 
     public static ConjunctiveQuery createBooleanConjunctiveQuery(String queryString) {
         return createConjunctiveQuery(List.of(), queryString);
+    }
+
+    public static ConjunctiveQuery createConjunctiveQuery(List<String> termsString, String queryString) {
+        ImmutableLiteralsList immutableLiteralsList = ImmutableLiteralsListMother.create(queryString);
+        List<Term> headTerms = TermMother.createTerms(termsString);
+        return QueryFactory.createConjunctiveQuery(headTerms, immutableLiteralsList);
     }
 
     public static ConjunctiveQuery createBooleanConjunctiveQuery(String conjunctiveQueryString, Set<Predicate> predicates) {
@@ -67,6 +67,7 @@ public class QueryMother {
         while (matcher.find()) {
             String predicateName = matcher.group(1);
             List<String> termNames = List.of(matcher.group(2).split(","));
+            termNames = termNames.stream().map(String::trim).toList();
 
             List<Term> constantList = TermMother.createTerms(termNames);
             Predicate predicate = predicates.stream().filter(p -> p.getName().equals(predicateName)).findFirst().get();

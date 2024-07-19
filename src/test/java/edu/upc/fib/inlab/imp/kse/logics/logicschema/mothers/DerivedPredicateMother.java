@@ -6,8 +6,8 @@ import java.util.List;
 
 public class DerivedPredicateMother {
     /**
-     * Create a derived predicate with as many definition rules as predicates given by parameter.
-     * Each definition rule is composed of only one predicate
+     * Create a derived predicate with as many definition rules as predicates given by parameter. Each definition rule
+     * is composed of only one predicate
      *
      * @param derivedPredicateName must be non-null
      * @param arity                must be non-negative

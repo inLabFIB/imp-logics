@@ -1,0 +1,31 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/tasks.xml
+/usage.statistics.xml
+/dictionaries
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Sensitive or high-churn files
+/dataSources/
+/dataSources.local.xml
+/dataSources.ids
+/sqlDataSources.xml
+/dynamic.xml
+/uiDesigner.xml
+/dbnavigator.xml
+
+# SonarLint plugin
+/sonarlint/
+
+# Maven
+/artifacts/
+/compiler.xml
+/jarRepositories.xml
+/modules.xml
+/*.iml
+/modules/
+/sonarlint.xml
+/misc.xml

@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Constant;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Term;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Variable;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.ConstantSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.VariableSpec;
@@ -28,7 +29,7 @@ public class TermAssert extends AbstractAssert<TermAssert, Term> {
         } else if (actual instanceof Constant) {
             Assertions.assertThat(spec).isInstanceOf(ConstantSpec.class);
         } else {
-            throw new RuntimeException("Unrecognized Term class");
+            throw new IMPLogicsException("Unrecognized Term class");
         }
 
         return this;

@@ -11,8 +11,8 @@ import java.util.Set;
 /**
  * Class that partitions a set of equalities.
  * <p>
- * The partition groups all the equality built-in literals that share some term, so that, every term
- * appears in one of such groups, and only in one.
+ * The partition groups all the equality built-in literals that share some term, so that, every term appears in one of
+ * such groups, and only in one.
  */
 class PartitionOfEqualityLiterals {
     private final Set<EqualityLiteralsGroup> equalityLiterals;

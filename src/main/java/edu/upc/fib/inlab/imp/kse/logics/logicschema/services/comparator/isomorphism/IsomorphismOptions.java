@@ -3,8 +3,8 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.comparator.isomorp
 public record IsomorphismOptions(boolean changeVariableNamesAllowed, boolean changeLiteralOrderAllowed,
                                  boolean changingDerivedPredicateNameAllowed) {
     /**
-     * Default options os Isomorphism.
-     * It permits changing the variableNames, the order of the literals, and the name of the predicate names.
+     * Default options os Isomorphism. It permits changing the variableNames, the order of the literals, and the name of
+     * the predicate names.
      */
     public IsomorphismOptions() {
         this(true, true, true);

@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LogicSchemaBuilder;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.DerivationRuleSpecBuilder;
@@ -18,30 +19,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * predicate is defined, only, through one derivation rule. </p>
  *
  * <p>To achieve so, this class replaces the derivation rule's head to avoid repeated predicates. E.g.: </p>
- * P :- A, B <br>
- * P :- C, D <br>
+ * P :- A, B <br> P :- C, D <br>
  * <p>
- * is replaced by: <br>
- * P_1 :- A, B <br>
- * P_2 :- C, D <br>
+ * is replaced by: <br> P_1 :- A, B <br> P_2 :- C, D <br>
  *
  * <p> Consequently, any apparition of predicates which have been transformed (such as the predicate P in the previous
- * example), is replaced by its new transformed predicates. E.g.:</p>
- * :- P, R <br>
- * :- S, not(P) <br>
+ * example), is replaced by its new transformed predicates. E.g.:</p> :- P, R <br> :- S, not(P) <br>
  * <p>
- * is transformed to: <br>
- * :- P_1, R <br>
- * :- P_2, R <br>
- * :- S, not(P_1), not(P_2) <br>
+ * is transformed to: <br> :- P_1, R <br> :- P_2, R <br> :- S, not(P_1), not(P_2) <br>
  */
 public class SingleDerivationRuleTransformer extends LogicSchemaTransformationProcess {
 
     private final MultipleConstraintIDGenerator generatorId;
-
-    private static final class PredicateNameToNewPredicateNamesMap extends HashMap<String, List<String>> {
-
-    }
 
     /**
      * Creates an SingleDerivationRuleTransformer that will use the SuffixMultipleConstraintIDGenerator as a strategy
@@ -52,8 +41,8 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
     }
 
     /**
-     * Creates an SingleDerivationRuleTransformer that will use the given generatorId strategy
-     * for creating new constraintIDs, if necessary.
+     * Creates an SingleDerivationRuleTransformer that will use the given generatorId strategy for creating new
+     * constraintIDs, if necessary.
      *
      * @param generatorId not null
      */
@@ -64,7 +53,8 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
 
     /**
      * @param logicSchema not-null
-     * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived predicate is defined through only one derivation rule
+     * @return a transformation where the final logicSchema is a new equivalent logic schema where every derived
+     * predicate is defined through only one derivation rule
      */
     @Override
     public SchemaTransformation executeTransformation(LogicSchema logicSchema) {
@@ -79,6 +69,17 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         return transformTransformation(logicSchema).transformed();
     }
 
+    private static boolean predicateGeneratesSingleRule(Predicate predicate, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
+        boolean isSimple = false;
+        if (predicate.getDerivationRules().size() == 1) {
+            DerivationRule dr = predicate.getFirstDerivationRule();
+            isSimple = dr.getBody().stream()
+                    .filter(OrdinaryLiteral.class::isInstance)
+                    .map(OrdinaryLiteral.class::cast)
+                    .noneMatch(ol -> ol.isPositive() && predicateTransformMap.get(ol.getAtom().getPredicateName()).size() > 1);
+        }
+        return isSimple;
+    }
 
     private SchemaTransformation transformTransformation(LogicSchema logicSchema) {
         checkLogicSchema(logicSchema);
@@ -186,18 +187,6 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         return result;
     }
 
-    private static boolean predicateGeneratesSingleRule(Predicate predicate, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
-        boolean isSimple = false;
-        if (predicate.getDerivationRules().size() == 1) {
-            DerivationRule dr = predicate.getFirstDerivationRule();
-            isSimple = dr.getBody().stream()
-                    .filter(OrdinaryLiteral.class::isInstance)
-                    .map(OrdinaryLiteral.class::cast)
-                    .noneMatch(ol -> ol.isPositive() && predicateTransformMap.get(ol.getAtom().getPredicateName()).size() > 1);
-        }
-        return isSimple;
-    }
-
     private List<DerivationRuleSpec> buildDerivationRuleSpecsByRule(DerivationRule rule, int numberOfGeneratedRules, PredicateNameToNewPredicateNamesMap predicateTransformMap) {
         ImmutableLiteralsList literalsList = rule.getBody();
 
@@ -217,7 +206,6 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
                             .build();
                 }).toList();
     }
-
 
     private List<BodySpecFragment> buildBodySpecFragmentsByLiteralsList(ImmutableLiteralsList literalsList,
                                                                         PredicateNameToNewPredicateNamesMap predicateTransformMap) {
@@ -265,7 +253,7 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
                 return List.of(bodyFragment);
             }
         } else {
-            throw new RuntimeException("Literal type not supported");
+            throw new IMPLogicsException("Literal type not supported");
         }
     }
 
@@ -280,15 +268,19 @@ public class SingleDerivationRuleTransformer extends LogicSchemaTransformationPr
         AtomicInteger index = new AtomicInteger(0);
         return listOfBodyFragments.stream()
                 .map(bodyFragment -> {
-                            ConstraintID newConstraintId = newConstraintIDS.get(index.getAndIncrement());
-                            constraintTransformMap.addConstraintIDOrigin(newConstraintId, logicConstraint.getID());
-                            return new LogicConstraintWithIDSpecBuilder()
-                                    .addConstraintId(newConstraintId.id())
-                                    .addAllLiteralSpecs(bodyFragment)
-                                    .build();
-                        }
+                         ConstraintID newConstraintId = newConstraintIDS.get(index.getAndIncrement());
+                         constraintTransformMap.addConstraintIDOrigin(newConstraintId, logicConstraint.getID());
+                         return new LogicConstraintWithIDSpecBuilder()
+                                 .addConstraintId(newConstraintId.id())
+                                 .addAllLiteralSpecs(bodyFragment)
+                                 .build();
+                     }
                 )
                 .toList();
+    }
+
+    private static final class PredicateNameToNewPredicateNamesMap extends HashMap<String, List<String>> {
+
     }
 
 }

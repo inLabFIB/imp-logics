@@ -19,6 +19,57 @@ import static org.mockito.Mockito.*;
 
 class LogicProcessPipelineTest {
 
+    @Test
+    void should_returnInputLogicSchema_when_processPipelineIsEmpty() {
+        List<LogicProcess> logicProcesses = List.of();
+
+        LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
+
+        LogicProcessPipeline pipeline = new LogicProcessPipeline(logicProcesses);
+        LogicSchema logicSchemaOutput = pipeline.execute(inputSchema);
+
+        assertThat(logicSchemaOutput).isEqualTo(inputSchema);
+    }
+
+    @Test
+    void should_returnLogicSchemaExpected_when_processPipelineContainsOneProcess() {
+        List<LogicProcess> logicProcesses = new LinkedList<>();
+
+        LogicSchema schema = LogicSchemaMother.createEmptySchema();
+        LogicSchema expectedOutputSchema = LogicSchemaMother.createEmptySchema();
+
+        LogicProcess mock = mockLogicProcess(schema, expectedOutputSchema);
+        logicProcesses.add(mock);
+
+        LogicProcessPipeline pipeline = new LogicProcessPipeline(logicProcesses);
+        LogicSchema logicSchemaOutput = pipeline.execute(schema);
+
+        assertThat(logicSchemaOutput).isEqualTo(expectedOutputSchema);
+    }
+
+    private static LogicProcess mockLogicProcess(LogicSchema inputSchema, LogicSchema outputSchema) {
+        LogicProcess mock = mock(LogicProcess.class);
+        when(mock.execute(inputSchema)).thenReturn(outputSchema);
+        return mock;
+    }
+
+    @ParameterizedTest(name = "should execute {0} transformation process")
+    @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+    void should_executeNTransformation_processPipelineContainsNProcess(int numberOfProcesses) {
+
+        LogicSchema schema = LogicSchemaMother.createEmptySchema();
+
+        List<LogicProcess> mocks = IntStream.range(0, numberOfProcesses)
+                .mapToObj(i -> mockLogicProcess(schema, schema))
+                .toList();
+
+        LogicProcessPipeline pipeline = new LogicProcessPipeline(mocks);
+        pipeline.execute(schema);
+
+        assertThat(mocks).hasSize(numberOfProcesses);
+        mocks.forEach(mock -> verify(mock, times(1)).execute(any(LogicSchema.class)));
+    }
+
     @Nested
     class InputValidationTests {
 
@@ -42,58 +93,6 @@ class LogicProcessPipelineTest {
             assertThatThrownBy(() -> pipeline.execute(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
-    }
-
-    @Test
-    void should_returnInputLogicSchema_when_processPipelineIsEmpty() {
-        List<LogicProcess> logicProcesses = List.of();
-
-        LogicSchema inputSchema = LogicSchemaMother.createEmptySchema();
-
-        LogicProcessPipeline pipeline = new LogicProcessPipeline(logicProcesses);
-        LogicSchema logicSchemaOutput = pipeline.execute(inputSchema);
-
-        assertThat(logicSchemaOutput).isEqualTo(inputSchema);
-    }
-
-
-    @Test
-    void should_returnLogicSchemaExpected_when_processPipelineContainsOneProcess() {
-        List<LogicProcess> logicProcesses = new LinkedList<>();
-
-        LogicSchema schema = LogicSchemaMother.createEmptySchema();
-        LogicSchema expectedOutputSchema = LogicSchemaMother.createEmptySchema();
-
-        LogicProcess mock = mockLogicProcess(schema, expectedOutputSchema);
-        logicProcesses.add(mock);
-
-        LogicProcessPipeline pipeline = new LogicProcessPipeline(logicProcesses);
-        LogicSchema logicSchemaOutput = pipeline.execute(schema);
-
-        assertThat(logicSchemaOutput).isEqualTo(expectedOutputSchema);
-    }
-
-    @ParameterizedTest(name = "should execute {0} transformation process")
-    @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
-    void should_executeNTransformation_processPipelineContainsNProcess(int numberOfProcesses) {
-
-        LogicSchema schema = LogicSchemaMother.createEmptySchema();
-
-        List<LogicProcess> mocks = IntStream.range(0, numberOfProcesses)
-                .mapToObj(i -> mockLogicProcess(schema, schema))
-                .toList();
-
-        LogicProcessPipeline pipeline = new LogicProcessPipeline(mocks);
-        pipeline.execute(schema);
-
-        assertThat(mocks).hasSize(numberOfProcesses);
-        mocks.forEach(mock -> verify(mock, times(1)).execute(any(LogicSchema.class)));
-    }
-
-    private static LogicProcess mockLogicProcess(LogicSchema inputSchema, LogicSchema outputSchema) {
-        LogicProcess mock = mock(LogicProcess.class);
-        when(mock.execute(inputSchema)).thenReturn(outputSchema);
-        return mock;
     }
 
 }

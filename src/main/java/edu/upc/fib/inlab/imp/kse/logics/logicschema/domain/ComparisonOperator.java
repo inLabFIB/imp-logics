@@ -51,24 +51,24 @@ public enum ComparisonOperator {
         this.symbol = symbol;
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
     public static Optional<ComparisonOperator> fromSymbol(String symbol) {
         return Optional.ofNullable(LOOKUP.get(symbol));
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     public boolean isSymmetric(ComparisonOperator rangeOperator) {
         return this.equals(rangeOperator.getSymmetric());
     }
 
-    public ComparisonOperator getNegatedOperator() {
-        return NEGATED.get(this);
-    }
-
     public ComparisonOperator getSymmetric() {
         return SYMMETRIC.get(this);
+    }
+
+    public ComparisonOperator getNegatedOperator() {
+        return NEGATED.get(this);
     }
 
     public <T> T accept(LogicSchemaVisitor<T> visitor) {

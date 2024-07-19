@@ -46,9 +46,9 @@ class TrivialLiteralCleanerTest {
         @Test
         void should_maintainTraceabilityMap_when_transformLogicSchemaCreatesSeveralConstraints() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                         @1 :- P(X), TRUE()
-                         P(x) :- Q(x), TRUE()
-                    """);
+                                                                                                @1 :- P(X), TRUE()
+                                                                                                P(x) :- Q(x), TRUE()
+                                                                                           """);
 
             TrivialLiteralCleaner builtInLiteralCleaner = new TrivialLiteralCleaner();
             SchemaTransformation schemaTransformation = builtInLiteralCleaner.executeTransformation(originalSchema);
@@ -64,17 +64,17 @@ class TrivialLiteralCleanerTest {
         @Test
         void should_canExecuteProcess() {
             LogicSchema originalSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                         @1 :- P(X), TRUE()
-                         P(x) :- Q(x), TRUE()
-                    """);
+                                                                                                @1 :- P(X), TRUE()
+                                                                                                P(x) :- Q(x), TRUE()
+                                                                                           """);
 
             TrivialLiteralCleaner builtInLiteralCleaner = new TrivialLiteralCleaner();
             LogicSchema actualLogicSchema = builtInLiteralCleaner.execute(originalSchema);
 
             LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDs("""
-                         @1 :- P(X)
-                         P(x) :- Q(x)
-                    """);
+                                                                                                     @1 :- P(X)
+                                                                                                     P(x) :- Q(x)
+                                                                                                """);
             assertThat(actualLogicSchema)
                     .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
                     .isIsomorphicTo(expectedLogicSchema);
@@ -111,25 +111,6 @@ class TrivialLiteralCleanerTest {
             );
         }
 
-
-        @ParameterizedTest(name = "{0} -> {1}")
-        @MethodSource("provideLogicConstraintsAndBooleanBuiltinLiterals")
-        void should_clean_when_schemaContainsLogicConstraintsAndBooleanBuiltinLiterals(
-                String schemaString,
-                String expectedSchemaString,
-                List<PredicateSpec> expectedPredicateSpecs
-        ) {
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
-
-            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
-            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
-
-            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema)
-                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                    .isIsomorphicTo(expectedLogicSchema);
-        }
-
         static Stream<Arguments> provideDerivationRulesAndBooleanBuiltinLiterals() {
 
             return Stream.of(
@@ -156,25 +137,6 @@ class TrivialLiteralCleanerTest {
             );
         }
 
-        @ParameterizedTest(name = "{0} -> {1}")
-        @MethodSource("provideDerivationRulesAndBooleanBuiltinLiterals")
-        void should_clean_when_schemaContainsDerivationRulesAndBooleanBuiltinLiterals(
-                String schemaString,
-                String expectedSchemaString,
-                List<PredicateSpec> expectedPredicateSpecs
-        ) {
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(schemaString);
-
-            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
-            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
-
-            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema)
-                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                    .isIsomorphicTo(expectedLogicSchema);
-        }
-
-
         static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals() {
             return Stream.of(
                     Arguments.of(
@@ -199,24 +161,6 @@ class TrivialLiteralCleanerTest {
                     )
 
             );
-        }
-
-        @ParameterizedTest(name = "{0} -> {1}")
-        @MethodSource("provideDerivationRulesWithBuiltinLiterals")
-        void should_clean_when_schemaContainsSeveralDerivationRulesWithBuiltinLiterals(
-                String schemaString,
-                String expectedSchemaString,
-                List<PredicateSpec> expectedPredicateSpecs
-        ) {
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
-
-            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
-            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
-
-            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema)
-                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         static Stream<Arguments> provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads() {
@@ -307,24 +251,6 @@ class TrivialLiteralCleanerTest {
             );
         }
 
-        @ParameterizedTest(name = "{0} -> {1}")
-        @MethodSource("provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads")
-        void should_clean_when_schemaContainsDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads(
-                String schemaString,
-                String expectedSchemaString,
-                List<PredicateSpec> expectedPredicateSpecs
-        ) {
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
-
-            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
-            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
-
-            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema)
-                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                    .isIsomorphicTo(expectedLogicSchema);
-        }
-
         static Stream<Arguments> provideLogicSchemas() {
             return Stream.of(
                     Arguments.of(
@@ -350,24 +276,6 @@ class TrivialLiteralCleanerTest {
                             List.of()
                     )
             );
-        }
-
-        @ParameterizedTest(name = "{0} -> {1}")
-        @MethodSource("provideLogicSchemas")
-        void integrationTests(
-                String schemaString,
-                String expectedSchemaString,
-                List<PredicateSpec> expectedPredicateSpecs
-        ) {
-            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
-
-            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
-            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
-
-            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
-            assertThat(actualLogicSchema)
-                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                    .isIsomorphicTo(expectedLogicSchema);
         }
 
         static Stream<Arguments> provideLogicSchemasWithNegation() {
@@ -424,10 +332,100 @@ class TrivialLiteralCleanerTest {
         }
 
         @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicConstraintsAndBooleanBuiltinLiterals")
+        void should_clean_when_schemaContainsLogicConstraintsAndBooleanBuiltinLiterals(
+                String schemaString,
+                String expectedSchemaString,
+                List<PredicateSpec> expectedPredicateSpecs
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideDerivationRulesAndBooleanBuiltinLiterals")
+        void should_clean_when_schemaContainsDerivationRulesAndBooleanBuiltinLiterals(
+                String schemaString,
+                String expectedSchemaString,
+                List<PredicateSpec> expectedPredicateSpecs
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(schemaString);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideDerivationRulesWithBuiltinLiterals")
+        void should_clean_when_schemaContainsSeveralDerivationRulesWithBuiltinLiterals(
+                String schemaString,
+                String expectedSchemaString,
+                List<PredicateSpec> expectedPredicateSpecs
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads")
+        void should_clean_when_schemaContainsDerivationRulesWithBuiltinLiterals_WithRepeatedVariablesAndConstantsInHeads(
+                String schemaString,
+                String expectedSchemaString,
+                List<PredicateSpec> expectedPredicateSpecs
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
+        @MethodSource("provideLogicSchemas")
+        void integrationTests(
+                String schemaString,
+                String expectedSchemaString,
+                List<PredicateSpec> expectedPredicateSpecs
+        ) {
+            LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(schemaString);
+
+            TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();
+            LogicSchema actualLogicSchema = cleaner.clean(logicSchema);
+
+            LogicSchema expectedLogicSchema = LogicSchemaMother.buildLogicSchemaWithIDsAndPredicates(expectedSchemaString, expectedPredicateSpecs);
+            assertThat(actualLogicSchema)
+                    .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                    .isIsomorphicTo(expectedLogicSchema);
+        }
+
+        @ParameterizedTest(name = "{0} -> {1}")
         @MethodSource("provideLogicSchemasWithNegation")
         void should_clean_when_schemaIncludesNegatedDerivedLiterals(String inputSchema,
-                                                                           String expectedSchema,
-                                                                           List<PredicateSpec> additionalExpectedPredicates) {
+                                                                    String expectedSchema,
+                                                                    List<PredicateSpec> additionalExpectedPredicates) {
             LogicSchema logicSchema = LogicSchemaMother.buildLogicSchemaWithIDs(inputSchema);
 
             TrivialLiteralCleaner cleaner = new TrivialLiteralCleaner();

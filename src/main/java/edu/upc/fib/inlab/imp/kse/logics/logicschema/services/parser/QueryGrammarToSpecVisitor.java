@@ -3,7 +3,10 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.StringToTermSpecFactory;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElementSpec> {
 
@@ -29,14 +32,6 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
         QuerySpec parsedQuerySpec = new QuerySpec(headTerms, body);
         queries.add(parsedQuerySpec);
         return parsedQuerySpec;
-    }
-
-    protected BodySpec createBody(QueryGrammarParser.BodyContext ctx) {
-        List<LiteralSpec> literals = new LinkedList<>();
-        for (QueryGrammarParser.LiteralContext litContext : ctx.literal()) {
-            literals.add((LiteralSpec) this.visitLiteral(litContext));
-        }
-        return new BodySpec(literals);
     }
 
     @Override
@@ -73,6 +68,11 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
         return new OrdinaryLiteralSpec(predicateName, termSpecList, false);
     }
 
+    @Override
+    public TermSpec visitTerm(QueryGrammarParser.TermContext ctx) {
+        return stringToTermSpecFactory.createTermSpec(ctx.getText());
+    }
+
     private List<TermSpec> createTermsList(QueryGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
         for (QueryGrammarParser.TermContext termContext : ctx.term()) {
@@ -81,9 +81,12 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
         return termSpecList;
     }
 
-    @Override
-    public TermSpec visitTerm(QueryGrammarParser.TermContext ctx) {
-        return stringToTermSpecFactory.createTermSpec(ctx.getText());
+    protected BodySpec createBody(QueryGrammarParser.BodyContext ctx) {
+        List<LiteralSpec> literals = new LinkedList<>();
+        for (QueryGrammarParser.LiteralContext litContext : ctx.literal()) {
+            literals.add((LiteralSpec) this.visitLiteral(litContext));
+        }
+        return new BodySpec(literals);
     }
 
 }

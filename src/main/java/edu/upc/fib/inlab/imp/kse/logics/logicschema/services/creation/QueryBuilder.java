@@ -1,7 +1,8 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
 import java.util.HashMap;
@@ -23,15 +24,11 @@ public class QueryBuilder {
 
     public QueryBuilder(Set<Predicate> relationalSchema) {
         this.predicatesByName = new HashMap<>();
-        for(Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
+        for (Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, BodySpec bodySpec) {
         return buildQuery(termSpecList, bodySpec.literals());
-    }
-
-    public Query buildQuery(QuerySpec queriesSpec) {
-        return buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
@@ -51,7 +48,7 @@ public class QueryBuilder {
                 int numberOfTerms = olSpec.getTermSpecList().size();
                 addPredicateIfAbsent(olSpec.getPredicateName(), numberOfTerms);
             } else if (!(literalSpec instanceof BuiltInLiteralSpec)) {
-                throw new RuntimeException("Unrecognized literalSpec " + literalSpec.getClass().getName());
+                throw new IMPLogicsException("Unrecognized literalSpec " + literalSpec.getClass().getName());
             }
         }
     }
@@ -64,7 +61,11 @@ public class QueryBuilder {
     private void checkRepeatedNameWithDifferentArity(String predicateName, int arity) {
         if (predicatesByName.containsKey(predicateName)
                 && predicatesByName.get(predicateName).getArity() != arity) {
-            throw new RepeatedPredicateName(predicateName);
+            throw new RepeatedPredicateNameException(predicateName);
         }
+    }
+
+    public Query buildQuery(QuerySpec queriesSpec) {
+        return buildQuery(queriesSpec.getTermSpecList(), queriesSpec.getBodySpec());
     }
 }

@@ -71,14 +71,6 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
         return new BodySpec(literals);
     }
 
-    private List<TermSpec> createTermsList(DependencySchemaGrammarParser.TermsListContext ctx) {
-        List<TermSpec> termSpecList = new LinkedList<>();
-        for (DependencySchemaGrammarParser.TermContext termContext : ctx.term()) {
-            termSpecList.add(this.visitTerm(termContext));
-        }
-        return termSpecList;
-    }
-
     @Override
     public BuiltInLiteralSpec visitComparisonBuiltInLiteral(DependencySchemaGrammarParser.ComparisonBuiltInLiteralContext ctx) {
         TermSpec leftTermSpec = visitTerm(ctx.term(0));
@@ -116,5 +108,13 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
     @Override
     public TermSpec visitTerm(DependencySchemaGrammarParser.TermContext ctx) {
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
+    }
+
+    private List<TermSpec> createTermsList(DependencySchemaGrammarParser.TermsListContext ctx) {
+        List<TermSpec> termSpecList = new LinkedList<>();
+        for (DependencySchemaGrammarParser.TermContext termContext : ctx.term()) {
+            termSpecList.add(this.visitTerm(termContext));
+        }
+        return termSpecList;
     }
 }

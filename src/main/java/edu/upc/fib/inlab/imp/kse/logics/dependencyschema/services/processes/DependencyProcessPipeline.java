@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A pipeline of DependencyProcesses. This class is useful for chaining several transformations over a dependency schema.
+ * A pipeline of DependencyProcesses. This class is useful for chaining several transformations over a dependency
+ * schema.
  */
 public class DependencyProcessPipeline implements DependencyProcess {
 

@@ -34,43 +34,28 @@ class SingleHeadTGDTransformerTest {
                 Arguments.of(
                         "P(x) -> A1(x), A2(x)",
                         Set.of(
-                                "P(x) -> AUX1(x)",
-                                "AUX1(x) -> A1(x)",
-                                "AUX1(x) -> A2(x)"
+                                "P(x) -> A1_A2_SingleHead(x)",
+                                "A1_A2_SingleHead(x) -> A1(x)",
+                                "A1_A2_SingleHead(x) -> A2(x)"
                         )
                 ),
                 Arguments.of(
                         "P(x), Q(x) -> A1(x), A2(y)",
                         Set.of(
-                                "P(x), Q(x) -> AUX1(x, y)",
-                                "AUX1(x, y) -> A1(x)",
-                                "AUX1(x, y) -> A2(y)"
+                                "P(x), Q(x) -> A1_A2_SingleHead(x, y)",
+                                "A1_A2_SingleHead(x, y) -> A1(x)",
+                                "A1_A2_SingleHead(x, y) -> A2(y)"
                         )
                 ),
                 Arguments.of(
-                        "P(x), AUX1(x) -> A1(x), A2(y)",
+                        "P(x), A1_A2_SingleHead(x) -> A1(x), A2(y)",
                         Set.of(
-                                "P(x), AUX1(x) -> AUX2(x, y)",
-                                "AUX2(x, y) -> A1(x)",
-                                "AUX2(x, y) -> A2(y)"
+                                "P(x), A1_A2_SingleHead(x) -> A1_A2_SingleHead2(x, y)",
+                                "A1_A2_SingleHead2(x, y) -> A1(x)",
+                                "A1_A2_SingleHead2(x, y) -> A2(y)"
                         )
                 )
         );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideTGDsToNormalizeToOneHeadAtom")
-    void should_return_SingleHeadedTGD_whenSchemaHasOneTGD(String tgdString, Set<String> expectedTGDsString) {
-        DependencySchema tgd = DependencySchemaMother.buildDependencySchema(tgdString);
-        SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
-
-        DependencySchema normalizedTGD = tgdNormalizer.execute(tgd);
-
-        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
-
-        Assertions.assertThat(normalizedTGD.getAllTGDs())
-                .usingElementComparator(tgdComparator())
-                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
     }
 
     static Stream<Arguments> provideSchemasToNormalizeToOneHeadAtom() {
@@ -92,12 +77,12 @@ class SingleHeadTGDTransformerTest {
                                 T(x,y) -> x=y
                                 """,
                         Set.of(
-                                "P(x) -> AUX1(x)",
-                                "AUX1(x) -> A1(x)",
-                                "AUX1(x) -> A2(x)",
-                                "P(x), Q(x) -> AUX2(x, y)",
-                                "AUX2(x, y) -> A1(x)",
-                                "AUX2(x, y) -> A2(y)",
+                                "P(x) -> A1_A2_SingleHead(x)",
+                                "A1_A2_SingleHead(x) -> A1(x)",
+                                "A1_A2_SingleHead(x) -> A2(x)",
+                                "P(x), Q(x) -> A1_A2_SingleHead2(x, y)",
+                                "A1_A2_SingleHead2(x, y) -> A1(x)",
+                                "A1_A2_SingleHead2(x, y) -> A2(y)",
                                 "T(x,y) -> x=y"
                         )
                 )
@@ -105,18 +90,18 @@ class SingleHeadTGDTransformerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideSchemasToNormalizeToOneHeadAtom")
-    void should_return_SingleHeadedTGD_whenSchemaHasSeveralDependencies(String dependencyString, Set<String> expectedTGDsString) {
-        DependencySchema schema = DependencySchemaMother.buildDependencySchema(dependencyString);
+    @MethodSource("provideTGDsToNormalizeToOneHeadAtom")
+    void should_return_SingleHeadedTGD_whenSchemaHasOneTGD(String tgdString, Set<String> expectedTGDsString) {
+        DependencySchema tgd = DependencySchemaMother.buildDependencySchema(tgdString);
         SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
 
-        DependencySchema normalizedTGD = tgdNormalizer.execute(schema);
+        DependencySchema normalizedTGD = tgdNormalizer.execute(tgd);
 
-        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
 
-        Assertions.assertThat(normalizedTGD.getAllDependencies())
-                .usingElementComparator(dependenciesComparator())
-                .containsExactlyInAnyOrderElementsOf(expectedDependencies);
+        Assertions.assertThat(normalizedTGD.getAllTGDs())
+                .usingElementComparator(tgdComparator())
+                .containsExactlyInAnyOrderElementsOf(expectedTGDs);
     }
 
     static Comparator<TGD> tgdComparator() {
@@ -139,6 +124,21 @@ class SingleHeadTGDTransformerTest {
             }
             return 0;
         };
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSchemasToNormalizeToOneHeadAtom")
+    void should_return_SingleHeadedTGD_whenSchemaHasSeveralDependencies(String dependencyString, Set<String> expectedTGDsString) {
+        DependencySchema schema = DependencySchemaMother.buildDependencySchema(dependencyString);
+        SingleHeadTGDTransformer tgdNormalizer = new SingleHeadTGDTransformer();
+
+        DependencySchema normalizedTGD = tgdNormalizer.execute(schema);
+
+        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+
+        Assertions.assertThat(normalizedTGD.getAllDependencies())
+                .usingElementComparator(dependenciesComparator())
+                .containsExactlyInAnyOrderElementsOf(expectedDependencies);
     }
 
     static Comparator<Dependency> dependenciesComparator() {

@@ -62,6 +62,11 @@ public final class FunctionalDependency {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(predicate, keyPositions, determinedPositions);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
@@ -69,11 +74,6 @@ public final class FunctionalDependency {
         return Objects.equals(this.predicate, that.predicate) &&
                 Objects.equals(this.keyPositions, that.keyPositions) &&
                 Objects.equals(this.determinedPositions, that.determinedPositions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(predicate, keyPositions, determinedPositions);
     }
 
     @Override

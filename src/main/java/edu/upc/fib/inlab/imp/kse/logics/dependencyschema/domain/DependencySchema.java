@@ -2,13 +2,12 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerived;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExists;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateOutsideSchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerivedException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateOutsideSchemaException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A dependency schema bounds several predicates and dependencies together guaranteeing their consistency.
@@ -28,7 +27,8 @@ public class DependencySchema {
 
     public DependencySchema(Set<Predicate> predicates, Set<Dependency> dependencies) {
         predicates.forEach(predicate -> {
-            if (predicatesByName.containsKey(predicate.getName())) throw new RepeatedPredicateName(predicate.getName());
+            if (predicatesByName.containsKey(predicate.getName()))
+                throw new RepeatedPredicateNameException(predicate.getName());
             this.predicatesByName.put(predicate.getName(), predicate);
         });
 
@@ -38,6 +38,25 @@ public class DependencySchema {
         });
 
         checkDerivedPredicatesUsesPredicatesFromSchema();
+    }
+
+    private void checkPredicatesBelongsToSchema(Dependency d) {
+        for (Literal l : d.getBody()) {
+            if (l instanceof OrdinaryLiteral ol) {
+                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
+                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
+                if (predicateFromConstraint != predicateFromSchemaWithSameName)
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
+            }
+        }
+        if (d instanceof TGD tgd) {
+            for (Atom atom : tgd.getHead()) {
+                Predicate predicateFromConstraint = atom.getPredicate();
+                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
+                if (predicateFromConstraint != predicateFromSchemaWithSameName)
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
+            }
+        }
     }
 
     private void checkDerivedPredicatesUsesPredicatesFromSchema() {
@@ -54,26 +73,7 @@ public class DependencySchema {
                 Predicate predicateFromConstraint = ol.getAtom().getPredicate();
                 Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
                 if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchema(predicateFromConstraint.getName());
-            }
-        }
-    }
-
-    private void checkPredicatesBelongsToSchema(Dependency d) {
-        for (Literal l : d.getBody()) {
-            if (l instanceof OrdinaryLiteral ol) {
-                Predicate predicateFromConstraint = ol.getAtom().getPredicate();
-                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
-                if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchema(predicateFromConstraint.getName());
-            }
-        }
-        if (d instanceof TGD tgd) {
-            for (Atom atom : tgd.getHead()) {
-                Predicate predicateFromConstraint = atom.getPredicate();
-                Predicate predicateFromSchemaWithSameName = predicatesByName.get(predicateFromConstraint.getName());
-                if (predicateFromConstraint != predicateFromSchemaWithSameName)
-                    throw new PredicateOutsideSchema(predicateFromConstraint.getName());
+                    throw new PredicateOutsideSchemaException(predicateFromConstraint);
             }
         }
     }
@@ -84,18 +84,19 @@ public class DependencySchema {
 
     public Predicate getPredicateByName(String predicateName) {
         if (!predicatesByName.containsKey(predicateName)) {
-            throw new PredicateNotExists(predicateName);
+            throw new PredicateNotFoundException(predicateName);
         }
         return predicatesByName.get(predicateName);
     }
 
     public List<DerivationRule> getDerivationRulesByPredicateName(String derivedPredicateName) {
-        if (!predicatesByName.containsKey(derivedPredicateName)) throw new PredicateNotExists(derivedPredicateName);
+        if (!predicatesByName.containsKey(derivedPredicateName))
+            throw new PredicateNotFoundException(derivedPredicateName);
 
         Predicate predicate = predicatesByName.get(derivedPredicateName);
         if (predicate.isDerived()) {
             return predicate.getDerivationRules();
-        } else throw new PredicateIsNotDerived(derivedPredicateName);
+        } else throw new PredicateIsNotDerivedException(predicate);
     }
 
     public Set<Dependency> getAllDependencies() {

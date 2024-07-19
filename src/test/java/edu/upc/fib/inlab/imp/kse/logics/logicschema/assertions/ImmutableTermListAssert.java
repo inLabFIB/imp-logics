@@ -15,10 +15,6 @@ public class ImmutableTermListAssert extends AbstractListAssert<ImmutableTermLis
         super(terms, ImmutableTermListAssert.class);
     }
 
-    public static ImmutableTermListAssert assertThat(ImmutableTermList actual) {
-        return new ImmutableTermListAssert(actual);
-    }
-
     public ImmutableTermListAssert containsVariable(int index, String variableName) {
         TermAssert.assertThat(actual.get(index))
                 .isVariable(variableName);
@@ -46,9 +42,13 @@ public class ImmutableTermListAssert extends AbstractListAssert<ImmutableTermLis
         return assertThat(new ImmutableTermList(newArrayList(iterable)));
     }
 
+    public static ImmutableTermListAssert assertThat(ImmutableTermList actual) {
+        return new ImmutableTermListAssert(actual);
+    }
+
     /**
-     * Checks whether the actual terms list is isomorphic to the input terms list.
-     * That is, whether they are the same list up to renaming variables.
+     * Checks whether the actual terms list is isomorphic to the input terms list. That is, whether they are the same
+     * list up to renaming variables.
      *
      * @param expectedTermsList not null, might be empty
      * @return this assert
@@ -57,7 +57,7 @@ public class ImmutableTermListAssert extends AbstractListAssert<ImmutableTermLis
         try {
             Substitution substitution = new Substitution(actual, expectedTermsList);
             SubstitutionAssert.assertThat(substitution).mapsToDifferentVariables(actual.getUsedVariables());
-        } catch (SubstitutionException subsExc){
+        } catch (SubstitutionException subsExc) {
             failure(subsExc.getMessage());
         }
 

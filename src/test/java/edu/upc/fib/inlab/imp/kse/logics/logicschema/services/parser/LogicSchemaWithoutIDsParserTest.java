@@ -3,7 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.DerivationRule;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.LogicSchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.NotExpectingConstraintID;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.NotExpectingConstraintIDException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,7 +30,7 @@ class LogicSchemaWithoutIDsParserTest {
 
         LogicSchemaWithoutIDsParser parser = new LogicSchemaWithoutIDsParser();
         assertThatThrownBy(() -> parser.parse(schemaString))
-                .isInstanceOf(NotExpectingConstraintID.class);
+                .isInstanceOf(NotExpectingConstraintIDException.class);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.assertions.SchemaTraceabilityMapAssert;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoin;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoinException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.mothers.SchemaTraceabilityMapMother;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,17 +15,6 @@ class SchemaTraceabilityMapTest {
 
     @Nested
     class JoinMapTests {
-        @Nested
-        class InputValidation {
-            @Test
-            void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
-                SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
-                        .createEmptyMap();
-                assertThatThrownBy(() -> emptyMap.joinMap(null))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-        }
-
         @Test
         void should_returnNewMap_whenJoiningMaps() {
             SchemaTraceabilityMap newMap = SchemaTraceabilityMapMother
@@ -62,7 +51,7 @@ class SchemaTraceabilityMapTest {
                     .create(Map.of("1_1", "1"));
 
             assertThatThrownBy(() -> oldMap.joinMap(newMap))
-                    .isInstanceOf(MapsDoNotJoin.class);
+                    .isInstanceOf(MapsDoNotJoinException.class);
         }
 
         @Test
@@ -73,6 +62,17 @@ class SchemaTraceabilityMapTest {
                     .create(Map.of("1_1", "1", "2_1_1", "2_1"));
 
             assertDoesNotThrow(() -> oldMap.joinMap(newMap));
+        }
+
+        @Nested
+        class InputValidation {
+            @Test
+            void should_throwIllegalArgumentException_whenCurrentMapIsNull() {
+                SchemaTraceabilityMap emptyMap = SchemaTraceabilityMapMother
+                        .createEmptyMap();
+                assertThatThrownBy(() -> emptyMap.joinMap(null))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
         }
 
     }

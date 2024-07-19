@@ -115,9 +115,9 @@ public class OrdinaryLiteralTest {
         @Test
         void should_returnSeveralDefinitionRules_whenLiteralHasSeveralDefinitionRules() {
             LogicSchema logicSchema = new LogicSchemaWithIDsParser().parse("""
-                        P(x, y) :- R(x, y), S(y, z)
-                        P(x, y) :- R(x, y), T(y, z)
-                    """);
+                                                                                       P(x, y) :- R(x, y), S(y, z)
+                                                                                       P(x, y) :- R(x, y), T(y, z)
+                                                                                   """);
             OrdinaryLiteral ordinaryLiteral = LiteralMother.createOrdinaryLiteral(logicSchema, true, "P", "a", "b");
 
             List<ImmutableLiteralsList> unfoldedLiteral = ordinaryLiteral.unfold();
@@ -152,6 +152,21 @@ public class OrdinaryLiteralTest {
 
         @Nested
         class NegatedUnfoldingTests {
+            public static Stream<Arguments> literalsAndItsNegation() {
+                return Stream.of(
+                        Arguments.of("A()", "not(A())"),
+                        Arguments.of("not(A())", "A()"),
+                        Arguments.of("TRUE()", "FALSE()"),
+                        Arguments.of("FALSE()", "TRUE()"),
+                        Arguments.of("1 < 2", "1 >= 2"),
+                        Arguments.of("1 <= 2", "1 > 2"),
+                        Arguments.of("1 = 2", "1 <> 2"),
+                        Arguments.of("1 <> 2", "1 = 2"),
+                        Arguments.of("1 >= 2", "1 < 2"),
+                        Arguments.of("1 > 2", "1 <= 2")
+                );
+            }
+
             @Test
             void should_notUnfold_whenDefinitionRuleContainsExistentialVariable() {
                 OrdinaryLiteral ordinaryLiteral = OrdinaryLiteralMother.createOrdinaryLiteral(
@@ -174,8 +189,8 @@ public class OrdinaryLiteralTest {
             @Test
             void should_notUnfold_whenDefinitionRuleContainsNonNegatableLiteral() {
                 DerivationRule derivationRule = DerivationRuleMother.create("Derived(x) :- NonNegatableLiteral(x)",
-                        "Derived",
-                        Set.of("NonNegatableLiteral"));
+                                                                            "Derived",
+                                                                            Set.of("NonNegatableLiteral"));
                 OrdinaryLiteral negatedDerivedLiteral = new OrdinaryLiteral(new Atom(derivationRule.getHead().getPredicate(), derivationRule.getHeadTerms()), false);
 
                 List<ImmutableLiteralsList> unfoldedLiteralsList = negatedDerivedLiteral.unfoldWithNegationExtension();
@@ -203,21 +218,6 @@ public class OrdinaryLiteralTest {
                 ImmutableLiteralsListAssert.assertThat(unfoldedLiteralsList.get(0))
                         .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
                         .isIsomorphicTo(expectedLiteralsList);
-            }
-
-            public static Stream<Arguments> literalsAndItsNegation() {
-                return Stream.of(
-                        Arguments.of("A()", "not(A())"),
-                        Arguments.of("not(A())", "A()"),
-                        Arguments.of("TRUE()", "FALSE()"),
-                        Arguments.of("FALSE()", "TRUE()"),
-                        Arguments.of("1 < 2", "1 >= 2"),
-                        Arguments.of("1 <= 2", "1 > 2"),
-                        Arguments.of("1 = 2", "1 <> 2"),
-                        Arguments.of("1 <> 2", "1 = 2"),
-                        Arguments.of("1 >= 2", "1 < 2"),
-                        Arguments.of("1 > 2", "1 <= 2")
-                );
             }
 
             @ParameterizedTest
@@ -251,19 +251,19 @@ public class OrdinaryLiteralTest {
                 List<ImmutableLiteralsList> unfoldedLiteralsList = ordinaryLiteral.unfoldWithNegationExtension();
 
                 List<ImmutableLiteralsList> expectedUnfolded = List.of(ImmutableLiteralsListMother.create(
-                                "not(A(x))",
-                                "Derived(x) :- A(x), B(x)"
-                        ),
-                        ImmutableLiteralsListMother.create(
-                                "not(B(x))",
-                                "Derived(x) :- A(x), B(x)"
-                        ));
+                                                                               "not(A(x))",
+                                                                               "Derived(x) :- A(x), B(x)"
+                                                                       ),
+                                                                       ImmutableLiteralsListMother.create(
+                                                                               "not(B(x))",
+                                                                               "Derived(x) :- A(x), B(x)"
+                                                                       ));
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(2);
                 expectedUnfolded.forEach(expected ->
-                        Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> LogicSchemaAssertions.assertThat(unfolded)
-                                .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
-                                .isIsomorphicTo(expected)));
+                                                 Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> LogicSchemaAssertions.assertThat(unfolded)
+                                                         .usingIsomorphismOptions(new IsomorphismOptions(false, false, false))
+                                                         .isIsomorphicTo(expected)));
             }
 
 
@@ -323,9 +323,9 @@ public class OrdinaryLiteralTest {
 
                 Assertions.assertThat(unfoldedLiteralsList).hasSize(6);
                 expectedUnfolded.forEach(expected ->
-                        Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> LogicSchemaAssertions.assertThat(unfolded)
-                                .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
-                                .isIsomorphicTo(expected)));
+                                                 Assertions.assertThat(unfoldedLiteralsList).anySatisfy(unfolded -> LogicSchemaAssertions.assertThat(unfolded)
+                                                         .usingIsomorphismOptions(new IsomorphismOptions(false, true, false))
+                                                         .isIsomorphicTo(expected)));
             }
 
         }

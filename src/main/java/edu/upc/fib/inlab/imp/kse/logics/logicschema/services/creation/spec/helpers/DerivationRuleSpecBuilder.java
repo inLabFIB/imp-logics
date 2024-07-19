@@ -14,8 +14,8 @@ public class DerivationRuleSpecBuilder extends NormalClauseSpecBuilder<Derivatio
     private List<TermSpec> headTerms;
 
     /**
-     * Creates a new DerivationRuleSpecBuilder using a DefaultStringToTermSpecFactory to distinguish
-     * the kind of Term to instantiate for the given term names.
+     * Creates a new DerivationRuleSpecBuilder using a DefaultStringToTermSpecFactory to distinguish the kind of Term to
+     * instantiate for the given term names.
      */
     public DerivationRuleSpecBuilder() {
         this(new AllVariableTermTypeCriteria());

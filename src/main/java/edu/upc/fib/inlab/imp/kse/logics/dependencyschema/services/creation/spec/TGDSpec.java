@@ -14,15 +14,15 @@ public class TGDSpec extends DependencySpec {
 
     private final HeadAtomsSpec headAtomSpecs;
 
+    public TGDSpec(List<LiteralSpec> bodySpec, List<OrdinaryLiteralSpec> termSpecList) {
+        this(new BodySpec(bodySpec), new HeadAtomsSpec(termSpecList));
+    }
+
     public TGDSpec(BodySpec body, HeadAtomsSpec headAtomsSpecs) {
         super(body);
         if (Objects.isNull(headAtomsSpecs)) throw new IllegalArgumentException("Head terms cannot be null");
 
         this.headAtomSpecs = headAtomsSpecs;
-    }
-
-    public TGDSpec(List<LiteralSpec> bodySpec, List<OrdinaryLiteralSpec> termSpecList) {
-        this(new BodySpec(bodySpec), new HeadAtomsSpec(termSpecList));
     }
 
     public HeadAtomsSpec getHeadAtomSpecs() {

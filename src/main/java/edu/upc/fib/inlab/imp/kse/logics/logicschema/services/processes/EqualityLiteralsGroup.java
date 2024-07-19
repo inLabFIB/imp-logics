@@ -18,12 +18,8 @@ class EqualityLiteralsGroup {
         equalityLiterals = new LinkedHashSet<>();
     }
 
-    private void addEqualities(Set<ComparisonBuiltInLiteral> equalityLiterals) {
-        equalityLiterals.forEach(this::addEquality);
-    }
-
-    void addEquality(ComparisonBuiltInLiteral equalityLiteral) {
-        equalityLiterals.add(equalityLiteral);
+    boolean containsTerm(Term term) {
+        return getTerms().contains(term);
     }
 
     private Set<Term> getTerms() {
@@ -32,22 +28,19 @@ class EqualityLiteralsGroup {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private Set<Variable> getVariables() {
-        return getTerms().stream()
-                .filter(Term::isVariable)
-                .map(Variable.class::cast)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    boolean containsTerm(Term term) {
-        return getTerms().contains(term);
-    }
-
     EqualityLiteralsGroup union(EqualityLiteralsGroup secondGroup) {
         EqualityLiteralsGroup newGroup = new EqualityLiteralsGroup();
         newGroup.addEqualities(equalityLiterals);
         newGroup.addEqualities(secondGroup.equalityLiterals);
         return newGroup;
+    }
+
+    private void addEqualities(Set<ComparisonBuiltInLiteral> equalityLiterals) {
+        equalityLiterals.forEach(this::addEquality);
+    }
+
+    void addEquality(ComparisonBuiltInLiteral equalityLiteral) {
+        equalityLiterals.add(equalityLiteral);
     }
 
     SubstitutionForEqualities computeSubstitutionResult() {
@@ -81,5 +74,12 @@ class EqualityLiteralsGroup {
             }
         }
         return new SubstitutionForEqualities(substitution, equalityLiterals);
+    }
+
+    private Set<Variable> getVariables() {
+        return getTerms().stream()
+                .filter(Term::isVariable)
+                .map(Variable.class::cast)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A pipeline of SchemaTransformationProcessPipeline.
- * This class is useful for chaining several transformations over a logic schema.
+ * A pipeline of SchemaTransformationProcessPipeline. This class is useful for chaining several transformations over a
+ * logic schema.
  */
 public class SchemaTransformationProcessPipeline extends LogicSchemaTransformationProcess {
 

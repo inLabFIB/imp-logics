@@ -61,8 +61,8 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                 lit -> LiteralAssert.assertThat(lit)
                         .asInstanceOf(InstanceOfAssertFactories.type(BooleanBuiltInLiteral.class))
                         .satisfies(l ->
-                                BuiltInLiteralAssert.assertThat(l)
-                                        .hasOperationName(BooleanBuiltInLiteral.fromValue(booleanValue))
+                                           BuiltInLiteralAssert.assertThat(l)
+                                                   .hasOperationName(BooleanBuiltInLiteral.fromValue(booleanValue))
                         )
         );
         return this;
@@ -74,8 +74,8 @@ public abstract class NormalClauseAssert<T extends NormalClause> extends Abstrac
                 lit -> LiteralAssert.assertThat(lit)
                         .asInstanceOf(InstanceOfAssertFactories.type(CustomBuiltInLiteral.class))
                         .satisfies(l ->
-                                BuiltInLiteralAssert.assertThat(l)
-                                        .hasOperationName(operationName)
+                                           BuiltInLiteralAssert.assertThat(l)
+                                                   .hasOperationName(operationName)
                         )
         );
         return this;

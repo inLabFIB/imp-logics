@@ -1,10 +1,10 @@
 package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerived;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotExists;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateOutsideSchema;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateName;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateIsNotDerivedException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateNotFoundException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.PredicateOutsideSchemaException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableAtomListMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.ImmutableLiteralsListMother;
@@ -34,7 +34,7 @@ class DependencySchemaTest {
             Set<Dependency> dependencies = Set.of();
 
             assertThatThrownBy(() -> new DependencySchema(predicates, dependencies))
-                    .isInstanceOf(RepeatedPredicateName.class);
+                    .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
         @Test
@@ -49,7 +49,7 @@ class DependencySchemaTest {
             );
 
             assertThatThrownBy(() -> new DependencySchema(predicates, dependencies))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -64,7 +64,7 @@ class DependencySchemaTest {
             );
 
             assertThatThrownBy(() -> new DependencySchema(predicates, dependencies))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -75,7 +75,7 @@ class DependencySchemaTest {
             Set<Dependency> dependencies = Set.of();
 
             assertThatThrownBy(() -> new DependencySchema(predicates, dependencies))
-                    .isInstanceOf(PredicateOutsideSchema.class);
+                    .isInstanceOf(PredicateOutsideSchemaException.class);
         }
 
         @Test
@@ -104,7 +104,7 @@ class DependencySchemaTest {
         void should_throwException_WhenRetrievingNonExistentPredicate() {
             DependencySchema dependencySchema = new DependencySchema(Set.of(), Set.of());
             assertThatThrownBy(() -> dependencySchema.getPredicateByName("p"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
     }
 
@@ -151,7 +151,7 @@ class DependencySchemaTest {
         void should_throwException_WhenRetrievingDerivationRules_WithNonExistentPredicateName() {
             DependencySchema dependencySchema = new DependencySchema(Set.of(), Set.of());
             assertThatThrownBy(() -> dependencySchema.getDerivationRulesByPredicateName("nonExistentPredicateName"))
-                    .isInstanceOf(PredicateNotExists.class);
+                    .isInstanceOf(PredicateNotFoundException.class);
         }
 
         @Test
@@ -160,7 +160,7 @@ class DependencySchemaTest {
             Predicate basePredicate = new MutablePredicate(basePredicateName, 2);
             DependencySchema dependencySchema = new DependencySchema(Set.of(basePredicate), Set.of());
             assertThatThrownBy(() -> dependencySchema.getDerivationRulesByPredicateName(basePredicateName))
-                    .isInstanceOf(PredicateIsNotDerived.class);
+                    .isInstanceOf(PredicateIsNotDerivedException.class);
         }
     }
 
@@ -192,14 +192,6 @@ class DependencySchemaTest {
             Assertions.assertThat(dependencySchema.isEmpty()).isFalse();
         }
     }
-
-
-
-
-
-
-
-
 
 
 }

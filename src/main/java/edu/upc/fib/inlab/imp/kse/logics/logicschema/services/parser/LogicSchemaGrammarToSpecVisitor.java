@@ -33,20 +33,20 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
         return derivationRuleSpec;
     }
 
-    protected BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
-        List<LiteralSpec> literals = new LinkedList<>();
-        for (LogicSchemaGrammarParser.LiteralContext litContext : ctx.literal()) {
-            literals.add((LiteralSpec) this.visitLiteral(litContext));
-        }
-        return new BodySpec(literals);
-    }
-
     private List<TermSpec> createTermsList(LogicSchemaGrammarParser.TermsListContext ctx) {
         List<TermSpec> termSpecList = new LinkedList<>();
         for (LogicSchemaGrammarParser.TermContext termContext : ctx.term()) {
             termSpecList.add(this.visitTerm(termContext));
         }
         return termSpecList;
+    }
+
+    protected BodySpec createBody(LogicSchemaGrammarParser.BodyContext ctx) {
+        List<LiteralSpec> literals = new LinkedList<>();
+        for (LogicSchemaGrammarParser.LiteralContext litContext : ctx.literal()) {
+            literals.add((LiteralSpec) this.visitLiteral(litContext));
+        }
+        return new BodySpec(literals);
     }
 
     @Override

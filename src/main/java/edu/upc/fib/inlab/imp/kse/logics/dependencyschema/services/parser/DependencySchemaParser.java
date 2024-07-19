@@ -9,7 +9,6 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpe
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.TermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.CustomBuiltInPredicateNameChecker;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.printer.LogicSchemaPrinter;
 import org.antlr.v4.runtime.*;
 
 import java.util.Set;
@@ -33,11 +32,6 @@ public class DependencySchemaParser {
         return DependencySchemaFactory.createDependencySchema(dependencySchemaSpec);
     }
 
-    public DependencySchema parse(String schemaString, Set<Predicate> relationalSchema) {
-        DependencySchemaSpec dependencySchemaSpec = parseToSpec(schemaString);
-        return DependencySchemaFactory.createDependencySchema(dependencySchemaSpec, relationalSchema);
-    }
-
     public DependencySchemaSpec parseToSpec(String schemaString) {
         CharStream input = CharStreams.fromString(schemaString);
         DependencySchemaGrammarLexer lexer = new DependencySchemaGrammarLexer(input, builtInPredicateNameChecker);
@@ -48,6 +42,11 @@ public class DependencySchemaParser {
         parser.addErrorListener(new ErrorListener());
         DependencySchemaGrammarParser.ProgContext tree = parser.prog();
         return visitor.visitProg(tree);
+    }
+
+    public DependencySchema parse(String schemaString, Set<Predicate> relationalSchema) {
+        DependencySchemaSpec dependencySchemaSpec = parseToSpec(schemaString);
+        return DependencySchemaFactory.createDependencySchema(dependencySchemaSpec, relationalSchema);
     }
 
     private static class ErrorListener extends BaseErrorListener {

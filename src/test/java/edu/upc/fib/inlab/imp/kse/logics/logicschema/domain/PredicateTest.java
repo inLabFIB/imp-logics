@@ -1,6 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 
-import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatch;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.ArityMismatchException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.DerivedPredicateMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.QueryMother;
 import org.junit.jupiter.api.Nested;
@@ -59,7 +59,7 @@ class PredicateTest {
     void should_ThrowException_WhenCreatingPredicate_WithQueriesNotMatchInArity() {
         Query definitionRule = QueryMother.createTrivialQuery(1, "p");
         assertThatThrownBy(() -> new Predicate("p", 0, List.of(definitionRule))).isInstanceOf(
-                ArityMismatch.class
+                ArityMismatchException.class
         );
     }
 
@@ -133,10 +133,10 @@ class PredicateTest {
         @Test
         void should_returnFalse_whenPredicateIsDerived_definedOverDerivedPredicates_butNotRecursive() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(x, y)
-                            R(x, y) :- S(x, y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(x, y)
+                                                                                        R(x, y) :- S(x, y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isFalse();
         }
@@ -144,10 +144,10 @@ class PredicateTest {
         @Test
         void should_returnFalse_whenPredicateIsDerived_definedOverRecurisvePredicates() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(x, y)
-                            R(x, y) :- R(x, z), R(z, y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(x, y)
+                                                                                        R(x, y) :- R(x, z), R(z, y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isFalse();
         }
@@ -155,9 +155,9 @@ class PredicateTest {
         @Test
         void should_returTrue_whenPredicateIsDirectlyRecursive() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- P(y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- P(y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isTrue();
         }
@@ -165,12 +165,12 @@ class PredicateTest {
         @Test
         void should_returTrue_whenPredicateIsRecursiveThroughSeveralRules() {
             Predicate predicate = DerivedPredicateMother.createDerivedPredicate("P",
-                    """
-                            P(x) :- R(y)
-                            P(x) :- Rec(y)
-                            R(y) :- S(y)
-                            Rec(y) :- P(y)
-                            """);
+                                                                                """
+                                                                                        P(x) :- R(y)
+                                                                                        P(x) :- Rec(y)
+                                                                                        R(y) :- S(y)
+                                                                                        Rec(y) :- P(y)
+                                                                                        """);
             boolean isRecursive = predicate.isRecursive();
             assertThat(isRecursive).isTrue();
         }

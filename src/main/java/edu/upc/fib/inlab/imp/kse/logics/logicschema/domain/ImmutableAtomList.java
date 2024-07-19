@@ -11,21 +11,19 @@ import java.util.stream.Collectors;
 public class ImmutableAtomList implements List<Atom> {
 
     /**
-     * Invariants:
-     * - atomList is not null
-     * - atomList does not contain nulls
+     * Invariants: - atomList is not null - atomList does not contain nulls
      */
     private final List<Atom> atomList;
+
+    public ImmutableAtomList(Atom... atoms) {
+        this(Arrays.stream(atoms).toList());
+    }
 
     public ImmutableAtomList(List<Atom> atomList) {
         if (Objects.isNull(atomList)) throw new IllegalArgumentException("Atom list cannot be null");
         if (atomList.stream().anyMatch(Objects::isNull))
             throw new IllegalArgumentException("Atom list cannot contain null elements");
         this.atomList = Collections.unmodifiableList(atomList);
-    }
-
-    public ImmutableAtomList(Atom... atoms) {
-        this(Arrays.stream(atoms).toList());
     }
 
     /**
@@ -161,6 +159,11 @@ public class ImmutableAtomList implements List<Atom> {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(atomList);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof List<?>)) return false;
@@ -168,18 +171,13 @@ public class ImmutableAtomList implements List<Atom> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(atomList);
-    }
-
-    public <T> T accept(LogicSchemaVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
     public String toString() {
         return atomList.stream()
                 .map(Atom::toString)
                 .collect(Collectors.joining(", "));
+    }
+
+    public <T> T accept(LogicSchemaVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

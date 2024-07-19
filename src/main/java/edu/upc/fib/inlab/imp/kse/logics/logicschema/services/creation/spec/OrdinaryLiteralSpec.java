@@ -13,16 +13,16 @@ public class OrdinaryLiteralSpec implements LiteralSpec {
     private final List<TermSpec> termsList;
     private final boolean isPositive;
 
+    public OrdinaryLiteralSpec(String predicateName, List<TermSpec> termsList) {
+        this(predicateName, termsList, true);
+    }
+
     public OrdinaryLiteralSpec(String predicateName, List<TermSpec> termsList, boolean isPositive) {
         if (isNull(predicateName)) throw new IllegalArgumentException("Predicate name cannot be null");
         if (isNull(termsList)) throw new IllegalArgumentException("Terms list cannot be null");
         this.predicateName = predicateName;
         this.termsList = Collections.unmodifiableList(termsList);
         this.isPositive = isPositive;
-    }
-
-    public OrdinaryLiteralSpec(String predicateName, List<TermSpec> termsList) {
-        this(predicateName, termsList, true);
     }
 
     public String getPredicateName() {

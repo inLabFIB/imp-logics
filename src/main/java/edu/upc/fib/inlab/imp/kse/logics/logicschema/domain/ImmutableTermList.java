@@ -11,21 +11,19 @@ import java.util.stream.Collectors;
  */
 public class ImmutableTermList implements List<Term> {
     /**
-     * Invariants:
-     * - termsList is not null
-     * - termsList does not contain nulls
+     * Invariants: - termsList is not null - termsList does not contain nulls
      */
     private final List<Term> termsList;
+
+    public ImmutableTermList(Term... terms) {
+        this(Arrays.stream(terms).toList());
+    }
 
     public ImmutableTermList(List<Term> termsList) {
         if (Objects.isNull(termsList)) throw new IllegalArgumentException("Term's list cannot be null");
         if (termsList.stream().anyMatch(Objects::isNull))
             throw new IllegalArgumentException("Term's list cannot contain null elements");
         this.termsList = Collections.unmodifiableList(termsList);
-    }
-
-    public ImmutableTermList(Term... terms) {
-        this(Arrays.stream(terms).toList());
     }
 
     @Override
@@ -202,15 +200,15 @@ public class ImmutableTermList implements List<Term> {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(termsList);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof List<?>)) return false;
         else return Objects.equals(termsList, o);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(termsList);
     }
 
     @Override
