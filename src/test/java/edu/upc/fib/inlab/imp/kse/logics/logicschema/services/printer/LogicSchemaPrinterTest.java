@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.LogicSchemaW
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,8 @@ class LogicSchemaPrinterTest {
         LogicSchemaPrinter printer = new LogicSchemaPrinter();
         String actualLogicSchema = printer.print(logicSchema);
 
-        Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
-        Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+        Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toCollection(LinkedHashSet::new));
 
         assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
     }
@@ -60,8 +61,8 @@ class LogicSchemaPrinterTest {
             LogicSchemaPrinter printer = new LogicSchemaPrinter();
             String actualLogicSchema = printer.print(logicSchema);
 
-            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
-            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toCollection(LinkedHashSet::new));
 
             assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
         }
@@ -91,8 +92,8 @@ class LogicSchemaPrinterTest {
             LogicSchemaPrinter printer = new LogicSchemaPrinter();
             String actualLogicSchema = printer.print(logicSchema);
 
-            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
-            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toCollection(LinkedHashSet::new));
 
             assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
         }
@@ -112,8 +113,8 @@ class LogicSchemaPrinterTest {
             LogicSchemaPrinter printer = new LogicSchemaPrinter();
             String actualLogicSchema = printer.print(logicSchema);
 
-            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toSet());
-            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toSet());
+            Set<String> actualNormalClauses = actualLogicSchema.lines().collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<String> expectedNormalClauses = schemaString.lines().collect(Collectors.toCollection(LinkedHashSet::new));
 
             assertThat(actualNormalClauses).containsExactlyInAnyOrderElementsOf(expectedNormalClauses);
         }

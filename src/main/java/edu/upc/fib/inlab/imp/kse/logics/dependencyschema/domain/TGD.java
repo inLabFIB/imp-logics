@@ -38,7 +38,7 @@ public class TGD extends Dependency {
                 .filter(Variable.class::isInstance)
                 .map(t -> (Variable) t)
                 .filter(t -> !universalVariables.contains(t))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ImmutableAtomList getHead() {
@@ -69,7 +69,7 @@ public class TGD extends Dependency {
             throw new UnsupportedOperationException("Guardedness check not implemented yet when body contains built-in or negated literals");
         Set<Variable> uVars = getUniversalVariables();
         for (Literal l : getBody()) {
-            if (new HashSet<>(l.getTerms()).containsAll(uVars)) return true;
+            if (new LinkedHashSet<>(l.getTerms()).containsAll(uVars)) return true;
         }
         return false;
     }

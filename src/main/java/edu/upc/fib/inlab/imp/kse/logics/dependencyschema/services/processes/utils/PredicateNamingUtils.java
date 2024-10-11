@@ -4,6 +4,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ImmutableAtomList;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.Predicate;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,7 @@ public class PredicateNamingUtils {
     }
 
     public static Set<String> obtainPredicateNames(DependencySchema schema) {
-        return schema.getAllPredicates().stream().map(Predicate::getName).collect(Collectors.toSet());
+        return schema.getAllPredicates().stream().map(Predicate::getName).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static String createNewAuxPredicateName(ImmutableAtomList head, Set<String> usedPredicateNames, String auxPredicateNameSuffix) {

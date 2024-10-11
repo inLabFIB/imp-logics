@@ -5,25 +5,22 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsE
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class QueryBuilder {
 
     private Map<String, Predicate> predicatesByName;
 
     public QueryBuilder() {
-        this(new HashMap<>());
+        this(new LinkedHashMap<>());
     }
 
     public QueryBuilder(Map<String, MutablePredicate> relationalSchema) {
-        this.predicatesByName = new HashMap<>(relationalSchema);
+        this.predicatesByName = new LinkedHashMap<>(relationalSchema);
     }
 
     public QueryBuilder(Set<Predicate> relationalSchema) {
-        this.predicatesByName = new HashMap<>();
+        this.predicatesByName = new LinkedHashMap<>();
         for (Predicate p : relationalSchema) predicatesByName.put(p.getName(), p);
     }
 

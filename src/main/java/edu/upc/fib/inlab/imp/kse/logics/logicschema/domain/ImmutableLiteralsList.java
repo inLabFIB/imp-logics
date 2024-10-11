@@ -207,15 +207,15 @@ public class ImmutableLiteralsList implements List<Literal> {
         result.addAll(substitutedLiterals);
         result.addAll(nextLiterals);
 
-        Map<Literal, Literal> newOriginalLiteralMap = new HashMap<>();
+        Map<Literal, Literal> newOriginalLiteralMap = new LinkedHashMap<>();
         substitutedLiterals.forEach(l -> newOriginalLiteralMap.put(l, unfoldedLiteral));
 
-        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new HashMap<>();
+        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new LinkedHashMap<>();
         return new ImmutableLiteralsList(result, newOriginalLiteralMap, newOriginalLiteralPositionMap);
     }
 
     private static Map<LiteralPosition, LiteralPosition> addTraceabilityOfPositions(DerivationRule derivationRule, ImmutableLiteralsList unfoldedLiterals, Literal literal) {
-        Map<LiteralPosition, LiteralPosition> literalPositionMap = new HashMap<>();
+        Map<LiteralPosition, LiteralPosition> literalPositionMap = new LinkedHashMap<>();
         for (int literalIndex = 0; literalIndex < derivationRule.getBody().size(); ++literalIndex) {
             Literal unfoldedLiteral = unfoldedLiterals.get(literalIndex);
             Literal literalFromRule = derivationRule.getBody().get(literalIndex);
@@ -250,7 +250,7 @@ public class ImmutableLiteralsList implements List<Literal> {
                 .map(l -> l.applySubstitution(substitution))
                 .toList();
 
-        Map<Literal, Literal> newOriginalLiteralMap = new HashMap<>();
+        Map<Literal, Literal> newOriginalLiteralMap = new LinkedHashMap<>();
         for (int i = 0; i < literalList.size(); ++i) {
             Literal originalLiteral = literalList.get(i);
             Literal literalAfterSubs = substitutedLiteralsList.get(i);
@@ -259,7 +259,7 @@ public class ImmutableLiteralsList implements List<Literal> {
             }
         }
 
-        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new HashMap<>();
+        Map<LiteralPosition, LiteralPosition> newOriginalLiteralPositionMap = new LinkedHashMap<>();
         return new ImmutableLiteralsList(substitutedLiteralsList, newOriginalLiteralMap, newOriginalLiteralPositionMap);
 
     }

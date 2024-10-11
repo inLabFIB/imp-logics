@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.domain;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.visitor.LogicSchemaVisitor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ public enum ComparisonOperator {
     GREATER_OR_EQUALS(">="),
     NOT_EQUALS("<>");
 
-    private static final Map<String, ComparisonOperator> LOOKUP = new HashMap<>();
+    private static final Map<String, ComparisonOperator> LOOKUP = new LinkedHashMap<>();
     private static final Map<ComparisonOperator, ComparisonOperator> SYMMETRIC =
             Map.of(
                     LESS_THAN, GREATER_THAN,

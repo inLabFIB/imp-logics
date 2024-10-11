@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class DependencySchemaBuilder {
 
-    private final Map<String, Predicate> predicatesByName = new HashMap<>();
+    private final Map<String, Predicate> predicatesByName = new LinkedHashMap<>();
 
     private final Set<Dependency> dependencies = new LinkedHashSet<>();
 

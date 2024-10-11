@@ -118,7 +118,7 @@ public class Atom {
     private SubstitutionAndBuiltInLiterals computeSubstitutionForHeadAndAdditionalBuiltInLiterals(List<Term> headTerms) {
         Substitution substitution = new Substitution();
         List<BuiltInLiteral> builtInLiterals = new LinkedList<>();
-        Map<Variable, Integer> visitedVariablesToIndex = new HashMap<>(); //Useful for detecting repeated variables
+        Map<Variable, Integer> visitedVariablesToIndex = new LinkedHashMap<>(); //Useful for detecting repeated variables
         for (int i = 0; i < headTerms.size(); ++i) {
             Term headTerm = headTerms.get(i);
             Term actualTerm = this.terms.get(i);

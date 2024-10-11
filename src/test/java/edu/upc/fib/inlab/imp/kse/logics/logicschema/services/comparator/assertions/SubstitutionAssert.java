@@ -10,6 +10,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.operations.Substituti
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -79,7 +80,7 @@ public class SubstitutionAssert extends AbstractAssert<SubstitutionAssert, Subst
                 .map(actual::getTerm)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         Assertions.assertThat(rangeTerms)
                 .hasSize(variables.size())
                 .allMatch(Term::isVariable);

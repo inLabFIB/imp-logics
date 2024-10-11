@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +42,7 @@ class LevelTest {
 
         @Test
         void should_throwException_whenCreatingLevelWithNullPredicate() {
-            Set<Predicate> predicates = new HashSet<>();
+            Set<Predicate> predicates = new LinkedHashSet<>();
             predicates.add(null);
             assertThatThrownBy(() -> new Level(predicates))
                     .isInstanceOf(IllegalArgumentException.class);

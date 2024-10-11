@@ -20,8 +20,8 @@ import java.util.*;
  */
 public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
 
-    private final Map<ConstraintID, LogicConstraint> logicConstraintById = new HashMap<>();
-    private final Map<String, Predicate> predicatesByName = new HashMap<>();
+    private final Map<ConstraintID, LogicConstraint> logicConstraintById = new LinkedHashMap<>();
+    private final Map<String, Predicate> predicatesByName = new LinkedHashMap<>();
     private final ConstraintIDGenerator<T> constraintIDGenerator;
 
 

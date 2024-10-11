@@ -25,7 +25,7 @@ public class SingleExistentialVarTGDTransformer implements DependencyProcess {
     @Override
     public DependencySchema execute(DependencySchema dependencySchema) {
         DependencySchemaBuilder builder = new DependencySchemaBuilder();
-        Set<String> alreadyUsedPredicateNames = new HashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
+        Set<String> alreadyUsedPredicateNames = new LinkedHashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
 
         for (Dependency dependency : dependencySchema.getAllDependencies()) {
             if (dependency instanceof EGD egd) {

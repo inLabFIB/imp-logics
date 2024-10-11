@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.visitor.DependencySchemaVisitor;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -31,7 +32,7 @@ public abstract class Dependency {
                 .flatMap(l -> l.getTerms().stream())
                 .filter(Variable.class::isInstance)
                 .map(t -> (Variable) t)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ImmutableLiteralsList getBody() {

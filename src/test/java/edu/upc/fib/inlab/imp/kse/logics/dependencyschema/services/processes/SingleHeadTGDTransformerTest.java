@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -97,7 +98,9 @@ class SingleHeadTGDTransformerTest {
 
         DependencySchema normalizedTGD = tgdNormalizer.execute(tgd);
 
-        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
+        Set<TGD> expectedTGDs = expectedTGDsString.stream()
+                .map(TGDMother::createTGD)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         Assertions.assertThat(normalizedTGD.getAllTGDs())
                 .usingElementComparator(tgdComparator())
@@ -134,7 +137,7 @@ class SingleHeadTGDTransformerTest {
 
         DependencySchema normalizedTGD = tgdNormalizer.execute(schema);
 
-        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toCollection(LinkedHashSet::new));
 
         Assertions.assertThat(normalizedTGD.getAllDependencies())
                 .usingElementComparator(dependenciesComparator())

@@ -110,7 +110,7 @@ public class EGDToFDAnalyzer {
     private boolean allTermsAreDifferentVariables(OrdinaryLiteral oLit) {
         return oLit.getTerms().stream()
                 .filter(Variable.class::isInstance)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(LinkedHashSet::new))
                 .size() == oLit.getArity();
     }
 

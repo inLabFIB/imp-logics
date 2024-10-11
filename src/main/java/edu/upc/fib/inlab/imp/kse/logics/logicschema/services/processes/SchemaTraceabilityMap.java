@@ -3,10 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.ConstraintID;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.processes.exceptions.MapsDoNotJoinException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class is responsible to recall which constraintsID (from one schema) comes from what constraintID (from an
@@ -16,7 +13,7 @@ public class SchemaTraceabilityMap {
     private final Map<ConstraintID, ConstraintID> constraintToOrigConstraintIDMap;
 
     public SchemaTraceabilityMap() {
-        this.constraintToOrigConstraintIDMap = new HashMap<>();
+        this.constraintToOrigConstraintIDMap = new LinkedHashMap<>();
     }
 
     /**
@@ -25,7 +22,7 @@ public class SchemaTraceabilityMap {
      * @param toCopy not null
      */
     protected SchemaTraceabilityMap(SchemaTraceabilityMap toCopy) {
-        this.constraintToOrigConstraintIDMap = new HashMap<>(toCopy.constraintToOrigConstraintIDMap);
+        this.constraintToOrigConstraintIDMap = new LinkedHashMap<>(toCopy.constraintToOrigConstraintIDMap);
     }
 
     /**

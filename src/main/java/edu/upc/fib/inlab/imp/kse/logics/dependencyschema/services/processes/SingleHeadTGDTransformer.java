@@ -18,10 +18,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.Liter
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.TermSpec;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +30,7 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
     @Override
     public DependencySchema execute(DependencySchema dependencySchema) {
         DependencySchemaBuilder builder = new DependencySchemaBuilder();
-        Set<String> alreadyUsedPredicateNames = new HashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
+        Set<String> alreadyUsedPredicateNames = new LinkedHashSet<>(PredicateNamingUtils.obtainPredicateNames(dependencySchema));
 
         for (Dependency dependency : dependencySchema.getAllDependencies()) {
             if (dependency instanceof EGD egd) {
@@ -82,7 +79,7 @@ public class SingleHeadTGDTransformer implements DependencyProcess {
                 .flatMap(Set::stream)
                 .map(t -> (Term) t)
                 .map(DependencySchemaToSpecHelper::buildTermSpec)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 

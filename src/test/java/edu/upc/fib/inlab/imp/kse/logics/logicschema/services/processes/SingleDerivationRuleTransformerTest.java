@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -145,7 +146,7 @@ class SingleDerivationRuleTransformerTest {
             Set<String> headPredicates = logicSchemaTransformed.getAllDerivationRules().stream()
                     .map(DerivationRule::getHead)
                     .map(Atom::getPredicateName)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             assertThat(headPredicates).hasSize(2);
         }
     }
