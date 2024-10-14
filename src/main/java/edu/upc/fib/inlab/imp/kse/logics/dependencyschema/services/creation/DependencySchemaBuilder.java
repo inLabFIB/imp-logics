@@ -10,6 +10,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.creation.spec.
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.ContextTermFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.LiteralFactory;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
@@ -47,13 +48,14 @@ public class DependencySchemaBuilder {
     }
 
     private void addDependency(DependencySpec dependencySpec) {
-        ImmutableLiteralsList body = buildBody(dependencySpec.getBody());
+        ContextTermFactory contextTermFactory = new ContextTermFactory(dependencySpec.getAllVariableNames());
+        ImmutableLiteralsList body = buildBody(dependencySpec.getBody(), contextTermFactory);
         if (dependencySpec instanceof TGDSpec tgdSpec) {
             List<LiteralSpec> castedList = tgdSpec.getHeadAtomSpecs().atoms()
                     .stream()
                     .map(LiteralSpec.class::cast)
                     .toList();
-            ImmutableLiteralsList headAsLiterals = buildBody(castedList);
+            ImmutableLiteralsList headAsLiterals = buildBody(castedList, contextTermFactory);
             List<Atom> atomList = headAsLiterals.stream()
                     .map(l -> (OrdinaryLiteral) l)
                     .map(OrdinaryLiteral::getAtom)
@@ -61,14 +63,14 @@ public class DependencySchemaBuilder {
             ImmutableAtomList head = new ImmutableAtomList(atomList);
             dependencies.add(new TGD(body, head));
         } else if (dependencySpec instanceof EGDSpec egdSpec) {
-            EqualityComparisonBuiltInLiteral head = (EqualityComparisonBuiltInLiteral) (new LiteralFactory(predicatesByName)).buildBuiltInLiteral(egdSpec.getHead());
+            EqualityComparisonBuiltInLiteral head = (EqualityComparisonBuiltInLiteral) (new LiteralFactory(predicatesByName, contextTermFactory)).buildBuiltInLiteral(egdSpec.getHead());
             dependencies.add(new EGD(body, head));
         } else throw new IMPLogicsException("Unknown Dependency type");
     }
 
-    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
+    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec, ContextTermFactory contextTermFactory) {
         addPredicatesFromBody(bodySpec);
-        return new BodyBuilder(new LiteralFactory(predicatesByName)).addLiterals(bodySpec).build();
+        return new BodyBuilder(new LiteralFactory(predicatesByName, contextTermFactory)).addLiterals(bodySpec).build();
     }
 
     private void addPredicatesFromBody(List<LiteralSpec> bodySpec) {

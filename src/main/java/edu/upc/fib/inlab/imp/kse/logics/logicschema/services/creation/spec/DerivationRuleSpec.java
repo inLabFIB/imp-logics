@@ -1,7 +1,6 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Specification of a derivation rule.
@@ -30,5 +29,18 @@ public class DerivationRuleSpec extends NormalClauseSpec implements LogicElement
 
     public List<TermSpec> getTermSpecList() {
         return termSpecList;
+    }
+
+    @Override
+    public Set<String> getAllVariableNames() {
+        Set<String> result = new LinkedHashSet<>(getAllHeadVariableNames());
+        result.addAll(new BodySpec(getBody()).getAllVariableNames());
+        return result;
+    }
+
+    public Set<String> getAllHeadVariableNames() {
+        Set<String> result = new HashSet<>();
+        for (TermSpec termSpec : termSpecList) if (termSpec instanceof VariableSpec) result.add(termSpec.getName());
+        return result;
     }
 }

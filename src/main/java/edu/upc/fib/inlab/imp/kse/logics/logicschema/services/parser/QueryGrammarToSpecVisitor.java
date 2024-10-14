@@ -70,6 +70,7 @@ public class QueryGrammarToSpecVisitor extends QueryGrammarBaseVisitor<LogicElem
 
     @Override
     public TermSpec visitTerm(QueryGrammarParser.TermContext ctx) {
+        if (ctx.UNNAMED_VARIABLE() != null) return new UnnamedVariableSpec(ctx.getText());
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
     }
 

@@ -5,7 +5,10 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.IMPLogicsE
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.*;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class QueryBuilder {
 
@@ -29,14 +32,19 @@ public class QueryBuilder {
     }
 
     public Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
-        ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
-        ImmutableLiteralsList body = buildBody(bodySpec);
+        ContextTermFactory contextTermFactory = new ContextTermFactory(getAllVariableNames(termSpecList, bodySpec));
+        ImmutableTermList headTerms = contextTermFactory.buildTerms(termSpecList);
+        ImmutableLiteralsList body = buildBody(bodySpec, contextTermFactory);
         return QueryFactory.createQuery(headTerms, body);
     }
 
-    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
+    private static Set<String> getAllVariableNames(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
+        return new DerivationRuleSpec("query", termSpecList, bodySpec).getAllVariableNames();
+    }
+
+    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec, ContextTermFactory contextTermFactory) {
         addPredicatesFromBody(bodySpec);
-        return new BodyBuilder(new LiteralFactory(predicatesByName)).addLiterals(bodySpec).build();
+        return new BodyBuilder(new LiteralFactory(predicatesByName, contextTermFactory)).addLiterals(bodySpec).build();
     }
 
     private void addPredicatesFromBody(List<LiteralSpec> bodySpec) {

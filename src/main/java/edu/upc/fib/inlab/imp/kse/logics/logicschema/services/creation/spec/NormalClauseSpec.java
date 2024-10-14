@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Specification of a NormalClause. E.g. specification of a derivation rule, or logic constraint.
@@ -17,4 +18,7 @@ public abstract class NormalClauseSpec {
     public List<LiteralSpec> getBody() {
         return body.literals();
     }
+
+    public abstract Set<String> getAllVariableNames();
+
 }

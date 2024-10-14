@@ -3,6 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.exceptions.RepeatedPredicateNameException;
+import edu.upc.fib.inlab.imp.kse.logics.logicschema.mothers.LogicSchemaMother;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.AllVariableTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.helpers.CapitalConstantsTermTypeCriteria;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.parser.exceptions.ParserCanceledException;
@@ -379,5 +380,137 @@ class LogicSchemaParserTest {
                     .isInstanceOf(RepeatedPredicateNameException.class);
         }
 
+    }
+
+    @Nested
+    class UnnamedVariableTests {
+
+        @Test
+        void should_parseLogicConstraint_withUnnamedVariable() {
+            String logicSchemaString = "@1 :- P(_)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("@1 :- P(a)"));
+        }
+
+        @Test
+        void should_parseLogicConstraint_withMultipleUnnamedVariables() {
+            String logicSchemaString = "@1 :- P(_,_,_)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("@1 :- P(a,b,c)"));
+        }
+
+        @Test
+        void should_parseLogicConstraint_withMultipleUnnamedVariables_andMultipleLiterals() {
+            String logicSchemaString = "@1 :- P(_,_,_), P(_,_,_), Q(_,_,_)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("@1 :- P(a,b,c), P(d,e,f), Q(g,h,i)"));
+        }
+
+        @Test
+        void should_resetVariableNaming_betweenLogicConstraints() {
+            String logicSchemaString = """
+                    @1 :- P(_,_,_)
+                    @2 :- P(_,_,_)
+                    """;
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            LogicSchema expectedSchema = LogicSchemaMother
+                    .buildLogicSchemaWithIDs("""
+                                                     @1 :- P(a,b,c)
+                                                     @2 :- P(a,b,c)
+                                                     """);
+            assertThat(logicSchema).isLogicallyEquivalentTo(expectedSchema);
+
+            ImmutableTermList terms1 = logicSchema.getLogicConstraintByID(new ConstraintID("1")).getBody().get(0).getTerms();
+            ImmutableTermList terms2 = logicSchema.getLogicConstraintByID(new ConstraintID("2")).getBody().get(0).getTerms();
+            for (int i = 0; i < terms1.size(); i++) assertThat(terms1.get(i)).isEqualTo(terms2.get(i));
+        }
+
+        @Test
+        void should_resetVariableNaming_betweenDerivationRules_withMultipleLiterals() {
+            String logicSchemaString = "aux1(_,_) :- P(_,_,_), P(_,_,_), Q(_,_,_)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            LogicSchema expectedSchema = LogicSchemaMother
+                    .buildLogicSchemaWithIDs("""
+                                                     aux1(j,k) :- P(a,b,c), P(d,e,f), Q(g,h,i)
+                                                     """);
+            assertThat(logicSchema).isLogicallyEquivalentTo(expectedSchema);
+        }
+
+        @Test
+        void should_resetVariableNaming_betweenDerivationRules() {
+            String logicSchemaString = """
+                    aux1(_,_) :- P(_,_,_)
+                    aux2(_,_) :- P(_,_,_)
+                    """;
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            LogicSchema expectedSchema = LogicSchemaMother
+                    .buildLogicSchemaWithIDs("""
+                                                     aux1(d,e) :- P(a,b,c)
+                                                     aux2(d,e) :- P(a,b,c)
+                                                     """);
+            assertThat(logicSchema).isLogicallyEquivalentTo(expectedSchema);
+
+            ImmutableTermList terms1 = logicSchema.getPredicateByName("aux1").getFirstDerivationRule().getBody().get(0).getTerms();
+            ImmutableTermList terms2 = logicSchema.getPredicateByName("aux2").getFirstDerivationRule().getBody().get(0).getTerms();
+            for (int i = 0; i < terms1.size(); i++) assertThat(terms1.get(i)).isEqualTo(terms2.get(i));
+        }
+
+        @Test
+        void should_avoidVariableNameCollisions_InLogicConstraints1() {
+            String logicSchemaString = """
+                    @1 :- P(u0,_,_)
+                    """;
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("@1 :- P(a,b,c)"));
+        }
+
+        @Test
+        void should_avoidVariableNameCollisions_InLogicConstraints2() {
+            String logicSchemaString = """
+                    @1 :- P(_,u0,_)
+                    """;
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("@1 :- P(a,b,c)"));
+        }
+
+        @Test
+        void should_avoidVariableNameCollisions_InDerivationRules() {
+            String logicSchemaString = "Q(u1,_) :- P(u0,_,_)";
+            LogicSchemaParser<?> logicSchemaParser = new LogicSchemaWithIDsParser();
+
+            LogicSchema logicSchema = logicSchemaParser.parse(logicSchemaString);
+
+            assertThat(logicSchema)
+                    .isLogicallyEquivalentTo(LogicSchemaMother.buildLogicSchemaWithIDs("Q(a,b) :- P(c,d,e)"));
+        }
     }
 }

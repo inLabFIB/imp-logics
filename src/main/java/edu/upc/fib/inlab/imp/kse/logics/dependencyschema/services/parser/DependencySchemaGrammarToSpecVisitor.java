@@ -107,6 +107,7 @@ public class DependencySchemaGrammarToSpecVisitor extends DependencySchemaGramma
 
     @Override
     public TermSpec visitTerm(DependencySchemaGrammarParser.TermContext ctx) {
+        if (ctx.UNNAMED_VARIABLE() != null) return new UnnamedVariableSpec(ctx.getText());
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
     }
 

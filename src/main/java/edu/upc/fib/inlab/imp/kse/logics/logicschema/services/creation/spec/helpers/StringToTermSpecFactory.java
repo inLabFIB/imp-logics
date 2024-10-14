@@ -25,21 +25,13 @@ public class StringToTermSpecFactory {
 
     public List<TermSpec> createTermSpecs(String... termNames) {
         List<TermSpec> termSpecList = new LinkedList<>();
-        for (String name : termNames) {
-            TermSpec termSpec = createTermSpec(name);
-
-            termSpecList.add(termSpec);
-        }
+        for (String name : termNames) termSpecList.add(createTermSpec(name));
         return termSpecList;
     }
 
     public TermSpec createTermSpec(String name) {
-        if (termTypeCriteria.isConstant(name)) {
-            return new ConstantSpec(name);
-        } else if (termTypeCriteria.isVariable(name)) {
-            return new VariableSpec(name);
-        } else {
-            throw new IMPLogicsException("Unrecognized term name: " + name);
-        }
+        if (termTypeCriteria.isConstant(name)) return new ConstantSpec(name);
+        else if (termTypeCriteria.isVariable(name)) return new VariableSpec(name);
+        else throw new IMPLogicsException("Unrecognized term name: " + name);
     }
 }

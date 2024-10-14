@@ -1,7 +1,9 @@
 package edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
 
@@ -36,5 +38,12 @@ public class OrdinaryLiteralSpec implements LiteralSpec {
 
     public boolean isPositive() {
         return isPositive;
+    }
+
+    @Override
+    public Set<String> getAllVariableNames() {
+        Set<String> result = new LinkedHashSet<>();
+        for (TermSpec termSpec : termsList) if (termSpec instanceof VariableSpec) result.add(termSpec.getName());
+        return result;
     }
 }

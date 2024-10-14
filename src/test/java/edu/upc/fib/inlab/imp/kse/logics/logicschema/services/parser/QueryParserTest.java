@@ -206,5 +206,22 @@ class QueryParserTest {
         }
     }
 
+    @Nested
+    class UnnamedVariableTests {
+
+        @Test
+        void should_avoidVariableNameCollisions_InQuery() {
+            String queryString = "(u1,_) :- P(u0,_,_)";
+            QueryParser queryParser = new QueryParser();
+
+            Query query = queryParser.parse(queryString).get(0);
+
+            assertThat(query).isNotNull();
+            for (Term t : query.getHeadTerms()) assertThat(t).isVariable().isNotEqualTo(new Variable("_"));
+            for (Term t : query.getBody().getUsedVariables())
+                assertThat(t).isVariable().isNotEqualTo(new Variable("_"));
+        }
+
+    }
 
 }

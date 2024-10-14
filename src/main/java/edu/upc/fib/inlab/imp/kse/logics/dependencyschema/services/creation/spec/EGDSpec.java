@@ -4,8 +4,10 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BodyS
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.LiteralSpec;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Specification of a logic constraint including an ID for it.
@@ -27,5 +29,12 @@ public class EGDSpec extends DependencySpec {
 
     public BuiltInLiteralSpec getHead() {
         return head;
+    }
+
+    @Override
+    public Set<String> getAllVariableNames() {
+        Set<String> result = new LinkedHashSet<>(head.getAllVariableNames());
+        result.addAll(new BodySpec(getBody()).getAllVariableNames());
+        return result;
     }
 }

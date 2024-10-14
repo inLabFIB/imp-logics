@@ -6,6 +6,7 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.Logic
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Specification of a Dependency. E.g. specification of a TGD, or EGD.
@@ -21,4 +22,7 @@ public abstract class DependencySpec implements LogicElementSpec {
     public List<LiteralSpec> getBody() {
         return body.literals();
     }
+
+    public abstract Set<String> getAllVariableNames();
+
 }

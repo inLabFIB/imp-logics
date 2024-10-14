@@ -50,23 +50,24 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
     }
 
     private void addDerivationRule(DerivationRuleSpec drs) {
+        ContextTermFactory contextTermFactory = new ContextTermFactory(drs.getAllVariableNames());
         predicatesByName.putIfAbsent(
                 drs.getPredicateName(),
                 new MutablePredicate(drs.getPredicateName(), drs.getTermSpecList().size()));
-        Query query = buildQuery(drs.getTermSpecList(), drs.getBody());
+        Query query = buildQuery(drs.getTermSpecList(), drs.getBody(), contextTermFactory);
         MutablePredicate mutablePredicate = (MutablePredicate) predicatesByName.get(drs.getPredicateName());
         mutablePredicate.addDerivationRule(query);
     }
 
-    private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec) {
-        ImmutableTermList headTerms = TermSpecToTermFactory.buildTerms(termSpecList);
-        ImmutableLiteralsList body = buildBody(bodySpec);
+    private Query buildQuery(List<TermSpec> termSpecList, List<LiteralSpec> bodySpec, ContextTermFactory contextTermFactory) {
+        ImmutableTermList headTerms = contextTermFactory.buildTerms(termSpecList);
+        ImmutableLiteralsList body = buildBody(bodySpec, contextTermFactory);
         return QueryFactory.createQuery(headTerms, body);
     }
 
-    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec) {
+    private ImmutableLiteralsList buildBody(List<LiteralSpec> bodySpec, ContextTermFactory contextTermFactory) {
         addPredicatesFromBody(bodySpec);
-        return new BodyBuilder(new LiteralFactory(predicatesByName)).addLiterals(bodySpec).build();
+        return new BodyBuilder(new LiteralFactory(predicatesByName, contextTermFactory)).addLiterals(bodySpec).build();
     }
 
     private void addPredicatesFromBody(List<LiteralSpec> bodySpec) {
@@ -142,8 +143,9 @@ public class LogicSchemaBuilder<T extends LogicConstraintSpec> {
     }
 
     private void addLogicConstraint(ConstraintID constraintID, LogicConstraintSpec lcs) {
+        ContextTermFactory contextTermFactory = new ContextTermFactory(lcs.getAllVariableNames());
         if (logicConstraintById.containsKey(constraintID)) throw new RepeatedConstraintIDException(constraintID);
-        ImmutableLiteralsList body = buildBody(lcs.getBody());
+        ImmutableLiteralsList body = buildBody(lcs.getBody(), contextTermFactory);
         logicConstraintById.put(constraintID, new LogicConstraint(constraintID, body));
     }
 }

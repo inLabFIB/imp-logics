@@ -5,22 +5,25 @@ import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.exceptions
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.BuiltInLiteralSpec;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.services.creation.spec.OrdinaryLiteralSpec;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 //TODO: add documentation
 public class LiteralFactory {
 
     private final Map<String, Predicate> predicatesByName;
+    private final ContextTermFactory contextTermFactory;
 
     public LiteralFactory(Map<String, ? extends Predicate> predicatesByName) {
+        this(predicatesByName, new ContextTermFactory(Set.of()));
+    }
+
+    public LiteralFactory(Map<String, ? extends Predicate> predicatesByName, ContextTermFactory contextTermFactory) {
         this.predicatesByName = Collections.unmodifiableMap(predicatesByName);
+        this.contextTermFactory = contextTermFactory;
     }
 
     public OrdinaryLiteral buildOrdinaryLiteral(OrdinaryLiteralSpec olSpec) {
-        List<Term> terms = TermSpecToTermFactory.buildTerms(olSpec.getTermSpecList());
+        List<Term> terms = contextTermFactory.buildTerms(olSpec.getTermSpecList());
         Predicate predicate = predicatesByName.get(olSpec.getPredicateName());
         return new OrdinaryLiteral(new Atom(predicate, terms), olSpec.isPositive());
     }
@@ -30,8 +33,9 @@ public class LiteralFactory {
         Optional<ComparisonOperator> comparisonOperatorOpt = ComparisonOperator.fromSymbol(operator);
         if (comparisonOperatorOpt.isPresent()) {
             checkNumberOfTerms(bilSpec, 2);
-            Term leftTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(0));
-            Term rightTerm = TermSpecToTermFactory.buildTerm(bilSpec.getTermSpecList().get(1));
+            ImmutableTermList terms = contextTermFactory.buildTerms(bilSpec.getTermSpecList());
+            Term leftTerm = terms.get(0);
+            Term rightTerm = terms.get(1);
             ComparisonOperator comparisonOperator = comparisonOperatorOpt.get();
             if (comparisonOperator.equals(ComparisonOperator.EQUALS))
                 return new EqualityComparisonBuiltInLiteral(leftTerm, rightTerm);
@@ -43,7 +47,7 @@ public class LiteralFactory {
             checkEmptyTerms(bilSpec);
             return new BooleanBuiltInLiteral(booleanValue.get());
         } else {
-            return new CustomBuiltInLiteral(bilSpec.getOperator(), TermSpecToTermFactory.buildTerms(bilSpec.getTermSpecList()));
+            return new CustomBuiltInLiteral(bilSpec.getOperator(), contextTermFactory.buildTerms(bilSpec.getTermSpecList()));
         }
     }
 

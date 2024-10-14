@@ -25,6 +25,7 @@ GTE:            '>=';
 
 STRING:         SINGLE_QUOTE | DOUBLE_QUOTE;
 NUMBER:         DECIMAL | FLOAT | REAL;
+UNNAMED_VARIABLE:'_';
 ALPHANUMERIC_WITH_PRIMA: ALPHANUMERIC [']* {if(builtInPredicateNameChecker.isBuiltInPredicateName(getText())) setType(DependencySchemaGrammarParser.BUILTIN_PREDICATE);};
 NEWLINE:        '\r'? '\n';
 WS:             [ \t]+ -> skip ; // toss out whitespace
@@ -64,4 +65,4 @@ negatedAtom: NOT OPENPAR atom CLOSEPAR;
 atom: predicate OPENPAR termsList CLOSEPAR;
 termsList: | term (COMMA term)*;
 predicate: ALPHANUMERIC_WITH_PRIMA;
-term: STRING | NUMBER | ALPHANUMERIC_WITH_PRIMA;
+term: STRING | NUMBER | ALPHANUMERIC_WITH_PRIMA | UNNAMED_VARIABLE;

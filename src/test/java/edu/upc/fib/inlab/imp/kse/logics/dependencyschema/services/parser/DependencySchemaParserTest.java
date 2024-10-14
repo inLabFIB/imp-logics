@@ -2,6 +2,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.parser;
 
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.Dependency;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.DependencySchema;
+import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.EGD;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LiteralAssert;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.assertions.LogicSchemaAssertions;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
@@ -480,4 +481,29 @@ class DependencySchemaParserTest {
             LiteralAssert.assertThat(ordinaryLiteral).hasVariable(0, variableString);
         }
     }
+
+    @Nested
+    class UnnamedVariableTests {
+
+        @Test
+        void should_avoidVariableNameCollisions_InTGD() {
+            String schemaString = "q(u0,_), s(_,u1,_) -> p(_), r(_)";
+
+            DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+            assertThat(dependencySchema).hasDependencies(1);
+        }
+
+        @Test
+        void should_avoidVariableNameCollisions_InEGD() {
+            String schemaString = "q(u0,_), s(_,u1,_) -> _=_";
+
+            DependencySchema dependencySchema = new DependencySchemaParser().parse(schemaString);
+
+            assertThat(dependencySchema).hasDependencies(1);
+            EGD egd = dependencySchema.getAllEGDs().get(0);
+            Assertions.assertThat(egd.getHead().getUsedVariables()).hasSize(2);
+        }
+    }
+
 }
