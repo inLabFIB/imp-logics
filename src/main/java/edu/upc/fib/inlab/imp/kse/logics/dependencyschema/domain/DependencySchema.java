@@ -22,7 +22,7 @@ public class DependencySchema {
      *     <li>All dependencies are defined through predicates of the dependencySchema</li>
      * </ul>
      */
-    private final Map<String, Predicate> predicatesByName = new HashMap<>();
+    private final Map<String, Predicate> predicatesByName = new LinkedHashMap<>();
     private final Set<Dependency> dependencies = new LinkedHashSet<>();
 
     public DependencySchema(Set<Predicate> predicates, Set<Dependency> dependencies) {

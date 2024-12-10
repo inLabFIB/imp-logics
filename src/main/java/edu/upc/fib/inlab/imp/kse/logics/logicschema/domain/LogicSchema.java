@@ -22,8 +22,8 @@ public class LogicSchema {
      *     <li>All the derivation rules defining the predicates are included in this logicSchema</li>
      * </ul>
      */
-    private final Map<String, Predicate> predicatesByName = new HashMap<>();
-    private final Map<ConstraintID, LogicConstraint> constraintsByID = new HashMap<>();
+    private final Map<String, Predicate> predicatesByName = new LinkedHashMap<>();
+    private final Map<ConstraintID, LogicConstraint> constraintsByID = new LinkedHashMap<>();
 
     public LogicSchema(Set<Predicate> predicates, Set<LogicConstraint> constraints) {
         predicates.forEach(predicate -> {
@@ -123,7 +123,7 @@ public class LogicSchema {
      * @return a LevelHierarchy for this schema
      */
     public LevelHierarchy computeLevelHierarchy() {
-        Map<Predicate, Integer> predicateToLevelMap = new HashMap<>();
+        Map<Predicate, Integer> predicateToLevelMap = new LinkedHashMap<>();
         for (Predicate predicate : this.getAllPredicates()) {
             fillPredicateIntoALevel(predicate, predicateToLevelMap);
         }

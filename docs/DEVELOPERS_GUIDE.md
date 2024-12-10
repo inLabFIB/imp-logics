@@ -47,9 +47,14 @@ language some dependency schema is written in (e.g. *linear*, *guarded*, etc).
 In case you want to extend such Analyzer to identify a new Datalog+/- language, please,
 proceed as follows:
 
-1. Extend the enumeration from DatalogPlusMinusAnalyzer::DatalogPlusMinusLanguage to include your language.
-2. Implement a new subclass of DatalogPlusMinusLanguageChecker and implement its abstract methods.
-3. Instantiate such new subclass in the structure DatalogPlusMinusAnalyzer::datalogCheckers
+1. Extend the enumeration from `DatalogPlusMinusAnalyzer::DatalogPlusMinusLanguage` to include your language.
+2. Implement a new subclass of `DatalogPlusMinusLanguageChecker` and implement its abstract methods.
+3. Instantiate such new subclass in the structure `DatalogPlusMinusAnalyzer::datalogCheckers`
+
+## Guidance for use Java Collections
+- Use ordered collections because its traversal is deterministic.
+  - Use `LinkedHashMap.class` instead of `HashMap.class`
+  - Use `LinkedHashSet.class` instead of `HashSet.class`
 
 ## Guidance for creating equals & hashcode
 

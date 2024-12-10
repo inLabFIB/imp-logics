@@ -85,6 +85,7 @@ public abstract class LogicSchemaGrammarToSpecVisitor<T extends LogicConstraintS
 
     @Override
     public TermSpec visitTerm(LogicSchemaGrammarParser.TermContext ctx) {
+        if (ctx.UNNAMED_VARIABLE() != null) return new UnnamedVariableSpec(ctx.getText());
         return stringToTermSpecFactory.createTermSpec(ctx.getText());
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createNewFreshVariableThrowsExceptionForNullVariableNamePrefix() {
             String variableNamePrefix = null;
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("x"));
 
             assertThatThrownBy(() -> NewFreshVariableFactory.createNewFreshVariable(variableNamePrefix, usedVariables))
@@ -46,7 +47,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createEnumeratedNewFreshVariableThrowsExceptionForNullVariableNamePrefix() {
             String variableNamePrefix = null;
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("x"));
 
             assertThatThrownBy(() -> NewFreshVariableFactory.createEnumeratedNewFreshVariable(variableNamePrefix, usedVariables))
@@ -62,7 +63,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createNewFreshVariableReturnsUniqueNameWhenUsedVariablesIsEmpty() {
             String variableNamePrefix = "prefix";
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
 
             Variable result = NewFreshVariableFactory.createNewFreshVariable(variableNamePrefix, usedVariables);
 
@@ -72,7 +73,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createNewFreshVariableReturnsUniqueNameWhenUsedVariablesContainsPrefix() {
             String variableNamePrefix = "var";
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("var"));
 
             Variable result = NewFreshVariableFactory.createNewFreshVariable(variableNamePrefix, usedVariables);
@@ -85,7 +86,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createNewFreshVariableThrowsExceptionForNullPrefix() {
             String variableNamePrefix = null;
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
 
             assertThatThrownBy(() -> NewFreshVariableFactory.createNewFreshVariable(variableNamePrefix, usedVariables))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -99,7 +100,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createEnumeratedNewFreshVariableReturnsEnumeratedNameWhenUsedVariablesContainsVariablePrefix() {
             String variableNamePrefix = "x";
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("x"));
             usedVariables.add(new Variable("y"));
 
@@ -111,7 +112,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createEnumeratedNewFreshVariableReturnsUniqueNameWhenUsedVariablesNotContainsVariableName() {
             String variableNamePrefix = "var";
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("x"));
             usedVariables.add(new Variable("y"));
 
@@ -123,7 +124,7 @@ class NewFreshVariableFactoryTest {
         @Test
         void createEnumeratedNewFreshVariableReturnsUniqueNameWhenUsedVariablesContainsVariableName() {
             String variableNamePrefix = "x";
-            Set<Variable> usedVariables = new HashSet<>();
+            Set<Variable> usedVariables = new LinkedHashSet<>();
             usedVariables.add(new Variable("x0"));
             usedVariables.add(new Variable("x1"));
 

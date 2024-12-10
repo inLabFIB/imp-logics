@@ -3,10 +3,7 @@ package edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers;
 import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.domain.TGD;
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class is the responsible to make the marking of literal positions of the TGDs according to the 2010 25th Annual
@@ -28,7 +25,7 @@ public class StickyMarkingAnalyzer {
     }
 
     static Set<LiteralPosition> getInitialStickyMarking(List<TGD> tgds) {
-        Set<LiteralPosition> initialMarking = new HashSet<>();
+        Set<LiteralPosition> initialMarking = new LinkedHashSet<>();
         for (TGD tgd : tgds) {
             initialMarking.addAll(getInitialStickyMarking(tgd));
         }
@@ -36,7 +33,7 @@ public class StickyMarkingAnalyzer {
     }
 
     private static Set<LiteralPosition> getInitialStickyMarking(TGD tgd) {
-        Set<LiteralPosition> result = new HashSet<>();
+        Set<LiteralPosition> result = new LinkedHashSet<>();
         for (Literal lit : tgd.getBody()) {
             if (lit instanceof OrdinaryLiteral ordinaryLiteral) {
                 for (int position = 0; position < ordinaryLiteral.getArity(); ++position) {
@@ -73,7 +70,7 @@ public class StickyMarkingAnalyzer {
     }
 
     private static Set<LiteralPosition> getStickyMarkingPropagation(TGD tgd, Set<LiteralPosition> initialMarking) {
-        Set<LiteralPosition> result = new HashSet<>(initialMarking);
+        Set<LiteralPosition> result = new LinkedHashSet<>(initialMarking);
         for (Atom atomHead : tgd.getHead()) {
             for (int position = 0; position < atomHead.getTerms().size(); ++position) {
                 Term term = atomHead.getTerms().get(position);

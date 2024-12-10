@@ -7,6 +7,7 @@ import edu.upc.fib.inlab.imp.kse.logics.dependencyschema.services.analyzers.egds
 import edu.upc.fib.inlab.imp.kse.logics.logicschema.domain.*;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
     }
 
     private static Set<PredicatePosition> getPositionsWithExistentialVars(DependencySchema dependencySchema) {
-        Set<PredicatePosition> result = new HashSet<>();
+        Set<PredicatePosition> result = new LinkedHashSet<>();
         for (TGD tgd : dependencySchema.getAllTGDs()) {
             Set<Variable> existentialVariables = tgd.getExistentialVariables();
             if (existentialVariables.isEmpty()) continue;
@@ -98,7 +99,7 @@ public class WeaklyGuardedChecker extends DatalogPlusMinusLanguageChecker {
      * @return the set of affected positions given the initial set of affected positions
      */
     private static Set<PredicatePosition> getAffectedPositions(DependencySchema dependencySchema, Set<PredicatePosition> affectedPositions) {
-        Set<PredicatePosition> newAffectedPositions = new HashSet<>(affectedPositions);
+        Set<PredicatePosition> newAffectedPositions = new LinkedHashSet<>(affectedPositions);
         for (Dependency dependency : dependencySchema.getAllDependencies()) {
             if (dependency instanceof TGD tgd) {
                 Set<Variable> frontierVariables = tgd.getFrontierVariables();

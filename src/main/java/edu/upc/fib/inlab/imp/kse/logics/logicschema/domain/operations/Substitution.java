@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * variable can be mapped, at most, to one term.
  */
 public class Substitution {
-    private Map<Variable, Term> termsMap = new HashMap<>();
+    private Map<Variable, Term> termsMap = new LinkedHashMap<>();
 
     /**
      * Constructs an empty {@code Substitution}.
@@ -28,7 +28,7 @@ public class Substitution {
      */
     public Substitution(Substitution toCopy) {
         if (Objects.isNull(toCopy)) throw new IllegalArgumentException("Input substitution cannot be null");
-        this.termsMap = new HashMap<>(toCopy.termsMap);
+        this.termsMap = new LinkedHashMap<>(toCopy.termsMap);
     }
 
     /**

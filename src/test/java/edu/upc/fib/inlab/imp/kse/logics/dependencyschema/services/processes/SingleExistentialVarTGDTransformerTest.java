@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,7 +97,7 @@ class SingleExistentialVarTGDTransformerTest {
 
         DependencySchema transformedSchema = transformer.execute(schema);
 
-        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toSet());
+        Set<TGD> expectedTGDs = expectedTGDsString.stream().map(TGDMother::createTGD).collect(Collectors.toCollection(LinkedHashSet::new));
 
         assertThat(transformedSchema.getAllTGDs())
                 .usingElementComparator(tgdComparator())
@@ -111,7 +112,7 @@ class SingleExistentialVarTGDTransformerTest {
 
         DependencySchema transformedSchema = transformer.execute(schema);
 
-        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toSet());
+        Set<Dependency> expectedDependencies = expectedTGDsString.stream().map(DependencyMother::buildDependency).collect(Collectors.toCollection(LinkedHashSet::new));
 
         assertThat(transformedSchema.getAllDependencies())
                 .usingElementComparator(dependenciesComparator())

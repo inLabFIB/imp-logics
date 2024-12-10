@@ -100,7 +100,7 @@ public class NonConflictingFDsAnalyzer {
                 .filter(variable -> !universalVariables.contains(variable))
                 .toList();
 
-        Set<Variable> existentialVarsSet = new HashSet<>(existentialVarsList);
+        Set<Variable> existentialVarsSet = new LinkedHashSet<>(existentialVarsList);
         return existentialVarsSet.size() < existentialVarsList.size();
     }
 
