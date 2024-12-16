@@ -69,3 +69,9 @@ project with maven.
 This library is implemented by the IMP research group (https://imp.upc.edu/en), and the innovation
 lab group inLab-FIB (https://inlab.fib.upc.edu/en/), both from Universitat Politècnica de Catalunya - BarcelonaTech
 (https://www.upc.edu/en)
+
+## References
+
+- *IMP-Logics: a metamodel for analysis and transformations of Datalog programs*.
+  José Francisco Crespo, Martí Juanola, Xavier Oriol, Martí Recalde, Ernest Teniente (MODELS Companion
+  2024) (https://dl.acm.org/doi/abs/10.1145/3652620.3687790)
